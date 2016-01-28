@@ -1,0 +1,20 @@
+STACI v2.0
+ (c) BME Dept. of Hydrodynamic Systems
+ (c) C. Hos (csaba.hos@hds.bme.hu)
+ info: www.hds.bme.hu\staci
+
+ date: Tue Nov 18 23:38:45 2014
+
+ input file:anytown_1med.spr
+
+ Number of nodes: 24
+ Number of edges: 44
+
+
+Solving system...
+====================================
+
+ Number of nonzero Jacobian entries: 216 out of 4624 (0%)
+
+
+ok

@@ -1,0 +1,32 @@
+STACI v2.0
+ (c) BME Dept. of Hydrodynamic Systems
+ (c) C. Hos (csaba.hos@hds.bme.hu)
+ info: www.hds.bme.hu\staci
+
+ date: Thu Jul 23 21:30:34 2015
+
+ input file:res_time_test.spr
+
+ Number of nodes: 4
+ Number of edges: 5
+
+
+Solving system...
+====================================
+
+ Number of nonzero Jacobian entries: 21 out of 81 (25.9259%)
+
+ iter. # 0./100 e_mp=2.00e+02,  e_p=3.72e+01  relax.=1.00, relax.mul.=1.20
+ iter. # 1./100 e_mp=0.00e+00,  e_p=9.13e+00  relax.=1.00, relax.mul.=1.20
+ iter. # 2./100 e_mp=0.00e+00,  e_p=2.28e+00  relax.=1.00, relax.mul.=1.20
+ iter. # 3./100 e_mp=3.08e-15,  e_p=5.68e-01  relax.=1.00, relax.mul.=1.20
+ iter. # 4./100 e_mp=0.00e+00,  e_p=1.40e-01  relax.=1.00, relax.mul.=1.20
+ iter. # 5./100 e_mp=0.00e+00,  e_p=3.33e-02  relax.=1.00, relax.mul.=1.20
+ iter. # 6./100 e_mp=0.00e+00,  e_p=6.86e-03  relax.=1.00, relax.mul.=1.20
+ iter. # 7./100 e_mp=0.00e+00,  e_p=8.35e-04  relax.=1.00, relax.mul.=1.20
+
+Computing residence time...
+====================================
+
+
+ok

@@ -1,0 +1,504 @@
+Staci
+BME Hidrodinamikai Rendszerek Tanszek
+Wed Nov 19 10:00:33 2014
+
+
+ Agelem neve  : CHANNEL4
+        tipusa: Csatorna
+        ro    : 1000 [kg/m^3]
+        Aref  : 0.7854 [m^2]
+        mp    : 360 [m3/h]
+  kapcsolodas : NODE2(index:0) ==> NODE3(index:1)
+       adatok : hossz [m]         : 20
+                z eleje [m]       : 1
+                z vege [m]        : 0
+                lejtes [%]        : 5
+                Hmax [m]          : 1
+                erdesseg [mm]     : 0.1
+                lambda [-]        : 0.00198878
+                surl.teny.(n) [-] : 0.0044848
+                geometria tipus   : 1m atmeroju kor keresztmetszet
+                numerikus megoldo beallitasai (db)     : 20
+                klor lebomlasi allando (cl_k)          : 0.016
+                klor lebomlasi allando a falnal (cl_w) : 0
+                debug szint                            : 3
+
+
+(0) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+5.000000e+00m, he=+0.000000e+00m, pv=+5.000000e+00m, hv=+0.000000e+00m, mp=+1.000000e+02
+          ye=+4.000000e+00, ye+ze=+5.000000e+00, yv=+5.000000e+00, yv+zv=+5.000000e+00
+
+	teltszelveny eset: ye=+4.000000e+00m > D �s yv=+5.000000e+00m >D
+
+	  * f sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -0.000330506
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -0.000329845
+
+
+	      f  = -3.305059e-04
+	 df/dye  = +1.000000e+00
+	 df/dyv  = -1.000000e+00
+	 df/dmp  = -6.606813e-06
+
+(1) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+5.000000e+00m, he=+0.000000e+00m, pv=+5.000000e+00m, hv=+0.000000e+00m, mp=+1.000000e+02
+          ye=+4.000000e+00, ye+ze=+5.000000e+00, yv=+5.000000e+00, yv+zv=+5.000000e+00
+
+	teltszelveny eset: ye=+4.000000e+00m > D �s yv=+5.000000e+00m >D
+
+	  * f sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -0.000330506
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -0.000329845
+
+
+	      f  = -3.305059e-04
+	 df/dye  = +1.000000e+00
+	 df/dyv  = -1.000000e+00
+	 df/dmp  = -6.606813e-06
+
+(2) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+4.580000e+00m, he=+0.000000e+00m, pv=+4.460000e+00m, hv=+0.000000e+00m, mp=+1.825707e+04
+          ye=+3.580000e+00, ye+ze=+4.580000e+00, yv=+4.460000e+00, yv+zv=+4.460000e+00
+
+	teltszelveny eset: ye=+3.580000e+00m > D �s yv=+4.460000e+00m >D
+
+	  * f sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -10.8964
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -10.8744
+
+
+	      f  = -1.089644e+01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = -1.000000e+00
+	 df/dmp  = -1.206210e-03
+
+(3) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+4.136480e+00m, he=+0.000000e+00m, pv=+3.889760e+00m, hv=+0.000000e+00m, mp=+1.706128e+04
+          ye=+3.136480e+00, ye+ze=+4.136480e+00, yv=+3.889760e+00, yv+zv=+3.889760e+00
+
+	teltszelveny eset: ye=+3.136480e+00m > D �s yv=+3.889760e+00m >D
+
+	  * f sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -9.37389
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -9.35466
+
+
+	      f  = -9.373889e+00
+	 df/dye  = +1.000000e+00
+	 df/dyv  = -1.000000e+00
+	 df/dmp  = -1.127207e-03
+
+(4) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+3.680896e+00m, he=+0.000000e+00m, pv=+3.304009e+00m, hv=+0.000000e+00m, mp=+1.573975e+04
+          ye=+2.680896e+00, ye+ze=+3.680896e+00, yv=+3.304009e+00, yv+zv=+3.304009e+00
+
+	teltszelveny eset: ye=+2.680896e+00m > D �s yv=+3.304009e+00m >D
+
+	  * f sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -7.81106
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -7.79469
+
+
+	      f  = -7.811057e+00
+	 df/dye  = +1.000000e+00
+	 df/dyv  = -1.000000e+00
+	 df/dmp  = -1.039896e-03
+
+(5) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+3.228666e+00m, he=+0.000000e+00m, pv=+2.722570e+00m, hv=+0.000000e+00m, mp=+1.430644e+04
+          ye=+2.228666e+00, ye+ze=+3.228666e+00, yv=+2.722570e+00, yv+zv=+2.722570e+00
+
+	teltszelveny eset: ye=+2.228666e+00m > D �s yv=+2.722570e+00m >D
+
+	  * f sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -6.25851
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -6.24499
+
+
+	      f  = -6.258509e+00
+	 df/dye  = +1.000000e+00
+	 df/dyv  = -1.000000e+00
+	 df/dmp  = -9.451997e-04
+
+(6) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+2.798518e+00m, he=+0.000000e+00m, pv=+2.169524e+00m, hv=+0.000000e+00m, mp=+1.278886e+04
+          ye=+1.798518e+00, ye+ze=+2.798518e+00, yv=+2.169524e+00, yv+zv=+2.169524e+00
+
+	teltszelveny eset: ye=+1.798518e+00m > D �s yv=+2.169524e+00m >D
+
+	  * f sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -4.77659
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -4.76579
+
+
+	      f  = -4.776591e+00
+	 df/dye  = +1.000000e+00
+	 df/dyv  = -1.000000e+00
+	 df/dmp  = -8.449359e-04
+
+(7) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+2.410783e+00m, he=+0.000000e+00m, pv=+1.671006e+00m, hv=+0.000000e+00m, mp=+1.123193e+04
+          ye=+1.410783e+00, ye+ze=+2.410783e+00, yv=+1.671006e+00, yv+zv=+1.671006e+00
+
+	teltszelveny eset: ye=+1.410783e+00m > D �s yv=+1.671006e+00m >D
+
+	  * f sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -3.42977
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -3.42143
+
+
+	      f  = -3.429766e+00
+	 df/dye  = +1.000000e+00
+	 df/dyv  = -1.000000e+00
+	 df/dmp  = -7.420729e-04
+
+(8) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+2.084433e+00m, he=+0.000000e+00m, pv=+1.251414e+00m, hv=+0.000000e+00m, mp=+9.701487e+03
+          ye=+1.084433e+00, ye+ze=+2.084433e+00, yv=+1.251414e+00, yv+zv=+1.251414e+00
+
+	teltszelveny eset: ye=+1.084433e+00m > D �s yv=+1.251414e+00m >D
+
+	  * f sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -2.27766
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:1
+			 f = (ze+ye)-(zv+yv)-dp = -2.27145
+
+
+	      f  = -2.277664e+00
+	 df/dye  = +1.000000e+00
+	 df/dyv  = -1.000000e+00
+	 df/dmp  = -6.409590e-04
+
+(9) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+1.833137e+00m, he=+0.000000e+00m, pv=+9.283195e-01m, hv=+0.000000e+00m, mp=+8.285554e+03
+          ye=+8.331374e-01, ye+ze=+1.833137e+00, yv=+9.283195e-01, yv+zv=+9.283195e-01
+
+		Norm�lszint(ek):
+			yn1 = +5.194464e-01 m
+
+		Kritikus szint: yc = +9.988009e-01 m
+
+	2.a.ii. eset: ye=+8.331374e-01 m >0, mp=+8.285554e+03 kg/s >0, yn<yc
+		(1 db norm�lszint: yn=+5.194464e-01 m < yc=+9.988009e-01 m)
+
+	  * f sz�m�t�sa:
+		  f_2aii: yn<ykrit, integr�l�s ir�nya: -->
+
+		Kritikus szint: yc = +9.988009e-01 m
+
+		Norm�lszint(ek):
+			yn1 = +5.194464e-01 m
+			 o !!! ye=0.833137 < ykrit=0.998801,  jac[1]=0
+			 f = ye-yn = 0.313691
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:
+		  f_2aii: yn<ykrit, integr�l�s ir�nya: -->
+
+		Kritikus szint: yc = +9.987961e-01 m
+
+		Norm�lszint(ek):
+			yn1 = +5.191351e-01 m
+			 o !!! ye=0.833137 < ykrit=0.998796,  jac[1]=0
+			 f = ye-yn = 0.314002
+
+
+	      f  = +3.136910e-01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -3.757829e-05
+
+(10) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+1.661246e+00m, he=+0.000000e+00m, pv=+7.073161e-01m, hv=+0.000000e+00m, mp=+8.018539e+03
+          ye=+6.612458e-01, ye+ze=+1.661246e+00, yv=+7.073161e-01, yv+zv=+7.073161e-01
+
+		Norm�lszint(ek):
+			yn1 = +5.093932e-01 m
+
+		Kritikus szint: yc = +9.986329e-01 m
+
+	2.a.ii. eset: ye=+6.612458e-01 m >0, mp=+8.018539e+03 kg/s >0, yn<yc
+		(1 db norm�lszint: yn=+5.093932e-01 m < yc=+9.986329e-01 m)
+
+	  * f sz�m�t�sa:
+		  f_2aii: yn<ykrit, integr�l�s ir�nya: -->
+
+		Kritikus szint: yc = +9.986329e-01 m
+
+		Norm�lszint(ek):
+			yn1 = +5.093932e-01 m
+			 o !!! ye=0.661246 < ykrit=0.998633,  jac[1]=0
+			 f = ye-yn = 0.151853
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:
+		  f_2aii: yn<ykrit, integr�l�s ir�nya: -->
+
+		Kritikus szint: yc = +9.986274e-01 m
+
+		Norm�lszint(ek):
+			yn1 = +5.090907e-01 m
+			 o !!! ye=0.661246 < ykrit=0.998627,  jac[1]=0
+			 f = ye-yn = 0.152155
+
+
+	      f  = +1.518526e-01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -3.773300e-05
+
+(11) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+1.561407e+00m, he=+0.000000e+00m, pv=+5.789514e-01m, hv=+0.000000e+00m, mp=+7.864403e+03
+          ye=+5.614067e-01, ye+ze=+1.561407e+00, yv=+5.789514e-01, yv+zv=+5.789514e-01
+
+		Norm�lszint(ek):
+			yn1 = +5.035697e-01 m
+
+		Kritikus szint: yc = +9.985224e-01 m
+
+	2.a.ii. eset: ye=+5.614067e-01 m >0, mp=+7.864403e+03 kg/s >0, yn<yc
+		(1 db norm�lszint: yn=+5.035697e-01 m < yc=+9.985224e-01 m)
+
+	  * f sz�m�t�sa:
+		  f_2aii: yn<ykrit, integr�l�s ir�nya: -->
+
+		Kritikus szint: yc = +9.985224e-01 m
+
+		Norm�lszint(ek):
+			yn1 = +5.035697e-01 m
+			 o !!! ye=0.561407 < ykrit=0.998522,  jac[1]=0
+			 f = ye-yn = 0.057837
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:
+		  f_2aii: yn<ykrit, integr�l�s ir�nya: -->
+
+		Kritikus szint: yc = +9.985165e-01 m
+
+		Norm�lszint(ek):
+			yn1 = +5.032721e-01 m
+			 o !!! ye=0.561407 < ykrit=0.998517,  jac[1]=0
+			 f = ye-yn = 0.0581346
+
+
+	      f  = +5.783699e-02
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -3.783784e-05
+
+(12) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+1.515781e+00m, he=+0.000000e+00m, pv=+5.202899e-01m, hv=+0.000000e+00m, mp=+7.794306e+03
+          ye=+5.157810e-01, ye+ze=+1.515781e+00, yv=+5.202899e-01, yv+zv=+5.202899e-01
+
+		Norm�lszint(ek):
+			yn1 = +5.009158e-01 m
+
+		Kritikus szint: yc = +9.984685e-01 m
+
+	2.a.ii. eset: ye=+5.157810e-01 m >0, mp=+7.794306e+03 kg/s >0, yn<yc
+		(1 db norm�lszint: yn=+5.009158e-01 m < yc=+9.984685e-01 m)
+
+	  * f sz�m�t�sa:
+		  f_2aii: yn<ykrit, integr�l�s ir�nya: -->
+
+		Kritikus szint: yc = +9.984685e-01 m
+
+		Norm�lszint(ek):
+			yn1 = +5.009158e-01 m
+			 o !!! ye=0.515781 < ykrit=0.998469,  jac[1]=0
+			 f = ye-yn = 0.0148652
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:
+		  f_2aii: yn<ykrit, integr�l�s ir�nya: -->
+
+		Kritikus szint: yc = +9.984624e-01 m
+
+		Norm�lszint(ek):
+			yn1 = +5.006205e-01 m
+			 o !!! ye=0.515781 < ykrit=0.998462,  jac[1]=0
+			 f = ye-yn = 0.0151605
+
+
+	      f  = +1.486521e-02
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -3.788934e-05
+
+(13) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+1.501711e+00m, he=+0.000000e+00m, pv=+5.021992e-01m, hv=+0.000000e+00m, mp=+7.772756e+03
+          ye=+5.017105e-01, ye+ze=+1.501711e+00, yv=+5.021992e-01, yv+zv=+5.021992e-01
+
+		Norm�lszint(ek):
+			yn1 = +5.000992e-01 m
+
+		Kritikus szint: yc = +9.984515e-01 m
+
+	2.a.ii. eset: ye=+5.017105e-01 m >0, mp=+7.772756e+03 kg/s >0, yn<yc
+		(1 db norm�lszint: yn=+5.000992e-01 m < yc=+9.984515e-01 m)
+
+	  * f sz�m�t�sa:
+		  f_2aii: yn<ykrit, integr�l�s ir�nya: -->
+
+		Kritikus szint: yc = +9.984515e-01 m
+
+		Norm�lszint(ek):
+			yn1 = +5.000992e-01 m
+			 o !!! ye=0.501711 < ykrit=0.998451,  jac[1]=0
+			 f = ye-yn = 0.00161135
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:
+		  f_2aii: yn<ykrit, integr�l�s ir�nya: -->
+
+		Kritikus szint: yc = +9.984453e-01 m
+
+		Norm�lszint(ek):
+			yn1 = +4.998045e-01 m
+			 o !!! ye=0.501711 < ykrit=0.998445,  jac[1]=0
+			 f = ye-yn = 0.00190598
+
+
+	      f  = +1.611350e-03
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -3.790557e-05
+
+(14) f kiertekelese
+-----------------------------------------
+  Adatok: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+5.000000e-01m, hv=+0.000000e+00m, mp=+7.770140e+03
+          ye=+5.000000e-01, ye+ze=+1.500000e+00, yv=+5.000000e-01, yv+zv=+5.000000e-01
+
+		Norm�lszint(ek):
+			yn1 = +5.000000e-01 m
+
+		Kritikus szint: yc = +9.984494e-01 m
+
+	2.a.ii. eset: ye=+5.000000e-01 m >0, mp=+7.770140e+03 kg/s >0, yn<yc
+		(1 db norm�lszint: yn=+5.000000e-01 m < yc=+9.984494e-01 m)
+
+	  * f sz�m�t�sa:
+		  f_2aii: yn<ykrit, integr�l�s ir�nya: -->
+
+		Kritikus szint: yc = +9.984494e-01 m
+
+		Norm�lszint(ek):
+			yn1 = +5.000000e-01 m
+			 o !!! ye=0.5 < ykrit=0.998449,  jac[1]=0
+			 f = ye-yn = -5.09037e-09
+
+	  * df/dye sz�m�t�sa:
+
+	  * df/dyv sz�m�t�sa:
+
+	  * df/dmp sz�m�t�sa:
+		  f_2aii: yn<ykrit, integr�l�s ir�nya: -->
+
+		Kritikus szint: yc = +9.984432e-01 m
+
+		Norm�lszint(ek):
+			yn1 = +4.997055e-01 m
+			 o !!! ye=0.5 < ykrit=0.998443,  jac[1]=0
+			 f = ye-yn = 0.000294542
+
+
+	      f  = -5.090370e-09
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -3.790758e-05
+
+	Eredmeny adatok epitese...
+
+		 ye+ze = 1.5m, ye=0.5m
+		 yv+zv = 0.5m, yv=0.5m
+		 mp    = 7770.14kg/s
+		 eset  : 2.a.ii.
+		 eredmeny adatvektorok hossza : 0
+
+
+ Eredmenyvektorok:
+
+
+	  i    	   x[m]   	   yf[m]   	   yf+D[m]   	   y[m]   	   p[v.o.m.]   	   yf+p[m]

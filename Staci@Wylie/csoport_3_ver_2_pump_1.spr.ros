@@ -1,0 +1,20 @@
+STACI v2.0
+ (c) BME Dept. of Hydrodynamic Systems
+ (c) C. Hos (csaba.hos@hds.bme.hu)
+ info: www.hds.bme.hu\staci
+
+ date: Fri Sep 19 16:50:35 2014
+
+ input file:csoport_3_ver_2_pump_1.spr
+
+ Number of nodes: 10
+ Number of edges: 16
+
+
+Szamitas
+====================================
+
+ Number of nonzero Jacobian entries: 74 out of 676 (0%)
+
+
+ok

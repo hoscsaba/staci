@@ -1,0 +1,18 @@
+STACI v2.0
+ (c) BME Dept. of Hydrodynamic Systems
+ (c) C. Hos (csaba.hos@hds.bme.hu)
+ info: www.hds.bme.hu\staci
+
+ date: Thu Sep 25 16:07:45 2014
+
+ input file:LOV-SOPRKV-1-input.spr
+
+ Number of nodes: 624
+ Number of edges: 633
+
+ Azonos ID-k keresese....
+---------------------------	 ok.
+
+ Rendszer epitese
+---------------------------
+!!! Nincs meg a PIPE1 agelem eleji csomopont!

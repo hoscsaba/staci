@@ -1,0 +1,17 @@
+STACI v2.0
+ (c) BME Dept. of Hydrodynamic Systems
+ (c) C. Hos (csaba.hos@hds.bme.hu)
+ info: www.hds.bme.hu\staci
+
+ date: Wed Nov 19 10:00:33 2014
+
+ input file:nyf_teszt.spr
+
+ Number of nodes: 2
+ Number of edges: 3
+
+
+Solving system...
+====================================
+
+ Number of nonzero Jacobian entries: 11 out of 25 (0%)

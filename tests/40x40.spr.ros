@@ -1,0 +1,25 @@
+STACI v2.0
+ (c) BME Dept. of Hydrodynamic Systems
+ (c) C. Hos (csaba.hos@hds.bme.hu)
+ info: www.hds.bme.hu\staci
+
+ date: Tue Nov 18 23:38:05 2014
+
+ input file:40x40.spr
+
+ Number of nodes: 1600
+ Number of edges: 3121
+
+
+Solving system...
+====================================
+
+ Number of nonzero Jacobian entries: 15603 out of 22287841 (0%)
+
+ iter. # 0./100 e_mp=1.28e+03,  e_p=5.28e+03  relax.=1.00, relax.mul.=1.20
+ iter. # 1./100 e_mp=5.39e-13,  e_p=5.21e+03  relax.=1.00, relax.mul.=1.20
+ iter. # 2./100 e_mp=8.81e-15,  e_p=8.89e-02  relax.=1.00, relax.mul.=1.20
+ iter. # 3./100 e_mp=9.75e-15,  e_p=8.84e-03  relax.=1.00, relax.mul.=1.20
+ iter. # 4./100 e_mp=5.33e-15,  e_p=9.34e-04  relax.=1.00, relax.mul.=1.20
+
+ok

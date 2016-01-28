@@ -1,0 +1,39 @@
+STACI v2.0
+ (c) BME Dept. of Hydrodynamic Systems
+ (c) C. Hos (csaba.hos@hds.bme.hu)
+ info: www.hds.bme.hu\staci
+
+ date: Wed Sep  2 21:06:31 2015
+
+ input file:proba1.spr
+
+ Number of nodes: 2
+ Number of edges: 3
+
+
+Solving system...
+====================================
+
+ Number of nonzero Jacobian entries: 11 out of 25 (44%)
+
+ iter. # 0./100 e_mp=2.00e+02,  e_p=2.68e+01  relax.=0.10, relax.mul.=1.20
+ iter. # 1./100 e_mp=1.76e+02,  e_p=2.36e+01  relax.=0.12, relax.mul.=1.20
+ iter. # 2./100 e_mp=1.51e+02,  e_p=2.03e+01  relax.=0.14, relax.mul.=1.20
+ iter. # 3./100 e_mp=1.25e+02,  e_p=1.70e+01  relax.=0.17, relax.mul.=1.20
+ iter. # 4./100 e_mp=9.88e+01,  e_p=1.36e+01  relax.=0.21, relax.mul.=1.20
+ iter. # 5./100 e_mp=7.42e+01,  e_p=1.04e+01  relax.=0.25, relax.mul.=1.20
+ iter. # 6./100 e_mp=5.20e+01,  e_p=7.53e+00  relax.=0.30, relax.mul.=1.20
+ iter. # 7./100 e_mp=3.34e+01,  e_p=5.05e+00  relax.=0.36, relax.mul.=1.20
+ iter. # 8./100 e_mp=1.90e+01,  e_p=3.10e+00  relax.=0.43, relax.mul.=1.20
+ iter. # 9./100 e_mp=9.21e+00,  e_p=1.69e+00  relax.=0.52, relax.mul.=1.20
+ iter. # 10./100 e_mp=3.51e+00,  e_p=7.90e-01  relax.=0.62, relax.mul.=1.20
+ iter. # 11./100 e_mp=9.02e-01,  e_p=2.97e-01  relax.=0.74, relax.mul.=1.20
+ iter. # 12./100 e_mp=9.77e-02,  e_p=7.57e-02  relax.=0.89, relax.mul.=1.20
+ iter. # 13./100 e_mp=0.00e+00,  e_p=8.05e-03  relax.=1.00, relax.mul.=1.20
+ iter. # 14./100 e_mp=0.00e+00,  e_p=1.47e-04  relax.=1.00, relax.mul.=1.20
+
+Computing residence time...
+====================================
+
+
+ok

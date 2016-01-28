@@ -1,0 +1,540 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"sur",
+				"surlodas"
+			],
+			[
+				"fricion_",
+				"friction_model_type"
+			],
+			[
+				"get",
+				"getline"
+			],
+			[
+				"Get",
+				"Get_Tipus"
+			],
+			[
+				"he",
+				"headloss"
+			],
+			[
+				"Set",
+				"Set_head_loss"
+			],
+			[
+				"agelem",
+				"agelemek"
+			],
+			[
+				"Q_mere",
+				"Q_meres_corr_5"
+			],
+			[
+				"mass",
+				"mass_flow_rate"
+			],
+			[
+				"mdot",
+				"mdot_profile"
+			],
+			[
+				"mp",
+				"mpref"
+			],
+			[
+				"pe",
+				"pendprime"
+			],
+			[
+				"PAR",
+				"PARGAMMA"
+			],
+			[
+				"Q",
+				"Q_CFD"
+			],
+			[
+				"dp",
+				"dp_CFD"
+			],
+			[
+				"dp_",
+				"dp_meres"
+			],
+			[
+				"valve",
+				"valve_type"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "Szivattyu.cpp",
+			"settings":
+			{
+				"buffer_size": 6423,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "VisszacsapoSzelep.cpp",
+			"settings":
+			{
+				"buffer_size": 2894,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 332.0,
+		"selected_items":
+		[
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 579.0
+	},
+	"console":
+	{
+		"height": 139.0,
+		"history":
+		[
+			"import urllib.request,os; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); open(os.path.join(ipp, pf), 'wb').write(urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ','%20')).read())"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/Cso.cpp",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/Szivattyu.h",
+		"/home/hoscsaba/Dropbox/staci/plot_pump_curve.m",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/Staci.cpp",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/staci_main.cpp",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/Cso.h",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/VisszacsapoSzelep.cpp",
+		"/home/hoscsaba/Dropbox/staci/projektek/bjg/Richmond_part_epa.spr",
+		"/home/hoscsaba/Dropbox/staci/projektek/bjg/Richmond_part2_epa.spr",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/Richmond_skeleton_epa_mod11.spr",
+		"/home/hoscsaba/Dropbox/Default (Linux).sublime-keymap",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/Richmond_skeleton_epa_mod9.spr",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/Richmond_skeleton_epa_mod8.spr",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/anytown_exeter_epa.spr",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/Richmond_skeleton_epa.spr",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/anytown_exeter_epa.spr.ros",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/anytown_vegleges_HW.spr",
+		"/home/hoscsaba/Dropbox/Oktatas/ÁTG/fóliák 2014/1-Bevezetés,tematika/1_bevezetes_tematika.tex",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/data_io.cpp",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/Staci.h",
+		"/home/hoscsaba/Dropbox/ize.txt",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/anytown_vegleges.spr",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/Agelem.h",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/Agelem.cpp",
+		"/home/hoscsaba/Dropbox/Grundfos (1)/opti/cscvn_example.m",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/foviz_alapzona_1.spr",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/anytown.spr",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/out.dat",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/teszt1.spr",
+		"/home/hoscsaba/Dropbox/staci/kod/new_staci/xmlParser.cpp",
+		"/home/hoscsaba/.config/sublime-text-3/Packages/User/Default (Linux).sublime-keymap",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/Matlab/Tests/process_runs.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/Matlab/Tests/1E2_m_1/show_runs.m",
+		"/home/hoscsaba/Dropbox/Grundfos (1)/opti/ga_example.m",
+		"/home/hoscsaba/Oktatas/ATG/iATG/source/iatg/src/AtgKompresszio.java",
+		"/home/hoscsaba/Oktatas/ATG/iATG/source/iatg/src/HelloWorld.java",
+		"/home/hoscsaba/Oktatas/ATG/iATG/source/iatg/src/HelloWorld.html",
+		"/home/hoscsaba/Dropbox/Oktatas/UFPN/lecture_notes/UFPN_lecture_notes.tex",
+		"/home/hoscsaba/Letöltések/Orphan Black Season 1/Orphan.Black.S01E01.HDTV.x264-2HD_en.srt",
+		"/home/hoscsaba/Oktatas/ATG/iATG/source/iatg/bin/java.policy.applet",
+		"/home/hoscsaba/Dropbox/Cell sorter/cell_sorter_kiert.m",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_5_(inerter)/Matlab/Tests/04/GDM_stab_driver2.m",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_5_(inerter)/Matlab/GDM/GDM.m",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_5_(inerter)/Matlab/GDM/GEN_ExtractResult.m",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_5_(inerter)/Matlab/Tests/04/GEN_DefineData.m",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_5_(inerter)/Matlab/Tests/04/show_runs.m",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_5_(inerter)/Matlab/Tests/04/GDM_3L4_L_.dat",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_5_(inerter)/Matlab/Tests/03/GDM_stab_driver2.m",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_5_(inerter)/Matlab/GDM/GEN_GetValveEqulibrium.m",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_5_(inerter)/Matlab/Tests/03/GDM_driver.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/GDM/GDM.m",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_5_(inerter)/Matlab/Tests/03/GDM_stab_driver.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/Tests/02/GEN_DefineData.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/Tests/02/GDM_stab_driver.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/Tests/02/GDM_driver.m",
+		"/home/hoscsaba/Dropbox/2013_pentair_phase_2/Extra_stuff/Auto/nwm/nwm.f90",
+		"/home/hoscsaba/Dropbox/2013_pentair_phase_2/Extra_stuff/Auto/nwm_friction/nwm.f90",
+		"/home/hoscsaba/Dropbox/2013_pentair_phase_2/Extra_stuff/Auto/nwm/csaba/nWM_for_AUTO.txt",
+		"/home/hoscsaba/Dropbox/2013_pentair_phase_2/Extra_stuff/Auto/nwm/csaba/nwm.f90",
+		"/home/hoscsaba/.bashrc",
+		"/home/hoscsaba/Dropbox/2013_pentair_phase_2/Extra_stuff/Auto/nwm/csaba/nWM_for_AUTO_BB1_lin.txt",
+		"/home/hoscsaba/Munka/2014_01_Nimco_controls/intro_pres/NIMCO_intro_pres.tex",
+		"/home/hoscsaba/Dropbox/Munka/API_paper_2013_fall/Extra_stuff/Auto/nwm/nwm.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/Tests/01/GEN_DefineData.m",
+		"/home/hoscsaba/Dropbox/Munka/API_paper_2013_fall/Extra_stuff/asympt.m",
+		"/home/hoscsaba/Dropbox/Munka/API_paper_2013_fall/Presentation/Presentation/beamerPentair.sty",
+		"/home/hoscsaba/Oktatas/ATG/TAMOP/interaktiv_animaciok/AtgAxialisSebessegiHaromszog.class",
+		"/home/hoscsaba/Oktatas/PhD/BCs/DISS_ListofTheses_magyar.tex",
+		"/home/hoscsaba/Oktatas/PhD/BCs/Dissertation.tex",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/GDM/GEN_ExtractResult.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/Tests/01/GDM_driver.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/GDM/GDM_GetMassFlowProfile.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/GDM/GDM_GetDataNeededForGDM.m",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_4/matlab_GDM/GDM.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/GDM_QWM_gas_thread_no3/GDM.m",
+		"/home/hoscsaba/Dropbox/Munka/2013_Pentair_Phase_2/Time_series_comparison/GDM.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/GDM/GEN_InitialiseFigures.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/GDM/GEN_PlotAll.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/GDM/tmp_sim.dat",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/GDM/tmp.dat",
+		"/home/hoscsaba/Dropbox/staci/projektek/wdss/out.dat",
+		"/home/hoscsaba/Dropbox/staci/projektek/wdss/wdss.py",
+		"/home/hoscsaba/Dropbox/staci/projektek/wdss/anytown_vegleges.spr",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/GDM/GEN_ConvertAndStoreData.m",
+		"/home/hoscsaba/Munka/2013_Pentair_Phase_2/000_M5_Inerter_modeling/GDM/driver.m",
+		"/home/hoscsaba/Tudomany/2014_01_Aszodi_Nukleon_biralat/2014_01_Nukleon_SCWR-FQT_biralat.tex",
+		"/usr/share/applications/sublimetext3.desktop",
+		"/home/hoscsaba/Dropbox/Cell sorter/Üres/cell_sorter_ures_alap_20_microlps_001.out",
+		"/home/hoscsaba/Oktatas/Diploma/2013_Fedor_Gabor_RezgoKup/CFX/rezgokup60mm16f/rezgokup60mm16f_001.out",
+		"/home/hoscsaba/Dropbox/staci/projektek/jarmi_wdss/anytown_vegleges_0p1.dat",
+		"/home/hoscsaba/Oktatas/FluidFlowStability/hf_2013/FülePéter_RayleighBenard/solveVars.m",
+		"/home/hoscsaba/Oktatas/FluidFlowStability/hf_2013/FülePéter_RayleighBenard/varsys.m",
+		"/home/hoscsaba/Oktatas/Diploma/2013_12_Csippa_Benjamin_EGI_CFD_biralat/2013_12_Csippa_Benjamin_EGI_CFD_biralat.tex",
+		"/home/hoscsaba/Oktatas/Diploma/2013_Boros_Csanad_Ors_Buborekos_Aramlas/2013_12_Boros_Csanad_Buborekos_Aramlas_biralat.tex",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_4/Pentair_m4_doc.tex",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_4/matlab_GDM/GDM_GetDataNeededForGDM.m",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_4/matlab_GDM/GEN_ConvertAndStoreData.m",
+		"/home/hoscsaba/Dropbox/Munka/Pentair_Report_Phase_2_Milestone_4/matlab_GDM/GEN_DefineData.m",
+		"/home/hoscsaba/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
+		"/home/hoscsaba/.config/sublime-text-3/Packages/SideBarEnhancements/CHANGELOG"
+	],
+	"find":
+	{
+		"height": 37.0
+	},
+	"find_in_files":
+	{
+		"height": 95.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"relax",
+			"hali",
+			"v_min",
+			"kepek/",
+			"f_count",
+			"size",
+			"length",
+			"headloss",
+			"head_",
+			"sett",
+			"iter",
+			"fric",
+			"Cso",
+			"cso",
+			"p_init",
+			"init",
+			"izentr",
+			"pause",
+			"do_plot=",
+			"mdot_pro",
+			"mdot_in",
+			"valve_",
+			"compute",
+			"Sqrt(pend)",
+			"L-pip",
+			"valve_type",
+			"valve_ty",
+			"pause",
+			"do_plot=",
+			"pause",
+			"at ",
+			"at",
+			"t_profile",
+			"function",
+			"simID",
+			"otka",
+			"valve_type",
+			"lax-wen",
+			"beta",
+			"lax-wen",
+			"todo"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			" ",
+			"PP",
+			"dfile"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "Szivattyu.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6423,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								4776,
+								4776
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close"
+							],
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2436.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "VisszacsapoSzelep.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2894,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								702,
+								702
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close"
+							],
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 33.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 331.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "new_staci.sublime-project",
+	"replace":
+	{
+		"height": 66.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 256.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
