@@ -417,7 +417,7 @@ void Staci::build_system()
     bool stop = false;
 
     logfile_write("\n Azonos ID-k keresese....",
-                  3);
+      3);
     // ELEMEK
     string nev1, nev2;
     //int szam = 0;
@@ -508,7 +508,7 @@ void Staci::build_system()
         {
             strstrm.str("");
             strstrm << "\n!!! Nincs meg a " << agelemek[i]->Get_nev()
-                    << " agelem eleji csomopont!";
+            << " agelem eleji csomopont!";
             logfile_write(strstrm.str(), 1);
 //            cout << strstrm.str();
             StaciException csphiba(strstrm.str());
@@ -535,7 +535,7 @@ void Staci::build_system()
 //                      logfile_write(strstrm.str(), 3);
 //                      cout<<strstrm.str();
                 if ((agelemek[i]->Get_Cspv_Nev()).compare(cspok[j]->Get_nev())
-                        == 0)
+                    == 0)
                 {
                     v_megvan = true;
                     cspv = j;
@@ -554,7 +554,7 @@ void Staci::build_system()
             {
                 strstrm.str("");
                 strstrm << "\n!!! Nincs meg a " << agelemek[i]->Get_nev()
-                        << " agelem vegi csomopont!";
+                << " agelem vegi csomopont!";
                 //      logfile_write(strstrm.str(), 1);
                 cout << strstrm.str();
             }
@@ -737,11 +737,11 @@ string Staci::list_results()
     strstrm << endl << endl << "EREDMENYEK:";
     for (unsigned int i = 0; i < agelemek.size(); i++)
         strstrm << endl << "\t" << agelemek[i]->Get_nev() << ":\tmp=" << agelemek[i]->Get_mp() << " kg/s" << "\tQ=" << (3600 * (agelemek[i]->Get_Q())) << " m3/h" << "\tv="
-                << agelemek[i]->Get_v() << " m/s";
+    << agelemek[i]->Get_v() << " m/s";
     strstrm << endl << "\t" << "-----------------------------------------------------------------";
     for (unsigned int i = 0; i < cspok.size(); i++)
         strstrm << endl << "\t" << cspok[i]->Get_nev() << ":\t p=" << cspok[i]->Get_p() * 1000 * 9.81 / 1e5 << " bar" << "\tH=" << cspok[i]->Get_p() << " m" << ",   H+magassag="
-                << cspok[i]->Get_p() + cspok[i]->Get_h() << " m";
+    << cspok[i]->Get_p() + cspok[i]->Get_h() << " m";
     strstrm << endl << endl;
     return strstrm.str();
 }
@@ -812,86 +812,86 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern)
     /*for (int i = 0; i < N; i++)
         for (int j = 0; j < N; j++)
             m_jac[i][j] = 0.0;*/
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
-        if (agelemek[i]->Get_Csp_db() == 1)
-        {
-            pevhev[0] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_p();
-            pevhev[1] = 0.0;
-            pevhev[2] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
-            pevhev[3] = 0.0;
-        }
-        else
-        {
-            pevhev[0] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_p();
-            pevhev[1] = cspok[agelemek[i]->Get_Cspv_Index()]->Get_p();
-            pevhev[2] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
-            pevhev[3] = cspok[agelemek[i]->Get_Cspv_Index()]->Get_h();
-        }
-        f[i] = agelemek[i]->f(pevhev);
-        jv = agelemek[i]->df(pevhev);
+            for (unsigned int i = 0; i < agelemek.size(); i++)
+            {
+                if (agelemek[i]->Get_Csp_db() == 1)
+                {
+                    pevhev[0] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_p();
+                    pevhev[1] = 0.0;
+                    pevhev[2] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
+                    pevhev[3] = 0.0;
+                }
+                else
+                {
+                    pevhev[0] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_p();
+                    pevhev[1] = cspok[agelemek[i]->Get_Cspv_Index()]->Get_p();
+                    pevhev[2] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
+                    pevhev[3] = cspok[agelemek[i]->Get_Cspv_Index()]->Get_h();
+                }
+                f[i] = agelemek[i]->f(pevhev);
+                jv = agelemek[i]->df(pevhev);
         //cout<<endl<<jv;
         //pevhev.clear();
 
-        Q_indx = i;
-        pe_indx = agelemek[i]->Get_Cspe_Index();
-        pv_indx = agelemek[i]->Get_Cspv_Index();
+                Q_indx = i;
+                pe_indx = agelemek[i]->Get_Cspe_Index();
+                pv_indx = agelemek[i]->Get_Cspv_Index();
 
-        m_jac[i][agelemek.size() + pe_indx] = jv.at(0);
-        if (create_sparse_pattern)
-        {
-            m_is_element_empty[i][agelemek.size() + pe_indx] = false;
-            m_nnz++;
-        }
+                m_jac[i][agelemek.size() + pe_indx] = jv.at(0);
+                if (create_sparse_pattern)
+                {
+                    m_is_element_empty[i][agelemek.size() + pe_indx] = false;
+                    m_nnz++;
+                }
 
-        if (agelemek[i]->Get_Csp_db() == 2)
-        {
-            m_jac[i][agelemek.size() + pv_indx] = jv.at(1);
-            if (create_sparse_pattern)
-            {
-                m_is_element_empty[i][agelemek.size() + pv_indx] = false;
-                m_nnz++;
+                if (agelemek[i]->Get_Csp_db() == 2)
+                {
+                    m_jac[i][agelemek.size() + pv_indx] = jv.at(1);
+                    if (create_sparse_pattern)
+                    {
+                        m_is_element_empty[i][agelemek.size() + pv_indx] = false;
+                        m_nnz++;
+                    }
+                }
+
+                m_jac[i][Q_indx] = jv.at(2);
+                if (create_sparse_pattern)
+                {
+                    m_is_element_empty[i][Q_indx] = false;
+                    m_nnz++;
+                }
+
+                col[i] = jv.at(3);
+                jv.clear();
             }
-        }
 
-        m_jac[i][Q_indx] = jv.at(2);
-        if (create_sparse_pattern)
-        {
-            m_is_element_empty[i][Q_indx] = false;
-            m_nnz++;
-        }
-
-        col[i] = jv.at(3);
-        jv.clear();
-    }
-
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
-        f[agelemek.size() + i] = -cspok[i]->Get_fogy();
-        for (unsigned int j = 0; j < cspok[i]->ag_be.size(); j++)
-        {
-            f[agelemek.size() + i] += agelemek[cspok[i]->ag_be.at(j)]->Get_mp();
-            m_jac[agelemek.size() + i][cspok[i]->ag_be.at(j)] = +1.0;
-            if (create_sparse_pattern)
+            for (unsigned int i = 0; i < cspok.size(); i++)
             {
-                m_is_element_empty[agelemek.size() + i][cspok[i]->ag_be.at(j)] =
-                    false;
-                m_nnz++;
+                f[agelemek.size() + i] = -cspok[i]->Get_fogy();
+                for (unsigned int j = 0; j < cspok[i]->ag_be.size(); j++)
+                {
+                    f[agelemek.size() + i] += agelemek[cspok[i]->ag_be.at(j)]->Get_mp();
+                    m_jac[agelemek.size() + i][cspok[i]->ag_be.at(j)] = +1.0;
+                    if (create_sparse_pattern)
+                    {
+                        m_is_element_empty[agelemek.size() + i][cspok[i]->ag_be.at(j)] =
+                        false;
+                        m_nnz++;
+                    }
+                }
+                for (unsigned int j = 0; j < cspok[i]->ag_ki.size(); j++)
+                {
+                    f[agelemek.size() + i] -= agelemek[cspok[i]->ag_ki.at(j)]->Get_mp();
+                    m_jac[agelemek.size() + i][cspok[i]->ag_ki.at(j)] = -1.0;
+                    if (create_sparse_pattern)
+                    {
+                        m_is_element_empty[agelemek.size() + i][cspok[i]->ag_ki.at(j)] =
+                        false;
+                        m_nnz++;
+                    }
+                }
+                col[agelemek.size() + i] = -cspok[i]->Get_fogy();
             }
-        }
-        for (unsigned int j = 0; j < cspok[i]->ag_ki.size(); j++)
-        {
-            f[agelemek.size() + i] -= agelemek[cspok[i]->ag_ki.at(j)]->Get_mp();
-            m_jac[agelemek.size() + i][cspok[i]->ag_ki.at(j)] = -1.0;
-            if (create_sparse_pattern)
-            {
-                m_is_element_empty[agelemek.size() + i][cspok[i]->ag_ki.at(j)] =
-                    false;
-                m_nnz++;
-            }
-        }
-        col[agelemek.size() + i] = -cspok[i]->Get_fogy();
-    }
 
     //    int NN = x.size();
     //    m_jac.clear();
@@ -925,166 +925,166 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern)
     //    //  }
     //    //  cout << endl;
 
-    if (debug_level > 6)
-        Print_Jacobian();
+            if (debug_level > 6)
+                Print_Jacobian();
 
-    if (create_sparse_pattern)
-    {
-        ostringstream msg1;
-        msg1 << endl << " Number of nonzero Jacobian entries: " << m_nnz << " out of " << (N * N);
-        msg1 << " (" << (( ((double) m_nnz) / N / N) * 100) << "%)" << endl;
+            if (create_sparse_pattern)
+            {
+                ostringstream msg1;
+                msg1 << endl << " Number of nonzero Jacobian entries: " << m_nnz << " out of " << (N * N);
+                msg1 << " (" << (( ((double) m_nnz) / N / N) * 100) << "%)" << endl;
         //msg1 << endl << " Jacobian size check : m_jac.capacity()=" << m_jac.capacity();
         //msg1 << endl << " Jacobian size check : m_jac[0].capacity()=" << m_jac[0].capacity()<<endl;
-        logfile_write(msg1.str(), 1);
-    }
+                logfile_write(msg1.str(), 1);
+            }
 
-}
+        }
 
 //--------------------------------------------------------------
-void Staci::build_vectors_frozen_Jacobian(Vec_DP &x, Vec_DP &f)
-{
+        void Staci::build_vectors_frozen_Jacobian(Vec_DP &x, Vec_DP &f)
+        {
 
     //int N = cspok.size() + agelemek.size();
-    vector<double> pevhev;
+            vector<double> pevhev;
 
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-        x[i] = agelemek[i]->Get_mp();
-    for (unsigned int i = 0; i < cspok.size(); i++)
-        x[agelemek.size() + i] = cspok[i]->Get_p();
+            for (unsigned int i = 0; i < agelemek.size(); i++)
+                x[i] = agelemek[i]->Get_mp();
+            for (unsigned int i = 0; i < cspok.size(); i++)
+                x[agelemek.size() + i] = cspok[i]->Get_p();
 
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
-        if (agelemek[i]->Get_Csp_db() == 1)
-        {
-            pevhev.push_back(cspok[agelemek[i]->Get_Cspe_Index()]->Get_p());
-            pevhev.push_back(0);
-            pevhev.push_back(cspok[agelemek[i]->Get_Cspe_Index()]->Get_h());
-            pevhev.push_back(0);
-        }
-        else
-        {
-            pevhev.push_back(cspok[agelemek[i]->Get_Cspe_Index()]->Get_p());
-            pevhev.push_back(cspok[agelemek[i]->Get_Cspv_Index()]->Get_p());
-            pevhev.push_back(cspok[agelemek[i]->Get_Cspe_Index()]->Get_h());
-            pevhev.push_back(cspok[agelemek[i]->Get_Cspv_Index()]->Get_h());
-        }
-        f[i] = agelemek[i]->f(pevhev);
+            for (unsigned int i = 0; i < agelemek.size(); i++)
+            {
+                if (agelemek[i]->Get_Csp_db() == 1)
+                {
+                    pevhev.push_back(cspok[agelemek[i]->Get_Cspe_Index()]->Get_p());
+                    pevhev.push_back(0);
+                    pevhev.push_back(cspok[agelemek[i]->Get_Cspe_Index()]->Get_h());
+                    pevhev.push_back(0);
+                }
+                else
+                {
+                    pevhev.push_back(cspok[agelemek[i]->Get_Cspe_Index()]->Get_p());
+                    pevhev.push_back(cspok[agelemek[i]->Get_Cspv_Index()]->Get_p());
+                    pevhev.push_back(cspok[agelemek[i]->Get_Cspe_Index()]->Get_h());
+                    pevhev.push_back(cspok[agelemek[i]->Get_Cspv_Index()]->Get_h());
+                }
+                f[i] = agelemek[i]->f(pevhev);
         //jv = agelemek[i]->df(pevhev);
-        pevhev.clear();
-    }
+                pevhev.clear();
+            }
 
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
-        f[agelemek.size() + i] = -cspok[i]->Get_fogy();
-        for (unsigned int j = 0; j < cspok[i]->ag_be.size(); j++)
-            f[agelemek.size() + i] += agelemek[cspok[i]->ag_be.at(j)]->Get_mp();
+            for (unsigned int i = 0; i < cspok.size(); i++)
+            {
+                f[agelemek.size() + i] = -cspok[i]->Get_fogy();
+                for (unsigned int j = 0; j < cspok[i]->ag_be.size(); j++)
+                    f[agelemek.size() + i] += agelemek[cspok[i]->ag_be.at(j)]->Get_mp();
 
-        for (unsigned int j = 0; j < cspok[i]->ag_ki.size(); j++)
-            f[agelemek.size() + i] -= agelemek[cspok[i]->ag_ki.at(j)]->Get_mp();
+                for (unsigned int j = 0; j < cspok[i]->ag_ki.size(); j++)
+                    f[agelemek.size() + i] -= agelemek[cspok[i]->ag_ki.at(j)]->Get_mp();
 
         //col[agelemek.size() + i] = -cspok[i]->Get_fogy();
-    }
+            }
 
-}
+        }
 
 
 //--------------------------------------------------------------
-bool Staci::solve_system()
-{
+        bool Staci::solve_system()
+        {
 
-    const int N = cspok.size() + agelemek.size();
-    Mat_DP invjac(N, N);
+            const int N = cspok.size() + agelemek.size();
+            Mat_DP invjac(N, N);
     //Mat_DP jac(N, N), invjac(N, N);
-    Vec_DP col(N), b(N), x(N), dx(N), f(N), xu(N);
-    Vec_INT indx(N);
-    int iter = 0;
-    double e_mp = 1e10, e_p = 1e10, e_mp_r = 1e10, e_p_r = 1e10;
-    bool konv_ok = false;
+            Vec_DP col(N), b(N), x(N), dx(N), f(N), xu(N);
+            Vec_INT indx(N);
+            int iter = 0;
+            double e_mp = 1e10, e_p = 1e10, e_mp_r = 1e10, e_p_r = 1e10;
+            bool konv_ok = false;
 
 
-    m_ss.str("");
-    m_ss << "\n\nSolving system...\n====================================" << endl;
+            m_ss.str("");
+            m_ss << "\n\nSolving system...\n====================================" << endl;
 
     /*m_ss<<"iter_max="<<iter_max<<endl;*/
     //m_ss<<"e_mp_max="<<e_mp_max<<endl;
     //m_ss<<"e_p_max ="<<e_p_max<<endl;
     //m_ss<<"megoldo :"<<akt_megoldo<<endl;
-    logfile_write(m_ss.str(), 1);
-    cout << m_ss.str();
+            logfile_write(m_ss.str(), 1);
+            cout << m_ss.str();
 
     // Solver
-    build_vectors(x, f, true);
+            build_vectors(x, f, true);
 
     // Iteracio!!!
-    bool comp_ok = true;
+            bool comp_ok = true;
 
-    while ((iter < iter_max + 1) && (!konv_ok))
-    {
+            while ((iter < iter_max + 1) && (!konv_ok))
+            {
 
-        progress_file_write((double)iter / iter_max * 100.0);
+                progress_file_write((double)iter / iter_max * 100.0);
 
-        if ((e_mp > 0.1 || e_p > 0.1) || (iter % 1 == 0))
-            build_vectors(x, f, false);
-        else
-        {
-            build_vectors_frozen_Jacobian(x, f);
-            if (debug_level > 1)
-                cout << endl << "\t Using frozen Jacobian...";
-        }
+                if ((e_mp > 0.1 || e_p > 0.1) || (iter % 1 == 0))
+                    build_vectors(x, f, false);
+                else
+                {
+                    build_vectors_frozen_Jacobian(x, f);
+                    if (debug_level > 1)
+                        cout << endl << "\t Using frozen Jacobian...";
+                }
 
-        compute_error(f, e_mp, e_p, e_mp_r, e_p_r, konv_ok);
+                compute_error(f, e_mp, e_p, e_mp_r, e_p_r, konv_ok);
 
-        logfile_write(iter_info(x, f, iter, e_mp, e_p), 1);
-        cout << iter_info(x, f, iter, e_mp, e_p);
-        update_relax(e_mp, e_p, e_mp_r, e_p_r);
+                logfile_write(iter_info(x, f, iter, e_mp, e_p), 1);
+                cout << iter_info(x, f, iter, e_mp, e_p);
+                update_relax(e_mp, e_p, e_mp_r, e_p_r);
 
-        comp_ok = umfpack_solver(x, f);
+                comp_ok = umfpack_solver(x, f);
 
-        if ((!comp_ok) && (iter > 100))
-        {
-            cout << endl << endl << "WARNING: Staci::solve_system() -> umfpack_solver did not provide a solution, switching back to nr_solver!!\n\n";
-            nr_solver(x, f);
-        }
+                if ((!comp_ok) && (iter > 100))
+                {
+                    cout << endl << endl << "WARNING: Staci::solve_system() -> umfpack_solver did not provide a solution, switching back to nr_solver!!\n\n";
+                    nr_solver(x, f);
+                }
 
-        if ((e_mp != e_mp) || (e_p != e_p))
-        {
+                if ((e_mp != e_mp) || (e_p != e_p))
+                {
             //cout << "\n !!! e_mp is NaN!";
-            iter = iter_max + 1;
-            comp_ok = false;
-            konv_ok = false;
-        }
-        else
-            iter++;
-    }
+                    iter = iter_max + 1;
+                    comp_ok = false;
+                    konv_ok = false;
+                }
+                else
+                    iter++;
+            }
     //cout<<"\n\t\t number of iterations:"<<iter++<<", comp_ok="<<comp_ok;
     //cin.get();
 
-    if ((!konv_ok) && (debug_level > 2))
-    {
+            if ((!konv_ok) && (debug_level > 2))
+            {
 
-        if (!konv_ok)
-            m_ss << "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n";
-        for (unsigned int i = 0; i < agelemek.size(); i++)
-            m_ss << "\n\t" << agelemek[i]->Get_nev() << "("
-                 << agelemek[i]->GetType() << "): mp=" << x[i] << ", f="
-                 << f[i];
+                if (!konv_ok)
+                    m_ss << "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n";
+                for (unsigned int i = 0; i < agelemek.size(); i++)
+                    m_ss << "\n\t" << agelemek[i]->Get_nev() << "("
+                << agelemek[i]->GetType() << "): mp=" << x[i] << ", f="
+                << f[i];
 
-        for (unsigned int i = 0; i < cspok.size(); i++)
-            m_ss << "\n\t" << cspok[i]->Get_nev() << ": p="
-                 << x[agelemek.size() + i] << ", f="
-                 << f[agelemek.size() + i];
-        if (!konv_ok)
-            m_ss
-                    << "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\nBajjj van.\n\n";
+                for (unsigned int i = 0; i < cspok.size(); i++)
+                    m_ss << "\n\t" << cspok[i]->Get_nev() << ": p="
+                << x[agelemek.size() + i] << ", f="
+                << f[agelemek.size() + i];
+                if (!konv_ok)
+                    m_ss
+                << "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\nBajjj van.\n\n";
 
-        cout << m_ss.str();
+                cout << m_ss.str();
         /*
           if (!konv_ok)
           cin.get();
         */
-    }
+  }
 
-    return konv_ok;
+  return konv_ok;
 }
 
 
@@ -1153,21 +1153,21 @@ bool Staci::solve_system_old()
             for (int j = 0; j < N; j++)
                 jac[i][j] = 0.0;
 
-        for (unsigned int i = 0; i < agelemek.size(); i++)
-        {
-            if (agelemek[i]->Get_Csp_db() == 1)
+            for (unsigned int i = 0; i < agelemek.size(); i++)
             {
+                if (agelemek[i]->Get_Csp_db() == 1)
+                {
                 /*pevhev.push_back(0);
                   pevhev.push_back(cspok[agelemek[i]->Get_Cspv_Index()]->Get_p());
                   pevhev.push_back(0);
                   pevhev.push_back(cspok[agelemek[i]->Get_Cspv_Index()]->Get_h());*/
-                pevhev[0] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_p();
-                pevhev[1] = 0.0;
-                pevhev[2] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
-                pevhev[3] = 0.0;
-            }
-            else
-            {
+                  pevhev[0] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_p();
+                  pevhev[1] = 0.0;
+                  pevhev[2] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
+                  pevhev[3] = 0.0;
+              }
+              else
+              {
                 pevhev[0] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_p();
                 pevhev[1] = cspok[agelemek[i]->Get_Cspv_Index()]->Get_p();
                 pevhev[2] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
@@ -1290,7 +1290,7 @@ bool Staci::solve_system_old()
 
         switch (akt_megoldo)
         {
-        case Linear:
+            case Linear:
             // Linearizalt egyenletek megoldasa:
             //-------------------------------------------------------------------------------------------
             NR::ludcmp(jac, indx, d);
@@ -1303,7 +1303,7 @@ bool Staci::solve_system_old()
             }
             break;
 
-        case Newton_Raphson:
+            case Newton_Raphson:
 
             // Jacobi inverzenek szamitasa:
             //-------------------------------
@@ -1373,7 +1373,7 @@ bool Staci::solve_system_old()
             }
             break;
 
-        default:
+            default:
             cout << endl << endl << "HIBA: nem ismerek " << akt_megoldo << " megoldot!!!" << endl;
             break;
         }
@@ -1794,7 +1794,7 @@ void Staci::transport_step(double dt)
             if ((cspok.at(i)->Get_nev() == "NODE_1346650") || (cspok.at(i)->Get_nev() == "NODE_1337960"))
             {
                 cout << "\n\t" << cspok.at(i)->Get_nev() << ": szaml=" << szaml << ", cl_be*fabs(fogy)="
-                     << (cl_be * fabs(fogy)) << ", nevezo=" << nevezo;
+                << (cl_be * fabs(fogy)) << ", nevezo=" << nevezo;
                 cout << "\n\t\t atlagos koncentracio: " << c << endl;
             }
         }
@@ -1851,7 +1851,7 @@ void Staci::transport_step(double dt)
                           <<konc_e<<", vel_e="<<vel_e<<", teta="<<teta;
                           }*/
 
-                        if (agelemek.at(i)->konc.at(j) < 0)
+                          if (agelemek.at(i)->konc.at(j) < 0)
                             agelemek.at(i)->konc.at(j) = 0.0;
                     }
                     agelemek.at(i)->konc.at(0) = konc_eleje;
@@ -1993,37 +1993,37 @@ void Staci::nr_solver(Vec_DP x, Vec_DP f)
         for (int j = 0; j < N; j++)
             jac[i][j] = m_jac[i][j];
 
-    NR::ludcmp(jac, indx, d);
+        NR::ludcmp(jac, indx, d);
 
-    for (int j = 0; j < N; j++)
-    {
-        for (int i = 0; i < N; i++)
-            col[i] = 0.0;
-        col[j] = 1.0;
-        NR::lubksb(jac, indx, col);
-        for (int i = 0; i < N; i++)
-            invjac[i][j] = col[i];
-    }
-
-    for (int i = 0; i < N; i++)
-    {
-        dx[i] = 0;
         for (int j = 0; j < N; j++)
-            dx[i] += invjac[i][j] * f[j];
-        xu[i] = x[i] - m_relax * dx[i];
-    }
+        {
+            for (int i = 0; i < N; i++)
+                col[i] = 0.0;
+            col[j] = 1.0;
+            NR::lubksb(jac, indx, col);
+            for (int i = 0; i < N; i++)
+                invjac[i][j] = col[i];
+        }
+
+        for (int i = 0; i < N; i++)
+        {
+            dx[i] = 0;
+            for (int j = 0; j < N; j++)
+                dx[i] += invjac[i][j] * f[j];
+            xu[i] = x[i] - m_relax * dx[i];
+        }
 
     // Visszairas
     //------------------------
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-        agelemek[i]->Set_mp(xu[i]);
-    for (unsigned int i = 0; i < cspok.size(); i++)
-        cspok[i]->Set_p(xu[agelemek.size() + i]);
-}
+        for (unsigned int i = 0; i < agelemek.size(); i++)
+            agelemek[i]->Set_mp(xu[i]);
+        for (unsigned int i = 0; i < cspok.size(); i++)
+            cspok[i]->Set_p(xu[agelemek.size() + i]);
+    }
 
 //--------------------------------------------------------------
-bool Staci::umfpack_solver(Vec_I_DP xr, Vec_I_DP f)
-{
+    bool Staci::umfpack_solver(Vec_I_DP xr, Vec_I_DP f)
+    {
 
     // Build sparse matrix
     /* Ti[k] is row index of entry k, as matrix is scanned columnwise */
@@ -2031,200 +2031,200 @@ bool Staci::umfpack_solver(Vec_I_DP xr, Vec_I_DP f)
     //    cout<<endl<<"\n m_nnz="<<m_nnz<<endl;
 
 
-    vector<int> vTi;
-    vTi.reserve(m_nnz);
+        vector<int> vTi;
+        vTi.reserve(m_nnz);
     /* Tj[k] is column index of entry k, as matrix is scanned columnwise */
-    vector<int> vTj;
-    vTj.reserve(m_nnz);
+        vector<int> vTj;
+        vTj.reserve(m_nnz);
     /* value of entry k, as matrix is scanned columnwise */
-    vector<double> vTx;
-    vTx.reserve(m_nnz);
+        vector<double> vTx;
+        vTx.reserve(m_nnz);
 
-    int n = agelemek.size() + cspok.size();
-    int nz = 0;
-    for (int col = 0; col < n; col++)
-        for (int row = 0; row < n; row++)
-            if (!m_is_element_empty[row][col])
-            {
+        int n = agelemek.size() + cspok.size();
+        int nz = 0;
+        for (int col = 0; col < n; col++)
+            for (int row = 0; row < n; row++)
+                if (!m_is_element_empty[row][col])
+                {
                 // vTi.push_back(row);
                 // vTj.push_back(col);
                 // vTx.push_back(m_jac[row][col]);
-                vTi[nz] = row;
-                vTj[nz] = col;
-                vTx[nz] = m_jac[row][col];
-                nz++;
-            }
+                    vTi[nz] = row;
+                    vTj[nz] = col;
+                    vTx[nz] = m_jac[row][col];
+                    nz++;
+                }
 
-    int Ap[n + 1];
-    int Ai[nz];
-    double Ax[nz];
-    int status;
-    int Ti[nz];
-    int Tj[nz];
-    double Tx[nz];
-    double dx[n];
-    for (int i = 0; i < n; i++)
-        dx[i] = 0.;
+                int Ap[n + 1];
+                int Ai[nz];
+                double Ax[nz];
+                int status;
+                int Ti[nz];
+                int Tj[nz];
+                double Tx[nz];
+                double dx[n];
+                for (int i = 0; i < n; i++)
+                    dx[i] = 0.;
 
-    void *Symbolic, *Numeric;
+                void *Symbolic, *Numeric;
 
-    for (int i = 0; i < nz; i++)
-    {
-        Ti[i] = vTi[i];
-        Tj[i] = vTj[i];
-        Tx[i] = vTx[i];
-    }
+                for (int i = 0; i < nz; i++)
+                {
+                    Ti[i] = vTi[i];
+                    Tj[i] = vTj[i];
+                    Tx[i] = vTx[i];
+                }
 
-    double b[n];
-    for (int i = 0; i < n; i++)
-        b[i] = f[i];
+                double b[n];
+                for (int i = 0; i < n; i++)
+                    b[i] = f[i];
 
     /* convert matrix from triplet form to compressed-column form */
-    status = umfpack_di_triplet_to_col(n, n, nz, Ti, Tj, Tx, Ap, Ai, Ax, NULL);
+                status = umfpack_di_triplet_to_col(n, n, nz, Ti, Tj, Tx, Ap, Ai, Ax, NULL);
 
     /* symbolic analysis */
-    status = umfpack_di_symbolic(n, n, Ap, Ai, Ax, &Symbolic, NULL, NULL);
+                status = umfpack_di_symbolic(n, n, Ap, Ai, Ax, &Symbolic, NULL, NULL);
 
     /* LU factorization */
-    umfpack_di_numeric(Ap, Ai, Ax, Symbolic, &Numeric, NULL, NULL);
+                umfpack_di_numeric(Ap, Ai, Ax, Symbolic, &Numeric, NULL, NULL);
 
-    umfpack_di_free_symbolic(&Symbolic);
+                umfpack_di_free_symbolic(&Symbolic);
 
     /* solve system */
-    umfpack_di_solve(UMFPACK_A, Ap, Ai, Ax, dx, b, Numeric, NULL, NULL);
+                umfpack_di_solve(UMFPACK_A, Ap, Ai, Ax, dx, b, Numeric, NULL, NULL);
 
-    umfpack_di_free_numeric(&Numeric);
+                umfpack_di_free_numeric(&Numeric);
 
-    bool success = true;
-    for (int i = 0; i < n; i++)
-        if (isnan(dx[i]))
-        {
+                bool success = true;
+                for (int i = 0; i < n; i++)
+                    if (isnan(dx[i]))
+                    {
             //            cout << "\n\n!!!!\nStaci.cpp, umfpack_solver() -> x[" << i
             //                    << "]=NaN!!!\n\n";
-            success = false;
-            break;
-        }
+                        success = false;
+                        break;
+                    }
 
     // Visszairas
     //------------------------
-    if (success)
-    {
-        for (unsigned int i = 0; i < agelemek.size(); i++)
-            agelemek[i]->Set_mp(xr[i] - m_relax * dx[i]);
-        for (unsigned int i = 0; i < cspok.size(); i++)
-            cspok[i]->Set_p(
-                xr[agelemek.size() + i]
-                - m_relax * dx[agelemek.size() + i]);
-    }
+                    if (success)
+                    {
+                        for (unsigned int i = 0; i < agelemek.size(); i++)
+                            agelemek[i]->Set_mp(xr[i] - m_relax * dx[i]);
+                        for (unsigned int i = 0; i < cspok.size(); i++)
+                            cspok[i]->Set_p(
+                                xr[agelemek.size() + i]
+                                - m_relax * dx[agelemek.size() + i]);
+                    }
 
 
-    return success;
-}
+                    return success;
+                }
 
 
 //--------------------------------------------------------------
-void Staci::Compute_Head_Losses()
-{
-    double pe, pv, he, hv, dh;
-    cout << endl << endl << "Nyomasesesek szamitasa...";
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
-        if (agelemek[i]->Get_Csp_db() == 1)
-        {
-            agelemek[i]->Set_head_loss(0.0);
-        }
-        else
-        {
-            pe = cspok[agelemek[i]->Get_Cspe_Index()]->Get_p();
-            pv = cspok[agelemek[i]->Get_Cspv_Index()]->Get_p();
-            he = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
-            hv = cspok[agelemek[i]->Get_Cspv_Index()]->Get_h();
-            dh = fabs(pe + he - pv - hv);
-            agelemek[i]->Set_head_loss(dh);
-        }
-    }
+                void Staci::Compute_Head_Losses()
+                {
+                    double pe, pv, he, hv, dh;
+                    cout << endl << endl << "Nyomasesesek szamitasa...";
+                    for (unsigned int i = 0; i < agelemek.size(); i++)
+                    {
+                        if (agelemek[i]->Get_Csp_db() == 1)
+                        {
+                            agelemek[i]->Set_head_loss(0.0);
+                        }
+                        else
+                        {
+                            pe = cspok[agelemek[i]->Get_Cspe_Index()]->Get_p();
+                            pv = cspok[agelemek[i]->Get_Cspv_Index()]->Get_p();
+                            he = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
+                            hv = cspok[agelemek[i]->Get_Cspv_Index()]->Get_h();
+                            dh = fabs(pe + he - pv - hv);
+                            agelemek[i]->Set_head_loss(dh);
+                        }
+                    }
     //cout << "\t OK";
-}
+                }
 
 //--------------------------------------------------------------
 
-void Staci::Print_Jacobian()
+                void Staci::Print_Jacobian()
 //                void Staci::Print_Jacobian(vector<vector<double> > jac)
 
-{
-    ostringstream strstrm;
-    string strstrm_nev;
-    const unsigned int MAX_NEV_HOSSZ = 15;
+                {
+                    ostringstream strstrm;
+                    string strstrm_nev;
+                    const unsigned int MAX_NEV_HOSSZ = 15;
 
-    strstrm.str("");
-    strstrm << scientific << setprecision(3) << showpos;
-    strstrm << endl << "\nJACOBI:" << endl << "          ";
+                    strstrm.str("");
+                    strstrm << scientific << setprecision(3) << showpos;
+                    strstrm << endl << "\nJACOBI:" << endl << "          ";
 
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
-        strstrm_nev = agelemek[i]->Get_nev();
-        while (strstrm_nev.size() < MAX_NEV_HOSSZ)
-            strstrm_nev.append(" ");
-        strstrm << "\tmp," << strstrm_nev;
-    }
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
-        strstrm_nev = cspok[i]->Get_nev();
-        while (strstrm_nev.size() < MAX_NEV_HOSSZ)
-            strstrm_nev.append(" ");
-        strstrm << "\t p," << strstrm_nev;
-    }
-    strstrm << endl;
+                    for (unsigned int i = 0; i < agelemek.size(); i++)
+                    {
+                        strstrm_nev = agelemek[i]->Get_nev();
+                        while (strstrm_nev.size() < MAX_NEV_HOSSZ)
+                            strstrm_nev.append(" ");
+                        strstrm << "\tmp," << strstrm_nev;
+                    }
+                    for (unsigned int i = 0; i < cspok.size(); i++)
+                    {
+                        strstrm_nev = cspok[i]->Get_nev();
+                        while (strstrm_nev.size() < MAX_NEV_HOSSZ)
+                            strstrm_nev.append(" ");
+                        strstrm << "\t p," << strstrm_nev;
+                    }
+                    strstrm << endl;
 
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
-        strstrm_nev = agelemek[i]->Get_nev();
-        while (strstrm_nev.size() < MAX_NEV_HOSSZ)
-            strstrm_nev.append(" ");
-        strstrm << strstrm_nev;
-        for (unsigned int j = 0; j < agelemek.size() + cspok.size(); j++)
-            strstrm << "; " << m_jac[i][j];
-        strstrm << endl;
-    }
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
-        strstrm_nev = cspok[i]->Get_nev();
-        while (strstrm_nev.size() < MAX_NEV_HOSSZ)
-            strstrm_nev.append(" ");
-        strstrm << strstrm_nev;
-        for (unsigned int j = 0; j < agelemek.size() + cspok.size(); j++)
-            strstrm << ";" << m_jac[agelemek.size() + i][j];
-        strstrm << endl;
-    }
+                    for (unsigned int i = 0; i < agelemek.size(); i++)
+                    {
+                        strstrm_nev = agelemek[i]->Get_nev();
+                        while (strstrm_nev.size() < MAX_NEV_HOSSZ)
+                            strstrm_nev.append(" ");
+                        strstrm << strstrm_nev;
+                        for (unsigned int j = 0; j < agelemek.size() + cspok.size(); j++)
+                            strstrm << "; " << m_jac[i][j];
+                        strstrm << endl;
+                    }
+                    for (unsigned int i = 0; i < cspok.size(); i++)
+                    {
+                        strstrm_nev = cspok[i]->Get_nev();
+                        while (strstrm_nev.size() < MAX_NEV_HOSSZ)
+                            strstrm_nev.append(" ");
+                        strstrm << strstrm_nev;
+                        for (unsigned int j = 0; j < agelemek.size() + cspok.size(); j++)
+                            strstrm << ";" << m_jac[agelemek.size() + i][j];
+                        strstrm << endl;
+                    }
 
-    ofstream JacFile;
-    JacFile.open("dfdx.txt");
-    JacFile << strstrm.str();
-    JacFile.close();
+                    ofstream JacFile;
+                    JacFile.open("dfdx.txt");
+                    JacFile << strstrm.str();
+                    JacFile.close();
     //  logfile_write(strstrm.str(), 3);
-}
+                }
 
 //--------------------------------------------------------------
-string Staci::iter_info(Vec_DP x, Vec_DP f, int iter, double e_mp, double e_p)
-{
+                string Staci::iter_info(Vec_DP x, Vec_DP f, int iter, double e_mp, double e_p)
+                {
 
-    m_ss.str("");
+                    m_ss.str("");
 
-    if (debug_level > 3)
-    {
-        for (unsigned int i = 0; i < agelemek.size(); i++)
-            m_ss << "\n\t" << agelemek[i]->Get_nev() << "("
-                 << agelemek[i]->GetType() << "): mp=" << x[i] << ", f="
-                 << f[i];
-        for (unsigned int i = 0; i < cspok.size(); i++)
-            m_ss << "\n\t" << cspok[i]->Get_nev() << ": p="
-                 << x[agelemek.size() + i] << ", f="
-                 << f[agelemek.size() + i];
-    }
+                    if (debug_level > 3)
+                    {
+                        for (unsigned int i = 0; i < agelemek.size(); i++)
+                            m_ss << "\n\t" << agelemek[i]->Get_nev() << "("
+                        << agelemek[i]->GetType() << "): mp=" << x[i] << ", f="
+                        << f[i];
+                        for (unsigned int i = 0; i < cspok.size(); i++)
+                            m_ss << "\n\t" << cspok[i]->Get_nev() << ": p="
+                        << x[agelemek.size() + i] << ", f="
+                        << f[agelemek.size() + i];
+                    }
 
-    m_ss.setf(ios::dec);
-    m_ss.unsetf(ios::showpos);
-    m_ss << endl << " iter. # " << iter << "./" << iter_max;
+                    m_ss.setf(ios::dec);
+                    m_ss.unsetf(ios::showpos);
+                    m_ss << endl << " iter. # " << iter << "./" << iter_max;
     m_ss << setprecision(2) << scientific;// << number << std::endl;
     m_ss << " e_mp=" << e_mp << ",  e_p=" << e_p;
     m_ss << setprecision(2) << fixed;
@@ -2235,7 +2235,7 @@ string Staci::iter_info(Vec_DP x, Vec_DP f, int iter, double e_mp, double e_p)
 
 //--------------------------------------------------------------
 void Staci::compute_error(Vec_DP f, double &e_mp, double &e_p, double &e_mp_r,
-                          double &e_p_r, bool &konv_ok)
+  double &e_p_r, bool &konv_ok)
 {
 
     e_mp_r = e_mp;
@@ -2256,7 +2256,7 @@ void Staci::compute_error(Vec_DP f, double &e_mp, double &e_p, double &e_mp_r,
 
 //--------------------------------------------------------------
 void Staci::update_relax(double e_mp, double e_p, double &e_mp_r,
-                         double &e_p_r)
+ double &e_p_r)
 {
     m_RELAX_MIN = 0.01;
     m_RELAX_MAX = 1.0;
@@ -2330,7 +2330,7 @@ void Staci::Compute_dfdmu()
         stringstream strstrm;
         strstrm.str("");
         strstrm << "\nStaci::Compute_dfdmu(): !!! element_ID: " << element_ID << ", property_ID: "
-                << property_ID << " not found (property_ID = demand | diameter)!";
+        << property_ID << " not found (property_ID = demand | diameter)!";
         logfile_write(strstrm.str(), 1);
         cout << strstrm.str();
         StaciException hiba(strstrm.str());
@@ -2371,302 +2371,300 @@ void Staci::Compute_dxdmu()
                 nz++;
             }
 
-    int Ap[n + 1];
-    int Ai[nz];
-    double Ax[nz];
-    int status;
-    int Ti[nz];
-    int Tj[nz];
-    double Tx[nz];
-    double dx[n];
-    for (int i = 0; i < n; i++)
-        dx[i] = 0.;
+            int Ap[n + 1];
+            int Ai[nz];
+            double Ax[nz];
+            int status;
+            int Ti[nz];
+            int Tj[nz];
+            double Tx[nz];
+            double dx[n];
+            for (int i = 0; i < n; i++)
+                dx[i] = 0.;
 
-    void *Symbolic, *Numeric;
+            void *Symbolic, *Numeric;
 
-    for (int i = 0; i < nz; i++)
-    {
-        Ti[i] = vTi[i];
-        Tj[i] = vTj[i];
-        Tx[i] = vTx[i];
-    }
+            for (int i = 0; i < nz; i++)
+            {
+                Ti[i] = vTi[i];
+                Tj[i] = vTj[i];
+                Tx[i] = vTx[i];
+            }
 
-    double b[n];
-    for (int i = 0; i < n; i++)
-        b[i] = -m_dfdmu[i];
+            double b[n];
+            for (int i = 0; i < n; i++)
+                b[i] = -m_dfdmu[i];
 
     /* convert matrix from triplet form to compressed-column form */
-    status = umfpack_di_triplet_to_col(n, n, nz, Ti, Tj, Tx, Ap, Ai, Ax, NULL);
+            status = umfpack_di_triplet_to_col(n, n, nz, Ti, Tj, Tx, Ap, Ai, Ax, NULL);
 
     /* symbolic analysis */
-    status = umfpack_di_symbolic(n, n, Ap, Ai, Ax, &Symbolic, NULL, NULL);
+            status = umfpack_di_symbolic(n, n, Ap, Ai, Ax, &Symbolic, NULL, NULL);
 
     /* LU factorization */
-    umfpack_di_numeric(Ap, Ai, Ax, Symbolic, &Numeric, NULL, NULL);
+            umfpack_di_numeric(Ap, Ai, Ax, Symbolic, &Numeric, NULL, NULL);
 
-    umfpack_di_free_symbolic(&Symbolic);
+            umfpack_di_free_symbolic(&Symbolic);
 
     /* solve system */
-    umfpack_di_solve(UMFPACK_A, Ap, Ai, Ax, dx, b, Numeric, NULL, NULL);
+            umfpack_di_solve(UMFPACK_A, Ap, Ai, Ax, dx, b, Numeric, NULL, NULL);
 
-    umfpack_di_free_numeric(&Numeric);
+            umfpack_di_free_numeric(&Numeric);
 
-    bool success = true;
-    for (int i = 0; i < n; i++)
-        if (isnan(dx[i]))
-        {
-            cout << "\n\n!!!!\nStaci.cpp, dxdmu() -> x[" << i
-                 << "]=NaN!!!\n\n";
-            break;
-        }
+            bool success = true;
+            for (int i = 0; i < n; i++)
+                if (isnan(dx[i]))
+                {
+                    cout << "\n\n!!!!\nStaci.cpp, dxdmu() -> x[" << i
+                    << "]=NaN!!!\n\n";
+                    break;
+                }
 
     // Visszairas
     //------------------------
-    m_dxdmu.clear();
+                m_dxdmu.clear();
 
-    for (unsigned int i = 0; i < n; i++)
-        m_dxdmu.push_back(dx[i]);
+                for (unsigned int i = 0; i < n; i++)
+                    m_dxdmu.push_back(dx[i]);
 
-}
+            }
 
 //--------------------------------------------------------------
-void Staci::Print_dfdmu()
-{
+            void Staci::Print_dfdmu()
+            {
     //Compute_dfdmu();
 
-    ostringstream strstrm;
-    string strstrm_nev;
-    const unsigned int MAX_NEV_HOSSZ = 15;
+                ostringstream strstrm;
+                string strstrm_nev;
+                const unsigned int MAX_NEV_HOSSZ = 15;
 
-    strstrm.str("");
-    strstrm << scientific << setprecision(3) << showpos;
-    strstrm << "Parameter: " << element_ID << ", " << property_ID;
+                strstrm.str("");
+                strstrm << scientific << setprecision(3) << showpos;
+                strstrm << "Parameter: " << element_ID << ", " << property_ID;
 
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-        strstrm << "\n" << i << "; (" << agelemek.at(i)->Get_nev() << "); " << m_dfdmu[i];
+                for (unsigned int i = 0; i < agelemek.size(); i++)
+                    strstrm << "\n" << i << "; (" << agelemek.at(i)->Get_nev() << "); " << m_dfdmu[i];
 
-    for (unsigned int i = 0; i < cspok.size(); i++)
-        strstrm << "\n" << i << "; (" << cspok.at(i)->Get_nev() << "); " << m_dfdmu[agelemek.size() + i];
+                for (unsigned int i = 0; i < cspok.size(); i++)
+                    strstrm << "\n" << i << "; (" << cspok.at(i)->Get_nev() << "); " << m_dfdmu[agelemek.size() + i];
 
-    ofstream OutFile;
-    OutFile.open("dfdmu.txt");
-    OutFile << strstrm.str();
-    OutFile.close();
+                ofstream OutFile;
+                OutFile.open("dfdmu.txt");
+                OutFile << strstrm.str();
+                OutFile.close();
 
-}
-
-//--------------------------------------------------------------
-void Staci::Print_dxdmu()
-{
-
-    ostringstream strstrm;
-    string strstrm_nev;
-    const unsigned int MAX_NEV_HOSSZ = 15;
-
-    strstrm.str("");
-    strstrm << scientific << setprecision(3) << showpos;
-    strstrm << "Parameter: " << element_ID << ", " << property_ID;
-
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-        strstrm << "\n" << i << ";(mp @ " << agelemek.at(i)->Get_nev() << "); " << m_dxdmu[i] << "; mp(kg/s)=" << agelemek.at(i)->Get_mp();
-
-    for (unsigned int i = 0; i < cspok.size(); i++)
-        strstrm << "\n" << i << ";(p @ " << cspok.at(i)->Get_nev() << "); " << m_dxdmu[agelemek.size() + i] << "; p(vom)=" << cspok.at(i)->Get_p();
-
-    ofstream OutFile;
-    OutFile.open("dxdmu.txt");
-    OutFile << strstrm.str();
-    OutFile.close();
-}
+            }
 
 //--------------------------------------------------------------
-void Staci::solve_residence_time() {
-    string max_ID;
-    double max_VAL, mean_VAL, mean_VAL_prev = -61, d_mean_VAL = 1000;
+            void Staci::Print_dxdmu()
+            {
 
-    m_ss.str("");
-    m_ss << "\n\nComputing residence time...\n====================================" << endl;
-    logfile_write(m_ss.str(), 1);
-    cout << m_ss.str();
+                ostringstream strstrm;
+                string strstrm_nev;
+                const unsigned int MAX_NEV_HOSSZ = 15;
 
-    int step = 1;
-    int step_max = 1000;
+                strstrm.str("");
+                strstrm << scientific << setprecision(3) << showpos;
+                strstrm << "Parameter: " << element_ID << ", " << property_ID;
 
-    while ((step < step_max) && (d_mean_VAL > 10)) {
-        residence_time_step(max_ID, max_VAL, mean_VAL);
-        if ((step % 20) == 0)
-            cout << endl << "\t step #" << step << " max. res. time: " << convert_to_hr_min(max_VAL) << " (" << max_ID << "), mean: " << convert_to_hr_min(mean_VAL);
-        step++;
-        d_mean_VAL = fabs(mean_VAL - mean_VAL_prev);
-        mean_VAL_prev = mean_VAL;
-    }
+                for (unsigned int i = 0; i < agelemek.size(); i++)
+                    strstrm << "\n" << i << ";(mp @ " << agelemek.at(i)->Get_nev() << "); " << m_dxdmu[i] << "; mp(kg/s)=" << agelemek.at(i)->Get_mp();
+
+                for (unsigned int i = 0; i < cspok.size(); i++)
+                    strstrm << "\n" << i << ";(p @ " << cspok.at(i)->Get_nev() << "); " << m_dxdmu[agelemek.size() + i] << "; p(vom)=" << cspok.at(i)->Get_p();
+
+                ofstream OutFile;
+                OutFile.open("dxdmu.txt");
+                OutFile << strstrm.str();
+                OutFile.close();
+            }
+
+//--------------------------------------------------------------
+            void Staci::solve_residence_time() {
+                string max_ID;
+                double max_VAL, mean_VAL, VAL_prev = -61, d_VAL = 1000;
+
+                m_ss.str("");
+                m_ss << "\n\nComputing residence time...\n====================================" << endl;
+                logfile_write(m_ss.str(), 1);
+                cout << m_ss.str();
+
+                int step = 1;
+                int step_max = 100000;
+
+                while ((step < step_max) && (d_VAL > 1)) {
+                    residence_time_step(max_ID, max_VAL, mean_VAL);
+                    if ((step % 20) == 0)
+                        cout << endl << "\t step #" << step << " max. res. time: " << convert_to_hr_min(max_VAL) << " (" << max_ID << "), mean: " << convert_to_hr_min(mean_VAL);
+                    d_VAL = fabs(mean_VAL - VAL_prev);
+                    VAL_prev = mean_VAL;
+                    step++;
+                }
     // Utolso lepes mindenkeppen legyen kint
-    cout << endl << "\t step #" << step << " max. res. time: " << convert_to_hr_min(max_VAL) << " (" << max_ID << "), mean: " << convert_to_hr_min(mean_VAL);
-}
+                cout << endl << "\t step #" << step << " max. res. time: " << convert_to_hr_min(max_VAL) << " (" << max_ID << "), mean: " << convert_to_hr_min(mean_VAL);
+            }
 
 //--------------------------------------------------------------
-void Staci::residence_time_step(string& max_ID, double& max_VAL, double& mean_VAL) {
+            void Staci::residence_time_step(string& max_ID, double& max_VAL, double& mean_VAL) {
 
-    bool transp_debug = false;
-    double mv = -1.;
-    double sum = 0;
-    double TINY_MASS_FLOW_RATE = 1.e-3;
-    double TINY_VEL = 0.0001;
-    double MAX_TIME = 168 * 3600.;
+                bool transp_debug = false;
+                double mv = -1.;
+                double sum = 0;
+                double TINY_MASS_FLOW_RATE = 1.e-3;
+                double TINY_VEL = 0.0001;
+                double MAX_TIME = 168 * 3600.;
 
     // 1. lepes: csomoponti atlagkor meghatarozasa
-    double szaml, nevezo, c, m;
-    vector <int> temp;
-    int length_be, length_ki;
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
+                double szaml, nevezo, c, m;
+                vector <int> temp;
+                int length_be, length_ki;
+                for (unsigned int i = 0; i < cspok.size(); i++)
+                {
 
         // Csak akkor piszkaljuk a csomoponti eletkort, ha nincs betap.
         // Legalabb 1cm3/h betap legyen
-        if (cspok.at(i)->Get_fogy() < (-1.e-6 * 1000. / 3600.)) {
-            if (transp_debug)
-                cout << endl << cspok.at(i)->Get_nev() << ": \n\tbetap miatt adott vizkor: " << cspok.at(i)->Get_dprop("tt") / 60. << "min";
+                    if (cspok.at(i)->Get_fogy() < (-1.e-6 * 1000. / 3600.)) {
+                        if (transp_debug)
+                            cout << endl << cspok.at(i)->Get_nev() << ": \n\tbetap miatt adott vizkor: " << cspok.at(i)->Get_dprop("tt") / 60. << "min";
             // cin.get();
-        }
-        else {
+                    }
+                    else {
             // Tomegarammal sulyozott atlag
-            szaml = 0.0;
-            nevezo = 0.0;
+                        szaml = 0.0;
+                        nevezo = 0.0;
 
             // Bemeno agak
-            if (transp_debug)
-                cout << endl << cspok.at(i)->Get_nev() << ": \n\tbemeno agak: (";
-            temp.clear();
-            temp = cspok.at(i)->ag_be;
-            length_be = temp.size();
-            if (transp_debug)
-                cout << temp.size() << "db)";
-
-            if (temp.size() > 0) {
-                for (unsigned int j = 0; j < temp.size(); j++) {
-                    if (agelemek.at(temp.at(j))->Get_v() >= 0) {
-                        c = agelemek.at(temp.at(j))->Get_tt_end();
-                        double ce = agelemek.at(temp.at(j))->Get_tt_start();
-                        m = agelemek.at(temp.at(j))->Get_mp();
                         if (transp_debug)
-                            cout << " mp= " << m << " t=" << (c / 60) << " min (tt_start = " << (ce / 60) << "min)";
+                            cout << endl << cspok.at(i)->Get_nev() << ": \n\tbemeno agak: (";
+                        temp.clear();
+                        temp = cspok.at(i)->ag_be;
+                        length_be = temp.size();
+                        if (transp_debug)
+                            cout << temp.size() << "db)";
+
+                        if (temp.size() > 0) {
+                            for (unsigned int j = 0; j < temp.size(); j++) {
+                                if (agelemek.at(temp.at(j))->Get_v() >= 0) {
+                                    c = agelemek.at(temp.at(j))->Get_tt_end();
+                                    double ce = agelemek.at(temp.at(j))->Get_tt_start();
+                                    m = agelemek.at(temp.at(j))->Get_mp();
+                                    if (transp_debug)
+                                        cout << " mp= " << m << " t=" << (c / 60) << " min (tt_start = " << (ce / 60) << "min)";
 
                         // 0 tomegaram eseten 0-val szorozzuk a szamlalot
-                        if (fabs(m) < TINY_MASS_FLOW_RATE)
-                            m = TINY_MASS_FLOW_RATE;
-                        szaml += fabs(m) * c;
-                        nevezo += fabs(m);
-                    }
-                }
-            }
+                                    if (fabs(m) < TINY_MASS_FLOW_RATE)
+                                        m = TINY_MASS_FLOW_RATE;
+                                    szaml += fabs(m) * c;
+                                    nevezo += fabs(m);
+                                }
+                            }
+                        }
 
             // Kimeno agak
-            if (transp_debug)
-                cout << endl << "\n\tkimeno agak: (";
-            temp.clear();
-            temp = cspok.at(i)->ag_ki;
-            length_ki = temp.size();
-            if (transp_debug)
-                cout << temp.size() << "db)";
-
-            if (temp.size() > 0) {
-                for (unsigned int j = 0; j < temp.size(); j++) {
-                    if (agelemek.at(temp.at(j))->Get_v() <= 0) {
-                        c = agelemek.at(temp.at(j))->Get_tt_start();
-                        double ce = agelemek.at(temp.at(j))->Get_tt_end();
-                        m = agelemek.at(temp.at(j))->Get_mp();
                         if (transp_debug)
-                            cout << " mp= " << m << " t=" << (c / 60) << " min (tt_end = " << (ce / 60) << "min)";
+                            cout << endl << "\n\tkimeno agak: (";
+                        temp.clear();
+                        temp = cspok.at(i)->ag_ki;
+                        length_ki = temp.size();
+                        if (transp_debug)
+                            cout << temp.size() << "db)";
+
+                        if (temp.size() > 0) {
+                            for (unsigned int j = 0; j < temp.size(); j++) {
+                                if (agelemek.at(temp.at(j))->Get_v() <= 0) {
+                                    c = agelemek.at(temp.at(j))->Get_tt_start();
+                                    double ce = agelemek.at(temp.at(j))->Get_tt_end();
+                                    m = agelemek.at(temp.at(j))->Get_mp();
+                                    if (transp_debug)
+                                        cout << " mp= " << m << " t=" << (c / 60) << " min (tt_end = " << (ce / 60) << "min)";
 
                         // 0 tomegaram eseten 0-val szorozzuk a szamlalot
-                        if (fabs(m) < TINY_MASS_FLOW_RATE)
-                            m = TINY_MASS_FLOW_RATE;
-                        szaml += fabs(m) * c;
-                        nevezo += fabs(m);
+                                    if (fabs(m) < TINY_MASS_FLOW_RATE)
+                                        m = TINY_MASS_FLOW_RATE;
+                                    szaml += fabs(m) * c;
+                                    nevezo += fabs(m);
+                                }
+                            }
+                        }
+            // A virtualics csomopontokban siman lehet nevezo=0
+                        if (fabs(nevezo) < TINY_MASS_FLOW_RATE)
+                            nevezo = TINY_MASS_FLOW_RATE;
+
+                        cspok.at(i)->Set_dprop("tt", szaml / nevezo);
+                        sum = sum + szaml / nevezo;
+
+                        if (transp_debug)
+                            cout <<  "\n\t atlagos vizkor= " << cspok.at(i)->Get_dprop("tt") / 60 << "min";
                     }
                 }
-            }
-            // A virtualics csomopontokban siman lehet nevezeo=0
-            if (fabs(nevezo) < TINY_MASS_FLOW_RATE)
-                nevezo = TINY_MASS_FLOW_RATE;
 
-            cspok.at(i)->Set_dprop("tt", szaml / nevezo);
-            sum = sum + szaml / nevezo;
-
-            if (transp_debug)
-                cout <<  "\n\t atlagos vizkor= " << cspok.at(i)->Get_dprop("tt") / 60 << "min";
-        }
-    }
-
-    mean_VAL = sum / (double(cspok.size()));
+                mean_VAL = sum / (double(cspok.size()));
 
     // 2. lepes: csoelemek leptetese
 
-    double v, L, tt_s, tt_e;
-    for (int i = 0; i < agelemek.size(); i++) {
-        string type = agelemek.at(i)->GetType();
-int cspe_id = agelemek.at(i)->Get_Cspe_Index();
-                int cspv_id = agelemek.at(i)->Get_Cspv_Index();
-       
-
-        if (type.compare("Cso") == 0) {
-            L = agelemek.at(i)->Get_dprop("L");
-            v = agelemek.at(i)->Get_v();
-            if (v >= 0) {
-                if (agelemek.at(i)->Get_v() < TINY_VEL) {
-                    tt_s = cspok.at(cspe_id)->Get_dprop("tt");
-                    tt_e = cspok.at(cspv_id)->Get_dprop("tt");
-                    if (tt_s > tt_e)
-                        tt_e = tt_s;
-                    else
-                        tt_s = tt_e;
-                    // v = TINY_VEL;
-                }
-                else {
+                double v, L, tt_s, tt_e;
+                for (int i = 0; i < agelemek.size(); i++) {
+                    string type = agelemek.at(i)->GetType();
                     int cspe_id = agelemek.at(i)->Get_Cspe_Index();
-                    tt_s = cspok.at(cspe_id)->Get_dprop("tt");
-                    tt_e = tt_s + L / v;
+                    int cspv_id = agelemek.at(i)->Get_Cspv_Index();
+
+
+                    if (type.compare("Cso") == 0) {
+                        L = agelemek.at(i)->Get_dprop("L");
+                        v = agelemek.at(i)->Get_v();
+                        if (v >= 0) {
+                            // cout<<"\n v>=0!!!";
+                            if (agelemek.at(i)->Get_v() < TINY_VEL) {
+                                tt_s = cspok.at(cspe_id)->Get_dprop("tt");
+                                tt_e = cspok.at(cspv_id)->Get_dprop("tt");
+                                if (tt_s > tt_e)
+                                    tt_e = tt_s;
+                                else
+                                    tt_s = tt_e;
+                                v = TINY_VEL;
+                                // cout<<"\n v is set to TINY_VEL.";
+                            }
+                            // else {
+                            int cspe_id = agelemek.at(i)->Get_Cspe_Index();
+                            tt_s = cspok.at(cspe_id)->Get_dprop("tt");
+                            tt_e = tt_s + L / v;
 
                     // Get maximum value
-                    if (tt_e > mv) {
-                        max_VAL = tt_e;
-                        mv      = tt_e;
-                        max_ID = agelemek.at(i)->Get_nev();
-                    }
-                }
+                            if (tt_e > mv) {
+                                max_VAL = tt_e;
+                                mv      = tt_e;
+                                max_ID = agelemek.at(i)->Get_nev();
+                            }
+                            // }
 
-                if (tt_s < MAX_TIME)
-                    agelemek.at(i)->Set_tt_start(tt_s);
-                else
-                    agelemek.at(i)->Set_tt_start(MAX_TIME);
-                if (tt_e < MAX_TIME)
-                    agelemek.at(i)->Set_tt_end(tt_e);
-                else
-                    agelemek.at(i)->Set_tt_end(MAX_TIME);
+                            if (tt_s < MAX_TIME)
+                                agelemek.at(i)->Set_tt_start(tt_s);
+                            else
+                                agelemek.at(i)->Set_tt_start(MAX_TIME);
+                            if (tt_e < MAX_TIME)
+                                agelemek.at(i)->Set_tt_end(tt_e);
+                            else
+                                agelemek.at(i)->Set_tt_end(MAX_TIME);
 
-                if (transp_debug)
-                    cout << endl << agelemek.at(i)->Get_nev() << ": v=" << v << "m/s, L=" << L << "m, tt_start=" <<
-                         (tt_s / 60.) << "min, tt_end=" << (tt_e / 60.) << "min";
-            }
-            else {
-                if (v > -TINY_VEL) {
-                    tt_s = cspok.at(cspe_id)->Get_dprop("tt");
-                    tt_e = cspok.at(cspv_id)->Get_dprop("tt");
-                    if (tt_s > tt_e)
-                        tt_e = tt_s;
-                    else
-                        tt_s = tt_e;
-                    //v = -TINY_VEL;
+                            if (transp_debug)
+                                cout << endl << agelemek.at(i)->Get_nev() << ": v=" << v << "m/s, L=" << L << "m, tt_start=" <<
+                            (tt_s / 60.) << "min, tt_end=" << (tt_e / 60.) << "min";
+                        }
+                        else {
+                            if (v > -TINY_VEL) {
+                                tt_s = cspok.at(cspe_id)->Get_dprop("tt");
+                                tt_e = cspok.at(cspv_id)->Get_dprop("tt");
+                                if (tt_s > tt_e)
+                                    tt_e = tt_s;
+                                else
+                                    tt_s = tt_e;
+                    v = -TINY_VEL; // Ki volt kommentelve
                 }
                 else {
                     int cspv_id = agelemek.at(i)->Get_Cspv_Index();
                     tt_e = cspok.at(cspv_id)->Get_dprop("tt");
                     tt_s = tt_e - L / v;
 
-                    // if (agelemek.at(i)->Get_nev()=="PIPE18"){
-                    //     cout<<endl<<"PIPE18: v="<<v<<", L/v="<<(L/v/3600)<<", tt_e="<<tt_e/3600<<", tt_s="<<tt_s/3600;
-                    //     cin.get();
-                    // }
                     if (tt_s > mv) {
                         max_VAL = tt_s;
                         mv      = tt_s;
@@ -2683,6 +2681,15 @@ int cspe_id = agelemek.at(i)->Get_Cspe_Index();
                 else
                     agelemek.at(i)->Set_tt_end(MAX_TIME);
             }
+
+            // if (agelemek.at(i)->Get_nev()=="PIPE21"){
+            //     cout<<endl<<"PIPE21: v="<<v<<", L/v="<<(L/v/3600)<<", tt_e="<<tt_e/3600<<", tt_s="<<tt_s/3600;
+            // }
+            //             if (agelemek.at(i)->Get_nev()=="PIPE24"){
+            //     cout<<endl<<"PIPE24: v="<<v<<", L/v="<<(L/v/3600)<<", tt_e="<<tt_e/3600<<", tt_s="<<tt_s/3600;
+            // }
+
+                // cin.get();
         }
         else {
             double v = agelemek.at(i)->Get_v();
@@ -2698,8 +2705,8 @@ int cspe_id = agelemek.at(i)->Get_Cspe_Index();
 
                 if (transp_debug) {
                     cout << endl << agelemek.at(i)->Get_nev() <<
-                         ": \n\trendszerbe bearamlas miatt (v=" << v << "m/s) adott vizkor: tt_start = " << tts / 60. << "min"
-                         << ", tt_end = " << tte / 60. << "min";
+                    ": \n\trendszerbe bearamlas miatt (v=" << v << "m/s) adott vizkor: tt_start = " << tts / 60. << "min"
+                    << ", tt_end = " << tte / 60. << "min";
                     cin.get();
                 }
             }
@@ -2732,7 +2739,7 @@ int cspe_id = agelemek.at(i)->Get_Cspe_Index();
                 agelemek.at(i)->Set_tt_end(tt);
                 if (transp_debug) {
                     cout << endl << agelemek.at(i)->Get_nev() <<
-                         ": \n\tvizkor: " << tt / 60. << "min";
+                    ": \n\tvizkor: " << tt / 60. << "min";
                     cin.get();
                 }
             }
