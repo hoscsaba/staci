@@ -169,10 +169,30 @@ void solve_hydraulics(Staci&  feladat, double& time2, double& time3) {
 	feladat.ini();
 //	feladat.list_system();
 
+	if (feladat.Get_debug_level()==-1)
+	{
+		cout<<"\n============================================================";
+		cout<<"\ndebug_level = -1   -->";
+		cout<<"\n\nExporting node names to <nodelist.txt>...";
+		cout<<"\nExporting connected nodes to <connected_nodes.txt>...";
+		feladat.export_connected_nodes();
+		cout<<" done.\n\nUse script connected_nodes.py to find isolated islands.";
+		cout<<"\n============================================================\n\n";
+	}
+
 	startTime = clock();
 	bool konv_ok = feladat.solve_system();
 	endTime = clock();
 	time2=double( endTime - startTime ) / CLOCKS_PER_SEC;
+
+	ostringstream msg;
+	string rrs_file = feladat.get_def_file()+".rrs";
+	msg << "\n\nTrying to delete previous *.rrs file ... ";
+    if ( remove( rrs_file.c_str()) != 0 )
+        msg << " file not found, cannot delete it.";
+    else
+        msg << "file successfully deleted." ;
+    cout << msg.str();
 
 	if (!konv_ok) {
 		cout<<endl<<endl <<"*********************************************************************************";
@@ -186,11 +206,17 @@ void solve_hydraulics(Staci&  feladat, double& time2, double& time3) {
 		feladat.set_res_file(resfile);
 		feladat.save_results(true);
 
-		ofstream outfile((feladat.get_def_file()+".rrs").c_str(), ios::trunc);
+		ofstream outfile(rrs_file.c_str(), ios::trunc);
 		outfile<<"error\n";
 		outfile.close();
 		feladat.logfile_write("\n\nerror", 0);
 	} else {
+		// Sikeres volt a fut�s?
+		ofstream outfile(rrs_file.c_str(), ios::trunc);
+		outfile<<"ok\n";
+		outfile.close();
+		feladat.logfile_write("\n\nok", 0);
+		
 		// If computation was OK, compute residence time also
 		feladat.solve_residence_time();
 
@@ -200,11 +226,8 @@ void solve_hydraulics(Staci&  feladat, double& time2, double& time3) {
 		endTime = clock();
 		time3=double( endTime - startTime ) / CLOCKS_PER_SEC;
 
-		// Sikeres volt a fut�s?
-		ofstream outfile((feladat.get_def_file()+".rrs").c_str(), ios::trunc);
-		outfile<<"ok\n";
-		outfile.close();
-		feladat.logfile_write("\n\nok", 0);
 		//cout<<feladat.list_results();
 	}
+
+	
 }

@@ -9,7 +9,7 @@ class Staci
 public:
     vector<Csomopont *> cspok;
     vector<Agelem *> agelemek;
-    bool export_aisee;
+    void export_connected_nodes();
     Staci(int argc, char *argv[]);
     ~Staci();
     string Get_out_file()

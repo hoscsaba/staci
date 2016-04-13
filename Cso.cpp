@@ -270,7 +270,7 @@ double Cso::Get_dfdmu(string mit)
 
     double out = 0.0;
     if (mit == "diameter")
-        out = -5.*surlodas() * L / pow(D, 6) * 8 / ro / pow(pi, 2) * mp * abs(mp);
+        out = -5.*surlodas() * L / pow(D, 6) * 8 / ro / pow(pi, 2) * mp * abs(mp); // Pa/m
     //else if (mit == "lambda")
     //    out = lambda;
     else
@@ -279,7 +279,7 @@ double Cso::Get_dfdmu(string mit)
              << mit << endl << endl;
         out = 0.0;
     }
-    return out/ro/g;
+    return out/ro/g; // Itt osztom vissza ro*g-vel
 }
 
 //--------------------------------------------------------------
@@ -320,7 +320,7 @@ d dp'/dmp=lambda*L/D*ro/2*1/(ro*A)^2*abs(v)
 double Cso::ComputeHeadlossDerivative()
 {
     double der;
-    der = surlodas() * L / pow(D, 5) * 8 / ro / pow(pi, 2) * 2 * abs(mp);
+    der = surlodas() * L / pow(D, 5) * 8 / ro / pow(pi, 2) * 2 * abs(mp); // Pa/(kg/s)
     return der;
 }
 
