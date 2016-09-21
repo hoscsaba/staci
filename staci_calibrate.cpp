@@ -700,16 +700,16 @@ void Load_Settings() {
 
     XMLNode xMainNode = XMLNode::openFileHelper("staci_calibrate_settings.xml", "settings");
 
-    global_debug_level = stoi(xMainNode.getChildNode("global_debug_level").getText());
-    Staci_debug_level = stoi(xMainNode.getChildNode("Staci_debug_level").getText());
+    global_debug_level = atoi(xMainNode.getChildNode("global_debug_level").getText());
+    Staci_debug_level = atoi(xMainNode.getChildNode("Staci_debug_level").getText());
     dir_name = xMainNode.getChildNode("dir_name").getText();
     fname_prefix = xMainNode.getChildNode("fname_prefix").getText();
     logfilename = xMainNode.getChildNode("logfilename").getText();
     Eredmenyek_FVM_dfile = xMainNode.getChildNode("Eredmenyek_FVM_dfile").getText();
     FVM_dfile = xMainNode.getChildNode("FVM_dfile").getText();
-    Num_of_Periods = stoi(xMainNode.getChildNode("Num_of_Periods").getText());
-    popsize = stoi(xMainNode.getChildNode("popsize").getText());
-    ngen = stoi(xMainNode.getChildNode("ngen").getText());
+    Num_of_Periods = atoi(xMainNode.getChildNode("Num_of_Periods").getText());
+    popsize = atoi(xMainNode.getChildNode("popsize").getText());
+    ngen = atoi(xMainNode.getChildNode("ngen").getText());
     pmut = stod(xMainNode.getChildNode("pmut").getText());
     pcross = stod(xMainNode.getChildNode("pcross").getText());
 
