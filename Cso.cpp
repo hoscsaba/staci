@@ -4,6 +4,7 @@ Fully filled pipe only!
 */
 
 using namespace std;
+
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -15,8 +16,7 @@ using namespace std;
 Cso::Cso(const string a_nev, const string a_cspe_nev, const string a_cspv_nev, const double a_ro,
          const double a_L, const double a_D, const double a_erdesseg,
          const double a_cl_k, const double a_cl_w, const double a_mp) :
-    Agelem(a_nev, a_D *a_D *pi / 4, a_mp, a_ro)
-{
+        Agelem(a_nev, a_D * a_D * pi / 4, a_mp, a_ro) {
     //Kotelezo adatok minden Agelemnel:
     tipus = "Cso";
     csp_db = 2;
@@ -40,29 +40,25 @@ Cso::Cso(const string a_nev, const string a_cspe_nev, const string a_cspv_nev, c
 DW (friction_model_type = 0) -> Darcy Wiesenbach
 HW (friction_model_type = 1) -> Hazen-Williams
 */
-void Cso::Set_friction_model(string a_fric_type)
-{
+void Cso::Set_friction_model(string a_fric_type) {
     if (a_fric_type == "DW")
         friction_model_type = 0;
-    else
-    {
+    else {
         if (a_fric_type == "HW")
             friction_model_type = 1;
-        else
-        {
-            cout << endl << "HIBA! Cso::ComputeHeadloss, ismeretlen surlodasi modell (DW|HW) : " << a_fric_type << endl << endl;
+        else {
+            cout << endl << "HIBA! Cso::ComputeHeadloss, ismeretlen surlodasi modell (DW|HW) : " << a_fric_type << endl
+                 << endl;
         }
     }
 }
 
 //--------------------------------------------------------------
-Cso::~Cso()
-{
+Cso::~Cso() {
 }
 
 //--------------------------------------------------------------
-string Cso::Info()
-{
+string Cso::Info() {
     ostringstream strstrm;
     strstrm << Agelem::Info();
     strstrm << "\n  kapcsolodas : " << cspe_nev << "(index:" << cspe_index << ") --> "
@@ -78,8 +74,7 @@ string Cso::Info()
 }
 
 //--------------------------------------------------------------
-double Cso::f(vector<double> x)
-{
+double Cso::f(vector<double> x) {
     double ere, tag1;
     double pe = x[0] * ro * g;
     double pv = x[1] * ro * g;
@@ -100,8 +95,7 @@ double Cso::f(vector<double> x)
 }
 
 //--------------------------------------------------------------
-vector<double> Cso::df(vector<double> x)
-{
+vector<double> Cso::df(vector<double> x) {
     //double pe=x[0]*ro*g;
     //double pv=x[1]*ro*g;
     double he = x[2];
@@ -118,8 +112,7 @@ vector<double> Cso::df(vector<double> x)
 }
 
 //--------------------------------------------------------------
-void Cso::Ini(int mode, double value)
-{
+void Cso::Ini(int mode, double value) {
     if (mode == 0)
         Set_mp(1.);
     else
@@ -137,8 +130,7 @@ For HW (friction_model_type = 1) -> Hazen-Williams model parameter 'erdesseg' is
 
 For any of these models, if parameter erdesseg is negative, it is assumed that lambda=-erdesseg
 */
-double Cso::surlodas()
-{
+double Cso::surlodas() {
 
     double v_min = 0.1;
     double v = mp / ro / (D * D * pi / 4);
@@ -153,16 +145,13 @@ double Cso::surlodas()
     {
         if (erdesseg <= 0)
             lambda = -erdesseg;
-        else
-        {
-            if (f_count >= 0)
-            {
+        else {
+            if (f_count >= 0) {
                 double Re = fabs(v) * D / nu;
 
                 double hiba = 1.0e10, ize = 0.0, lambda_uj = 0.0;
                 unsigned int i = 0;
-                while ((hiba > 1e-6) && (i < 10))
-                {
+                while ((hiba > 1e-6) && (i < 10)) {
                     ize = -2.0 * log10(erdesseg / 1000 / D / 3.71 + 2.51 / Re / sqrt(lambda));
                     lambda_uj = 1 / ize / ize;
                     hiba = fabs((lambda - lambda_uj) / lambda);
@@ -171,8 +160,7 @@ double Cso::surlodas()
                 if (i > 8)
                     cout << endl << endl << "WARNING: " << nev << endl
                          << "\t\t pipe " << nev << " friction factor coefficient iteration #" << i;
-            }
-            else
+            } else
                 lambda = 0.02;
         }
     }
@@ -181,31 +169,29 @@ double Cso::surlodas()
     {
         if (erdesseg <= 0)
             lambda = -erdesseg;
-        else
-        {
-            if (f_count >= 0)
-            {
+        else {
+            if (f_count >= 0) {
                 // v=0.849*C_factor*Rh^0.63*s^0.54
                 // s= h'/L
                 /*double C_factor=100;*/
                 //double Rh = D / 4; // A/K=(D^2*pi/4)/(D*pi)=D/4
                 double C_factor = erdesseg;
 
-                if (C_factor < 10.)
-                {
+                if (C_factor < 10.) {
                     cout << endl << "\tWARNING: " << " pipe " << nev
-                         << " friction factor is set to Hazen-Williams but the friction factor is too small (C_HW=" << C_factor << ").";
+                         << " friction factor is set to Hazen-Williams but the friction factor is too small (C_HW="
+                         << C_factor << ").";
                     cout << " -> OVERRIDING by C_HW=10.";
                     C_factor = 10.;
                     erdesseg = 10.;
                 }
 
-                dp = L / pow(C_factor, 1.85) / pow(D, 4.87) * 7.88 / pow(0.85, 1.85) * pow(fabs(v * Aref), 0.85) * (v * Aref) * ro * g;
+                dp = L / pow(C_factor, 1.85) / pow(D, 4.87) * 7.88 / pow(0.85, 1.85) * pow(fabs(v * Aref), 0.85) *
+                     (v * Aref) * ro * g;
 
                 lambda = fabs(dp / (L / D * ro / 2 * v * fabs(v)));
 
-            }
-            else
+            } else
                 lambda = 0.02;
         }
     }
@@ -213,14 +199,12 @@ double Cso::surlodas()
     //cout << endl <<nev<< ": lambda=" << lambda << endl;
     //    cin.get();
 
-    if (fabs(lambda) < lambda_min)
-    {
+    if (fabs(lambda) < lambda_min) {
         //cout<<endl<<"\t WARNING: "<<nev<<": v="<<v<<"m/s, lambda="<<lambda<<"<"<<lambda_min<<", overriding by "<<lambda_min;
         lambda = lambda_min;
     }
 
-    if (fabs(lambda) > lambda_max)
-    {
+    if (fabs(lambda) > lambda_max) {
         //cout<<endl<<"\t WARNING: "<<nev<<": v="<<v<<"m/s, lambda="<<lambda<<">"<<lambda_max<<", overriding by "<<lambda_max;
         lambda = lambda_max;
     }
@@ -229,8 +213,7 @@ double Cso::surlodas()
 }
 
 //--------------------------------------------------------------
-double Cso::Get_dprop(string mit)
-{
+double Cso::Get_dprop(string mit) {
 
     double out = 0.0;
     if (mit == "Aref")
@@ -255,8 +238,7 @@ double Cso::Get_dprop(string mit)
         out = fabs(ComputeHeadloss() / ro / g / L);
     else if (mit == "mass_flow_rate")
         out = mp;
-    else
-    {
+    else {
         cout << endl << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit="
              << mit << endl << endl;
         out = 0.0;
@@ -265,30 +247,28 @@ double Cso::Get_dprop(string mit)
 }
 
 //--------------------------------------------------------------
-double Cso::Get_dfdmu(string mit)
-{
+double Cso::Get_dfdmu(string mit) {
 
     double out = 0.0;
     if (mit == "diameter")
-        out = -5.*surlodas() * L / pow(D, 6) * 8 / ro / pow(pi, 2) * mp * abs(mp); // Pa/m
-    //else if (mit == "lambda")
-    //    out = lambda;
-    else
-    {
+        out = -5. * surlodas() * L / pow(D, 6) * 8 / ro / pow(pi, 2) * mp * abs(mp); // Pa/m
+        //else if (mit == "lambda")
+        //    out = lambda;
+    else {
         cout << endl << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit="
              << mit << endl << endl;
         out = 0.0;
     }
-    return out/ro/g; // Itt osztom vissza ro*g-vel
+    return out / ro / g; // Itt osztom vissza ro*g-vel
 }
 
 //--------------------------------------------------------------
-void Cso::Set_dprop(string mit, double mire)
-{
-    if (mit == "diameter")
+void Cso::Set_dprop(string mit, double mire) {
+    if (mit == "diameter") {
         D = mire;
-    else
-    {
+        Aref = D * D * pi / 4;
+        FolyTerf = Aref * L;
+    } else {
         cout << endl << "HIBA! Cso::Set_dprop(mit), ismeretlen bemenet: mit="
              << mit << endl << endl;
     }
@@ -300,12 +280,11 @@ void Cso::Set_dprop(string mit, double mire)
 /*!
 dp'=lambda*L/D*ro/2*v*fabs(v)
 */
-double Cso::ComputeHeadloss()
-{
+double Cso::ComputeHeadloss() {
     double headloss = 0.0;
     double v = mp / ro / Aref;
 
-    headloss = surlodas() * L / D * ro / 2.*v * fabs(v);
+    headloss = surlodas() * L / D * ro / 2. * v * fabs(v);
 
     return headloss;
 }
@@ -317,8 +296,7 @@ dp'=lambda*L/D*ro/2*v*fabs(v)
 d dp'/dmp=lambda*L/D*ro/2*1/(ro*A)^2*abs(v)
 */
 
-double Cso::ComputeHeadlossDerivative()
-{
+double Cso::ComputeHeadlossDerivative() {
     double der;
     der = surlodas() * L / pow(D, 5) * 8 / ro / pow(pi, 2) * 2 * abs(mp); // Pa/(kg/s)
     return der;

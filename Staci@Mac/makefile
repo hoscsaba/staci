@@ -47,7 +47,26 @@ INC:-I/Users/hoscsaba/Utils/SuiteSparse/UMFPACK/Include -I/Users/hoscsaba/Utils/
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: new_staci
+all: new_staci staci_calibrate
+
+staci_calibrate: $(OBJS) $(USER_OBJS)
+	@echo 'Building target: $@'
+	@echo 'Invoking: GCC C++ Linker'
+	g++ -I/Users/hoscsaba/Utils/SuiteSparse/UMFPACK/Include\
+	    -I/Users/hoscsaba/Utils/SuiteSparse/AMD/Include\
+	    -I/Users/hoscsaba/Utils/SuiteSparse/SuiteSparse_config\
+	    -o "staci_calibrate" $(OBJS) $(USER_OBJS) $(LIBS) $(UMFPACK)\
+	    /Users/hoscsaba/Utils/SuiteSparse/UMFPACK/Lib/libumfpack.a\
+		/Users/hoscsaba/Utils/SuiteSparse/AMD/Lib/libamd.a\
+		/Users/hoscsaba/Utils/SuiteSparse/SuiteSparse_config/libsuitesparseconfig.a\
+		/Users/hoscsaba/Utils/SuiteSparse/CHOLMOD/Lib/libcholmod.a\
+		/Users/hoscsaba/Utils/SuiteSparse/COLAMD/Lib/libcolamd.a\
+	    -L/usr/local/lib\
+	    -L/Users/hoscsaba/Utils/SuiteSparse/UMFPACK/Lib\
+	    $(LDFLAGS) 
+	    -Lga -lga -lm 
+	@echo 'Finished building target: $@'
+	@echo ' '
 
 # Tool invocations
 new_staci: $(OBJS) $(USER_OBJS)

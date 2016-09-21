@@ -1,4 +1,5 @@
 using namespace std;
+
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -8,9 +9,8 @@ using namespace std;
 #include "Vegakna.h"
 
 Vegakna::Vegakna(const string a_nev, const string a_csp_nev, const double a_ro, const double Aref,
-	const double a_Hf, const double a_H, const double a_mp, const double a_tt) :
-Agelem(a_nev, Aref, a_mp,a_ro,a_tt)
-{
+                 const double a_Hf, const double a_H, const double a_mp, const double a_tt) :
+        Agelem(a_nev, Aref, a_mp, a_ro, a_tt) {
     //Kotelezo adatok minden Agelemnel:
     tipus = "Vegakna";
     csp_db = 1;
@@ -26,20 +26,18 @@ Agelem(a_nev, Aref, a_mp,a_ro,a_tt)
 }
 
 //--------------------------------------------------------------
-Vegakna::~Vegakna()
-{
+Vegakna::~Vegakna() {
 }
 
 //--------------------------------------------------------------
-string Vegakna::Info()
-{
+string Vegakna::Info() {
     ostringstream strstrm;
     strstrm << Agelem::Info();
     strstrm << "\n        kapcsolodas : " << cspe_nev << "(index:" << cspe_index
-       << ")\n";
-strstrm << "        adatok : fenek magassag [m] : " << Hf << endl;
-strstrm << "                 vizszint [m]       : " << H << endl;
-return strstrm.str();
+            << ")\n";
+    strstrm << "        adatok : fenek magassag [m] : " << Hf << endl;
+    strstrm << "                 vizszint [m]       : " << H << endl;
+    return strstrm.str();
 }
 
 /*//--------------------------------------------------------------
@@ -49,8 +47,7 @@ return strstrm.str();
  }*/
 
 //--------------------------------------------------------------
- double Vegakna::f(vector<double> x)
- {
+double Vegakna::f(vector<double> x) {
     //    double pe=x[0]*ro*g;
     //    double pv=x[1]*ro*g;
     //    double he=x[2];
@@ -67,8 +64,7 @@ return strstrm.str();
 }
 
 //--------------------------------------------------------------
-vector<double> Vegakna::df(vector<double> x)
-{
+vector<double> Vegakna::df(vector<double> x) {
     vector<double> ere;
     ere.push_back(1.0);
     ere.push_back(0.0);
@@ -95,48 +91,45 @@ vector<double> Vegakna::df(vector<double> x)
  }
  */
 //--------------------------------------------------------------
- void Vegakna::Ini(int mode, double value)
- {
+void Vegakna::Ini(int mode, double value) {
     if (mode == 0)
-       mp = 1;
-   else
-       mp = value;
+        mp = 1;
+    else
+        mp = value;
 }
+
 //--------------------------------------------------------------
-void Vegakna::Set_dprop(string mit, double mire)
-{
+void Vegakna::Set_dprop(string mit, double mire) {
 
     if (mit == "bottom_level")
-       Hf = mire;
-   else if (mit == "water_level")
-       H = mire;
-   else
-       cout << endl
-   << "HIBA! Vegakna::Set_dprop(mit), ismeretlen bemenet: mit="
-   << mit << endl << endl;
+        Hf = mire;
+    else if (mit == "water_level")
+        H = mire;
+    else
+        cout << endl
+             << "HIBA! Vegakna::Set_dprop(mit), ismeretlen bemenet: mit="
+             << mit << endl << endl;
 }
 
 //--------------------------------------------------------------
-double Vegakna::Get_dprop(string mit)
-{
+double Vegakna::Get_dprop(string mit) {
 
     double out = 0.0;
     if (mit == "bottom_level")
-       out = Hf;
-   else if (mit == "mass_flow_rate")
-    out = mp;
-else if (mit == "water_level")
-	out = H;
-else if (mit == "headloss")
-	out = 0.0;
-else if (mit == "headloss_per_unit_length")
-	out = 0.0;
-else
-{
-	cout << endl
-  << "HIBA! Vegakna::Get_dprop(mit), ismeretlen bemenet: mit="
-  << mit << endl << endl;
-  out = 0.0;
-}
-return out;
+        out = Hf;
+    else if (mit == "mass_flow_rate")
+        out = mp;
+    else if (mit == "water_level")
+        out = H;
+    else if (mit == "headloss")
+        out = 0.0;
+    else if (mit == "headloss_per_unit_length")
+        out = 0.0;
+    else {
+        cout << endl
+             << "HIBA! Vegakna::Get_dprop(mit), ismeretlen bemenet: mit="
+             << mit << endl << endl;
+        out = 0.0;
+    }
+    return out;
 }

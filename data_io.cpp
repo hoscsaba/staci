@@ -153,6 +153,10 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
         cin.get();
         */
         aref = atof(Node_edges.getChildNode("edge", i).getChildNode("aref").getText());
+        if (aref<1e-3*1e-3){
+            printf("\nWARNING!!! Reference area of %s is %g, overriding with 1. m^2.",id.c_str(),aref);
+            aref=1.;
+        }
         /*cout<<endl<<" aref:"<<aref;
         cin.get();
         */
@@ -233,6 +237,9 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                 case 3: // Valve = JelleggorbesFojtas
                 {
                     double allas = atof(elem.getChildNode("position").getText());
+
+                    if (debug)
+                        cout << ", actual setting=" << allas;
                     int jgpsz = elem.getChildNode("curve").getChildNode("points").nChildNode("point_x");
                     vector<double> e(jgpsz), zeta(jgpsz);
                     curve_reader(id, elem.getChildNode("curve"), e, zeta);
@@ -242,6 +249,11 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                         aref = Aref_min;
                         cout<<"Warning! element "<<id<<" Aref="<<aref<<", overwriting with "<<Aref_min<<endl;
                     }
+                    if (allas > e.at(e.size()-1))
+                        cout<<"Warning! element "<<id<<" actual setting="<<allas<<" > e(end) "<<e.at(e.size()-1)<<endl;
+                    if (allas < e.at(0))
+                        cout<<"Warning! element "<<id<<" actual setting="<<allas<<" < e(0) "<<e.at(0)<<endl;
+
                         agelemek.push_back(new JelleggorbesFojtas(id, node_from, node_to, density, aref, e, zeta, allas, mass_flow_rate));
                     if (debug)
                         cout << " OK";
@@ -259,8 +271,8 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                     if (debug)
                         cout << ", bottom_level=" << Hb << "m" << ", water_level=" << Hw
                              << "m, szumma_patlag=" << patlag;
-                             
-                    agelemek.push_back(new Vegakna(id, node_from, density, aref, Hb, Hw, mass_flow_rate,travel_time));
+
+                    agelemek.push_back(new Vegakna(id, node_from, density, aref, Hb, Hw, mass_flow_rate, travel_time));
                     if (debug)
                         cout << " OK";
                     break;
@@ -421,16 +433,19 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                 }
             }
         }
+/*        printf("\n Size of agelemek is %lu, last one added is %s.",agelemek.size(),agelemek.at(agelemek.size()-1)->Get_nev().c_str());
+        cout<<agelemek.at(agelemek.size()-1)->Info();
+        cin.get();*/
     }
     if (debug)
     {
-        cout << endl << endl << endl << "Ennyiszer fordulnak elo a beepitett elemek:";
+        cout << endl << endl << endl << "Number of edge types:";
         cout << endl << "\tnode:\t" << csp_db;
         for (int j = 0; j < edge_type_number; j++)
             cout << endl << "\t" << edge_type.at(j) << ":\t" << edge_type_occur.at(j);
     }
 
-    patlag = patlag / darab;
+    //patlag = patlag / darab;
 
 }
 
@@ -573,7 +588,7 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
         cout << endl << endl << "Csomopontok eredmenyeinek kiirasa kesz." << endl;
     }
 
-    double mp, q, v, dh, dhpL, tt;
+    double mp, q, v, dh, dhpL, tt, aref;
     for (int i = 0; i < ag_db; i++)
     {
         id = Node_edges.getChildNode("edge", i).getChildNode("id").getText();
@@ -620,6 +635,12 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
                 os.str("");
                 os << scientific << setprecision(5) << tt;
                 Node_edges.getChildNode("edge", i).getChildNode("travel_time").addText(os.str().c_str());
+
+                aref = agelemek.at(i)->Get_Aref();
+                Node_edges.getChildNode("edge", i).getChildNode("aref").deleteText();
+                os.str("");
+                os << scientific << setprecision(5) << aref;
+                Node_edges.getChildNode("edge", i).getChildNode("aref").addText(os.str().c_str());
 
 
                 megvan = true;

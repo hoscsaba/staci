@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.2)
-project(new_staci)
+cmake_minimum_required(VERSION 3.6)
+project(staci)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
@@ -31,6 +31,7 @@ set(SOURCE_FILES
     nrutil_nr.h
     Staci.cpp
     Staci.h
+    staci_calibrate.cpp
     staci_main.cpp
     StaciException.h
     Szivattyu.cpp
@@ -40,6 +41,6 @@ set(SOURCE_FILES
     VisszacsapoSzelep.cpp
     VisszacsapoSzelep.h
     xmlParser.cpp
-    xmlParser.h)
+    xmlParser.h staci_calibrate.cpp.backup1.cpp)
 
-add_executable(new_staci ${SOURCE_FILES})
+add_executable(staci ${SOURCE_FILES})

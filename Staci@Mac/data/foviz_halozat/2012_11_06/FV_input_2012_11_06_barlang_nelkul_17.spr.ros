@@ -1,0 +1,16 @@
+STACI v2.0
+ (c) BME Dept. of Hydrodynamic Systems
+ (c) C. Hos (csaba.hos@hds.bme.hu)
+ info: www.hds.bme.hu\staci
+
+ date: Wed Sep 21 14:25:08 2016
+
+ input file:data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_17.spr
+
+ Number of nodes: 191
+ Number of edges: 269
+
+
+Automatic inicialization...
+	nodal pressures:	5 mwc 
+	edge mass flow rates:	100 kg/s ...

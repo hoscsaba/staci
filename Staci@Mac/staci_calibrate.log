@@ -1,0 +1,66 @@
+Building WDS systems....
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_1.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_2.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_3.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_4.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_5.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_6.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_7.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_8.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_9.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_10.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_11.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_12.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_13.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_14.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_15.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_16.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_17.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_18.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_19.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_20.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_21.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_22.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_23.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_24.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_25.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_26.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_27.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_28.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_29.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_30.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_31.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_32.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_33.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_34.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_35.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_36.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_37.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_38.sprSettings:
+	 global_debug_level:	1
+	 Staci_debug_level	0
+	 dir_name	data/foviz_halozat/2012_11_06/
+	 fname_prefix	FV_input_2012_11_06_barlang_nelkul_
+	 logfilename	staci_calibrate.log
+	 Eredmenyek_FVM_dfile	FV_input_2012_11_06_barlang_nelkul.csv
+	 Num_of_Periods	5
+	 popsize	50
+	 ngen	100
+	 pmut	0.01
+	 pcross	0.6
+
+Settings:
+	 global_debug_level   : 1
+	 Staci_debug_level    : 0
+
+	 dir_name             : data/foviz_halozat/2012_11_06/
+	 fname_prefix         : FV_input_2012_11_06_barlang_nelkul_
+	 logfilename          :staci_calibrate.log
+	 Eredmenyek_FVM_dfile : FV_input_2012_11_06_barlang_nelkul.csv
+	 Num_of_Periods       :5
+
+	 popsize : 50
+	 ngen    : 100
+	 pmut    : 0.01
+	 pcross  : 0.6
+

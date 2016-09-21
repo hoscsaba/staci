@@ -1,1045 +1,429 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="ISO-8859-2" standalone="no"?>
 <staci>
-	<settings>
-		<id>
-			vizkor_teszt1
-		</id>
-		<name/>
-		<color/>
-		<counter>
-			1
-		</counter>
-		<cpp_xml_debug>
-			false
-		</cpp_xml_debug>
-		<solution_exists>
-			true
-		</solution_exists>
-		<tsolution_exists>
-			false
-		</tsolution_exists>
-		<csolution_exists>
-			false
-		</csolution_exists>
-		<serial_exists>
-			false
-		</serial_exists>
-		<out_file>
-			staci.out
-		</out_file>
-		<debug_level>
-			2
-		</debug_level>
-		<friction_model>
-			DW
-		</friction_model>
-		<version>
-			1
-		</version>
-		<xstart>
-			0
-		</xstart>
-		<ystart>
-			0
-		</ystart>
-		<xend>
-			100
-		</xend>
-		<yend>
-			100
-		</yend>
-		<owner>
-			hos.csaba
-		</owner>
-		<width>
-			1000
-		</width>
-		<height>
-			1000
-		</height>
-		<hasmap>
-			false
-		</hasmap>
-		<image/>
-		<locked>
-			false
-		</locked>
-		<iter_max>
-			100
-		</iter_max>
-		<e_p_max>
-			0.001
-		</e_p_max>
-		<e_mp_max>
-			1.0
-		</e_mp_max>
-		<relax>
-			0.1
-		</relax>
-		<relax_mul>
-			1.2
-		</relax_mul>
-		<tt_length>
-			1.0
-		</tt_length>
-		<cl_length>
-			1.0
-		</cl_length>
-		<mp_init>
-			100.0
-		</mp_init>
-		<p_init>
-			5.0
-		</p_init>
-		<fluid_volume>
-			0.00000e+00
-		</fluid_volume>
-		<start_date>
-			2007-01-01
-		</start_date>
-		<start_time>
-			0.0
-		</start_time>
-		<time_step>
-			1.0
-		</time_step>
-		<step_count>
-			5
-		</step_count>
-		<play_step>
-			10.0
-		</play_step>
-		<muls>
-			<mul>
-				0.0
-			</mul>
-		</muls>
-	</settings>
-	<texts/>
-	<nodes>
-		<node>
-			<id>
-				NODE2
-			</id>
-			<name>
-				NODE2
-			</name>
-			<color>
-				-16777216
-			</color>
-			<counter>
-				2
-			</counter>
-			<xcoord>
-				0.0
-			</xcoord>
-			<ycoord>
-				0.0
-			</ycoord>
-			<xpos>
-				171
-			</xpos>
-			<ypos>
-				246
-			</ypos>
-			<height>
-				0.0
-			</height>
-			<demand>
-				0
-			</demand>
-			<density>
-				1000.0
-			</density>
-			<cl_input>
-				0.0
-			</cl_input>
-			<pressure>
-				3.92400e+05
-			</pressure>
-			<head>
-				4.00000e+01
-			</head>
-			<endnode>
-				false
-			</endnode>
-			<travel_time>
-				2.54346e+00
-			</travel_time>
-			<concentration>
-				0,0000
-			</concentration>
-			<curve>
-				<id>
-					muls
-				</id>
-				<x_val/>
-				<x_dim/>
-				<y_val/>
-				<y_dim/>
-				<points>
-					<point_x>
-						0,0000
-					</point_x>
-					<point_y>
-						2,0000
-					</point_y>
-					<point_x>
-						1,0000
-					</point_x>
-					<point_y>
-						2,0000
-					</point_y>
-					<point_x>
-						2,0000
-					</point_x>
-					<point_y>
-						2,0000
-					</point_y>
-					<point_x>
-						3,0000
-					</point_x>
-					<point_y>
-						2,0000
-					</point_y>
-					<point_x>
-						4,0000
-					</point_x>
-					<point_y>
-						2,0000
-					</point_y>
-				</points>
-			</curve>
-		</node>
-		<node>
-			<id>
-				NODE6
-			</id>
-			<name>
-				NODE6
-			</name>
-			<color>
-				-16777216
-			</color>
-			<counter>
-				6
-			</counter>
-			<xcoord>
-				0.0
-			</xcoord>
-			<ycoord>
-				0.0
-			</ycoord>
-			<xpos>
-				386
-			</xpos>
-			<ypos>
-				219
-			</ypos>
-			<height>
-				0.0
-			</height>
-			<demand>
-				0.0
-			</demand>
-			<density>
-				1000.0
-			</density>
-			<cl_input>
-				0.0
-			</cl_input>
-			<pressure>
-				0.0
-			</pressure>
-			<head>
-				0.0
-			</head>
-			<endnode>
-				true
-			</endnode>
-			<travel_time>
-				0.0
-			</travel_time>
-			<concentration>
-				0.0
-			</concentration>
-			<curve>
-				<id>
-					muls
-				</id>
-				<x_val/>
-				<x_dim/>
-				<y_val/>
-				<y_dim/>
-				<points>
-					<point_x>
-						0,0000
-					</point_x>
-					<point_y>
-						0,0000
-					</point_y>
-				</points>
-			</curve>
-		</node>
-		<node>
-			<id>
-				NODE9
-			</id>
-			<name>
-				NODE9
-			</name>
-			<color>
-				-16777216
-			</color>
-			<counter>
-				9
-			</counter>
-			<xcoord>
-				0.0
-			</xcoord>
-			<ycoord>
-				0.0
-			</ycoord>
-			<xpos>
-				335
-			</xpos>
-			<ypos>
-				243
-			</ypos>
-			<height>
-				0.0
-			</height>
-			<demand>
-				0.0
-			</demand>
-			<density>
-				1000.0
-			</density>
-			<cl_input>
-				0.0
-			</cl_input>
-			<pressure>
-				4.90500e+05
-			</pressure>
-			<head>
-				5.00000e+01
-			</head>
-			<endnode>
-				false
-			</endnode>
-			<travel_time>
-				2.00000e+00
-			</travel_time>
-			<concentration>
-				0,0000
-			</concentration>
-			<curve>
-				<id>
-					muls
-				</id>
-				<x_val/>
-				<x_dim/>
-				<y_val/>
-				<y_dim/>
-				<points>
-					<point_x>
-						0,0000
-					</point_x>
-					<point_y>
-						0,0000
-					</point_y>
-				</points>
-			</curve>
-		</node>
-		<node>
-			<id>
-				NODE13
-			</id>
-			<name>
-				NODE13
-			</name>
-			<color>
-				-16777216
-			</color>
-			<counter>
-				13
-			</counter>
-			<xcoord>
-				0.0
-			</xcoord>
-			<ycoord>
-				0.0
-			</ycoord>
-			<xpos>
-				139
-			</xpos>
-			<ypos>
-				227
-			</ypos>
-			<height>
-				0.0
-			</height>
-			<demand>
-				0.0
-			</demand>
-			<density>
-				1000.0
-			</density>
-			<cl_input>
-				0.0
-			</cl_input>
-			<pressure>
-				0.0
-			</pressure>
-			<head>
-				0.0
-			</head>
-			<endnode>
-				true
-			</endnode>
-			<travel_time>
-				0.0
-			</travel_time>
-			<concentration>
-				0.0
-			</concentration>
-			<curve>
-				<id>
-					muls
-				</id>
-				<x_val/>
-				<x_dim/>
-				<y_val/>
-				<y_dim/>
-				<points>
-					<point_x>
-						0,0000
-					</point_x>
-					<point_y>
-						0,0000
-					</point_y>
-				</points>
-			</curve>
-		</node>
-		<node>
-			<id>
-				NODE16
-			</id>
-			<name>
-				NODE16
-			</name>
-			<color>
-				-16777216
-			</color>
-			<counter>
-				16
-			</counter>
-			<xcoord>
-				0.0
-			</xcoord>
-			<ycoord>
-				0.0
-			</ycoord>
-			<xpos>
-				261
-			</xpos>
-			<ypos>
-				245
-			</ypos>
-			<height>
-				0.0
-			</height>
-			<demand>
-				0.0
-			</demand>
-			<density>
-				1000.0
-			</density>
-			<cl_input>
-				0.0
-			</cl_input>
-			<pressure>
-				4.41450e+05
-			</pressure>
-			<head>
-				4.50000e+01
-			</head>
-			<endnode>
-				false
-			</endnode>
-			<travel_time>
-				2.27173e+00
-			</travel_time>
-			<concentration>
-				0,0000
-			</concentration>
-			<curve>
-				<id>
-					muls
-				</id>
-				<x_val/>
-				<x_dim/>
-				<y_val/>
-				<y_dim/>
-				<points>
-					<point_x>
-						0,0000
-					</point_x>
-					<point_y>
-						0,0000
-					</point_y>
-				</points>
-			</curve>
-		</node>
-		<node>
-			<id>
-				NODE20
-			</id>
-			<name>
-				NODE20
-			</name>
-			<color>
-				-16777216
-			</color>
-			<counter>
-				20
-			</counter>
-			<xcoord>
-				0.0
-			</xcoord>
-			<ycoord>
-				0.0
-			</ycoord>
-			<xpos>
-				468
-			</xpos>
-			<ypos>
-				355
-			</ypos>
-			<height>
-				0.0
-			</height>
-			<demand>
-				0.0
-			</demand>
-			<density>
-				1000.0
-			</density>
-			<cl_input>
-				0.0
-			</cl_input>
-			<pressure>
-				4.41450e+05
-			</pressure>
-			<head>
-				4.50000e+01
-			</head>
-			<endnode>
-				false
-			</endnode>
-			<travel_time>
-				3.00456e+01
-			</travel_time>
-			<concentration>
-				0.0
-			</concentration>
-			<curve>
-				<id>
-					muls
-				</id>
-				<x_val/>
-				<x_dim/>
-				<y_val/>
-				<y_dim/>
-				<points>
-					<point_x>
-						0,0000
-					</point_x>
-					<point_y>
-						0,0000
-					</point_y>
-				</points>
-			</curve>
-		</node>
-		<node>
-			<id>
-				NODE23
-			</id>
-			<name>
-				NODE23
-			</name>
-			<color>
-				-16777216
-			</color>
-			<counter>
-				23
-			</counter>
-			<xcoord>
-				0.0
-			</xcoord>
-			<ycoord>
-				0.0
-			</ycoord>
-			<xpos>
-				522
-			</xpos>
-			<ypos>
-				317
-			</ypos>
-			<height>
-				0.0
-			</height>
-			<demand>
-				0.0
-			</demand>
-			<density>
-				1000.0
-			</density>
-			<cl_input>
-				0.0
-			</cl_input>
-			<pressure>
-				4.41450e+05
-			</pressure>
-			<head>
-				4.50000e+01
-			</head>
-			<endnode>
-				false
-			</endnode>
-			<travel_time>
-				5.78194e+01
-			</travel_time>
-			<concentration>
-				0.0
-			</concentration>
-			<curve>
-				<id>
-					muls
-				</id>
-				<x_val/>
-				<x_dim/>
-				<y_val/>
-				<y_dim/>
-				<points>
-					<point_x>
-						0,0000
-					</point_x>
-					<point_y>
-						0,0000
-					</point_y>
-				</points>
-			</curve>
-		</node>
-	</nodes>
-	<edges>
-		<edge>
-			<id>
-				PIPE4
-			</id>
-			<name>
-				PIPE4
-			</name>
-			<color>
-				-65281
-			</color>
-			<counter>
-				4
-			</counter>
-			<pipe_type>
-				pipe
-			</pipe_type>
-			<node_from>
-				NODE2
-			</node_from>
-			<node_to>
-				NODE16
-			</node_to>
-			<density>
-				1000
-			</density>
-			<aref>
-				3.14160e-02
-			</aref>
-			<mass_flow_rate>
-				-3.21151e+01
-			</mass_flow_rate>
-			<volume_flow_rate>
-				-1.15614e+02
-			</volume_flow_rate>
-			<velocity>
-				-1.02225e+00
-			</velocity>
-			<headloss>
-				5.00000e+00
-			</headloss>
-			<head_loss_per_unit_length>
-				5.00000e-03
-			</head_loss_per_unit_length>
-			<travel_time>
-				2.40760e+00
-			</travel_time>
-			<concentration>
-				0,0000
-			</concentration>
-			<edge_spec>
-				<pipe>
-					<length>
-						1000.0
-					</length>
-					<diameter>
-						0.2
-					</diameter>
-					<roughness>
-						0.1
-					</roughness>
-					<friction_coeff>
-						1.87751e-02
-					</friction_coeff>
-					<cl_k>
-						0.016
-					</cl_k>
-					<cl_w>
-						0.0
-					</cl_w>
-				</pipe>
-			</edge_spec>
-		</edge>
-		<edge>
-			<id>
-				POOL7
-			</id>
-			<name>
-				POOL7
-			</name>
-			<color>
-				-16776961
-			</color>
-			<counter>
-				7
-			</counter>
-			<pipe_type>
-				pool
-			</pipe_type>
-			<node_from>
-				NODE9
-			</node_from>
-			<node_to>
-				NODE6
-			</node_to>
-			<density>
-				1000
-			</density>
-			<aref>
-				1
-			</aref>
-			<mass_flow_rate>
-				-3.21151e+01
-			</mass_flow_rate>
-			<volume_flow_rate>
-				-1.15614e+02
-			</volume_flow_rate>
-			<velocity>
-				-3.21151e-02
-			</velocity>
-			<headloss>
-				0.00000e+00
-			</headloss>
-			<head_loss_per_unit_length>
-				0.00000e+00
-			</head_loss_per_unit_length>
-			<travel_time>
-				2.00000e+00
-			</travel_time>
-			<concentration>
-				0,0000
-			</concentration>
-			<edge_spec>
-				<pool>
-					<water_level>
-						50
-					</water_level>
-					<bottom_level>
-						0.0
-					</bottom_level>
-				</pool>
-			</edge_spec>
-		</edge>
-		<edge>
-			<id>
-				POOL14
-			</id>
-			<name>
-				POOL14
-			</name>
-			<color>
-				-16776961
-			</color>
-			<counter>
-				14
-			</counter>
-			<pipe_type>
-				pool
-			</pipe_type>
-			<node_from>
-				NODE2
-			</node_from>
-			<node_to>
-				NODE13
-			</node_to>
-			<density>
-				1000
-			</density>
-			<aref>
-				1.0
-			</aref>
-			<mass_flow_rate>
-				3.21151e+01
-			</mass_flow_rate>
-			<volume_flow_rate>
-				1.15614e+02
-			</volume_flow_rate>
-			<velocity>
-				3.21151e-02
-			</velocity>
-			<headloss>
-				0.00000e+00
-			</headloss>
-			<head_loss_per_unit_length>
-				0.00000e+00
-			</head_loss_per_unit_length>
-			<travel_time>
-				2.54346e+00
-			</travel_time>
-			<concentration>
-				0,0000
-			</concentration>
-			<edge_spec>
-				<pool>
-					<water_level>
-						40
-					</water_level>
-					<bottom_level>
-						0.0
-					</bottom_level>
-				</pool>
-			</edge_spec>
-		</edge>
-		<edge>
-			<id>
-				PIPE18
-			</id>
-			<name>
-				PIPE18
-			</name>
-			<color>
-				-65281
-			</color>
-			<counter>
-				18
-			</counter>
-			<pipe_type>
-				pipe
-			</pipe_type>
-			<node_from>
-				NODE16
-			</node_from>
-			<node_to>
-				NODE9
-			</node_to>
-			<density>
-				1000
-			</density>
-			<aref>
-				3.14160e-02
-			</aref>
-			<mass_flow_rate>
-				-3.21151e+01
-			</mass_flow_rate>
-			<volume_flow_rate>
-				-1.15614e+02
-			</volume_flow_rate>
-			<velocity>
-				-1.02225e+00
-			</velocity>
-			<headloss>
-				5.00000e+00
-			</headloss>
-			<head_loss_per_unit_length>
-				5.00000e-03
-			</head_loss_per_unit_length>
-			<travel_time>
-				2.13587e+00
-			</travel_time>
-			<concentration>
-				0,0000
-			</concentration>
-			<edge_spec>
-				<pipe>
-					<length>
-						1000.0
-					</length>
-					<diameter>
-						0.2
-					</diameter>
-					<roughness>
-						0.1
-					</roughness>
-					<friction_coeff>
-						1.87751e-02
-					</friction_coeff>
-					<cl_k>
-						0.016
-					</cl_k>
-					<cl_w>
-						0.0
-					</cl_w>
-				</pipe>
-			</edge_spec>
-		</edge>
-		<edge>
-			<id>
-				PIPE21
-			</id>
-			<name>
-				PIPE21
-			</name>
-			<color>
-				-65281
-			</color>
-			<counter>
-				21
-			</counter>
-			<pipe_type>
-				pipe
-			</pipe_type>
-			<node_from>
-				NODE16
-			</node_from>
-			<node_to>
-				NODE20
-			</node_to>
-			<density>
-				1000
-			</density>
-			<aref>
-				3.14160e-02
-			</aref>
-			<mass_flow_rate>
-				0.00000e+00
-			</mass_flow_rate>
-			<volume_flow_rate>
-				0.00000e+00
-			</volume_flow_rate>
-			<velocity>
-				0.00000e+00
-			</velocity>
-			<headloss>
-				0.00000e+00
-			</headloss>
-			<head_loss_per_unit_length>
-				0.00000e+00
-			</head_loss_per_unit_length>
-			<travel_time>
-				1.61606e+01
-			</travel_time>
-			<concentration>
-				0.0
-			</concentration>
-			<edge_spec>
-				<pipe>
-					<length>
-						10.0
-					</length>
-					<diameter>
-						0.2
-					</diameter>
-					<roughness>
-						0.1
-					</roughness>
-					<friction_coeff>
-						2.69437e-02
-					</friction_coeff>
-					<cl_k>
-						0.016
-					</cl_k>
-					<cl_w>
-						0.0
-					</cl_w>
-				</pipe>
-			</edge_spec>
-		</edge>
-		<edge>
-			<id>
-				PIPE24
-			</id>
-			<name>
-				PIPE24
-			</name>
-			<color>
-				-65281
-			</color>
-			<counter>
-				24
-			</counter>
-			<pipe_type>
-				pipe
-			</pipe_type>
-			<node_from>
-				NODE20
-			</node_from>
-			<node_to>
-				NODE23
-			</node_to>
-			<density>
-				1000
-			</density>
-			<aref>
-				3.14160e-02
-			</aref>
-			<mass_flow_rate>
-				0.00000e+00
-			</mass_flow_rate>
-			<volume_flow_rate>
-				0.00000e+00
-			</volume_flow_rate>
-			<velocity>
-				0.00000e+00
-			</velocity>
-			<headloss>
-				0.00000e+00
-			</headloss>
-			<head_loss_per_unit_length>
-				0.00000e+00
-			</head_loss_per_unit_length>
-			<travel_time>
-				4.39345e+01
-			</travel_time>
-			<concentration>
-				0.0
-			</concentration>
-			<edge_spec>
-				<pipe>
-					<length>
-						10.0
-					</length>
-					<diameter>
-						0.2
-					</diameter>
-					<roughness>
-						0.1
-					</roughness>
-					<friction_coeff>
-						2.69437e-02
-					</friction_coeff>
-					<cl_k>
-						0.016
-					</cl_k>
-					<cl_w>
-						0.0
-					</cl_w>
-				</pipe>
-			</edge_spec>
-		</edge>
-	</edges>
+<settings>
+<id>vizkor_teszt1</id>
+<name/>
+<color/>
+<counter>1</counter>
+<cpp_xml_debug>false</cpp_xml_debug>
+<solution_exists>true</solution_exists>
+<tsolution_exists>false</tsolution_exists>
+<csolution_exists>false</csolution_exists>
+<serial_exists>false</serial_exists>
+<out_file>staci.out</out_file>
+<debug_level>0</debug_level>
+<friction_model>DW</friction_model>
+<version>1</version>
+<xstart>0</xstart>
+<ystart>0</ystart>
+<xend>100</xend>
+<yend>100</yend>
+<owner>hos.csaba</owner>
+<width>1000</width>
+<height>1000</height>
+<hasmap>false</hasmap>
+<image/>
+<locked>false</locked>
+<iter_max>100</iter_max>
+<e_p_max>0.001</e_p_max>
+<e_mp_max>1.0</e_mp_max>
+<relax>1</relax>
+<relax_mul>2</relax_mul>
+<tt_length>1.0</tt_length>
+<cl_length>1.0</cl_length>
+<mp_init>100.0</mp_init>
+<p_init>5.0</p_init>
+<fluid_volume>0.00000e+00</fluid_volume>
+<start_date>2007-01-01</start_date>
+<start_time>0.0</start_time>
+<time_step>1.0</time_step>
+<step_count>5</step_count>
+<play_step>10.0</play_step>
+<muls>
+<mul>0.0</mul>
+</muls>
+</settings>
+<texts/>
+<nodes>
+<node>
+<id>NODE2</id>
+<name>NODE2</name>
+<color>-16777216</color>
+<counter>2</counter>
+<xcoord>0.0</xcoord>
+<ycoord>0.0</ycoord>
+<xpos>171</xpos>
+<ypos>246</ypos>
+<height>0.0</height>
+<demand>0</demand>
+<density>1000.0</density>
+<cl_input>0.0</cl_input>
+<pressure>3.92400e+05</pressure>
+<head>4.00000e+01</head>
+<endnode>false</endnode>
+<travel_time>2.54346e+00</travel_time>
+<concentration>0,0000</concentration>
+<curve>
+<id>muls</id>
+<x_val/>
+<x_dim/>
+<y_val/>
+<y_dim/>
+<points>
+<point_x>0,0000</point_x>
+<point_y>2,0000</point_y>
+<point_x>1,0000</point_x>
+<point_y>2,0000</point_y>
+<point_x>2,0000</point_x>
+<point_y>2,0000</point_y>
+<point_x>3,0000</point_x>
+<point_y>2,0000</point_y>
+<point_x>4,0000</point_x>
+<point_y>2,0000</point_y>
+</points>
+</curve>
+</node>
+<node>
+<id>NODE6</id>
+<name>NODE6</name>
+<color>-16777216</color>
+<counter>6</counter>
+<xcoord>0.0</xcoord>
+<ycoord>0.0</ycoord>
+<xpos>386</xpos>
+<ypos>219</ypos>
+<height>0.0</height>
+<demand>0.0</demand>
+<density>1000.0</density>
+<cl_input>0.0</cl_input>
+<pressure>0.0</pressure>
+<head>0.0</head>
+<endnode>true</endnode>
+<travel_time>0.0</travel_time>
+<concentration>0.0</concentration>
+<curve>
+<id>muls</id>
+<x_val/>
+<x_dim/>
+<y_val/>
+<y_dim/>
+<points>
+<point_x>0,0000</point_x>
+<point_y>0,0000</point_y>
+</points>
+</curve>
+</node>
+<node>
+<id>NODE9</id>
+<name>NODE9</name>
+<color>-16777216</color>
+<counter>9</counter>
+<xcoord>0.0</xcoord>
+<ycoord>0.0</ycoord>
+<xpos>335</xpos>
+<ypos>243</ypos>
+<height>0.0</height>
+<demand>0.0</demand>
+<density>1000.0</density>
+<cl_input>0.0</cl_input>
+<pressure>4.90500e+05</pressure>
+<head>5.00000e+01</head>
+<endnode>false</endnode>
+<travel_time>2.00000e+00</travel_time>
+<concentration>0,0000</concentration>
+<curve>
+<id>muls</id>
+<x_val/>
+<x_dim/>
+<y_val/>
+<y_dim/>
+<points>
+<point_x>0,0000</point_x>
+<point_y>0,0000</point_y>
+</points>
+</curve>
+</node>
+<node>
+<id>NODE13</id>
+<name>NODE13</name>
+<color>-16777216</color>
+<counter>13</counter>
+<xcoord>0.0</xcoord>
+<ycoord>0.0</ycoord>
+<xpos>139</xpos>
+<ypos>227</ypos>
+<height>0.0</height>
+<demand>0.0</demand>
+<density>1000.0</density>
+<cl_input>0.0</cl_input>
+<pressure>0.0</pressure>
+<head>0.0</head>
+<endnode>true</endnode>
+<travel_time>0.0</travel_time>
+<concentration>0.0</concentration>
+<curve>
+<id>muls</id>
+<x_val/>
+<x_dim/>
+<y_val/>
+<y_dim/>
+<points>
+<point_x>0,0000</point_x>
+<point_y>0,0000</point_y>
+</points>
+</curve>
+</node>
+<node>
+<id>NODE16</id>
+<name>NODE16</name>
+<color>-16777216</color>
+<counter>16</counter>
+<xcoord>0.0</xcoord>
+<ycoord>0.0</ycoord>
+<xpos>261</xpos>
+<ypos>245</ypos>
+<height>0.0</height>
+<demand>0.0</demand>
+<density>1000.0</density>
+<cl_input>0.0</cl_input>
+<pressure>4.41450e+05</pressure>
+<head>4.50000e+01</head>
+<endnode>false</endnode>
+<travel_time>2.27173e+00</travel_time>
+<concentration>0,0000</concentration>
+<curve>
+<id>muls</id>
+<x_val/>
+<x_dim/>
+<y_val/>
+<y_dim/>
+<points>
+<point_x>0,0000</point_x>
+<point_y>0,0000</point_y>
+</points>
+</curve>
+</node>
+<node>
+<id>NODE20</id>
+<name>NODE20</name>
+<color>-16777216</color>
+<counter>20</counter>
+<xcoord>0.0</xcoord>
+<ycoord>0.0</ycoord>
+<xpos>468</xpos>
+<ypos>355</ypos>
+<height>0.0</height>
+<demand>0.0</demand>
+<density>1000.0</density>
+<cl_input>0.0</cl_input>
+<pressure>4.41450e+05</pressure>
+<head>4.50000e+01</head>
+<endnode>false</endnode>
+<travel_time>3.00456e+01</travel_time>
+<concentration>0.0</concentration>
+<curve>
+<id>muls</id>
+<x_val/>
+<x_dim/>
+<y_val/>
+<y_dim/>
+<points>
+<point_x>0,0000</point_x>
+<point_y>0,0000</point_y>
+</points>
+</curve>
+</node>
+<node>
+<id>NODE23</id>
+<name>NODE23</name>
+<color>-16777216</color>
+<counter>23</counter>
+<xcoord>0.0</xcoord>
+<ycoord>0.0</ycoord>
+<xpos>522</xpos>
+<ypos>317</ypos>
+<height>0.0</height>
+<demand>0.0</demand>
+<density>1000.0</density>
+<cl_input>0.0</cl_input>
+<pressure>4.41450e+05</pressure>
+<head>4.50000e+01</head>
+<endnode>false</endnode>
+<travel_time>5.78194e+01</travel_time>
+<concentration>0.0</concentration>
+<curve>
+<id>muls</id>
+<x_val/>
+<x_dim/>
+<y_val/>
+<y_dim/>
+<points>
+<point_x>0,0000</point_x>
+<point_y>0,0000</point_y>
+</points>
+</curve>
+</node>
+</nodes>
+<edges>
+<edge>
+<id>PIPE4</id>
+<name>PIPE4</name>
+<color>-65281</color>
+<counter>4</counter>
+<pipe_type>pipe</pipe_type>
+<node_from>NODE2</node_from>
+<node_to>NODE16</node_to>
+<density>1000</density>
+<aref>0,0314</aref>
+<mass_flow_rate>-3.21151e+01</mass_flow_rate>
+<volume_flow_rate>-1.15614e+02</volume_flow_rate>
+<velocity>-1.02225e+00</velocity>
+<headloss>5.00000e+00</headloss>
+<head_loss_per_unit_length>5.00000e-03</head_loss_per_unit_length>
+<travel_time>2.40760e+00</travel_time>
+<concentration>0,0000</concentration>
+<edge_spec>
+<pipe>
+<length>1000.0</length>
+<diameter>0.2</diameter>
+<roughness>0.1</roughness>
+<friction_coeff>1.87751e-02</friction_coeff>
+<cl_k>0.016</cl_k>
+<cl_w>0.0</cl_w>
+</pipe>
+</edge_spec>
+</edge>
+<edge>
+<id>POOL7</id>
+<name>POOL7</name>
+<color>-16776961</color>
+<counter>7</counter>
+<pipe_type>pool</pipe_type>
+<node_from>NODE9</node_from>
+<node_to>NODE6</node_to>
+<density>1000</density>
+<aref>1</aref>
+<mass_flow_rate>-3.21151e+01</mass_flow_rate>
+<volume_flow_rate>-1.15614e+02</volume_flow_rate>
+<velocity>-3.21151e-02</velocity>
+<headloss>0.00000e+00</headloss>
+<head_loss_per_unit_length>0.00000e+00</head_loss_per_unit_length>
+<travel_time>2.00000e+00</travel_time>
+<concentration>0,0000</concentration>
+<edge_spec>
+<pool>
+<water_level>50</water_level>
+<bottom_level>0.0</bottom_level>
+</pool>
+</edge_spec>
+</edge>
+<edge>
+<id>POOL14</id>
+<name>POOL14</name>
+<color>-16776961</color>
+<counter>14</counter>
+<pipe_type>pool</pipe_type>
+<node_from>NODE2</node_from>
+<node_to>NODE13</node_to>
+<density>1000</density>
+<aref>1.0</aref>
+<mass_flow_rate>3.21151e+01</mass_flow_rate>
+<volume_flow_rate>1.15614e+02</volume_flow_rate>
+<velocity>3.21151e-02</velocity>
+<headloss>0.00000e+00</headloss>
+<head_loss_per_unit_length>0.00000e+00</head_loss_per_unit_length>
+<travel_time>2.54346e+00</travel_time>
+<concentration>0,0000</concentration>
+<edge_spec>
+<pool>
+<water_level>40</water_level>
+<bottom_level>0.0</bottom_level>
+</pool>
+</edge_spec>
+</edge>
+<edge>
+<id>PIPE18</id>
+<name>PIPE18</name>
+<color>-65281</color>
+<counter>18</counter>
+<pipe_type>pipe</pipe_type>
+<node_from>NODE16</node_from>
+<node_to>NODE9</node_to>
+<density>1000</density>
+<aref>0,0314</aref>
+<mass_flow_rate>-3.21151e+01</mass_flow_rate>
+<volume_flow_rate>-1.15614e+02</volume_flow_rate>
+<velocity>-1.02225e+00</velocity>
+<headloss>5.00000e+00</headloss>
+<head_loss_per_unit_length>5.00000e-03</head_loss_per_unit_length>
+<travel_time>2.13587e+00</travel_time>
+<concentration>0,0000</concentration>
+<edge_spec>
+<pipe>
+<length>1000.0</length>
+<diameter>0.2</diameter>
+<roughness>0.1</roughness>
+<friction_coeff>1.87751e-02</friction_coeff>
+<cl_k>0.016</cl_k>
+<cl_w>0.0</cl_w>
+</pipe>
+</edge_spec>
+</edge>
+<edge>
+<id>PIPE21</id>
+<name>PIPE21</name>
+<color>-65281</color>
+<counter>21</counter>
+<pipe_type>pipe</pipe_type>
+<node_from>NODE16</node_from>
+<node_to>NODE20</node_to>
+<density>1000</density>
+<aref>0,0314</aref>
+<mass_flow_rate>0.00000e+00</mass_flow_rate>
+<volume_flow_rate>0.00000e+00</volume_flow_rate>
+<velocity>0.00000e+00</velocity>
+<headloss>0.00000e+00</headloss>
+<head_loss_per_unit_length>0.00000e+00</head_loss_per_unit_length>
+<travel_time>1.61606e+01</travel_time>
+<concentration>0.0</concentration>
+<edge_spec>
+<pipe>
+<length>10.0</length>
+<diameter>0.2</diameter>
+<roughness>0.1</roughness>
+<friction_coeff>2.69437e-02</friction_coeff>
+<cl_k>0.016</cl_k>
+<cl_w>0.0</cl_w>
+</pipe>
+</edge_spec>
+</edge>
+<edge>
+<id>PIPE24</id>
+<name>PIPE24</name>
+<color>-65281</color>
+<counter>24</counter>
+<pipe_type>pipe</pipe_type>
+<node_from>NODE20</node_from>
+<node_to>NODE23</node_to>
+<density>1000</density>
+<aref>0,0314</aref>
+<mass_flow_rate>0.00000e+00</mass_flow_rate>
+<volume_flow_rate>0.00000e+00</volume_flow_rate>
+<velocity>0.00000e+00</velocity>
+<headloss>0.00000e+00</headloss>
+<head_loss_per_unit_length>0.00000e+00</head_loss_per_unit_length>
+<travel_time>4.39345e+01</travel_time>
+<concentration>0.0</concentration>
+<edge_spec>
+<pipe>
+<length>10.0</length>
+<diameter>0.2</diameter>
+<roughness>0.1</roughness>
+<friction_coeff>2.69437e-02</friction_coeff>
+<cl_k>0.016</cl_k>
+<cl_w>0.0</cl_w>
+</pipe>
+</edge_spec>
+</edge>
+</edges>
 </staci>

@@ -1,0 +1,351 @@
+\hypertarget{class_csatorna}{}\section{Csatorna Class Reference}
+\label{class_csatorna}\index{Csatorna@{Csatorna}}
+Inheritance diagram for Csatorna\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_csatorna}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_csatorna_ae3829a74761e0507363290fde29af12b}{Csatorna} (const string \hyperlink{class_agelem_abe92b7e3912367d5d1caf6b277ca0b7d}{nev}, const string a\+\_\+cspe\+\_\+nev, const string a\+\_\+cspv\+\_\+nev, const double a\+\_\+ro, const double \hyperlink{class_agelem_a3f8668febc2958fd539997d537552f17}{Aref}, const double L, const double ze, const double zv, const double surl, const int int\+\_\+steps, const int debugl, const double dia, const double a\+\_\+cl\+\_\+k, const double a\+\_\+cl\+\_\+w, const bool is\+\_\+reversed, const double a\+\_\+mp)
+\begin{DoxyCompactList}\small\item\em Konstruktor t�glalap km. eset�n. \end{DoxyCompactList}\item 
+\hyperlink{class_csatorna_a84452f3df42df853e0600d383cd37d8a}{$\sim$\+Csatorna} ()
+\begin{DoxyCompactList}\small\item\em Konstruktor user-\/defined km. eset�n. \end{DoxyCompactList}\item 
+string \hyperlink{class_csatorna_a77f24ff76c738a89cb827d251fec0845}{Info} ()
+\begin{DoxyCompactList}\small\item\em Inform�ci� \end{DoxyCompactList}\item 
+double \hyperlink{class_csatorna_a5cd4e0975717ce0baab89f57a566782a}{f} (vector$<$ double $>$)
+\begin{DoxyCompactList}\small\item\em �gegyenlet �rt�ke \end{DoxyCompactList}\item 
+vector$<$ double $>$ \hyperlink{class_csatorna_a5330dbbbc669f49382c822ffcc671d16}{df} (vector$<$ double $>$)
+\begin{DoxyCompactList}\small\item\em �gegyenlet derv�ltja \end{DoxyCompactList}\item 
+void \hyperlink{class_csatorna_ab30adea649ae8708061e211dc450cb06}{Ini} (int mode, double value)
+\begin{DoxyCompactList}\small\item\em Inicializ�ci� \end{DoxyCompactList}\item 
+void \hyperlink{class_csatorna_ab9528187fc3d40d210c85b72d7856f10}{keresztmetszet} (const double y, double \&A, double \&B, double \&Rh)
+\begin{DoxyCompactList}\small\item\em Keresztmetszeti jellemzok szamitasa. \end{DoxyCompactList}\item 
+void \hyperlink{class_csatorna_af30a5d124d26bd31548cf243c4a95178}{norm\+\_\+krit} (const double Q)\hypertarget{class_csatorna_af30a5d124d26bd31548cf243c4a95178}{}\label{class_csatorna_af30a5d124d26bd31548cf243c4a95178}
+
+\begin{DoxyCompactList}\small\item\em Norm�l-\/ �s kritikus szint sz�m�t�sa adott t�rfogat�ramhoz. \end{DoxyCompactList}\item 
+double \hyperlink{class_csatorna_aacea0461de03c4592e89cee026c2e1d5}{nyf\+\_\+ode} (const double x, const double y, const double \hyperlink{class_agelem_a1377d80d8511cc4adacccba31d28282d}{mp})
+\begin{DoxyCompactList}\small\item\em A ny�ltfelsz�n� �raml�s le�r� DE. \end{DoxyCompactList}\item 
+double \hyperlink{class_csatorna_a17e55cbde88d58985f7e315e7069ba3a}{ode\+\_\+megoldo} (double ystart, double dx, double xstart, double \hyperlink{class_agelem_a1377d80d8511cc4adacccba31d28282d}{mp})
+\begin{DoxyCompactList}\small\item\em O\+DE integr�l�s. \end{DoxyCompactList}\item 
+void \hyperlink{class_csatorna_a2ad82029529f1aa2b4da3122b608eb6c}{compute\+\_\+distr} ()
+\begin{DoxyCompactList}\small\item\em Az eredmenyeloszlasok elkeszitese. \end{DoxyCompactList}\item 
+vector$<$ double $>$ \hyperlink{class_csatorna_ab515ee9bcf30c35c22b23fd0617cc422}{Get\+\_\+res} (string mit)\hypertarget{class_csatorna_ab515ee9bcf30c35c22b23fd0617cc422}{}\label{class_csatorna_ab515ee9bcf30c35c22b23fd0617cc422}
+
+\begin{DoxyCompactList}\small\item\em Eredm�nyeloszl�sok visszaad�sa. \end{DoxyCompactList}\item 
+double \hyperlink{class_csatorna_a8ca44a377b12883ddad100f0dea9aed2}{surlodas} ()\hypertarget{class_csatorna_a8ca44a377b12883ddad100f0dea9aed2}{}\label{class_csatorna_a8ca44a377b12883ddad100f0dea9aed2}
+
+\begin{DoxyCompactList}\small\item\em Surl�dosi modell. \end{DoxyCompactList}\item 
+double \hyperlink{class_csatorna_a581b69e57becd825b645f07b07028051}{Get\+\_\+dprop} (string mit)\hypertarget{class_csatorna_a581b69e57becd825b645f07b07028051}{}\label{class_csatorna_a581b69e57becd825b645f07b07028051}
+
+\begin{DoxyCompactList}\small\item\em Get Double property. \end{DoxyCompactList}\item 
+void \hyperlink{class_csatorna_a4d75a74c04c6a66600068e98f055f2b4}{Set\+\_\+\+Foly\+Terf} ()\hypertarget{class_csatorna_a4d75a74c04c6a66600068e98f055f2b4}{}\label{class_csatorna_a4d75a74c04c6a66600068e98f055f2b4}
+
+\begin{DoxyCompactList}\small\item\em Folyadekterfogat az elemben. \end{DoxyCompactList}\item 
+void \hyperlink{class_csatorna_a765dd9b66d2a18b567a6045d17266a10}{error} (string fv, string msg)
+\begin{DoxyCompactList}\small\item\em Hibauzenet. \end{DoxyCompactList}\item 
+void \hyperlink{class_csatorna_ac2000669171af7d8fa5f447cb8aa231d}{warning} (string fv, string msg)
+\begin{DoxyCompactList}\small\item\em Figyelmeztetes. \end{DoxyCompactList}\item 
+string {\bfseries Get\+Type} ()\hypertarget{class_csatorna_a6b1b895f6b560b8bb3a517c48b12210e}{}\label{class_csatorna_a6b1b895f6b560b8bb3a517c48b12210e}
+
+\item 
+void {\bfseries Set\+\_\+dprop} (string mit, double mire)\hypertarget{class_csatorna_aa1895b07dd2d4b836f0efbe0869cd4e1}{}\label{class_csatorna_aa1895b07dd2d4b836f0efbe0869cd4e1}
+
+\item 
+virtual void \hyperlink{class_csatorna_a0b0b43ad04feb2e0cf60a6d027387ff9}{Set\+Log\+File} (string fnev)\hypertarget{class_csatorna_a0b0b43ad04feb2e0cf60a6d027387ff9}{}\label{class_csatorna_a0b0b43ad04feb2e0cf60a6d027387ff9}
+
+\begin{DoxyCompactList}\small\item\em Overriding Agelem\+::\+Set\+Log\+File() \end{DoxyCompactList}\item 
+virtual double \hyperlink{class_csatorna_a74db8402dcaaf02c408c1ac900a610f9}{Get\+\_\+v} ()\hypertarget{class_csatorna_a74db8402dcaaf02c408c1ac900a610f9}{}\label{class_csatorna_a74db8402dcaaf02c408c1ac900a610f9}
+
+\begin{DoxyCompactList}\small\item\em Sebesseg visszaadasa. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Csatorna@{Csatorna}!Csatorna@{Csatorna}}
+\index{Csatorna@{Csatorna}!Csatorna@{Csatorna}}
+\subsubsection[{\texorpdfstring{Csatorna(const string nev, const string a\+\_\+cspe\+\_\+nev, const string a\+\_\+cspv\+\_\+nev, const double a\+\_\+ro, const double Aref, const double L, const double ze, const double zv, const double surl, const int int\+\_\+steps, const int debugl, const double dia, const double a\+\_\+cl\+\_\+k, const double a\+\_\+cl\+\_\+w, const bool is\+\_\+reversed, const double a\+\_\+mp)}{Csatorna(const string nev, const string a_cspe_nev, const string a_cspv_nev, const double a_ro, const double Aref, const double L, const double ze, const double zv, const double surl, const int int_steps, const int debugl, const double dia, const double a_cl_k, const double a_cl_w, const bool is_reversed, const double a_mp)}}]{\setlength{\rightskip}{0pt plus 5cm}Csatorna\+::\+Csatorna (
+\begin{DoxyParamCaption}
+\item[{const string}]{nev, }
+\item[{const string}]{a\+\_\+cspe\+\_\+nev, }
+\item[{const string}]{a\+\_\+cspv\+\_\+nev, }
+\item[{const double}]{a\+\_\+ro, }
+\item[{const double}]{Aref, }
+\item[{const double}]{L, }
+\item[{const double}]{ze, }
+\item[{const double}]{zv, }
+\item[{const double}]{surl, }
+\item[{const int}]{int\+\_\+steps, }
+\item[{const int}]{debugl, }
+\item[{const double}]{dia, }
+\item[{const double}]{a\+\_\+cl\+\_\+k, }
+\item[{const double}]{a\+\_\+cl\+\_\+w, }
+\item[{const bool}]{is\+\_\+reversed, }
+\item[{const double}]{a\+\_\+mp}
+\end{DoxyParamCaption}
+)}\hypertarget{class_csatorna_ae3829a74761e0507363290fde29af12b}{}\label{class_csatorna_ae3829a74761e0507363290fde29af12b}
+
+
+Konstruktor t�glalap km. eset�n. 
+
+K�r km.
+
+Konstruktor k�r km. eset�n \index{Csatorna@{Csatorna}!````~Csatorna@{$\sim$\+Csatorna}}
+\index{````~Csatorna@{$\sim$\+Csatorna}!Csatorna@{Csatorna}}
+\subsubsection[{\texorpdfstring{$\sim$\+Csatorna()}{~Csatorna()}}]{\setlength{\rightskip}{0pt plus 5cm}Csatorna\+::$\sim$\+Csatorna (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_csatorna_a84452f3df42df853e0600d383cd37d8a}{}\label{class_csatorna_a84452f3df42df853e0600d383cd37d8a}
+
+
+Konstruktor user-\/defined km. eset�n. 
+
+Destruktor 
+
+\subsection{Member Function Documentation}
+\index{Csatorna@{Csatorna}!compute\+\_\+distr@{compute\+\_\+distr}}
+\index{compute\+\_\+distr@{compute\+\_\+distr}!Csatorna@{Csatorna}}
+\subsubsection[{\texorpdfstring{compute\+\_\+distr()}{compute_distr()}}]{\setlength{\rightskip}{0pt plus 5cm}void Csatorna\+::compute\+\_\+distr (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_csatorna_a2ad82029529f1aa2b4da3122b608eb6c}{}\label{class_csatorna_a2ad82029529f1aa2b4da3122b608eb6c}
+
+
+Az eredmenyeloszlasok elkeszitese. 
+
+debug f�jl �r�sa void logfile\+\_\+write(string msg, int msg\+\_\+debug\+\_\+level); \index{Csatorna@{Csatorna}!df@{df}}
+\index{df@{df}!Csatorna@{Csatorna}}
+\subsubsection[{\texorpdfstring{df(vector$<$ double $>$)}{df(vector< double >)}}]{\setlength{\rightskip}{0pt plus 5cm}vector$<$ double $>$ Csatorna\+::df (
+\begin{DoxyParamCaption}
+\item[{vector$<$ double $>$}]{x}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{class_csatorna_a5330dbbbc669f49382c822ffcc671d16}{}\label{class_csatorna_a5330dbbbc669f49382c822ffcc671d16}
+
+
+�gegyenlet derv�ltja 
+
+�gegyenlet deriv�ltjai (sz�m�t�s\+:
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{class_csatorna_a5cd4e0975717ce0baab89f57a566782a}{f}) 
+\end{DoxySeeAlso}
+\begin{DoxyReturn}{Returns}
+df �rt�ke 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_agelem_a7934ea6320bdc37526ed3daa108ce1ed}{Agelem}.
+
+\index{Csatorna@{Csatorna}!error@{error}}
+\index{error@{error}!Csatorna@{Csatorna}}
+\subsubsection[{\texorpdfstring{error(string fv, string msg)}{error(string fv, string msg)}}]{\setlength{\rightskip}{0pt plus 5cm}void Csatorna\+::error (
+\begin{DoxyParamCaption}
+\item[{string}]{fv, }
+\item[{string}]{msg}
+\end{DoxyParamCaption}
+)}\hypertarget{class_csatorna_a765dd9b66d2a18b567a6045d17266a10}{}\label{class_csatorna_a765dd9b66d2a18b567a6045d17266a10}
+
+
+Hibauzenet. 
+
+Hibauzenet k�perny�re �s eredm�nyf�jlba.
+
+
+\begin{DoxyParams}{Parameters}
+{\em fv} & h�v� f�ggv�ny \\
+\hline
+{\em msg} & �zenet \\
+\hline
+\end{DoxyParams}
+\index{Csatorna@{Csatorna}!f@{f}}
+\index{f@{f}!Csatorna@{Csatorna}}
+\subsubsection[{\texorpdfstring{f(vector$<$ double $>$)}{f(vector< double >)}}]{\setlength{\rightskip}{0pt plus 5cm}double Csatorna\+::f (
+\begin{DoxyParamCaption}
+\item[{vector$<$ double $>$}]{x}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{class_csatorna_a5cd4e0975717ce0baab89f57a566782a}{}\label{class_csatorna_a5cd4e0975717ce0baab89f57a566782a}
+
+
+�gegyenlet �rt�ke 
+
+�gegyenlet �s deriv�ltak sz�m�t�sa
+
+
+\begin{DoxyParams}{Parameters}
+{\em x\mbox{[}0\mbox{]}} & = pe/ro/g -\/ nyom�s \mbox{[}v.\+o.\+m.\mbox{]} az �gelem elej�n \\
+\hline
+{\em x\mbox{[}1\mbox{]}} & = pv/ro/g -\/ nyom�s \mbox{[}v.\+o.\+m.\mbox{]} az �gelem v�g�n \\
+\hline
+{\em x\mbox{[}2\mbox{]}} & = he/ro/g -\/ �gelem elej�n a csom�pont nullszintje \mbox{[}m\mbox{]} \\
+\hline
+{\em x\mbox{[}3\mbox{]}} & = hv/ro/g -\/ �gelem v�g�n a csom�pont nullszintje \mbox{[}m\mbox{]} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+f �rt�ke
+\end{DoxyReturn}
+�gelem elej�n az abszol�t nyom�sszint\+: he(aknafen�k) + pe/ro/g = x\mbox{[}0\mbox{]}+x\mbox{[}1\mbox{]} �gelem elej�n az abszol�t nyom�sszint\+: hv(aknafen�k) + pv/ro/g = x\mbox{[}0\mbox{]}+x\mbox{[}1\mbox{]}
+
+Az elj�r�s kisz�m�tja a deriv�ltakat is, �gy \begin{DoxySeeAlso}{See also}
+\hyperlink{class_csatorna_a5330dbbbc669f49382c822ffcc671d16}{df} csak visszaadja az �rt�ket. 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{class_agelem_aa1d93be52ddae11df003c4e35c47084b}{Agelem}.
+
+\index{Csatorna@{Csatorna}!Info@{Info}}
+\index{Info@{Info}!Csatorna@{Csatorna}}
+\subsubsection[{\texorpdfstring{Info()}{Info()}}]{\setlength{\rightskip}{0pt plus 5cm}string Csatorna\+::\+Info (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{class_csatorna_a77f24ff76c738a89cb827d251fec0845}{}\label{class_csatorna_a77f24ff76c738a89cb827d251fec0845}
+
+
+Inform�ci� 
+
+Info.
+
+\begin{DoxyReturn}{Returns}
+info string 
+\end{DoxyReturn}
+
+
+Reimplemented from \hyperlink{class_agelem_a2e6c4688cdbdf17c6d3bde0c6c08ff49}{Agelem}.
+
+\index{Csatorna@{Csatorna}!Ini@{Ini}}
+\index{Ini@{Ini}!Csatorna@{Csatorna}}
+\subsubsection[{\texorpdfstring{Ini(int mode, double value)}{Ini(int mode, double value)}}]{\setlength{\rightskip}{0pt plus 5cm}void Csatorna\+::\+Ini (
+\begin{DoxyParamCaption}
+\item[{int}]{mode, }
+\item[{double}]{value}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{class_csatorna_ab30adea649ae8708061e211dc450cb06}{}\label{class_csatorna_ab30adea649ae8708061e211dc450cb06}
+
+
+Inicializ�ci� 
+
+�gelem inicializ�l�sa
+
+
+\begin{DoxyParams}{Parameters}
+{\em mode} & -\/ (0) automatikus, (1) mp=value \\
+\hline
+{\em value} & csak mode=1 eset�n \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{class_agelem_a844171faf01143770bbd894b1a48e72f}{Agelem}.
+
+\index{Csatorna@{Csatorna}!keresztmetszet@{keresztmetszet}}
+\index{keresztmetszet@{keresztmetszet}!Csatorna@{Csatorna}}
+\subsubsection[{\texorpdfstring{keresztmetszet(const double y, double \&\+A, double \&\+B, double \&\+Rh)}{keresztmetszet(const double y, double &A, double &B, double &Rh)}}]{\setlength{\rightskip}{0pt plus 5cm}void Csatorna\+::keresztmetszet (
+\begin{DoxyParamCaption}
+\item[{const double}]{yy, }
+\item[{double \&}]{A, }
+\item[{double \&}]{B, }
+\item[{double \&}]{Rh}
+\end{DoxyParamCaption}
+)}\hypertarget{class_csatorna_ab9528187fc3d40d210c85b72d7856f10}{}\label{class_csatorna_ab9528187fc3d40d210c85b72d7856f10}
+
+
+Keresztmetszeti jellemzok szamitasa. 
+
+Keresztmetszeti jellemz�k sz�m�t�sa.
+
+
+\begin{DoxyParams}{Parameters}
+{\em y} & v�zszint \\
+\hline
+{\em \&A} & nedves�tett ter�let \\
+\hline
+{\em \&B} & nedves�tett ker�let \\
+\hline
+{\em \&\+Rh} & hidraulikai sug�r (A/B) \\
+\hline
+\end{DoxyParams}
+\index{Csatorna@{Csatorna}!nyf\+\_\+ode@{nyf\+\_\+ode}}
+\index{nyf\+\_\+ode@{nyf\+\_\+ode}!Csatorna@{Csatorna}}
+\subsubsection[{\texorpdfstring{nyf\+\_\+ode(const double x, const double y, const double mp)}{nyf_ode(const double x, const double y, const double mp)}}]{\setlength{\rightskip}{0pt plus 5cm}double Csatorna\+::nyf\+\_\+ode (
+\begin{DoxyParamCaption}
+\item[{const double}]{x, }
+\item[{const double}]{y, }
+\item[{const double}]{mp}
+\end{DoxyParamCaption}
+)}\hypertarget{class_csatorna_aacea0461de03c4592e89cee026c2e1d5}{}\label{class_csatorna_aacea0461de03c4592e89cee026c2e1d5}
+
+
+A ny�ltfelsz�n� �raml�s le�r� DE. 
+
+Folyad�kfelsz�nt le�r� dy/dx=f(x,y) K\+DE jobboldala.
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & x koordin�ta \\
+\hline
+{\em y} & y koordin�ta \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+dy/dx �rt�ke 
+\end{DoxyReturn}
+\index{Csatorna@{Csatorna}!ode\+\_\+megoldo@{ode\+\_\+megoldo}}
+\index{ode\+\_\+megoldo@{ode\+\_\+megoldo}!Csatorna@{Csatorna}}
+\subsubsection[{\texorpdfstring{ode\+\_\+megoldo(double ystart, double dx, double xstart, double mp)}{ode_megoldo(double ystart, double dx, double xstart, double mp)}}]{\setlength{\rightskip}{0pt plus 5cm}double Csatorna\+::ode\+\_\+megoldo (
+\begin{DoxyParamCaption}
+\item[{double}]{y0, }
+\item[{double}]{dx0, }
+\item[{double}]{x0, }
+\item[{double}]{mp}
+\end{DoxyParamCaption}
+)}\hypertarget{class_csatorna_a17e55cbde88d58985f7e315e7069ba3a}{}\label{class_csatorna_a17e55cbde88d58985f7e315e7069ba3a}
+
+
+O\+DE integr�l�s. 
+
+K\+DE megold�
+
+
+\begin{DoxyParams}{Parameters}
+{\em y0} & indul� felsz�n\+: y(x0) \\
+\hline
+{\em dx0} & kezdeti l�p�sk�z, az integr�l�s k�zben n�het/cs�kkenhet \\
+\hline
+{\em x0} & indul� x �rt�k, ez hat�rozza meg az integr�l�s ir�ny�t \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+y az integr�l�s eredm�nye 
+\end{DoxyReturn}
+\index{Csatorna@{Csatorna}!warning@{warning}}
+\index{warning@{warning}!Csatorna@{Csatorna}}
+\subsubsection[{\texorpdfstring{warning(string fv, string msg)}{warning(string fv, string msg)}}]{\setlength{\rightskip}{0pt plus 5cm}void Csatorna\+::warning (
+\begin{DoxyParamCaption}
+\item[{string}]{fv, }
+\item[{string}]{msg}
+\end{DoxyParamCaption}
+)}\hypertarget{class_csatorna_ac2000669171af7d8fa5f447cb8aa231d}{}\label{class_csatorna_ac2000669171af7d8fa5f447cb8aa231d}
+
+
+Figyelmeztetes. 
+
+Figyelmeztetes k�perny�re �s eredm�nyf�jlba.
+
+
+\begin{DoxyParams}{Parameters}
+{\em fv} & h�v� f�ggv�ny \\
+\hline
+{\em msg} & �zenet \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Csatorna.\+h\item 
+Csatorna.\+cpp\end{DoxyCompactItemize}

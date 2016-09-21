@@ -11,6 +11,7 @@ public:
     vector<Agelem *> agelemek;
     void export_connected_nodes();
     Staci(int argc, char *argv[]);
+    Staci(string spr_filename);
     ~Staci();
     string Get_out_file()
     {
@@ -27,6 +28,7 @@ public:
     void build_system();
     void build_system_old();
     void ini();
+    void ini(const Staci *IniStaci);
     void list_system();
     string list_results();
     void save_results(bool conv_reached);
@@ -77,6 +79,8 @@ public:
     void Set_FolyTerf();
     double m_get_dprop();
     void m_set_dprop();
+    double get_dprop(string ID, string prop);
+    void set_dprop(string ID, string prop, double val);
 
     // ADATMODOSITASHOZ
     string new_def_file, element_ID, property_ID;
@@ -110,6 +114,9 @@ private:
 
     double transp_dt, ido; //, transp_dt_ki;
     string progress_file;
+
+    void SetInitialParameters();
+
     void progress_file_write(double percent);
     void get_command_line_options(int argc, char *argv[]);
     string trim(string s, const string drop);

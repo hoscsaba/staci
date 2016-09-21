@@ -2,11 +2,11 @@
 
 class Vegakna:public Agelem{
   private:
-    /// Fenékszint [m]-ben
+    /// Fenekszint [m]-ben
     double Hf;
-    /// Vízszint a fenéktõl [m]-ben
+    /// Vizszint a fenektol [m]-ben
     double H;
-    /// A teljes nyomásszint a geodetikus alapszintre számolva (ro*g*(Hf+H))
+    /// A teljes nyomasszint a geodetikus alapszintre szï¿½molva (ro*g*(Hf+H))
     double p;
   public:
     Vegakna(const string nev, 

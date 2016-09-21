@@ -1,0 +1,58 @@
+STACI v2.0
+ (c) BME Dept. of Hydrodynamic Systems
+ (c) C. Hos (csaba.hos@hds.bme.hu)
+ info: www.hds.bme.hu\staci
+
+ date: Wed Mar  9 11:29:33 2016
+
+ input file:FV_input_2013_01_03_barlang_nelkul_4_mod.spr
+
+ Number of nodes: 189
+ Number of edges: 267
+
+
+Solving system...
+====================================
+
+ Number of nonzero Jacobian entries: 1321 out of 207936 (0.635292%)
+
+ iter. # 0./100 e_mp=3.62e+03,  e_p=2.45e+10  relax.=0.50, relax.mul.=1.20
+ iter. # 1./100 e_mp=3.44e+03,  e_p=2.33e+10  relax.=0.05, relax.mul.=1.20
+ iter. # 2./100 e_mp=3.23e+03,  e_p=2.19e+10  relax.=0.06, relax.mul.=1.20
+ iter. # 3./100 e_mp=3.00e+03,  e_p=2.04e+10  relax.=0.07, relax.mul.=1.20
+ iter. # 4./100 e_mp=2.74e+03,  e_p=1.86e+10  relax.=0.09, relax.mul.=1.20
+ iter. # 5./100 e_mp=2.46e+03,  e_p=1.68e+10  relax.=0.10, relax.mul.=1.20
+ iter. # 6./100 e_mp=2.15e+03,  e_p=1.47e+10  relax.=0.12, relax.mul.=1.20
+ iter. # 7./100 e_mp=1.83e+03,  e_p=1.26e+10  relax.=0.15, relax.mul.=1.20
+ iter. # 8./100 e_mp=1.50e+03,  e_p=1.05e+10  relax.=0.18, relax.mul.=1.20
+ iter. # 9./100 e_mp=1.18e+03,  e_p=8.33e+09  relax.=0.21, relax.mul.=1.20
+ iter. # 10./100 e_mp=8.75e+02,  e_p=6.32e+09  relax.=0.26, relax.mul.=1.20
+ iter. # 11./100 e_mp=6.04e+02,  e_p=4.52e+09  relax.=0.31, relax.mul.=1.20
+ iter. # 12./100 e_mp=3.80e+02,  e_p=2.99e+09  relax.=0.37, relax.mul.=1.20
+ iter. # 13./100 e_mp=2.11e+02,  e_p=1.81e+09  relax.=0.45, relax.mul.=1.20
+ iter. # 14./100 e_mp=9.79e+01,  e_p=9.70e+08  relax.=0.53, relax.mul.=1.20
+ iter. # 15./100 e_mp=3.51e+01,  e_p=4.47e+08  relax.=0.64, relax.mul.=1.20
+ iter. # 16./100 e_mp=8.05e+00,  e_p=1.69e+08  relax.=0.77, relax.mul.=1.20
+ iter. # 17./100 e_mp=6.08e-01,  e_p=4.89e+07  relax.=0.92, relax.mul.=1.20
+ iter. # 18./100 e_mp=6.50e-13,  e_p=1.22e+07  relax.=1.00, relax.mul.=1.20
+ iter. # 19./100 e_mp=5.70e-13,  e_p=3.06e+06  relax.=1.00, relax.mul.=1.20
+ iter. # 20./100 e_mp=6.58e-13,  e_p=7.64e+05  relax.=1.00, relax.mul.=1.20
+ iter. # 21./100 e_mp=6.22e-13,  e_p=1.91e+05  relax.=1.00, relax.mul.=1.20
+ iter. # 22./100 e_mp=7.30e-13,  e_p=4.77e+04  relax.=1.00, relax.mul.=1.20
+ iter. # 23./100 e_mp=6.72e-13,  e_p=1.19e+04  relax.=1.00, relax.mul.=1.20
+ iter. # 24./100 e_mp=4.83e-13,  e_p=2.98e+03  relax.=1.00, relax.mul.=1.20
+ iter. # 25./100 e_mp=5.38e-13,  e_p=7.42e+02  relax.=1.00, relax.mul.=1.20
+ iter. # 26./100 e_mp=6.52e-13,  e_p=1.83e+02  relax.=1.00, relax.mul.=1.20
+ iter. # 27./100 e_mp=5.25e-13,  e_p=4.38e+01  relax.=1.00, relax.mul.=1.20
+ iter. # 28./100 e_mp=6.12e-13,  e_p=1.12e+01  relax.=1.00, relax.mul.=1.20
+ iter. # 29./100 e_mp=6.77e-13,  e_p=2.26e+00  relax.=1.00, relax.mul.=1.20
+ iter. # 30./100 e_mp=7.95e-13,  e_p=4.18e-01  relax.=1.00, relax.mul.=1.20
+ iter. # 31./100 e_mp=6.47e-13,  e_p=9.77e-02  relax.=1.00, relax.mul.=1.20
+ iter. # 32./100 e_mp=7.55e-13,  e_p=2.12e-02  relax.=1.00, relax.mul.=1.20
+ iter. # 33./100 e_mp=4.60e-13,  e_p=4.68e-03  relax.=1.00, relax.mul.=1.20
+ iter. # 34./100 e_mp=5.87e-13,  e_p=1.16e-03  relax.=1.00, relax.mul.=1.20
+ iter. # 35./100 e_mp=5.67e-13,  e_p=2.90e-04  relax.=1.00, relax.mul.=1.20
+ iter. # 36./100 e_mp=6.52e-13,  e_p=7.26e-05  relax.=1.00, relax.mul.=1.20
+
+Computing residence time...
+====================================

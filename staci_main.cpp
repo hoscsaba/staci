@@ -39,8 +39,6 @@ int main(int argc, char* argv[]) {
 	endTime = clock();
 	timing.at(1)=double( endTime - startTime ) / CLOCKS_PER_SEC;
 
-	// cout<<endl<<endl<<"feladat.build_system() ready..."<<endl;
-	// cin.get();
 
 	// Stacioner halozatszamitas
 	//----------------------------------------
@@ -151,13 +149,13 @@ int main(int argc, char* argv[]) {
 
 	double sum_time =timing.at(0)+timing.at(1)+timing.at(2)+timing.at(3);
 
-	cout << endl<<"Timing:";
-	cout <<endl<<"\t Reading data files   : "<< timing.at(0) << " sec ("<<timing.at(0)/sum_time*100<<" %)";    
-	cout <<endl<<"\t Building the system  : "<< timing.at(1) << " sec ("<<timing.at(1)/sum_time*100<<" %)";    
-	cout <<endl<<"\t Iteration            : "<< timing.at(2) << " sec ("<<timing.at(2)/sum_time*100<<" %)";    
-	cout <<endl<<"\t Writing result files : "<< timing.at(3) << " sec ("<<timing.at(3)/sum_time*100<<" %)";    
-	cout <<endl<<"\t--------------------------------------------------";
-	cout <<endl<<"\t Overall              : "<<sum_time<<" sec"<<endl<<endl;
+	printf("\nTiming:\n============================");
+	printf("\n\t Reading data files   : %5.3f sec  (%4.1f %%)",timing.at(0),timing.at(0)/sum_time*100.);
+	printf("\n\t Building the system  : %5.3f sec  (%4.1f %%)",timing.at(1),timing.at(1)/sum_time*100.);
+	printf("\n\t Number cranching     : %5.3f sec  (%4.1f %%)",timing.at(2),timing.at(2)/sum_time*100.);
+	printf("\n\t Writing result files : %5.3f sec  (%4.1f %%)",timing.at(3),timing.at(3)/sum_time*100.);
+	printf("\n\t---------------------------------------------");
+	printf("\n\t Overall              : %5.3f sec\n\n",sum_time);
 
 	return 0;
 }
@@ -188,46 +186,52 @@ void solve_hydraulics(Staci&  feladat, double& time2, double& time3) {
 	ostringstream msg;
 	string rrs_file = feladat.get_def_file()+".rrs";
 	msg << "\n\nTrying to delete previous *.rrs file ... ";
-    if ( remove( rrs_file.c_str()) != 0 )
-        msg << " file not found, cannot delete it.";
-    else
-        msg << "file successfully deleted." ;
-    cout << msg.str();
+	if ( remove( rrs_file.c_str()) != 0 )
+		msg << " file not found, cannot delete it.";
+	else
+		msg << "file successfully deleted." ;
+	cout << msg.str();
 
 	if (!konv_ok) {
-		cout<<endl<<endl <<"*********************************************************************************";
-		cout<<endl <<"* !!! A megoldo nem konvergalt, az utolso lepes eredmenyei hiba.spr fajlban !!! *";
-		cout<<endl <<"*********************************************************************************" <<endl<<endl;
-
-		feladat.save_results(false);
-		//<feladatnev>.hiba.spr beallitasa
-		string resfile = feladat.get_def_file()+".hiba.spr";
-		feladat.copy_file(feladat.get_def_file(), resfile);
-		feladat.set_res_file(resfile);
-		feladat.save_results(true);
-
+		// Put "ERROR" to <problem.spr>.rrs
 		ofstream outfile(rrs_file.c_str(), ios::trunc);
-		outfile<<"error\n";
+		outfile<<"ERROR!\n";
 		outfile.close();
-		feladat.logfile_write("\n\nerror", 0);
+		feladat.logfile_write("\n\nERROR!", 0);
+
+		cout<<endl<<endl <<"***********************************************************************************";
+		cout<<endl <<      "* !!! THE SOLVER DID NOT CONVERGE, LAST ITERATION RESULTS ARE IN PROBLEM FILE !!! *";
+		cout<<endl <<      "***********************************************************************************" <<endl<<endl;
+
+		// feladat.save_results(false);
+		// //<feladatnev>.hiba.spr beallitasa
+		// string resfile = feladat.get_def_file()+".hiba.spr";
+		// feladat.copy_file(feladat.get_def_file(), resfile);
+		// feladat.set_res_file(resfile);
+		// feladat.save_results(true);
+
+		// ofstream outfile(rrs_file.c_str(), ios::trunc);
+		// outfile<<"ERROR!\n";
+		// outfile.close();
+		// feladat.logfile_write("\n\nERROR!", 0);
 	} else {
-		// Sikeres volt a fut�s?
+		// Put "OK" to <problem.spr>.rrs
 		ofstream outfile(rrs_file.c_str(), ios::trunc);
-		outfile<<"ok\n";
+		outfile<<"OK\n";
 		outfile.close();
-		feladat.logfile_write("\n\nok", 0);
+		feladat.logfile_write("\n\nOK", 0);
 		
 		// If computation was OK, compute residence time also
 		feladat.solve_residence_time();
-
-		startTime = clock();
-		feladat.set_res_file(feladat.get_def_file());
-		feladat.save_results(true);
-		endTime = clock();
-		time3=double( endTime - startTime ) / CLOCKS_PER_SEC;
+	}
+	startTime = clock();
+	feladat.set_res_file(feladat.get_def_file());
+	feladat.save_results(konv_ok);
+	endTime = clock();
+	time3=double( endTime - startTime ) / CLOCKS_PER_SEC;
 
 		//cout<<feladat.list_results();
-	}
+	// }
 
 	
 }

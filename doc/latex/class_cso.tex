@@ -1,0 +1,110 @@
+\hypertarget{class_cso}{}\section{Cso Class Reference}
+\label{class_cso}\index{Cso@{Cso}}
+Inheritance diagram for Cso\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_cso}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Cso} (const string \hyperlink{class_agelem_abe92b7e3912367d5d1caf6b277ca0b7d}{nev}, const string a\+\_\+cspe\+\_\+nev, const string a\+\_\+cspv\+\_\+nev, const double a\+\_\+ro, const double L, const double D, const double lambda, const double cl\+\_\+k, const double cl\+\_\+w, const double \hyperlink{class_agelem_a1377d80d8511cc4adacccba31d28282d}{mp})\hypertarget{class_cso_ab04f2170382860dcff777b7185c62ba7}{}\label{class_cso_ab04f2170382860dcff777b7185c62ba7}
+
+\item 
+string \hyperlink{class_cso_af6a08482d5949b0924459b7588efd2a0}{Info} ()\hypertarget{class_cso_af6a08482d5949b0924459b7588efd2a0}{}\label{class_cso_af6a08482d5949b0924459b7588efd2a0}
+
+\begin{DoxyCompactList}\small\item\em Informacio. \end{DoxyCompactList}\item 
+double \hyperlink{class_cso_a5b0e37d3a2f6095e958a7c5f27d8e060}{f} (vector$<$ double $>$)\hypertarget{class_cso_a5b0e37d3a2f6095e958a7c5f27d8e060}{}\label{class_cso_a5b0e37d3a2f6095e958a7c5f27d8e060}
+
+\begin{DoxyCompactList}\small\item\em Az agegyenlet erteke, nullara rendezve, v.\+o.\+m.-\/ben. \end{DoxyCompactList}\item 
+vector$<$ double $>$ \hyperlink{class_cso_acc0b1bb6f9558475a097219d88d07267}{df} (vector$<$ double $>$)\hypertarget{class_cso_acc0b1bb6f9558475a097219d88d07267}{}\label{class_cso_acc0b1bb6f9558475a097219d88d07267}
+
+\begin{DoxyCompactList}\small\item\em Jacobi\+: df/dhe, df/dhv, df/dmp, konstans tag. \end{DoxyCompactList}\item 
+void \hyperlink{class_cso_aad51dd17829b413a41f1afb0c275d55c}{Ini} (int mode, double value)\hypertarget{class_cso_aad51dd17829b413a41f1afb0c275d55c}{}\label{class_cso_aad51dd17829b413a41f1afb0c275d55c}
+
+\begin{DoxyCompactList}\small\item\em Inicializacio, mode=0 -\/$>$ automatikus, mode=1 -\/$>$ value beirasa. \end{DoxyCompactList}\item 
+double \hyperlink{class_cso_a01d6ba01b924fe317638fe196a139d1f}{surlodas} ()
+\begin{DoxyCompactList}\small\item\em Sets the friction coefficient lambda. \end{DoxyCompactList}\item 
+double \hyperlink{class_cso_a674c356a597eb9d6c9a46726b35e2a00}{Get\+\_\+dprop} (string mit)\hypertarget{class_cso_a674c356a597eb9d6c9a46726b35e2a00}{}\label{class_cso_a674c356a597eb9d6c9a46726b35e2a00}
+
+\begin{DoxyCompactList}\small\item\em Get double property, \hyperlink{class_cso}{Cso} es \hyperlink{class_csatorna}{Csatorna} akarja elulirja. \end{DoxyCompactList}\item 
+double \hyperlink{class_cso_a794959559cb679efb0529417e1df6556}{Get\+\_\+dfdmu} (string mit)\hypertarget{class_cso_a794959559cb679efb0529417e1df6556}{}\label{class_cso_a794959559cb679efb0529417e1df6556}
+
+\begin{DoxyCompactList}\small\item\em Get equation derivative w.\+r.\+t. parameter. \end{DoxyCompactList}\item 
+void {\bfseries Set\+\_\+dprop} (string mit, double mire)\hypertarget{class_cso_ae6db4734838a6261e89caeb53269e990}{}\label{class_cso_ae6db4734838a6261e89caeb53269e990}
+
+\item 
+string {\bfseries Get\+Type} ()\hypertarget{class_cso_a20b7469a9b992da3bc25c647cdfa23c8}{}\label{class_cso_a20b7469a9b992da3bc25c647cdfa23c8}
+
+\item 
+double \hyperlink{class_cso_a796d4ff0f69732001c91abe7e5ce7ed7}{Compute\+Headloss} ()
+\begin{DoxyCompactList}\small\item\em Computes the head loss in Pa. \end{DoxyCompactList}\item 
+double \hyperlink{class_cso_a5f8536643bc971ca70aebef850fa53a1}{Compute\+Headloss\+Derivative} ()
+\begin{DoxyCompactList}\small\item\em Computes the head loss derivative w.\+r.\+t. mass flow rate. \end{DoxyCompactList}\item 
+void \hyperlink{class_cso_a113196b16e49417924fea36b770f4d84}{Set\+\_\+friction\+\_\+model} (string friction\+\_\+model)
+\begin{DoxyCompactList}\small\item\em Sets the friction model. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Member Function Documentation}
+\index{Cso@{Cso}!Compute\+Headloss@{Compute\+Headloss}}
+\index{Compute\+Headloss@{Compute\+Headloss}!Cso@{Cso}}
+\subsubsection[{\texorpdfstring{Compute\+Headloss()}{ComputeHeadloss()}}]{\setlength{\rightskip}{0pt plus 5cm}double Cso\+::\+Compute\+Headloss (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_cso_a796d4ff0f69732001c91abe7e5ce7ed7}{}\label{class_cso_a796d4ff0f69732001c91abe7e5ce7ed7}
+
+
+Computes the head loss in Pa. 
+
+dp\textquotesingle{}=lambda$\ast$\+L/\+D$\ast$ro/2$\ast$v$\ast$fabs(v) \index{Cso@{Cso}!Compute\+Headloss\+Derivative@{Compute\+Headloss\+Derivative}}
+\index{Compute\+Headloss\+Derivative@{Compute\+Headloss\+Derivative}!Cso@{Cso}}
+\subsubsection[{\texorpdfstring{Compute\+Headloss\+Derivative()}{ComputeHeadlossDerivative()}}]{\setlength{\rightskip}{0pt plus 5cm}double Cso\+::\+Compute\+Headloss\+Derivative (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_cso_a5f8536643bc971ca70aebef850fa53a1}{}\label{class_cso_a5f8536643bc971ca70aebef850fa53a1}
+
+
+Computes the head loss derivative w.\+r.\+t. mass flow rate. 
+
+dp\textquotesingle{}=lambda$\ast$\+L/\+D$\ast$ro/2$\ast$v$\ast$fabs(v) d dp\textquotesingle{}/dmp=lambda$\ast$\+L/\+D$\ast$ro/2$\ast$1/(ro$\ast$A)$^\wedge$2$\ast$abs(v) \index{Cso@{Cso}!Set\+\_\+friction\+\_\+model@{Set\+\_\+friction\+\_\+model}}
+\index{Set\+\_\+friction\+\_\+model@{Set\+\_\+friction\+\_\+model}!Cso@{Cso}}
+\subsubsection[{\texorpdfstring{Set\+\_\+friction\+\_\+model(string friction\+\_\+model)}{Set_friction_model(string friction_model)}}]{\setlength{\rightskip}{0pt plus 5cm}void Cso\+::\+Set\+\_\+friction\+\_\+model (
+\begin{DoxyParamCaption}
+\item[{string}]{a\+\_\+fric\+\_\+type}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{class_cso_a113196b16e49417924fea36b770f4d84}{}\label{class_cso_a113196b16e49417924fea36b770f4d84}
+
+
+Sets the friction model. 
+
+DW (friction\+\_\+model\+\_\+type = 0) -\/$>$ Darcy Wiesenbach HW (friction\+\_\+model\+\_\+type = 1) -\/$>$ Hazen-\/\+Williams 
+
+Reimplemented from \hyperlink{class_agelem}{Agelem}.
+
+\index{Cso@{Cso}!surlodas@{surlodas}}
+\index{surlodas@{surlodas}!Cso@{Cso}}
+\subsubsection[{\texorpdfstring{surlodas()}{surlodas()}}]{\setlength{\rightskip}{0pt plus 5cm}double Cso\+::surlodas (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{class_cso_a01d6ba01b924fe317638fe196a139d1f}{}\label{class_cso_a01d6ba01b924fe317638fe196a139d1f}
+
+
+Sets the friction coefficient lambda. 
+
+Based on the actual friction model (DW, HW) computes the friction coefficient.
+
+For DW (friction\+\_\+model\+\_\+type = 0) -\/$>$ Darcy Wiesenbach model parameter \textquotesingle{}erdesseg\textquotesingle{} is pipe surface roughness in mm
+
+For HW (friction\+\_\+model\+\_\+type = 1) -\/$>$ Hazen-\/\+Williams model parameter \textquotesingle{}erdesseg\textquotesingle{} is the Hazen-\/\+Williamd constant. If the user-\/supplied value is less tha 10, it is overwritten to 10.
+
+For any of these models, if parameter erdesseg is negative, it is assumed that lambda=-\/erdesseg 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Cso.\+h\item 
+Cso.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,108 @@
+\hypertarget{class_szivattyu}{}\section{Szivattyu Class Reference}
+\label{class_szivattyu}\index{Szivattyu@{Szivattyu}}
+Inheritance diagram for Szivattyu\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_szivattyu}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Szivattyu} (const string \hyperlink{class_agelem_abe92b7e3912367d5d1caf6b277ca0b7d}{nev}, const string a\+\_\+cspe\+\_\+nev, const string a\+\_\+cspv\+\_\+nev, const double a\+\_\+ro, const double \hyperlink{class_agelem_a3f8668febc2958fd539997d537552f17}{Aref}, const vector$<$ double $>$ q, const vector$<$ double $>$ H, const double a\+\_\+mp)\hypertarget{class_szivattyu_aea7d1a77b34e471145a856483915369f}{}\label{class_szivattyu_aea7d1a77b34e471145a856483915369f}
+
+\item 
+string \hyperlink{class_szivattyu_a369c5e45b9381265feeba29d06bd1e59}{Info} ()\hypertarget{class_szivattyu_a369c5e45b9381265feeba29d06bd1e59}{}\label{class_szivattyu_a369c5e45b9381265feeba29d06bd1e59}
+
+\begin{DoxyCompactList}\small\item\em Informacio. \end{DoxyCompactList}\item 
+double \hyperlink{class_szivattyu_a083379e0cee2db17f1b20db3fdfcde79}{f} (vector$<$ double $>$)
+\begin{DoxyCompactList}\small\item\em Pump branch equation. \end{DoxyCompactList}\item 
+vector$<$ double $>$ \hyperlink{class_szivattyu_aefd62e0f02d12273d34511e4b8721f04}{df} (vector$<$ double $>$)\hypertarget{class_szivattyu_aefd62e0f02d12273d34511e4b8721f04}{}\label{class_szivattyu_aefd62e0f02d12273d34511e4b8721f04}
+
+\begin{DoxyCompactList}\small\item\em Jacobi\+: df/dhe, df/dhv, df/dmp, konstans tag. \end{DoxyCompactList}\item 
+void \hyperlink{class_szivattyu_a3c35ef43a38a45e9d077281a8804abe4}{Ini} (int mode, double value)\hypertarget{class_szivattyu_a3c35ef43a38a45e9d077281a8804abe4}{}\label{class_szivattyu_a3c35ef43a38a45e9d077281a8804abe4}
+
+\begin{DoxyCompactList}\small\item\em Inicializacio, mode=0 -\/$>$ automatikus, mode=1 -\/$>$ value beirasa. \end{DoxyCompactList}\item 
+void {\bfseries Set\+\_\+dprop} (string mit, double mire)\hypertarget{class_szivattyu_aae9b66e4fc0313360d1b8a65ba0a2a68}{}\label{class_szivattyu_aae9b66e4fc0313360d1b8a65ba0a2a68}
+
+\item 
+string {\bfseries Get\+Type} ()\hypertarget{class_szivattyu_a373372511e4b9ad88474594052c69a6a}{}\label{class_szivattyu_a373372511e4b9ad88474594052c69a6a}
+
+\item 
+double \hyperlink{class_szivattyu_ad2fec54e4e5cb236bc7b6a3e8dfbed2f}{Pump\+Char\+Curve} (double q)
+\begin{DoxyCompactList}\small\item\em Pump performance curve evaluation. \end{DoxyCompactList}\item 
+double {\bfseries Get\+\_\+\+Pump\+Head\+At} (double q)\hypertarget{class_szivattyu_ad2ddc46a360f9a4de20cae65dd381240}{}\label{class_szivattyu_ad2ddc46a360f9a4de20cae65dd381240}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Member Function Documentation}
+\index{Szivattyu@{Szivattyu}!f@{f}}
+\index{f@{f}!Szivattyu@{Szivattyu}}
+\subsubsection[{\texorpdfstring{f(vector$<$ double $>$)}{f(vector< double >)}}]{\setlength{\rightskip}{0pt plus 5cm}double Szivattyu\+::f (
+\begin{DoxyParamCaption}
+\item[{vector$<$ double $>$}]{x}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\hypertarget{class_szivattyu_a083379e0cee2db17f1b20db3fdfcde79}{}\label{class_szivattyu_a083379e0cee2db17f1b20db3fdfcde79}
+
+
+Pump branch equation. 
+
+The function evaluates the curve fit by the constructor \begin{DoxySeeAlso}{See also}
+\hyperlink{class_szivattyu}{Szivattyu()} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em x} & vector$<$double$>$ \\
+\hline
+{\em x(0)=pstart/ro/g} & \\
+\hline
+{\em x(1)=pend/ro/g} & \\
+\hline
+{\em x(2)=zstart} & \\
+\hline
+{\em x(3)=zend} & \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+(double) function error (should be zero) 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{class_szivattyu_ad2fec54e4e5cb236bc7b6a3e8dfbed2f}{Pump\+Char\+Curve()} 
+\end{DoxySeeAlso}
+
+
+Implements \hyperlink{class_agelem_aa1d93be52ddae11df003c4e35c47084b}{Agelem}.
+
+\index{Szivattyu@{Szivattyu}!Pump\+Char\+Curve@{Pump\+Char\+Curve}}
+\index{Pump\+Char\+Curve@{Pump\+Char\+Curve}!Szivattyu@{Szivattyu}}
+\subsubsection[{\texorpdfstring{Pump\+Char\+Curve(double q)}{PumpCharCurve(double q)}}]{\setlength{\rightskip}{0pt plus 5cm}double Szivattyu\+::\+Pump\+Char\+Curve (
+\begin{DoxyParamCaption}
+\item[{double}]{qq}
+\end{DoxyParamCaption}
+)}\hypertarget{class_szivattyu_ad2fec54e4e5cb236bc7b6a3e8dfbed2f}{}\label{class_szivattyu_ad2fec54e4e5cb236bc7b6a3e8dfbed2f}
+
+
+Pump performance curve evaluation. 
+
+The function evaluates the curve fit by the constructor \begin{DoxySeeAlso}{See also}
+\hyperlink{class_szivattyu}{Szivattyu()} 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em qq} & (double) flow rate in m$^\wedge$3/s \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+(double) head in m 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{class_szivattyu}{Szivattyu()} and \hyperlink{class_szivattyu_a083379e0cee2db17f1b20db3fdfcde79}{f()} 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Szivattyu.\+h\item 
+Szivattyu.\+cpp\end{DoxyCompactItemize}

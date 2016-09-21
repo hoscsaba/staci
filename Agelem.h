@@ -63,6 +63,11 @@ public:
     {
         return 0.0;
     }
+    /// Get double property, Cso es Csatorna akarja elulirja
+    double Get_Aref()
+    {
+        return Aref;
+    }
     /// Get equation derivative w.r.t. parameter
     virtual double Get_dfdmu(string mit)
     {

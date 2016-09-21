@@ -18,56 +18,63 @@
 // Mac:
 #include "/usr/local/include/umfpack.h"
 
-//--------------------------------------------------------------
-Staci::Staci(int argc, char *argv[])
-{
+// TODO: Clear up debug level behaviour in the doc!
+// TODO: log file cleanup!
+
+Staci::Staci(int argc, char *argv[]) {
+    opt = new AnyOption();
+    get_command_line_options(argc, argv);
+    SetInitialParameters();
+}
+
+Staci::Staci(string spr_filename) {
+    mode = 0;
+    def_file = spr_filename;
+    SetInitialParameters();
+}
+
+void Staci::SetInitialParameters() {
 
     van_ini = false;
 
     m_nnz = 0; /*!< Number of nonzero entries of the Jacobian. */
-
-    opt = new AnyOption();
-    get_command_line_options(argc, argv);
-
     // az adatfile olvasasa
-    if (mode >= 0)
-    {
+    if (mode >= 0) {
         data_io datta_io(def_file.c_str());
         datta_io.load_system(cspok, agelemek);
 
         // beallitasok
-        /*cout<<endl<<endl<<"Beallitasok:";*/
+        //cout<<endl<<endl<<"Beallitasok:";
         debug_level = atoi(datta_io.read_setting("debug_level").c_str());
-        /*cout<<endl<<"\tdebug_level  => "<<datta_io.read_setting("debug_level");*/
+        //cout<<endl<<"\tdebug_level  => "<<datta_io.read_setting("debug_level");
 
-        //out_file = datta_io.read_setting("out_file");
+        out_file = datta_io.read_setting("out_file");
         //cout<<endl<<"\tout_file     => "<<out_file;
 
         iter_max = atoi(datta_io.read_setting("iter_max").c_str());
-        /*cout<<endl<<"\titer_max     => "<<iter_max;*/
+        //cout<<endl<<"\titer_max     => "<<iter_max;
 
         e_p_max = atof(datta_io.read_setting("e_p_max").c_str());
-        /*cout<<endl<<"\te_p_max      => "<<e_p_max;*/
+        //cout<<endl<<"\te_p_max      => "<<e_p_max;
 
         e_mp_max = atof(datta_io.read_setting("e_mp_max").c_str());
-        /*cout<<endl<<"\te_mp_max     => "<<e_mp_max;*/
+        //cout<<endl<<"\te_mp_max     => "<<e_mp_max;
 
         m_relax = atof(datta_io.read_setting("relax").c_str());
-        /*      cout<<endl<<"\trelax        => "<<relax;*/
+        //     cout<<endl<<"\trelax        => "<<relax;
 
         m_relax_mul = atof(datta_io.read_setting("relax_mul").c_str());
-        /*      cout<<endl<<"\trelax szorzo => "<<relax_mul;*/
+        //      cout<<endl<<"\trelax szorzo => "<<relax_mul;
 
         mp_init = atof(datta_io.read_setting("mp_init").c_str());
-        /*      cout<<endl<<"\tmp ini       => "<<mp_init;*/
+        //      cout<<endl<<"\tmp ini       => "<<mp_init;
 
         p_init = atof(datta_io.read_setting("p_init").c_str());
-        /*      cout<<endl<<"\tp ini        => "<<p_init;*/
+        //      cout<<endl<<"\tp ini        => "<<p_init;
 
         friction_model = datta_io.read_setting("friction_model").c_str();
 
-        if (friction_model == "nincs ilyen node!")
-        {
+        if (friction_model == "nincs ilyen node!") {
             friction_model = "DW";
             cout << endl << endl << "******** WARNING! ********";
             cout << endl << "<friction_model>DW|HW</friction_model> node not found!";
@@ -75,32 +82,33 @@ Staci::Staci(int argc, char *argv[])
         }
     }
 
-    // Setting up the log & progress file
+    // Set up the log & progress file name
     set_out_file(def_file + ".ros");
     set_progress_file(def_file + ".rps");
-    time_t ido = time(0);
 
     // Delete if previous exists...
     ostringstream msg;
-    msg << "\nTrying to delete previous logfile " << out_file << "... ";
-    if ( remove( out_file.c_str()) != 0 )
+    msg << "\nTrying to delete previous logfile " << out_file.c_str() << "... ";
+    if (remove(out_file.c_str()) != 0)
         msg << " file not found, cannot delete it.";
     else
-        msg << "file successfully deleted." ;
-    cout << msg.str();
-    //logfile_write(msg.str(), 1); (Don't try to write this into log file yet, it does not exist.)
+        msg << "file successfully deleted.";
 
-    // Open new log file and add header
-    ofstream outfile;
-    outfile.open(out_file.c_str(), ios::trunc);
-    outfile <<  "STACI v2.0";
-    outfile << endl << " (c) BME Dept. of Hydrodynamic Systems";
-    outfile << endl << " (c) C. Hos (csaba.hos@hds.bme.hu)";
-    outfile << endl << " info: www.hds.bme.hu\\staci" << endl;
-    outfile << endl << " date: " << ctime(&ido);
-    outfile << endl << " input file:" << def_file << endl;
+    // Add header
+    m_ss.str("");
+    m_ss << "STACI v2.0";
+    m_ss << endl << " (c) BME Dept. of Hydrodynamic Systems";
+    m_ss << endl << " (c) C. Hos (csaba.hos@hds.bme.hu)";
+    m_ss << endl << " info: www.hds.bme.hu\\staci" << endl;
+    time_t ido = time(0);
+    m_ss << endl << " date: " << ctime(&ido);
+    m_ss << endl << " input file:" << def_file << endl;
+    if (debug_level > 0) {
+        cout << m_ss.str();
+        logfile_write(m_ss.str(), 1);
+    }
+    m_ss.str("");
 
-    outfile.close();
 
     // If set to false, the result file will not be saved!
     // Only set false for sensitivity analysis
@@ -109,33 +117,32 @@ Staci::Staci(int argc, char *argv[])
 }
 
 //--------------------------------------------------------------
-Staci::~Staci()
-{
+Staci::~Staci() {
     delete opt;
 }
 
 //--------------------------------------------------------------
-void Staci::get_command_line_options(int argc, char *argv[])
-{
+void Staci::get_command_line_options(int argc, char *argv[]) {
     opt->setVerbose(); /* print warnings about unknown options */
     opt->autoUsagePrint(true); /* print usage for bad options */
 
-    // foglalt parancssori argumentumok:
-    // -h --help
-    // -s --stac              (mode=0)
-    // -i --ini
-    // -t --travel_time       (mode=1)
-    // -c --conc_transp       (mode=2)
-    // -m --mod_prop          (mode=3)
-    //    -e --element_ID
-    //    -p --property_ID
-    //    -n --newValue
-    //    -o --outfile
-    // -l --list_all_elements (mode=4)
-    // -g --get_data          (mode=5)
-    //    -e --element_ID
-    //    -p --property_ID
-    // -r sensitivity
+    /// This function sets members 'mode' and 'def_file'.
+    /// Possible argumentums:
+    /// -h --help
+    /// -s --stac              (mode=0)
+    /// -i --ini
+    /// -t --travel_time       (mode=1)
+    /// -c --conc_transp       (mode=2)
+    /// -m --mod_prop          (mode=3)
+    ///    -e --element_ID
+    ///    -p --property_ID
+    ///    -n --newValue
+    ///    -o --outfile
+    /// -l --list_all_elements (mode=4)
+    /// -g --get_data          (mode=5)
+    ///    -e --element_ID
+    ///    -p --property_ID
+    /// -r sensitivity
 
     opt->addUsage("");
     opt->addUsage("staci hasznalata: ");
@@ -151,19 +158,23 @@ void Staci::get_command_line_options(int argc, char *argv[])
     opt->addUsage("\t\t -t  (--travel_time) <halofile>.xml    Tartozkodasi ido szamitas a halofile.xml feladaton");
     opt->addUsage(" ");
     opt->addUsage("\t koncentracioeloszlas szamitasa: ");
-    opt->addUsage("\t\t -c  (--conc_transp) <halofile>.xml    Koncentracio eloszlas szamitasa a halofile.xml feladaton");
+    opt->addUsage(
+            "\t\t -c  (--conc_transp) <halofile>.xml    Koncentracio eloszlas szamitasa a halofile.xml feladaton");
     opt->addUsage(" ");
     opt->addUsage("\t parameter megvaltoztatasa: ");
-    opt->addUsage("\t\t -m  (--mod_prop) <halofile_regi>.spr -e (--element_ID) <ID_ag/csp> -p (--property_ID) <ID_adat> -n (--newValue) <uj_ertek> -o (--outfile) <halofajl_uj>.spr    Adatmodositas: halofajl_regi.xml -> halofajl_uj.xml");
+    opt->addUsage(
+            "\t\t -m  (--mod_prop) <halofile_regi>.spr -e (--element_ID) <ID_ag/csp> -p (--property_ID) <ID_adat> -n (--newValue) <uj_ertek> -o (--outfile) <halofajl_uj>.spr    Adatmodositas: halofajl_regi.xml -> halofajl_uj.xml");
     opt->addUsage(" ");
     opt->addUsage("\t minden elem listazasa a kepernyora: ");
     opt->addUsage("\t\t -l  (--list_all_elements) <halofile_regi>.spr");
     opt->addUsage(" ");
     opt->addUsage("\t adat kiolvasasa: ");
-    opt->addUsage("\t\t -g  (--get_data) <halofile_regi>.spr -e (--element_ID) <ID_ag/csp> -p (--property_ID) <ID_adat>");
+    opt->addUsage(
+            "\t\t -g  (--get_data) <halofile_regi>.spr -e (--element_ID) <ID_ag/csp> -p (--property_ID) <ID_adat>");
     opt->addUsage(" ");
     opt->addUsage("\t erzekenysegvizsgalat: ");
-    opt->addUsage("\t\t -r  (--sensitivity) <halofile_regi>.spr -e (--element_ID) <ID_ag/csp> -p (--property_ID) <ID_adat>");
+    opt->addUsage(
+            "\t\t -r  (--sensitivity) <halofile_regi>.spr -e (--element_ID) <ID_ag/csp> -p (--property_ID) <ID_adat>");
     opt->addUsage(" ");
     opt->addUsage("");
 
@@ -182,122 +193,121 @@ void Staci::get_command_line_options(int argc, char *argv[])
 
     opt->processCommandArgs(argc, argv);
 
-    if ( !opt->hasOptions())
-    {
+    if (!opt->hasOptions()) {
         mode = -1;
         opt->printUsage();
-    }
-    else
-    {
-        if (opt->getFlag("help") || opt->getFlag( 'h') )
+    } else {
+        if (opt->getFlag("help") || opt->getFlag('h'))
             opt->printUsage();
-        if (opt->getValue( 's') != NULL || opt->getValue("stac") != NULL)
-        {
+        if (opt->getValue('s') != NULL || opt->getValue("stac") != NULL) {
             mode = 0;
-            def_file = opt->getValue( 's');
-            cout << endl << "Steady-state hydraulic simulation, data file: " << def_file << endl;
+            def_file = opt->getValue('s');
+            if (debug_level > 0) {
+                string msg = "\n Steady-state hydraulic simulation, data file: " + def_file + "\n";
+                if (debug_level > 0) {
+                    cout << msg;
+                    logfile_write(msg, 1);
+                }
+            }
         }
-        if (opt->getValue( 'i') != NULL || opt->getValue("ini") != NULL)
-        {
-            ini_file = opt->getValue( 'i');
-            cout << "Stacioner halozatszamitas, inicializacios file :        " << ini_file << endl;
+
+        if (opt->getValue('i') != NULL || opt->getValue("ini") != NULL) {
             van_ini = true;
+            mode = 0;
+            ini_file = opt->getValue('i');
+            if (debug_level > 0) {
+                string msg = "\n Stacioner halozatszamitas, inicializacios file : " + ini_file + "\n";
+                if (debug_level > 0) {
+                    cout << msg;
+                    logfile_write(msg, 1);
+                }
+            }
         }
-        if (opt->getValue( 't') != NULL || opt->getValue("travel_time") != NULL)
-        {
+
+        if (opt->getValue('t') != NULL || opt->getValue("travel_time") != NULL) {
             mode = 1;
-            def_file = opt->getValue( 't');
+            def_file = opt->getValue('t');
             cout << "Tartozkodasi ido szamitas, a feladatot tartalmazo file: " << def_file << endl;
         }
-        if (opt->getValue( 'c') != NULL || opt->getValue("conc_transp") != NULL)
-        {
+
+        if (opt->getValue('c') != NULL || opt->getValue("conc_transp") != NULL) {
             mode = 2;
-            def_file = opt->getValue( 'c');
+            def_file = opt->getValue('c');
             cout << "Koncentracioeloszlas szamitas, a feladatot tartalmazo file: " << def_file << endl;
         }
-        if (opt->getValue( 'r') != NULL || opt->getValue("sens") != NULL)
-        {
+
+        if (opt->getValue('r') != NULL || opt->getValue("sens") != NULL) {
             mode = 0;
-            def_file = opt->getValue( 'r');
-            cout << endl << "Steady-state hydraulic simulation and sensitivity analysis, data file: " << def_file << endl;
+            def_file = opt->getValue('r');
+            cout << endl << "Steady-state hydraulic simulation and sensitivity analysis, data file: " << def_file
+                 << endl;
         }
 
         // ADATMODOSITAS
         //-----------------------------
-        if ( opt->getValue( 'm' ) != NULL  || opt->getValue( "mod_prop" ) != NULL  )
-        {
+        if (opt->getValue('m') != NULL || opt->getValue("mod_prop") != NULL) {
             mode = 3;
-            def_file = opt->getValue( 'm' );
-            cout << endl << "Adatmodositas" << endl ;
+            def_file = opt->getValue('m');
+            cout << endl << "Adatmodositas" << endl;
             /*cout << "\n regi adatfajl: "<<def_file;*/
         }
-        if ( opt->getValue( 'e' ) != NULL  || opt->getValue( "element_ID" ) != NULL  )
-        {
-            element_ID = opt->getValue( 'e' );
+        if (opt->getValue('e') != NULL || opt->getValue("element_ID") != NULL) {
+            element_ID = opt->getValue('e');
             /* cout << "\n element_ID: "<< element_ID ;*/
         }
-        if ( opt->getValue( 'p' ) != NULL  || opt->getValue( "property_ID" ) != NULL  )
-        {
-            property_ID = opt->getValue( 'p' );
+        if (opt->getValue('p') != NULL || opt->getValue("property_ID") != NULL) {
+            property_ID = opt->getValue('p');
             /* cout << "\n property_ID: "<< property_ID ;*/
         }
-        if ( opt->getValue( 'n' ) != NULL  || opt->getValue( "newValue" ) != NULL  )
-        {
-            newValue = atof(opt->getValue( 'n' ));
+        if (opt->getValue('n') != NULL || opt->getValue("newValue") != NULL) {
+            newValue = atof(opt->getValue('n'));
             /* cout << "\n newValue: "<< newValue;*/
         }
-        if ( opt->getValue( 'o' ) != NULL  || opt->getValue( "outfile" ) != NULL  )
-        {
-            new_def_file = opt->getValue( 'o' );
+        if (opt->getValue('o') != NULL || opt->getValue("outfile") != NULL) {
+            new_def_file = opt->getValue('o');
             /* cout << "\n new_def_file: "<< new_def_file<<endl;*/
         }
 
         // Minden elem listazasa
         //-----------------------------
-        if ( opt->getValue( 'l' ) != NULL  || opt->getValue( "list_all_elements" ) != NULL  )
-        {
+        if (opt->getValue('l') != NULL || opt->getValue("list_all_elements") != NULL) {
             mode = 4;
-            def_file = opt->getValue( 'l' );
+            def_file = opt->getValue('l');
             /*cout << endl << "Adatkiolvasas"<< endl ;*/
         }
         // element_ID es property_ID fent
 
         // Adat kiolvasasa
         //-----------------------------
-        if ( opt->getValue( 'g' ) != NULL  || opt->getValue( "get_data" ) != NULL  )
-        {
+        if (opt->getValue('g') != NULL || opt->getValue("get_data") != NULL) {
             mode = 5;
-            def_file = opt->getValue( 'g' );
+            def_file = opt->getValue('g');
             /*cout << endl << "Adatkiolvasas"<< endl ;*/
         }
         // element_ID es property_ID fent
 
         // Erzekenysegvizsgalat
         //-----------------------------
-        if ( opt->getValue( 'r' ) != NULL  || opt->getValue( "sensitivity" ) != NULL  )
-        {
+        if (opt->getValue('r') != NULL || opt->getValue("sensitivity") != NULL) {
             mode = 6;
-            def_file = opt->getValue( 'r' );
+            def_file = opt->getValue('r');
         }
         // element_ID es property_ID fentAdatkiolvasas"<< endl ;*/
     }
 }
 
 //--------------------------------------------------------------
-double Staci::m_get_dprop()
-{
+double Staci::m_get_dprop() {
     bool elem_megvan = false;
     bool prop_megvan = false;
     double outdata = 0.0;
 
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
-        if ((agelemek[i]->Get_nev()) == element_ID)
-        {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if ((agelemek[i]->Get_nev()) == element_ID) {
             /*cout<<endl<<"\t Megvan az agelem: "<<element_ID<<endl;*/
             elem_megvan = true;
-            if ((property_ID == "diameter") || (property_ID == "mass_flow_rate") || (property_ID == "bottom_level") || (property_ID == "water_level") || (property_ID == "position"))
-            {
+            if ((property_ID == "diameter") || (property_ID == "mass_flow_rate") || (property_ID == "bottom_level") ||
+                (property_ID == "water_level") || (property_ID == "position")) {
                 //prop_megvan = true;
                 outdata = agelemek[i]->Get_dprop(property_ID);
                 prop_megvan = true;
@@ -305,14 +315,11 @@ double Staci::m_get_dprop()
         }
     }
 
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
-        if ((cspok[i]->Get_nev()) == element_ID)
-        {
+    for (unsigned int i = 0; i < cspok.size(); i++) {
+        if ((cspok[i]->Get_nev()) == element_ID) {
             /*cout<<endl<<"\t Megvan az agelem: "<<element_ID<<endl;*/
             elem_megvan = true;
-            if ((property_ID == "pressure") || (property_ID == "demand") || (property_ID == "head") )
-            {
+            if ((property_ID == "pressure") || (property_ID == "demand") || (property_ID == "head")) {
                 //prop_megvan = true;
                 outdata = cspok[i]->Get_dprop(property_ID);
                 prop_megvan = true;
@@ -320,98 +327,184 @@ double Staci::m_get_dprop()
         }
     }
 
-    if (!elem_megvan)
-    {
+    if (!elem_megvan) {
         cout << endl << endl << "HIBA!!! Staci::m_get_dprop(): Nincs ilyen elem: " << element_ID << endl << endl;
         exit(-1);
-    }
-    else
-    {
-        if (!prop_megvan)
-        {
-            cout << endl << endl << "HIBA!!! Staci::m_get_dprop(): Elem: " << element_ID << ", nincs ilyen adat: " << property_ID << endl << endl;
+    } else {
+        if (!prop_megvan) {
+            cout << endl << endl << "HIBA!!! Staci::m_get_dprop(): Elem: " << element_ID << ", nincs ilyen adat: "
+                 << property_ID << endl << endl;
             exit(-1);
-        }
-        else
+        } else
             return outdata;
     }
 }
 
 //--------------------------------------------------------------
-void Staci::m_set_dprop()
-{
+void Staci::m_set_dprop() {
     bool elem_megvan = false;
     bool prop_megvan = false;
     //double outdata;
 
 
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
-        if ((agelemek[i]->Get_nev()) == element_ID)
-        {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if ((agelemek[i]->Get_nev()) == element_ID) {
             /*cout<<endl<<"\t Megvan az agelem: "<<element_ID<<endl;*/
             elem_megvan = true;
-            if (property_ID == "diameter")
-            {
+            if (property_ID == "diameter") {
                 agelemek[i]->Set_dprop(property_ID, newValue);
                 prop_megvan = true;
             }
 
-            if (property_ID == "bottom_level")
-            {
+            if (property_ID == "bottom_level") {
                 agelemek[i]->Set_dprop(property_ID, newValue);
                 prop_megvan = true;
             }
 
-            if (property_ID == "water_level")
-            {
+            if (property_ID == "water_level") {
                 agelemek[i]->Set_dprop(property_ID, newValue);
                 prop_megvan = true;
             }
 
-            if (property_ID == "position")
-            {
+            if (property_ID == "position") {
                 agelemek[i]->Set_dprop(property_ID, newValue);
                 prop_megvan = true;
             }
         }
     }
 
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
+    for (unsigned int i = 0; i < cspok.size(); i++) {
         //cout<<endl<<"\t Csomopont: "<<element_ID;
-        if ((cspok[i]->Get_nev()) == element_ID)
-        {
+        if ((cspok[i]->Get_nev()) == element_ID) {
             //cout<<endl<<"\t Megvan a csomopont: "<<element_ID<<endl;
 
             elem_megvan = true;
-            if (property_ID == "demand")
-            {
+            if (property_ID == "demand") {
                 cspok[i]->Set_dprop(property_ID, newValue);
                 prop_megvan = true;
             }
         }
     }
 
-    if (!elem_megvan)
-    {
+    if (!elem_megvan) {
         cout << endl << endl << "HIBA!!! Staci::m_set_dprop(): Nincs ilyen elem: " << element_ID << endl << endl;
         exit(-1);
     }
-    if (!prop_megvan)
-    {
-        cout << endl << endl << "HIBA!!! Staci::m_set_dprop(): Elem: " << element_ID << ", nincs ilyen adat: " << property_ID << endl << endl;
+    if (!prop_megvan) {
+        cout << endl << endl << "HIBA!!! Staci::m_set_dprop(): Elem: " << element_ID << ", nincs ilyen adat: "
+             << property_ID << endl << endl;
         exit(-1);
     }
 }
 
 //--------------------------------------------------------------
-void Staci::build_system()
-{
+double Staci::get_dprop(string in_element_ID, string in_property_ID) {
+    bool elem_megvan = false;
+    bool prop_megvan = false;
+    double outdata = 0.0;
+
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if ((agelemek[i]->Get_nev()) == in_element_ID) {
+            /*cout<<endl<<"\t Megvan az agelem: "<<in_element_ID<<endl;*/
+            elem_megvan = true;
+            if ((in_property_ID == "diameter") || (in_property_ID == "mass_flow_rate") ||
+                (in_property_ID == "bottom_level") || (in_property_ID == "water_level") ||
+                (in_property_ID == "position")) {
+                //prop_megvan = true;
+                outdata = agelemek[i]->Get_dprop(in_property_ID);
+                prop_megvan = true;
+            }
+        }
+    }
+
+    for (unsigned int i = 0; i < cspok.size(); i++) {
+        if ((cspok[i]->Get_nev()) == in_element_ID) {
+            /*cout<<endl<<"\t Megvan az agelem: "<<in_element_ID<<endl;*/
+            elem_megvan = true;
+            if ((in_property_ID == "pressure") || (in_property_ID == "demand") || (in_property_ID == "head")) {
+                //prop_megvan = true;
+                outdata = cspok[i]->Get_dprop(in_property_ID);
+                prop_megvan = true;
+            }
+        }
+    }
+
+    if (!elem_megvan) {
+        cout << endl << endl << "HIBA!!! Staci::m_get_dprop(): Nincs ilyen elem: " << in_element_ID << endl << endl;
+        exit(-1);
+    } else {
+        if (!prop_megvan) {
+            cout << endl << endl << "HIBA!!! Staci::m_get_dprop(): Elem: " << in_element_ID << ", nincs ilyen adat: "
+                 << in_property_ID << endl << endl;
+            exit(-1);
+        } else
+            return outdata;
+    }
+}
+
+//--------------------------------------------------------------
+void Staci::set_dprop(string in_element_ID, string in_property_ID, double in_newValue) {
+    bool elem_megvan = false;
+    bool prop_megvan = false;
+
+
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if ((agelemek[i]->Get_nev()) == in_element_ID) {
+            /*cout<<endl<<"\t Megvan az agelem: "<<in_element_ID<<endl;*/
+            elem_megvan = true;
+            if (in_property_ID == "diameter") {
+                agelemek[i]->Set_dprop(in_property_ID, in_newValue);
+                prop_megvan = true;
+            }
+
+            if (in_property_ID == "bottom_level") {
+                agelemek[i]->Set_dprop(in_property_ID, in_newValue);
+                prop_megvan = true;
+            }
+
+            if (in_property_ID == "water_level") {
+                agelemek[i]->Set_dprop(in_property_ID, in_newValue);
+                prop_megvan = true;
+            }
+
+            if (in_property_ID == "position") {
+                agelemek[i]->Set_dprop(in_property_ID, in_newValue);
+                prop_megvan = true;
+            }
+        }
+    }
+
+    for (unsigned int i = 0; i < cspok.size(); i++) {
+        //cout<<endl<<"\t Csomopont: "<<in_element_ID;
+        if ((cspok[i]->Get_nev()) == in_element_ID) {
+            //cout<<endl<<"\t Megvan a csomopont: "<<in_element_ID<<endl;
+
+            elem_megvan = true;
+            if (in_property_ID == "demand") {
+                cspok[i]->Set_dprop(in_property_ID, in_newValue);
+                prop_megvan = true;
+            }
+        }
+    }
+
+    if (!elem_megvan) {
+        cout << endl << endl << "HIBA!!! Staci::m_set_dprop(): Nincs ilyen elem: " << in_element_ID << endl << endl;
+        exit(-1);
+    }
+    if (!prop_megvan) {
+        cout << endl << endl << "HIBA!!! Staci::m_set_dprop(): Elem: " << in_element_ID << ", nincs ilyen adat: "
+             << in_property_ID << endl << endl;
+        exit(-1);
+    }
+}
+
+//--------------------------------------------------------------
+void Staci::build_system() {
 
     ostringstream msg1;
     msg1 << endl << " Number of nodes: " << cspok.size();// << " (capacity: )" << cspok.capacity();
-    msg1 << endl << " Number of edges: " << agelemek.size() << endl; // << " (capacity: )" << agelemek.capacity() << endl;
+    msg1 << endl << " Number of edges: " << agelemek.size()
+         << endl; // << " (capacity: )" << agelemek.capacity() << endl;
     logfile_write(msg1.str(), 1);
 
     bool stop = false;
@@ -421,19 +514,18 @@ void Staci::build_system()
     // ELEMEK
     string nev1, nev2;
     //int szam = 0;
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        /*printf("\n i=%d",i); cin.get();*/
         //szam = 0;
         nev1 = agelemek[i]->Get_nev();
-        for (unsigned int j = 0; j < agelemek.size(); j++)
-        {
+        /*cout<<endl<<nev1;
+        cin.get();*/
+        for (unsigned int j = 0; j < agelemek.size(); j++) {
             nev2 = agelemek[j]->Get_nev();
-            if (i != j)
-            {
-                if (nev1 == nev2)
-                {
+            if (i != j) {
+                if (nev1 == nev2) {
                     ostringstream msg;
-                    msg << "\n HIBA: Azonos nevu elemek!!!" << nev1;
+                    msg << "\n HIBA: Azonos nevu elemek!!!" << nev1.c_str();
                     cout << msg.str();
                     logfile_write(msg.str(), 0);
                     stop = true;
@@ -443,18 +535,15 @@ void Staci::build_system()
     }
 
     // CSOMOPONTOK
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
+    for (unsigned int i = 0; i < cspok.size(); i++) {
         nev1 = cspok[i]->Get_nev();
-        for (unsigned int j = 0; j < cspok.size(); j++)
-        {
+
+        for (unsigned int j = 0; j < cspok.size(); j++) {
             nev2 = cspok[j]->Get_nev();
-            if (i != j)
-            {
-                if (nev1 == nev2)
-                {
+            if (i != j) {
+                if (nev1 == nev2) {
                     ostringstream msg("");
-                    msg << "\n HIBA: Azonos nevu csomopontok!!!" << nev1;
+                    msg << "\n HIBA: Azonos nevu csomopontok!!!" << nev1.c_str();
                     cout << msg.str();
                     logfile_write(msg.str(), 0);
                     stop = true;
@@ -476,21 +565,19 @@ void Staci::build_system()
     ostringstream strstrm;
 
     // az vege csp. nem mindig kell...
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
         /*cout << "\n\t" << agelemek[i]->Get_nev() << ":\tcspe:";*/
 
         e_megvan = false;
         j = 0;
-        while ((j < cspok.size()) && (!e_megvan))
-        {
+        while ((j < cspok.size()) && (!e_megvan)) {
             // log
             strstrm.str("");
-            strstrm << "\n\t" << agelemek[i]->Get_nev() << " cspe: " << agelemek[i]->Get_Cspe_Nev() << " =? " << cspok[j]->Get_nev();
+            strstrm << "\n\t" << agelemek[i]->Get_nev().c_str() << " cspe: " << agelemek[i]->Get_Cspe_Nev().c_str()
+                    << " =? " << cspok[j]->Get_nev().c_str();
             logfile_write(strstrm.str(), 5);
             //cout << strstrm.str();
-            if ((agelemek[i]->Get_Cspe_Nev()).compare(cspok[j]->Get_nev()) == 0)
-            {
+            if ((agelemek[i]->Get_Cspe_Nev()).compare(cspok[j]->Get_nev()) == 0) {
                 e_megvan = true;
                 cspe = j;
                 cspok[j]->ag_ki.push_back(i);
@@ -504,30 +591,25 @@ void Staci::build_system()
             }
             j++;
         }
-        if (!e_megvan)
-        {
+        if (!e_megvan) {
             strstrm.str("");
-            strstrm << "\n!!! Nincs meg a " << agelemek[i]->Get_nev()
-            << " agelem eleji csomopont!";
+            strstrm << "\n!!! Nincs meg a " << agelemek[i]->Get_nev().c_str()
+                    << " agelem eleji csomopont!";
             logfile_write(strstrm.str(), 1);
             //            cout << strstrm.str();
             StaciException csphiba(strstrm.str());
             throw csphiba;
-        }
-        else
-        {
+        } else {
             //        strstrm.str("");
             //        strstrm<<"\n\t"<<agelemek[i]->Get_nev()<<" cspe: "<<cspe;
             //        cout<<strstrm.str();
         }
 
         //cout<<"\tcspv: ";
-        if (agelemek[i]->Get_Csp_db() == 2)
-        {
+        if (agelemek[i]->Get_Csp_db() == 2) {
             v_megvan = false;
             j = 0;
-            while ((j < cspok.size()) && (!v_megvan))
-            {
+            while ((j < cspok.size()) && (!v_megvan)) {
                 // log
                 //                      strstrm.str("");
                 //                      strstrm << "\n\t"<<agelemek[i]->Get_nev()<<" cspv: "
@@ -535,8 +617,7 @@ void Staci::build_system()
                 //                      logfile_write(strstrm.str(), 3);
                 //                      cout<<strstrm.str();
                 if ((agelemek[i]->Get_Cspv_Nev()).compare(cspok[j]->Get_nev())
-                    == 0)
-                {
+                    == 0) {
                     v_megvan = true;
                     cspv = j;
                     cspok[j]->ag_be.push_back(i);
@@ -550,25 +631,20 @@ void Staci::build_system()
                 }
                 j++;
             }
-            if (!v_megvan)
-            {
+            if (!v_megvan) {
                 strstrm.str("");
-                strstrm << "\n!!! Nincs meg a " << agelemek[i]->Get_nev()
-                << " agelem vegi csomopont!";
+                strstrm << "\n!!! Nincs meg a " << agelemek[i]->Get_nev().c_str()
+                        << " agelem vegi csomopont!";
                 //      logfile_write(strstrm.str(), 1);
                 cout << strstrm.str();
-            }
-            else
-            {
+            } else {
                 //      strstrm.str("");
                 //      strstrm<<"\n\t"<<agelemek[i]->Get_nev()<<" cspv: "<<cspv;
                 //      cout<<strstrm.str();
             }
-        }
-        else
-        {
+        } else {
             strstrm.str("");
-            strstrm << "\n\t" << agelemek[i]->Get_nev() << " cspv: - " << cspv;
+            strstrm << "\n\t" << agelemek[i]->Get_nev().c_str() << " cspv: - " << cspv;
             //        cout<<strstrm.str();
         }
 
@@ -580,10 +656,8 @@ void Staci::build_system()
 
 
     // Surlodas beallitasa
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
-        if (agelemek[i]->Get_Tipus() == "Cso")
-        {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if (agelemek[i]->Get_Tipus() == "Cso") {
             /*cout << endl << "friction_model:" << friction_model;
             cin.get();*/
             agelemek[i]->Set_friction_model(friction_model);
@@ -594,8 +668,7 @@ void Staci::build_system()
 
 
 //--------------------------------------------------------------
-void Staci::build_system_old()
-{
+void Staci::build_system_old() {
     cout << "\nRendszer epitese...";
     logfile_write("\n Rendszer epitese\n---------------------------", 2);
     bool e_megvan = false;
@@ -604,88 +677,78 @@ void Staci::build_system_old()
     int cspe = 0, cspv = 0;
     ostringstream strstrm;
     // az 1. csp nem mindig kell...
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
         //cout<<"\n\t"<<agelemek[i]->Get_nev()<<":\tcspe:";
-        if (agelemek[i]->Get_Csp_db() == 2)
-        {
+        if (agelemek[i]->Get_Csp_db() == 2) {
             e_megvan = false;
             j = 0;
-            while ((j < cspok.size()) && (!e_megvan))
-            {
+            while ((j < cspok.size()) && (!e_megvan)) {
                 // log
                 strstrm.str("");
-                strstrm << "\n\t" << agelemek[i]->Get_nev() << " cspe: " << agelemek[i]->Get_Cspe_Nev() << " =? " << cspok[j]->Get_nev();
+                strstrm << "\n\t" << agelemek[i]->Get_nev().c_str() << " cspe: " << agelemek[i]->Get_Cspe_Nev()
+                        << " =? " << cspok[j]->Get_nev();
                 logfile_write(strstrm.str(), 3);
-                if ((agelemek[i]->Get_Cspe_Nev()).compare(cspok[j]->Get_nev()) == 0)
-                {
+                if ((agelemek[i]->Get_Cspe_Nev()).compare(cspok[j]->Get_nev()) == 0) {
                     e_megvan = true;
                     cspe = j;
                     cspok[j]->ag_ki.push_back(i);
                     // log
                     logfile_write(" OK", 3);
                     strstrm.str("");
-                    strstrm << "\n\t" << agelemek[i]->Get_nev() << " cspe: " << agelemek[i]->Get_Cspe_Nev() << " OK ";
+                    strstrm << "\n\t" << agelemek[i]->Get_nev().c_str() << " cspe: " << agelemek[i]->Get_Cspe_Nev()
+                            << " OK ";
                     logfile_write(strstrm.str(), 2);
                 }
                 j++;
             }
-            if (!e_megvan)
-            {
+            if (!e_megvan) {
                 strstrm.str("");
-                strstrm << "\n!!! Nincs meg a " << agelemek[i]->Get_nev() << " agelem eleji csomopont!";
+                strstrm << "\n!!! Nincs meg a " << agelemek[i]->Get_nev().c_str() << " agelem eleji csomopont!";
                 logfile_write(strstrm.str(), 1);
                 cout << " nincs meg!!!";
                 StaciException csphiba(strstrm.str());
                 throw csphiba;
-            }
-            else
-            {
+            } else {
                 strstrm.str("");
-                strstrm << "\n\t" << agelemek[i]->Get_nev() << " cspe: " << cspe;
+                strstrm << "\n\t" << agelemek[i]->Get_nev().c_str() << " cspe: " << cspe;
                 //cout<<" ok";
             }
-        }
-        else
-        {
+        } else {
             strstrm.str("");
-            strstrm << "\n\t" << agelemek[i]->Get_nev() << " cspe: - " << cspe;
+            strstrm << "\n\t" << agelemek[i]->Get_nev().c_str() << " cspe: - " << cspe;
             //cout<<" - ";
         }
 
         //cout<<"\tcspv: ";
         v_megvan = false;
         j = 0;
-        while ((j < cspok.size()) && (!v_megvan))
-        {
+        while ((j < cspok.size()) && (!v_megvan)) {
             // log
             strstrm.str("");
-            strstrm << "\n\t" << agelemek[i]->Get_nev() << " cspv: " << agelemek[i]->Get_Cspv_Nev() << " =? " << cspok[j]->Get_nev();
+            strstrm << "\n\t" << agelemek[i]->Get_nev().c_str() << " cspv: " << agelemek[i]->Get_Cspv_Nev() << " =? "
+                    << cspok[j]->Get_nev();
             logfile_write(strstrm.str(), 3);
-            if ((agelemek[i]->Get_Cspv_Nev()).compare(cspok[j]->Get_nev()) == 0)
-            {
+            if ((agelemek[i]->Get_Cspv_Nev()).compare(cspok[j]->Get_nev()) == 0) {
                 v_megvan = true;
                 cspv = j;
                 cspok[j]->ag_be.push_back(i);
                 // log
                 logfile_write(" OK", 3);
                 strstrm.str("");
-                strstrm << "\n\t" << agelemek[i]->Get_nev() << " cspv: " << agelemek[i]->Get_Cspv_Nev() << " OK ";
+                strstrm << "\n\t" << agelemek[i]->Get_nev().c_str() << " cspv: " << agelemek[i]->Get_Cspv_Nev()
+                        << " OK ";
                 logfile_write(strstrm.str(), 2);
             }
             j++;
         }
-        if (!v_megvan)
-        {
+        if (!v_megvan) {
             strstrm.str("");
-            strstrm << "\n!!! Nincs meg a " << agelemek[i]->Get_nev() << " agelem vegi csomopont!";
+            strstrm << "\n!!! Nincs meg a " << agelemek[i]->Get_nev().c_str() << " agelem vegi csomopont!";
             logfile_write(strstrm.str(), 1);
             //cout<<" nincs meg!!!";
-        }
-        else
-        {
+        } else {
             strstrm.str("");
-            strstrm << "\n\t" << agelemek[i]->Get_nev() << " cspv: " << cspv;
+            strstrm << "\n\t" << agelemek[i]->Get_nev().c_str() << " cspv: " << cspv;
             //cout<<" ok";
         }
         if (agelemek[i]->Get_Csp_db() == 2)
@@ -703,10 +766,8 @@ void Staci::build_system_old()
 }
 
 //--------------------------------------------------------------
-void Staci::logfile_write(string msg, int msg_debug_level)
-{
-    if (debug_level >= msg_debug_level)
-    {
+void Staci::logfile_write(string msg, int msg_debug_level) {
+    if (debug_level >= msg_debug_level) {
         ofstream outfile(out_file.c_str(), ios::app);
         outfile << msg;
         outfile.close();
@@ -714,8 +775,7 @@ void Staci::logfile_write(string msg, int msg_debug_level)
 }
 
 //--------------------------------------------------------------
-void Staci::list_system()
-{
+void Staci::list_system() {
     logfile_write("\n\n Csomopontok:\n--------------------------", 3);
     for (unsigned int i = 0; i < cspok.size(); i++)
         logfile_write(cspok[i]->Info(), 3);
@@ -725,8 +785,7 @@ void Staci::list_system()
 }
 
 //--------------------------------------------------------------
-string Staci::list_results()
-{
+string Staci::list_results() {
     ostringstream strstrm;
 
     //string pot;
@@ -736,41 +795,39 @@ string Staci::list_results()
     strstrm << scientific << setprecision(3) << showpos;
     strstrm << endl << endl << "EREDMENYEK:";
     for (unsigned int i = 0; i < agelemek.size(); i++)
-        strstrm << endl << "\t" << agelemek[i]->Get_nev() << ":\tmp=" << agelemek[i]->Get_mp() << " kg/s" << "\tQ=" << (3600 * (agelemek[i]->Get_Q())) << " m3/h" << "\tv="
-        << agelemek[i]->Get_v() << " m/s";
+        strstrm << endl << "\t" << agelemek[i]->Get_nev() << ":\tmp=" << agelemek[i]->Get_mp() << " kg/s" << "\tQ="
+                << (3600 * (agelemek[i]->Get_Q())) << " m3/h" << "\tv="
+                << agelemek[i]->Get_v() << " m/s";
     strstrm << endl << "\t" << "-----------------------------------------------------------------";
     for (unsigned int i = 0; i < cspok.size(); i++)
-        strstrm << endl << "\t" << cspok[i]->Get_nev() << ":\t p=" << cspok[i]->Get_p() * 1000 * 9.81 / 1e5 << " bar" << "\tH=" << cspok[i]->Get_p() << " m" << ",   H+magassag="
-        << cspok[i]->Get_p() + cspok[i]->Get_h() << " m";
+        strstrm << endl << "\t" << cspok[i]->Get_nev() << ":\t p=" << cspok[i]->Get_p() * 1000 * 9.81 / 1e5 << " bar"
+                << "\tH=" << cspok[i]->Get_p() << " m" << ",   H+magassag="
+                << cspok[i]->Get_p() + cspok[i]->Get_h() << " m";
     strstrm << endl << endl;
     return strstrm.str();
 }
 
 //--------------------------------------------------------------
-void Staci::save_results(bool conv_reached)
-{
+void Staci::save_results(bool conv_reached) {
 
 
     if (do_save_file) {
         data_io datta_io(res_file.c_str());
         datta_io.save_results(FolyMenny, cspok, agelemek, conv_reached);
-    }
-    else {
+    } else {
         cout << "\n WARNING!\n!!! do_save_file = false, results will not be saved to the .spr file !!!!\n\n";
     }
 
 }
 
 //--------------------------------------------------------------
-void Staci::save_mod_prop()
-{
+void Staci::save_mod_prop() {
     data_io datta_io(res_file.c_str());
     datta_io.save_mod_prop(cspok, agelemek, element_ID, property_ID);
 }
 
 //--------------------------------------------------------------
-void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern)
-{
+void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern) {
 
 
     unsigned long int N = cspok.size() + agelemek.size();
@@ -782,8 +839,7 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern)
     for (int i = 0; i < N; i++)
         m_jac.push_back(jac_row);
 
-    if (create_sparse_pattern)
-    {
+    if (create_sparse_pattern) {
         m_is_element_empty.clear();
         vector<bool> tmp(N, true);
         for (int i = 0; i < N; i++)
@@ -794,13 +850,11 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern)
 
     // aktualis x kiszedes az elemekbol
     //---------------------------------------------------
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
         x[i] = agelemek[i]->Get_mp();
         //      cout<<"\n x="<<x[i];
     }
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
+    for (unsigned int i = 0; i < cspok.size(); i++) {
         x[agelemek.size() + i] = cspok[i]->Get_p();
         //      cout<<"\n x="<<x[agelemek.size() + i];
     }
@@ -812,17 +866,13 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern)
     /*for (int i = 0; i < N; i++)
         for (int j = 0; j < N; j++)
             m_jac[i][j] = 0.0;*/
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
-        if (agelemek[i]->Get_Csp_db() == 1)
-        {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if (agelemek[i]->Get_Csp_db() == 1) {
             pevhev[0] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_p();
             pevhev[1] = 0.0;
             pevhev[2] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
             pevhev[3] = 0.0;
-        }
-        else
-        {
+        } else {
             pevhev[0] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_p();
             pevhev[1] = cspok[agelemek[i]->Get_Cspv_Index()]->Get_p();
             pevhev[2] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
@@ -838,25 +888,21 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern)
         pv_indx = agelemek[i]->Get_Cspv_Index();
 
         m_jac[i][agelemek.size() + pe_indx] = jv.at(0);
-        if (create_sparse_pattern)
-        {
+        if (create_sparse_pattern) {
             m_is_element_empty[i][agelemek.size() + pe_indx] = false;
             m_nnz++;
         }
 
-        if (agelemek[i]->Get_Csp_db() == 2)
-        {
+        if (agelemek[i]->Get_Csp_db() == 2) {
             m_jac[i][agelemek.size() + pv_indx] = jv.at(1);
-            if (create_sparse_pattern)
-            {
+            if (create_sparse_pattern) {
                 m_is_element_empty[i][agelemek.size() + pv_indx] = false;
                 m_nnz++;
             }
         }
 
         m_jac[i][Q_indx] = jv.at(2);
-        if (create_sparse_pattern)
-        {
+        if (create_sparse_pattern) {
             m_is_element_empty[i][Q_indx] = false;
             m_nnz++;
         }
@@ -865,26 +911,21 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern)
         jv.clear();
     }
 
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
+    for (unsigned int i = 0; i < cspok.size(); i++) {
         f[agelemek.size() + i] = -cspok[i]->Get_fogy();
-        for (unsigned int j = 0; j < cspok[i]->ag_be.size(); j++)
-        {
+        for (unsigned int j = 0; j < cspok[i]->ag_be.size(); j++) {
             f[agelemek.size() + i] += agelemek[cspok[i]->ag_be.at(j)]->Get_mp();
             m_jac[agelemek.size() + i][cspok[i]->ag_be.at(j)] = +1.0;
-            if (create_sparse_pattern)
-            {
+            if (create_sparse_pattern) {
                 m_is_element_empty[agelemek.size() + i][cspok[i]->ag_be.at(j)] =
                         false;
                 m_nnz++;
             }
         }
-        for (unsigned int j = 0; j < cspok[i]->ag_ki.size(); j++)
-        {
+        for (unsigned int j = 0; j < cspok[i]->ag_ki.size(); j++) {
             f[agelemek.size() + i] -= agelemek[cspok[i]->ag_ki.at(j)]->Get_mp();
             m_jac[agelemek.size() + i][cspok[i]->ag_ki.at(j)] = -1.0;
-            if (create_sparse_pattern)
-            {
+            if (create_sparse_pattern) {
                 m_is_element_empty[agelemek.size() + i][cspok[i]->ag_ki.at(j)] =
                         false;
                 m_nnz++;
@@ -928,11 +969,10 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern)
     if (debug_level > 6)
         Print_Jacobian();
 
-    if (create_sparse_pattern)
-    {
+    if (create_sparse_pattern) {
         ostringstream msg1;
         msg1 << endl << " Number of nonzero Jacobian entries: " << m_nnz << " out of " << (N * N);
-        msg1 << " (" << (( ((double) m_nnz) / N / N) * 100) << "%)" << endl;
+        msg1 << " (" << ((((double) m_nnz) / N / N) * 100) << "%)" << endl;
         //msg1 << endl << " Jacobian size check : m_jac.capacity()=" << m_jac.capacity();
         //msg1 << endl << " Jacobian size check : m_jac[0].capacity()=" << m_jac[0].capacity()<<endl;
         logfile_write(msg1.str(), 1);
@@ -941,8 +981,7 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern)
 }
 
 //--------------------------------------------------------------
-void Staci::build_vectors_frozen_Jacobian(Vec_DP &x, Vec_DP &f)
-{
+void Staci::build_vectors_frozen_Jacobian(Vec_DP &x, Vec_DP &f) {
 
     //int N = cspok.size() + agelemek.size();
     vector<double> pevhev;
@@ -952,17 +991,13 @@ void Staci::build_vectors_frozen_Jacobian(Vec_DP &x, Vec_DP &f)
     for (unsigned int i = 0; i < cspok.size(); i++)
         x[agelemek.size() + i] = cspok[i]->Get_p();
 
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
-        if (agelemek[i]->Get_Csp_db() == 1)
-        {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if (agelemek[i]->Get_Csp_db() == 1) {
             pevhev.push_back(cspok[agelemek[i]->Get_Cspe_Index()]->Get_p());
             pevhev.push_back(0);
             pevhev.push_back(cspok[agelemek[i]->Get_Cspe_Index()]->Get_h());
             pevhev.push_back(0);
-        }
-        else
-        {
+        } else {
             pevhev.push_back(cspok[agelemek[i]->Get_Cspe_Index()]->Get_p());
             pevhev.push_back(cspok[agelemek[i]->Get_Cspv_Index()]->Get_p());
             pevhev.push_back(cspok[agelemek[i]->Get_Cspe_Index()]->Get_h());
@@ -973,8 +1008,7 @@ void Staci::build_vectors_frozen_Jacobian(Vec_DP &x, Vec_DP &f)
         pevhev.clear();
     }
 
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
+    for (unsigned int i = 0; i < cspok.size(); i++) {
         f[agelemek.size() + i] = -cspok[i]->Get_fogy();
         for (unsigned int j = 0; j < cspok[i]->ag_be.size(); j++)
             f[agelemek.size() + i] += agelemek[cspok[i]->ag_be.at(j)]->Get_mp();
@@ -989,8 +1023,7 @@ void Staci::build_vectors_frozen_Jacobian(Vec_DP &x, Vec_DP &f)
 
 
 //--------------------------------------------------------------
-bool Staci::solve_system()
-{
+bool Staci::solve_system() {
 
     const int N = cspok.size() + agelemek.size();
     Mat_DP invjac(N, N);
@@ -1005,12 +1038,10 @@ bool Staci::solve_system()
     m_ss.str("");
     m_ss << "\n\nSolving system...\n====================================" << endl;
 
-    /*m_ss<<"iter_max="<<iter_max<<endl;*/
-    //m_ss<<"e_mp_max="<<e_mp_max<<endl;
-    //m_ss<<"e_p_max ="<<e_p_max<<endl;
-    //m_ss<<"megoldo :"<<akt_megoldo<<endl;
-    logfile_write(m_ss.str(), 1);
-    cout << m_ss.str();
+    if (debug_level > 0) {
+        logfile_write(m_ss.str(), 1);
+        cout << m_ss.str();
+    }
 
     // Solver
     build_vectors(x, f, true);
@@ -1018,81 +1049,83 @@ bool Staci::solve_system()
     // Iteracio!!!
     bool comp_ok = true;
 
-    while ((iter < iter_max + 1) && (!konv_ok))
-    {
+    while ((iter < iter_max + 1) && (!konv_ok)) {
 
-        progress_file_write((double)iter / iter_max * 100.0);
+        progress_file_write((double) iter / iter_max * 100.0);
 
-        if ((e_mp > 0.1 || e_p > 0.1) || (iter % 1 == 0))
+        if ((e_mp > 0.1 || e_p > 0.1) || (iter % 5 == 0))
             build_vectors(x, f, false);
-        else
-        {
+        else {
             build_vectors_frozen_Jacobian(x, f);
-            if (debug_level > 1)
-                cout << endl << "\t Using frozen Jacobian...";
+            //if (debug_level > 1) {
+                //cout << endl << "\t Using frozen Jacobian...";
+                //cin.get();
+            //}
         }
 
         compute_error(f, e_mp, e_p, e_mp_r, e_p_r, konv_ok);
 
-        logfile_write(iter_info(x, f, iter, e_mp, e_p), 1);
-        cout << iter_info(x, f, iter, e_mp, e_p);
+        if (debug_level > 1) {
+            logfile_write(iter_info(x, f, iter, e_mp, e_p), 1);
+            cout << iter_info(x, f, iter, e_mp, e_p);
+        }
         update_relax(e_mp, e_p, e_mp_r, e_p_r);
 
         comp_ok = umfpack_solver(x, f);
 
-        if ((!comp_ok) && (iter > 100))
-        {
-            cout << endl << endl << "WARNING: Staci::solve_system() -> umfpack_solver did not provide a solution, switching back to nr_solver!!\n\n";
+        if ((!comp_ok) && (iter > 100)) {
+            cout << endl << endl
+                 << "WARNING: Staci::solve_system() -> umfpack_solver did not provide a solution, switching back to nr_solver!!\n\n";
             nr_solver(x, f);
         }
 
-        /*if ((e_mp != e_mp) || (e_p != e_p))
-        {
-            //cout << "\n !!! e_mp is NaN!";
-            iter = iter_max + 1;
-            comp_ok = false;
-            konv_ok = false;
-        }*/
+            /*if ((e_mp != e_mp) || (e_p != e_p))
+            {
+                //cout << "\n !!! e_mp is NaN!";
+                iter = iter_max + 1;
+                comp_ok = false;
+                konv_ok = false;
+            }*/
         else
             iter++;
     }
     //cout<<"\n\t\t number of iterations:"<<iter++<<", comp_ok="<<comp_ok;
     //cin.get();
 
-    if ((!konv_ok) && (debug_level > 2))
-    {
+    if (debug_level == 1) {
+        logfile_write(iter_info(x, f, iter, e_mp, e_p), 1);
+        cout << iter_info(x, f, iter, e_mp, e_p);
+    }
+
+    if ((!konv_ok) && (debug_level > 2)) {
 
         if (!konv_ok)
             m_ss << "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n";
         for (unsigned int i = 0; i < agelemek.size(); i++)
-            m_ss << "\n\t" << agelemek[i]->Get_nev() << "("
-            << agelemek[i]->GetType() << "): mp=" << x[i] << ", f="
-            << f[i];
+            m_ss << "\n\t" << agelemek[i]->Get_nev().c_str() << "("
+                 << agelemek[i]->GetType().c_str() << "): mp=" << x[i] << ", f="
+                 << f[i];
 
         for (unsigned int i = 0; i < cspok.size(); i++)
-            m_ss << "\n\t" << cspok[i]->Get_nev() << ": p="
-            << x[agelemek.size() + i] << ", f="
-            << f[agelemek.size() + i];
+            m_ss << "\n\t" << cspok[i]->Get_nev().c_str() << ": p="
+                 << x[agelemek.size() + i] << ", f="
+                 << f[agelemek.size() + i];
         if (!konv_ok)
             m_ss
-            << "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\nBajjj van.\n\n";
+                    << "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\nBajjj van.\n\n";
 
         cout << m_ss.str();
-        /*
-          if (!konv_ok)
-          cin.get();
-        */
     }
+
+    Set_FolyTerf();
 
     return konv_ok;
 }
 
 
 //--------------------------------------------------------------
-bool Staci::solve_system_old()
-{
-    typedef enum
-    {
+bool Staci::solve_system_old() {
+    typedef enum {
         Newton_Raphson, Linear
     } megoldo;
     const int N = cspok.size() + agelemek.size();
@@ -1127,10 +1160,9 @@ bool Staci::solve_system_old()
     cout << endl << "SZAMITAS..." << endl;
 
     // Iteracio!!!
-    while ((iter < iter_max) && (!konv_ok))
-    {
+    while ((iter < iter_max) && (!konv_ok)) {
 
-        progress_file_write((double)iter / iter_max * 100.0);
+        progress_file_write((double) iter / iter_max * 100.0);
 
         strstrm.str("");
         strstrm.setf(ios::dec);
@@ -1154,10 +1186,8 @@ bool Staci::solve_system_old()
             for (int j = 0; j < N; j++)
                 jac[i][j] = 0.0;
 
-        for (unsigned int i = 0; i < agelemek.size(); i++)
-        {
-            if (agelemek[i]->Get_Csp_db() == 1)
-            {
+        for (unsigned int i = 0; i < agelemek.size(); i++) {
+            if (agelemek[i]->Get_Csp_db() == 1) {
                 /*pevhev.push_back(0);
                   pevhev.push_back(cspok[agelemek[i]->Get_Cspv_Index()]->Get_p());
                   pevhev.push_back(0);
@@ -1166,9 +1196,7 @@ bool Staci::solve_system_old()
                 pevhev[1] = 0.0;
                 pevhev[2] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
                 pevhev[3] = 0.0;
-            }
-            else
-            {
+            } else {
                 pevhev[0] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_p();
                 pevhev[1] = cspok[agelemek[i]->Get_Cspv_Index()]->Get_p();
                 pevhev[2] = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
@@ -1192,16 +1220,13 @@ bool Staci::solve_system_old()
             jv.clear();
         }
 
-        for (unsigned int i = 0; i < cspok.size(); i++)
-        {
+        for (unsigned int i = 0; i < cspok.size(); i++) {
             f[agelemek.size() + i] = -cspok[i]->Get_fogy();
-            for (unsigned int j = 0; j < cspok[i]->ag_be.size(); j++)
-            {
+            for (unsigned int j = 0; j < cspok[i]->ag_be.size(); j++) {
                 f[agelemek.size() + i] += agelemek[cspok[i]->ag_be.at(j)]->Get_mp();
                 jac[agelemek.size() + i][cspok[i]->ag_be.at(j)] = +1.0;
             }
-            for (unsigned int j = 0; j < cspok[i]->ag_ki.size(); j++)
-            {
+            for (unsigned int j = 0; j < cspok[i]->ag_ki.size(); j++) {
                 f[agelemek.size() + i] -= agelemek[cspok[i]->ag_ki.at(j)]->Get_mp();
                 jac[agelemek.size() + i][cspok[i]->ag_ki.at(j)] = -1.0;
             }
@@ -1251,15 +1276,13 @@ bool Staci::solve_system_old()
         strstrm << endl << "\nJACOBI:" << endl << "          ";
         string strstrm_nev;
         const unsigned int MAX_NEV_HOSSZ = 12;
-        for (unsigned int i = 0; i < agelemek.size(); i++)
-        {
+        for (unsigned int i = 0; i < agelemek.size(); i++) {
             strstrm_nev = agelemek[i]->Get_nev();
             while (strstrm_nev.size() < MAX_NEV_HOSSZ)
                 strstrm_nev.append(" ");
             strstrm << "\tmp," << strstrm_nev;
         }
-        for (unsigned int i = 0; i < cspok.size(); i++)
-        {
+        for (unsigned int i = 0; i < cspok.size(); i++) {
             strstrm_nev = cspok[i]->Get_nev();
             while (strstrm_nev.size() < MAX_NEV_HOSSZ)
                 strstrm_nev.append(" ");
@@ -1267,8 +1290,7 @@ bool Staci::solve_system_old()
         }
         strstrm << endl;
 
-        for (unsigned int i = 0; i < agelemek.size(); i++)
-        {
+        for (unsigned int i = 0; i < agelemek.size(); i++) {
             strstrm_nev = agelemek[i]->Get_nev();
             while (strstrm_nev.size() < MAX_NEV_HOSSZ)
                 strstrm_nev.append(" ");
@@ -1277,8 +1299,7 @@ bool Staci::solve_system_old()
                 strstrm << "\t" << jac[i][j];
             strstrm << endl;
         }
-        for (unsigned int i = 0; i < cspok.size(); i++)
-        {
+        for (unsigned int i = 0; i < cspok.size(); i++) {
             strstrm_nev = cspok[i]->Get_nev();
             while (strstrm_nev.size() < MAX_NEV_HOSSZ)
                 strstrm_nev.append(" ");
@@ -1289,16 +1310,14 @@ bool Staci::solve_system_old()
         }
         logfile_write(strstrm.str(), 3);
 
-        switch (akt_megoldo)
-        {
+        switch (akt_megoldo) {
             case Linear:
                 // Linearizalt egyenletek megoldasa:
                 //-------------------------------------------------------------------------------------------
                 NR::ludcmp(jac, indx, d);
                 NR::lubksb(jac, indx, col);
                 xu = col;
-                for (int i = 0; i < N; i++)
-                {
+                for (int i = 0; i < N; i++) {
                     xu[i] = x[i] + relax * xu[i];
                     dx[i] = xu[i] - x[i];
                 }
@@ -1310,8 +1329,7 @@ bool Staci::solve_system_old()
                 //-------------------------------
                 NR::ludcmp(jac, indx, d);
 
-                for (int j = 0; j < N; j++)
-                {
+                for (int j = 0; j < N; j++) {
                     for (int i = 0; i < N; i++)
                         col[i] = 0.0;
                     col[j] = 1.0;
@@ -1324,15 +1342,13 @@ bool Staci::solve_system_old()
                 strstrm.str("");
                 strstrm << scientific << setprecision(3) << showpos;
                 strstrm << endl << "\nINVERZ JACOBI:" << endl << "          ";
-                for (unsigned int i = 0; i < agelemek.size(); i++)
-                {
+                for (unsigned int i = 0; i < agelemek.size(); i++) {
                     strstrm_nev = agelemek[i]->Get_nev();
                     while (strstrm_nev.size() < MAX_NEV_HOSSZ)
                         strstrm_nev.append(" ");
                     strstrm << "\tmp," << strstrm_nev;
                 }
-                for (unsigned int i = 0; i < cspok.size(); i++)
-                {
+                for (unsigned int i = 0; i < cspok.size(); i++) {
                     strstrm_nev = cspok[i]->Get_nev();
                     while (strstrm_nev.size() < MAX_NEV_HOSSZ)
                         strstrm_nev.append(" ");
@@ -1340,8 +1356,7 @@ bool Staci::solve_system_old()
                 }
                 strstrm << endl;
 
-                for (unsigned int i = 0; i < agelemek.size(); i++)
-                {
+                for (unsigned int i = 0; i < agelemek.size(); i++) {
                     strstrm_nev = agelemek[i]->Get_nev();
                     while (strstrm_nev.size() < MAX_NEV_HOSSZ)
                         strstrm_nev.append(" ");
@@ -1350,8 +1365,7 @@ bool Staci::solve_system_old()
                         strstrm << "\t" << invjac[i][j];
                     strstrm << endl;
                 }
-                for (unsigned int i = 0; i < cspok.size(); i++)
-                {
+                for (unsigned int i = 0; i < cspok.size(); i++) {
                     strstrm_nev = cspok[i]->Get_nev();
                     while (strstrm_nev.size() < MAX_NEV_HOSSZ)
                         strstrm_nev.append(" ");
@@ -1365,8 +1379,7 @@ bool Staci::solve_system_old()
                 // Visszaszorzas
                 //--------------------------------
 
-                for (int i = 0; i < N; i++)
-                {
+                for (int i = 0; i < N; i++) {
                     dx[i] = 0;
                     for (int j = 0; j < N; j++)
                         dx[i] += invjac[i][j] * f[j];
@@ -1393,19 +1406,18 @@ bool Staci::solve_system_old()
         // A nevek legyenek azonos hosszuak...
         //string strstrm_nev;
         //const int MAX_NEV_HOSSZ=15;
-        for (unsigned int i = 0; i < agelemek.size(); i++)
-        {
+        for (unsigned int i = 0; i < agelemek.size(); i++) {
             strstrm_nev = agelemek[i]->Get_nev();
             while (strstrm_nev.size() < MAX_NEV_HOSSZ)
                 strstrm_nev.append(" ");
             strstrm << endl << strstrm_nev << "\t" << x[i] << "\t" << f[i] << "\t" << dx[i] << "\t" << xu[i];
         }
-        for (unsigned int i = 0; i < cspok.size(); i++)
-        {
+        for (unsigned int i = 0; i < cspok.size(); i++) {
             strstrm_nev = cspok[i]->Get_nev();
             while (strstrm_nev.size() < MAX_NEV_HOSSZ)
                 strstrm_nev.append(" ");
-            strstrm << endl << strstrm_nev << "\t" << x[agelemek.size() + i] << "\t" << f[agelemek.size() + i] << "\t" << dx[agelemek.size() + i] << "\t" << xu[agelemek.size() + i];
+            strstrm << endl << strstrm_nev << "\t" << x[agelemek.size() + i] << "\t" << f[agelemek.size() + i] << "\t"
+                    << dx[agelemek.size() + i] << "\t" << xu[agelemek.size() + i];
         }
         strstrm << endl << endl;
         logfile_write(strstrm.str(), 2);
@@ -1420,8 +1432,7 @@ bool Staci::solve_system_old()
     }
 
     strstrm.str("");
-    if (konv_ok)
-    {
+    if (konv_ok) {
         strstrm << endl << endl << "Normal befejezes...  :)" << endl;
         strstrm << list_results();
         logfile_write(strstrm.str(), 0);
@@ -1434,17 +1445,16 @@ bool Staci::solve_system_old()
         //          //agelemek.at(i)->Set_FolyTerf();
         //
         //      }
-    }
-    else
-        strstrm << endl << endl << "HIBA: Maximalis lepesszamot elertem, de a megadott hibahatar felett vagyok..." << endl;
+    } else
+        strstrm << endl << endl << "HIBA: Maximalis lepesszamot elertem, de a megadott hibahatar felett vagyok..."
+                << endl;
     logfile_write(strstrm.str(), 0);
     //int int1; cin>>int1;
     return konv_ok;
 }
 
 //--------------------------------------------------------------
-void Staci::export_connected_nodes()
-{
+void Staci::export_connected_nodes() {
 
     ofstream nodelistfile("nodelist.txt", ios::trunc);
     for (unsigned int i = 0; i < cspok.size(); i++)
@@ -1452,10 +1462,8 @@ void Staci::export_connected_nodes()
     nodelistfile.close();
 
     ofstream nodefile("connected_nodes.txt", ios::trunc);
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
-        if (agelemek[i]->Get_Csp_db() == 2)
-        {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if (agelemek[i]->Get_Csp_db() == 2) {
             string innen = cspok[agelemek[i]->Get_Cspe_Index()]->Get_nev();
             string ide = cspok[agelemek[i]->Get_Cspv_Index()]->Get_nev();
             string nev = agelemek[i]->Get_nev();
@@ -1466,30 +1474,29 @@ void Staci::export_connected_nodes()
 }
 
 //--------------------------------------------------------------
-void Staci::ini()
-{
+void Staci::ini() {
+    ostringstream strstrm;
+    if (!van_ini) {
+        strstrm << endl << endl << "Automatic inicialization...";
 
-    if (!van_ini)
-    {
-        cout << endl << endl << "Automatic inicialization...";
-        cout << endl << "\tnodal pressures:\t" << p_init << " mwc ";
-        for (unsigned int i = 0; i < cspok.size(); i++) {
-            cspok.at(i)->Ini(1, p_init);
-            //cout << endl << "\t" << cspok.at(i)->Get_nev() << " p=" << cspok.at(i)->Get_p();
-        }
+        strstrm << endl << "\tnodal pressures:\t" << p_init << " mwc ";
+        for (unsigned int i = 0; i < cspok.size(); i++)
+            cspok.at(i)->Ini(1., p_init);
 
-        cout << endl << "\tedge mass flow rates:\t" << mp_init << " kg/s ...";
+        strstrm << endl << "\tedge mass flow rates:\t" << mp_init << " kg/s ...";
+        for (unsigned int i = 0; i < agelemek.size(); i++)
+            agelemek.at(i)->Ini(1., mp_init);
 
-        for (unsigned int i = 0; i < agelemek.size(); i++) {
-            agelemek.at(i)->Ini(1, mp_init);
-            //cout << endl << "\t" << (i+1) << "/" << agelemek.size() << ":" << agelemek.at(i)->Get_nev() << " mp=" << agelemek.at(i)->Get_mp();
-        }
-    }
-    else
-    {
-        cout << endl << endl << "Inicializacio " << ini_file << " adatfajlbol..." << endl;
+    } else {
+        strstrm << endl << endl << "loading initial values from file " << ini_file << endl;
         data_io datta_io(ini_file.c_str());
         datta_io.load_ini_values(cspok, agelemek);
+    }
+
+    // Flush info into logfile and screen
+    if (debug_level > 0) {
+        logfile_write(strstrm.str(), 1);
+        cout << strstrm.str();
     }
 
     // Progress file torlese
@@ -1507,14 +1514,35 @@ void Staci::ini()
 }
 
 //--------------------------------------------------------------
-void Staci::post_process_res_file()
-{
+void Staci::ini(const Staci *IniStaci) {
+
+        for (unsigned int i = 0; i < cspok.size(); i++)
+            cspok.at(i)->Set_p(IniStaci->cspok.at(i)->Get_p());
+
+        for (unsigned int i = 0; i < agelemek.size(); i++)
+            agelemek.at(i)->Set_mp(IniStaci->agelemek.at(i)->Get_mp());
+
+    // Progress file torlese
+    ofstream pfile(progress_file.c_str(), ios::trunc);
+    pfile << fixed << setprecision(1) << 0.0 << "\n";
+    pfile.close();
+
+    // Set log file
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        //        cout << endl << "\t SetLogFile: " << (i+1) << "/" << agelemek.size() << ":" << agelemek.at(i)->Get_nev()<<" logfile: "<<out_file.c_str();
+        //            cout<<agelemek.at(i)->Info();
+        agelemek.at(i)->SetLogFile(out_file.c_str());
+    }
+
+}
+
+//--------------------------------------------------------------
+void Staci::post_process_res_file() {
     ostringstream strstrm;
     string s;
     ifstream ifs(res_file.c_str());
     int i = 0;
-    while (!ifs.eof())
-    {
+    while (!ifs.eof()) {
         getline(ifs, s);
         if (i == 0)
             strstrm << "<?xml version=\"1.0\" encoding=\"ISO-8859-2\"?>";
@@ -1530,15 +1558,13 @@ void Staci::post_process_res_file()
 }
 
 //--------------------------------------------------------------
-string Staci::trim(string s, const string drop)
-{
+string Staci::trim(string s, const string drop) {
     string r = s.erase(s.find_last_not_of(drop) + 1);
     return r.erase(0, r.find_first_not_of(drop));
 }
 
 //--------------------------------------------------------------
-void Staci::set_up_transport()
-{
+void Staci::set_up_transport() {
     unsigned int i;
     van_ini = true;
     data_io datta_io(def_file.c_str());
@@ -1547,29 +1573,21 @@ void Staci::set_up_transport()
 
     vector<double> v;
     double hossz;
-    for (i = 0; i < agelemek.size(); i++)
-    {
+    for (i = 0; i < agelemek.size(); i++) {
         v.clear();
         //cout<<endl<<"Agelem: "<<agelemek.at(i)->Get_nev();
-        if (agelemek.at(i)->Get_Tipus() == "Csatorna")
-        {
+        if (agelemek.at(i)->Get_Tipus() == "Csatorna") {
             v = agelemek.at(i)->Get_res("v");
             hossz = agelemek.at(i)->Get_dprop("L");
             agelemek.at(i)->set_up_grid(0.0, v, hossz);
-        }
-        else
-        {
-            if (agelemek.at(i)->Get_Tipus() == "Cso")
-            {
-                for (int j = 0; j < 10; j++)
-                {
+        } else {
+            if (agelemek.at(i)->Get_Tipus() == "Cso") {
+                for (int j = 0; j < 10; j++) {
                     v.push_back(agelemek.at(i)->Get_v());
                 }
                 hossz = agelemek.at(i)->Get_dprop("L");
                 agelemek.at(i)->set_up_grid(0.0, v, hossz);
-            }
-            else
-            {
+            } else {
                 v.push_back(agelemek.at(i)->Get_v());
                 v.push_back(agelemek.at(i)->Get_v());
                 hossz = 10.0;
@@ -1583,23 +1601,19 @@ void Staci::set_up_transport()
         //int int1;cin>>int1;
     }
     transp_dt = 1e100;
-    for (i = 0; i < agelemek.size(); i++)
-    {
+    for (i = 0; i < agelemek.size(); i++) {
         bool kell_eloszlas = false;
 
-        if (agelemek.at(i)->Get_Tipus() == "Cso")
-        {
+        if (agelemek.at(i)->Get_Tipus() == "Cso") {
             if (fabs(agelemek.at(i)->Get_dprop("erdesseg")) > 1e-5)
                 kell_eloszlas = true;
         }
         if (agelemek.at(i)->Get_Tipus() == "Csatorna")
             kell_eloszlas = true;
 
-        if (kell_eloszlas)
-        {
+        if (kell_eloszlas) {
             //cout << ", dt=" << agelemek.at(i)->cdt;
-            if (transp_dt > agelemek.at(i)->cdt)
-            {
+            if (transp_dt > agelemek.at(i)->cdt) {
                 transp_dt = agelemek.at(i)->cdt;
                 //cout << "*";
             }
@@ -1620,8 +1634,7 @@ void Staci::set_up_transport()
 }
 
 //--------------------------------------------------------------
-void Staci::solve_transport(int mode)
-{
+void Staci::solve_transport(int mode) {
     ostringstream strstrm;
     strstrm << "Starting computation..." << endl;
     logfile_write(strstrm.str(), 2);
@@ -1630,14 +1643,12 @@ void Staci::solve_transport(int mode)
     cout << fixed << setprecision(2) << setw(5) << setfill(' ') << right;
     ido = 0.;
     double counter = 0, szazalek;
-    while (ido < tt_length * 3600)
-    {
+    while (ido < tt_length * 3600) {
         szazalek = round(ido / (tt_length * 3600) * 100);
         //szazalek=round(10*szazalek)/10;
         progress_file_write(szazalek);
-        if (counter < szazalek)
-        {
-            cout << "\n\t\t" << szazalek << " %, time = " << (ido / 3600.) ;
+        if (counter < szazalek) {
+            cout << "\n\t\t" << szazalek << " %, time = " << (ido / 3600.);
             cout << "h, oldest fluid particle: " << (get_oldest() / 3600.) << "h";
             counter += 1;
         }
@@ -1647,8 +1658,7 @@ void Staci::solve_transport(int mode)
 }
 
 //--------------------------------------------------------------
-void Staci::save_transport(int mode)
-{
+void Staci::save_transport(int mode) {
     res_file = def_file;
     cout << endl << "Kimeneti fajl neve:" << res_file << endl;
     data_io datta_io(res_file.c_str());
@@ -1656,12 +1666,10 @@ void Staci::save_transport(int mode)
 }
 
 //--------------------------------------------------------------
-double Staci::get_oldest()
-{
+double Staci::get_oldest() {
     double tmax = 0;
     double tmp;
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
+    for (unsigned int i = 0; i < cspok.size(); i++) {
         tmp = cspok.at(i)->Get_dprop("konc_atlag");
         if (tmp > tmax)
             tmax = tmp;
@@ -1670,25 +1678,21 @@ double Staci::get_oldest()
 }
 
 //--------------------------------------------------------------
-void Staci::transport_step(double dt)
-{
+void Staci::transport_step(double dt) {
     bool transp_debug = false;
     vector<int> temp;
     double seb;
 
     // 1. lepes: csomopontok atlagos koncentraciojanak szamitasa
     double szaml, nevezo, c, m;
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
+    for (unsigned int i = 0; i < cspok.size(); i++) {
 
         // Ha meg van adva beadagolt klor, a csomopontban pontosan ennyi
-        if (fabs(cspok.at(i)->Get_dprop("cl_be")) > 1e-10)
-        {
+        if (fabs(cspok.at(i)->Get_dprop("cl_be")) > 1e-10) {
             cspok.at(i)->Set_dprop("konc_atlag", cspok.at(i)->Get_dprop("cl_be"));
         }
             // Ha nincs megadva, kevered�st kell sz�molni
-        else
-        {
+        else {
 
             szaml = 0.0;
             nevezo = 0.0;
@@ -1700,18 +1704,16 @@ void Staci::transport_step(double dt)
             if (transp_debug)
                 cout << temp.size() << "db)";
 
-            if (temp.size() > 0)
-            {
-                for (unsigned int j = 0; j < temp.size(); j++)
-                {
+            if (temp.size() > 0) {
+                for (unsigned int j = 0; j < temp.size(); j++) {
                     // pozitiv atlagsebessegu agak kellenek csak
                     //agelemek.at(temp.at(j))->show_grid(ido);
                     seb = agelemek.at(temp.at(j))->mean(agelemek.at(temp.at(j))->vel);
                     if (transp_debug)
-                        cout << endl << "\t\t" << agelemek.at(temp.at(j))->Get_nev() << ", vatlag=" << fixed << setprecision(3) << seb;
+                        cout << endl << "\t\t" << agelemek.at(temp.at(j))->Get_nev() << ", vatlag=" << fixed
+                             << setprecision(3) << seb;
                     int utolso = agelemek.at(temp.at(j))->vel.size() - 1;
-                    if (agelemek.at(temp.at(j))->vel.at(utolso) > 0)
-                    {
+                    if (agelemek.at(temp.at(j))->vel.at(utolso) > 0) {
                         c = agelemek.at(temp.at(j))->konc.at(utolso);
                         m = agelemek.at(temp.at(j))->Get_mp();
                         if (transp_debug)
@@ -1729,17 +1731,15 @@ void Staci::transport_step(double dt)
             if (transp_debug)
                 cout << temp.size() << "db)";
 
-            if (temp.size() > 0)
-            {
-                for (unsigned int j = 0; j < temp.size(); j++)
-                {
+            if (temp.size() > 0) {
+                for (unsigned int j = 0; j < temp.size(); j++) {
                     // negativ sebessegu agak kellenek csak
                     seb = agelemek.at(temp.at(j))->mean(agelemek.at(temp.at(j))->vel);
                     if (transp_debug)
-                        cout << endl << "\t\t" << agelemek.at(temp.at(j))->Get_nev() << ", vatlag=" << fixed << setprecision(3) << seb;
+                        cout << endl << "\t\t" << agelemek.at(temp.at(j))->Get_nev() << ", vatlag=" << fixed
+                             << setprecision(3) << seb;
 
-                    if (agelemek.at(temp.at(j))->vel.at(0) < 0)
-                    {
+                    if (agelemek.at(temp.at(j))->vel.at(0) < 0) {
                         c = agelemek.at(temp.at(j))->konc.at(0);
                         m = agelemek.at(temp.at(j))->Get_mp();
                         if (transp_debug)
@@ -1753,14 +1753,12 @@ void Staci::transport_step(double dt)
             fogy = cspok.at(i)->Get_dprop("fogy");
             cl_be = cspok.at(i)->Get_dprop("cl_be");
             // Ha "kifele" megy a viz, attol a csomopontban nem higul
-            if (fogy > 0)
-            {
+            if (fogy > 0) {
                 fogy = 0.0;
                 cl_be = 0.0;
             }
 
-            if (mode == 1)
-            {
+            if (mode == 1) {
                 //if (fabs(nevezo - fogy) > 1.e-10)
                 c = (szaml) / (nevezo - fogy);
                 //else
@@ -1769,11 +1767,9 @@ void Staci::transport_step(double dt)
                 //cout << endl << "ERROR!!!! Staci::transport_step(): fabs(nevezo-fogy)=" << fabs(nevezo - fogy) << "<1.e-10" << endl << endl;
                 //exit(-1);
                 //}
-            }
-            else
-            {
+            } else {
                 //if (nevezo + fabs(fogy) > 1.e-10)
-                c = (szaml + cl_be * fabs(fogy)) / (nevezo + fabs(fogy) );
+                c = (szaml + cl_be * fabs(fogy)) / (nevezo + fabs(fogy));
                 //else
                 //{
                 // TODO: logfile_write-ba!
@@ -1783,10 +1779,9 @@ void Staci::transport_step(double dt)
             }
 
             cspok.at(i)->Set_dprop("konc_atlag", c);
-            if ((cspok.at(i)->Get_nev() == "NODE_1346650") || (cspok.at(i)->Get_nev() == "NODE_1337960"))
-            {
+            if ((cspok.at(i)->Get_nev() == "NODE_1346650") || (cspok.at(i)->Get_nev() == "NODE_1337960")) {
                 cout << "\n\t" << cspok.at(i)->Get_nev() << ": szaml=" << szaml << ", cl_be*fabs(fogy)="
-                << (cl_be * fabs(fogy)) << ", nevezo=" << nevezo;
+                     << (cl_be * fabs(fogy)) << ", nevezo=" << nevezo;
                 cout << "\n\t\t atlagos koncentracio: " << c << endl;
             }
         }
@@ -1796,16 +1791,14 @@ void Staci::transport_step(double dt)
     //cin.get();
 
     // 2. lepes: agelemek leptetese
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
         //cout << endl << "\t updating " << agelemek.at(i)->Get_nev() << "...";
 
 
         // Ha nulla az �rdess�g, akkor csak �sszek�t� cs� �s szkippelj�k
         bool kell_eloszlas = false;
 
-        if (agelemek.at(i)->Get_Tipus() == "Cso")
-        {
+        if (agelemek.at(i)->Get_Tipus() == "Cso") {
             if ((fabs(agelemek.at(i)->Get_dprop("erdesseg"))) > 1e-5)
                 kell_eloszlas = true;
         }
@@ -1816,23 +1809,17 @@ void Staci::transport_step(double dt)
         //      int int1;
         //      cin>>int1;
 
-        if (kell_eloszlas)
-        {
-            if ((agelemek.at(i)->mean(agelemek.at(i)->vel)) > 0)
-            {
+        if (kell_eloszlas) {
+            if ((agelemek.at(i)->mean(agelemek.at(i)->vel)) > 0) {
                 double konc_eleje, konc, konc_e, vel_e, dx;
                 dx = agelemek.at(i)->cL / agelemek.at(i)->vel.size();
-                if (agelemek.at(i)->Get_Csp_db() == 1)
-                {
+                if (agelemek.at(i)->Get_Csp_db() == 1) {
                     konc_eleje = 0.0;
                     agelemek.at(i)->konc.at(0) = 0.0;
                     agelemek.at(i)->konc.at(1) = 0.0;
-                }
-                else
-                {
+                } else {
                     konc_eleje = cspok.at(agelemek.at(i)->Get_Cspe_Index())->Get_dprop("konc_atlag");
-                    for (unsigned int j = agelemek.at(i)->vel.size() - 1; j > 0; j--)
-                    {
+                    for (unsigned int j = agelemek.at(i)->vel.size() - 1; j > 0; j--) {
                         konc_e = agelemek.at(i)->konc.at(j - 1);
                         vel_e = agelemek.at(i)->vel.at(j - 1);
                         konc = agelemek.at(i)->konc.at(j);
@@ -1848,22 +1835,16 @@ void Staci::transport_step(double dt)
                     }
                     agelemek.at(i)->konc.at(0) = konc_eleje;
                 }
-            }
-            else
-            {
+            } else {
                 double konc_vege, konc, konc_u, vel_u, dx;
                 dx = agelemek.at(i)->cL / agelemek.at(i)->vel.size();
-                if (agelemek.at(i)->Get_Csp_db() == 1)
-                {
+                if (agelemek.at(i)->Get_Csp_db() == 1) {
                     konc_vege = cspok.at((unsigned long) agelemek.at(i)->Get_Cspv_Index())->Get_dprop("konc_atlag");
                     agelemek.at(i)->konc.at(0) = konc_vege;
                     agelemek.at(i)->konc.at(1) = konc_vege;
-                }
-                else
-                {
+                } else {
                     konc_vege = cspok.at((unsigned long) agelemek.at(i)->Get_Cspv_Index())->Get_dprop("konc_atlag");
-                    for (unsigned int j = 0; j < agelemek.at(i)->vel.size() - 1; j++)
-                    {
+                    for (unsigned int j = 0; j < agelemek.at(i)->vel.size() - 1; j++) {
                         konc_u = agelemek.at(i)->konc.at(j + 1);
                         vel_u = agelemek.at(i)->vel.at(j + 1);
                         konc = agelemek.at(i)->konc.at(j);
@@ -1874,29 +1855,24 @@ void Staci::transport_step(double dt)
                     agelemek.at(i)->konc.at(agelemek.at(i)->konc.size() - 1) = konc_vege;
                 }
             }
-        }
-        else
-        {
+        } else {
             double konc = cspok.at(agelemek.at(i)->Get_Cspe_Index())->Get_dprop("konc_atlag");
 
-            if (agelemek.at(i)->Get_Csp_db() == 2)
-            {
+            if (agelemek.at(i)->Get_Csp_db() == 2) {
                 double konc_vege = cspok.at(agelemek.at(i)->Get_Cspv_Index())->Get_dprop("konc_atlag");
                 konc = (konc + konc_vege) / 2;
             }
 
             //cout << endl << "dt=" << dt << ", " << agelemek.at(i)->show_grid(0.0) << "\n END OF GRID\n";
 
-            for (unsigned int j = 0; j < agelemek.at(i)->konc.size(); j++)
-            {
+            for (unsigned int j = 0; j < agelemek.at(i)->konc.size(); j++) {
                 //cout << "\t agelemek.at(i)->konc.size()=" << agelemek.at(i)->konc.size();
                 //cin.get();
                 agelemek.at(i)->konc.at(j) = konc;
             }
 
         }
-        if (agelemek.at(i)->Get_nev() == "PIPE_602407")
-        {
+        if (agelemek.at(i)->Get_nev() == "PIPE_602407") {
             cout << endl << "dt=" << dt << ", " << agelemek.at(i)->show_grid(0.0);
             /*cin.get();*/
         }
@@ -1905,30 +1881,23 @@ void Staci::transport_step(double dt)
     //cin.get();
 
 }
+
 //--------------------------------------------------------------
-double Staci::teta(double konc, const int i)
-{
+double Staci::teta(double konc, const int i) {
     if (mode == 1)
         return 1.0;
-    else
-    {
+    else {
         double Rh, cl_k, cl_w;
-        if (agelemek.at(i)->Get_Tipus() == "Csatorna")
-        {
+        if (agelemek.at(i)->Get_Tipus() == "Csatorna") {
             Rh = agelemek.at(i)->Get_dprop("Rh");
             cl_k = agelemek.at(i)->Get_dprop("cl_k");
             cl_w = agelemek.at(i)->Get_dprop("cl_w");
-        }
-        else
-        {
-            if (agelemek.at(i)->Get_Tipus() == "Cso")
-            {
+        } else {
+            if (agelemek.at(i)->Get_Tipus() == "Cso") {
                 Rh = agelemek.at(i)->Get_dprop("Rh");
                 cl_k = agelemek.at(i)->Get_dprop("cl_k");
                 cl_w = agelemek.at(i)->Get_dprop("cl_w");
-            }
-            else
-            {
+            } else {
                 Rh = 1;
                 cl_k = 0.0;
                 cl_w = 0.0;
@@ -1943,37 +1912,40 @@ double Staci::teta(double konc, const int i)
 }
 
 //--------------------------------------------------------------
-void Staci::copy_file(const string in_f_nev, const string out_f_nev)
-{
+void Staci::copy_file(const string in_f_nev, const string out_f_nev) {
     ifstream infile(in_f_nev.c_str(), ifstream::in);
     ofstream outfile(out_f_nev.c_str(), ifstream::trunc);
     outfile << infile.rdbuf();
 }
 
 //--------------------------------------------------------------
-void Staci::progress_file_write(double percent)
-{
+void Staci::progress_file_write(double percent) {
     ofstream pfile(progress_file.c_str(), ios::trunc);
     pfile << fixed << setprecision(1) << percent << "\n";
     pfile.close();
 }
 
 //--------------------------------------------------------------
-void Staci::Set_FolyTerf()
-{
-    cout << endl << endl << "Vizmennyis�g szamitasa:" << endl;
+void Staci::Set_FolyTerf() {
+
     double osszeg = 0;
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
         osszeg += agelemek.at(i)->Get_FolyTerf();
-        cout << endl << "\t" << agelemek.at(i)->Get_nev() << ":\t  " << agelemek.at(i)->Get_FolyTerf() << ",\t szum:" << osszeg;
+        //cout << endl << "\t" << agelemek.at(i)->Get_nev() << ":\t  " << agelemek.at(i)->Get_FolyTerf() << ",\t szum:" << osszeg;
     }
     FolyMenny = osszeg;
+
+    if (debug_level > 0) {
+        ostringstream msg;
+        msg << "\n\n Overall fluid volume:" << FolyMenny << " m3.  ";
+        cout << msg.str();
+        logfile_write(msg.str(), 1);
+    }
+
 }
 
 //--------------------------------------------------------------
-void Staci::nr_solver(Vec_DP x, Vec_DP f)
-{
+void Staci::nr_solver(Vec_DP x, Vec_DP f) {
 
     int N = x.size();
     Vec_DP col(N), b(N), dx(N), xu(N);
@@ -1987,8 +1959,7 @@ void Staci::nr_solver(Vec_DP x, Vec_DP f)
 
     NR::ludcmp(jac, indx, d);
 
-    for (int j = 0; j < N; j++)
-    {
+    for (int j = 0; j < N; j++) {
         for (int i = 0; i < N; i++)
             col[i] = 0.0;
         col[j] = 1.0;
@@ -1997,8 +1968,7 @@ void Staci::nr_solver(Vec_DP x, Vec_DP f)
             invjac[i][j] = col[i];
     }
 
-    for (int i = 0; i < N; i++)
-    {
+    for (int i = 0; i < N; i++) {
         dx[i] = 0;
         for (int j = 0; j < N; j++)
             dx[i] += invjac[i][j] * f[j];
@@ -2014,8 +1984,7 @@ void Staci::nr_solver(Vec_DP x, Vec_DP f)
 }
 
 //--------------------------------------------------------------
-bool Staci::umfpack_solver(Vec_I_DP xr, Vec_I_DP f)
-{
+bool Staci::umfpack_solver(Vec_I_DP xr, Vec_I_DP f) {
 
     // Build sparse matrix
     /* Ti[k] is row index of entry k, as matrix is scanned columnwise */
@@ -2036,8 +2005,7 @@ bool Staci::umfpack_solver(Vec_I_DP xr, Vec_I_DP f)
     int nz = 0;
     for (int col = 0; col < n; col++)
         for (int row = 0; row < n; row++)
-            if (!m_is_element_empty[row][col])
-            {
+            if (!m_is_element_empty[row][col]) {
                 // vTi.push_back(row);
                 // vTj.push_back(col);
                 // vTx.push_back(m_jac[row][col]);
@@ -2060,8 +2028,7 @@ bool Staci::umfpack_solver(Vec_I_DP xr, Vec_I_DP f)
 
     void *Symbolic, *Numeric;
 
-    for (int i = 0; i < nz; i++)
-    {
+    for (int i = 0; i < nz; i++) {
         Ti[i] = vTi[i];
         Tj[i] = vTj[i];
         Tx[i] = vTx[i];
@@ -2089,8 +2056,7 @@ bool Staci::umfpack_solver(Vec_I_DP xr, Vec_I_DP f)
 
     bool success = true;
     for (int i = 0; i < n; i++)
-        if (isnan(dx[i]))
-        {
+        if (isnan(dx[i])) {
             //            cout << "\n\n!!!!\nStaci.cpp, umfpack_solver() -> x[" << i
             //                    << "]=NaN!!!\n\n";
             success = false;
@@ -2099,8 +2065,7 @@ bool Staci::umfpack_solver(Vec_I_DP xr, Vec_I_DP f)
 
     // Visszairas
     //------------------------
-    if (success)
-    {
+    if (success) {
         for (unsigned int i = 0; i < agelemek.size(); i++)
             agelemek[i]->Set_mp(xr[i] - m_relax * dx[i]);
         for (unsigned int i = 0; i < cspok.size(); i++)
@@ -2115,18 +2080,13 @@ bool Staci::umfpack_solver(Vec_I_DP xr, Vec_I_DP f)
 
 
 //--------------------------------------------------------------
-void Staci::Compute_Head_Losses()
-{
+void Staci::Compute_Head_Losses() {
     double pe, pv, he, hv, dh;
-    cout << endl << endl << "Nyomasesesek szamitasa...";
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
-        if (agelemek[i]->Get_Csp_db() == 1)
-        {
+    //cout << endl << endl << "Nyomasesesek szamitasa...";
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if (agelemek[i]->Get_Csp_db() == 1) {
             agelemek[i]->Set_head_loss(0.0);
-        }
-        else
-        {
+        } else {
             pe = cspok[agelemek[i]->Get_Cspe_Index()]->Get_p();
             pv = cspok[agelemek[i]->Get_Cspv_Index()]->Get_p();
             he = cspok[agelemek[i]->Get_Cspe_Index()]->Get_h();
@@ -2152,15 +2112,13 @@ void Staci::Print_Jacobian()
     strstrm << scientific << setprecision(3) << showpos;
     strstrm << endl << "\nJACOBI:" << endl << "          ";
 
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
         strstrm_nev = agelemek[i]->Get_nev();
         while (strstrm_nev.size() < MAX_NEV_HOSSZ)
             strstrm_nev.append(" ");
         strstrm << "\tmp," << strstrm_nev;
     }
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
+    for (unsigned int i = 0; i < cspok.size(); i++) {
         strstrm_nev = cspok[i]->Get_nev();
         while (strstrm_nev.size() < MAX_NEV_HOSSZ)
             strstrm_nev.append(" ");
@@ -2168,8 +2126,7 @@ void Staci::Print_Jacobian()
     }
     strstrm << endl;
 
-    for (unsigned int i = 0; i < agelemek.size(); i++)
-    {
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
         strstrm_nev = agelemek[i]->Get_nev();
         while (strstrm_nev.size() < MAX_NEV_HOSSZ)
             strstrm_nev.append(" ");
@@ -2178,8 +2135,7 @@ void Staci::Print_Jacobian()
             strstrm << "; " << m_jac[i][j];
         strstrm << endl;
     }
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
+    for (unsigned int i = 0; i < cspok.size(); i++) {
         strstrm_nev = cspok[i]->Get_nev();
         while (strstrm_nev.size() < MAX_NEV_HOSSZ)
             strstrm_nev.append(" ");
@@ -2197,21 +2153,19 @@ void Staci::Print_Jacobian()
 }
 
 //--------------------------------------------------------------
-string Staci::iter_info(Vec_DP x, Vec_DP f, int iter, double e_mp, double e_p)
-{
+string Staci::iter_info(Vec_DP x, Vec_DP f, int iter, double e_mp, double e_p) {
 
     m_ss.str("");
 
-    if (debug_level > 3)
-    {
+    if (debug_level > 3) {
         for (unsigned int i = 0; i < agelemek.size(); i++)
             m_ss << "\n\t" << agelemek[i]->Get_nev() << "("
-            << agelemek[i]->GetType() << "): mp=" << x[i] << ", f="
-            << f[i];
+                 << agelemek[i]->GetType() << "): mp=" << x[i] << ", f="
+                 << f[i];
         for (unsigned int i = 0; i < cspok.size(); i++)
             m_ss << "\n\t" << cspok[i]->Get_nev() << ": p="
-            << x[agelemek.size() + i] << ", f="
-            << f[agelemek.size() + i];
+                 << x[agelemek.size() + i] << ", f="
+                 << f[agelemek.size() + i];
     }
 
     m_ss.setf(ios::dec);
@@ -2227,8 +2181,7 @@ string Staci::iter_info(Vec_DP x, Vec_DP f, int iter, double e_mp, double e_p)
 
 //--------------------------------------------------------------
 void Staci::compute_error(Vec_DP f, double &e_mp, double &e_p, double &e_mp_r,
-                          double &e_p_r, bool &konv_ok)
-{
+                          double &e_p_r, bool &konv_ok) {
 
     e_mp_r = e_mp;
     e_p_r = e_p;
@@ -2248,18 +2201,14 @@ void Staci::compute_error(Vec_DP f, double &e_mp, double &e_p, double &e_mp_r,
 
 //--------------------------------------------------------------
 void Staci::update_relax(double e_mp, double e_p, double &e_mp_r,
-                         double &e_p_r)
-{
+                         double &e_p_r) {
     m_RELAX_MIN = 0.01;
     m_RELAX_MAX = 1.0;
     double hiba, hiba_r;
-    if (e_p > e_mp)
-    {
+    if (e_p > e_mp) {
         hiba = e_p;
         hiba_r = e_p_r;
-    }
-    else
-    {
+    } else {
         hiba = e_mp;
         hiba_r = e_mp_r;
     }
@@ -2277,8 +2226,7 @@ void Staci::update_relax(double e_mp, double e_p, double &e_mp_r,
 }
 
 //--------------------------------------------------------------
-void Staci::list_all_elements()
-{
+void Staci::list_all_elements() {
     for (unsigned int i = 0; i < agelemek.size(); i++)
         cout << endl << agelemek.at(i)->Get_Tipus() << ";\t" << agelemek.at(i)->Get_nev() << ";";
     for (unsigned int i = 0; i < cspok.size(); i++)
@@ -2287,8 +2235,7 @@ void Staci::list_all_elements()
 }
 
 //--------------------------------------------------------------
-void Staci::Compute_dfdmu()
-{
+void Staci::Compute_dfdmu() {
     bool megvan = false;
     m_dfdmu.clear();
 
@@ -2304,8 +2251,7 @@ void Staci::Compute_dfdmu()
             // cin.get();
             m_dfdmu.push_back(dfdmu);
             megvan = true;
-        }
-        else
+        } else
             m_dfdmu.push_back(0.0);
     }
 
@@ -2313,8 +2259,7 @@ void Staci::Compute_dfdmu()
         if ((property_ID == "demand") && (element_ID == cspok.at(i)->Get_nev())) {
             m_dfdmu.push_back(-1.0);
             megvan = true;
-        }
-        else
+        } else
             m_dfdmu.push_back(0.0);
     }
 
@@ -2322,7 +2267,7 @@ void Staci::Compute_dfdmu()
         stringstream strstrm;
         strstrm.str("");
         strstrm << "\nStaci::Compute_dfdmu(): !!! element_ID: " << element_ID << ", property_ID: "
-        << property_ID << " not found (property_ID = demand | diameter)!";
+                << property_ID << " not found (property_ID = demand | diameter)!";
         logfile_write(strstrm.str(), 1);
         cout << strstrm.str();
         StaciException hiba(strstrm.str());
@@ -2332,8 +2277,7 @@ void Staci::Compute_dfdmu()
 }
 
 //--------------------------------------------------------------
-void Staci::Compute_dxdmu()
-{
+void Staci::Compute_dxdmu() {
     Compute_dfdmu();
 
     // Build sparse matrix
@@ -2352,8 +2296,7 @@ void Staci::Compute_dxdmu()
     int nz = 0;
     for (int col = 0; col < n; col++)
         for (int row = 0; row < n; row++)
-            if (!m_is_element_empty[row][col])
-            {
+            if (!m_is_element_empty[row][col]) {
                 // vTi.push_back(row);
                 // vTj.push_back(col);
                 // vTx.push_back(m_jac[row][col]);
@@ -2376,8 +2319,7 @@ void Staci::Compute_dxdmu()
 
     void *Symbolic, *Numeric;
 
-    for (int i = 0; i < nz; i++)
-    {
+    for (int i = 0; i < nz; i++) {
         Ti[i] = vTi[i];
         Tj[i] = vTj[i];
         Tx[i] = vTx[i];
@@ -2403,12 +2345,11 @@ void Staci::Compute_dxdmu()
 
     umfpack_di_free_numeric(&Numeric);
 
-    bool success = true;
+    //bool success = true;
     for (int i = 0; i < n; i++)
-        if (isnan(dx[i]))
-        {
+        if (isnan(dx[i])) {
             cout << "\n\n!!!!\nStaci.cpp, dxdmu() -> x[" << i
-            << "]=NaN!!!\n\n";
+                 << "]=NaN!!!\n\n";
             break;
         }
 
@@ -2422,13 +2363,12 @@ void Staci::Compute_dxdmu()
 }
 
 //--------------------------------------------------------------
-void Staci::Print_dfdmu()
-{
+void Staci::Print_dfdmu() {
     //Compute_dfdmu();
 
     ostringstream strstrm;
     string strstrm_nev;
-    const unsigned int MAX_NEV_HOSSZ = 15;
+    // const unsigned int MAX_NEV_HOSSZ = 15;
 
     strstrm.str("");
     strstrm << scientific << setprecision(3) << showpos;
@@ -2448,22 +2388,23 @@ void Staci::Print_dfdmu()
 }
 
 //--------------------------------------------------------------
-void Staci::Print_dxdmu()
-{
+void Staci::Print_dxdmu() {
 
     ostringstream strstrm;
-    string strstrm_nev;
-    const unsigned int MAX_NEV_HOSSZ = 15;
+    // string strstrm_nev;
+    //const unsigned int MAX_NEV_HOSSZ = 15;
 
     strstrm.str("");
     strstrm << scientific << setprecision(3) << showpos;
     strstrm << "Parameter: " << element_ID << ", " << property_ID;
 
     for (unsigned int i = 0; i < agelemek.size(); i++)
-        strstrm << "\n" << i << ";(mp @ " << agelemek.at(i)->Get_nev() << "); " << m_dxdmu[i] << "; mp(kg/s)=" << agelemek.at(i)->Get_mp();
+        strstrm << "\n" << i << ";(mp @ " << agelemek.at(i)->Get_nev() << "); " << m_dxdmu[i] << "; mp(kg/s)="
+                << agelemek.at(i)->Get_mp();
 
     for (unsigned int i = 0; i < cspok.size(); i++)
-        strstrm << "\n" << i << ";(p @ " << cspok.at(i)->Get_nev() << "); " << m_dxdmu[agelemek.size() + i] << "; p(vom)=" << cspok.at(i)->Get_p();
+        strstrm << "\n" << i << ";(p @ " << cspok.at(i)->Get_nev() << "); " << m_dxdmu[agelemek.size() + i]
+                << "; p(vom)=" << cspok.at(i)->Get_p();
 
     ofstream OutFile;
     OutFile.open("dxdmu.txt");
@@ -2478,26 +2419,36 @@ void Staci::solve_residence_time() {
 
     m_ss.str("");
     m_ss << "\n\nComputing residence time...\n====================================" << endl;
-    logfile_write(m_ss.str(), 1);
-    cout << m_ss.str();
-
+    if (debug_level > 0) {
+        logfile_write(m_ss.str(), 1);
+        cout << m_ss.str();
+    }
     int step = 1;
     int step_max = 100000;
 
     while ((step < step_max) && (d_VAL > 0.1)) {
         residence_time_step(max_ID, max_VAL, mean_VAL);
-        if ((step % 20) == 0)
-            cout << endl << "\t step #" << step << " max. res. time: " << convert_to_hr_min(max_VAL) << " (" << max_ID << "), mean: " << convert_to_hr_min(mean_VAL);
+        if (debug_level > 0) {
+            if ((step % 20) == 0)
+                cout << endl << "\t step #" << step << " max. res. time: " << convert_to_hr_min(max_VAL) << " ("
+                     << max_ID
+                     << "), mean: " << convert_to_hr_min(mean_VAL);
+        }
         d_VAL = fabs(mean_VAL - VAL_prev);
         VAL_prev = mean_VAL;
         step++;
     }
-    // Utolso lepes mindenkeppen legyen kint
-    cout << endl << "\t step #" << step << " max. res. time: " << convert_to_hr_min(max_VAL) << " (" << max_ID << "), mean: " << convert_to_hr_min(mean_VAL);
+    if (debug_level > 0) {
+        m_ss.str("");
+        m_ss << endl << "\t step #" << step << " max. res. time: " << convert_to_hr_min(max_VAL) << " (" << max_ID
+             << "), mean: " << convert_to_hr_min(mean_VAL);
+        logfile_write(m_ss.str(), 1);
+        cout << m_ss.str();
+    }
 }
 
 //--------------------------------------------------------------
-void Staci::residence_time_step(string& max_ID, double& max_VAL, double& mean_VAL) {
+void Staci::residence_time_step(string &max_ID, double &max_VAL, double &mean_VAL) {
 
     bool transp_debug = false;
     double mv = -1.;
@@ -2509,19 +2460,18 @@ void Staci::residence_time_step(string& max_ID, double& max_VAL, double& mean_VA
 
     // 1. lepes: csomoponti atlagkor meghatarozasa
     double szaml, nevezo, c, m;
-    vector <int> temp;
-    int length_be, length_ki;
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
+    vector<int> temp;
+    //int length_be, length_ki;
+    for (unsigned int i = 0; i < cspok.size(); i++) {
 
         // Csak akkor piszkaljuk a csomoponti eletkort, ha nincs betap.
         // Legalabb 1cm3/h betap legyen
         if (cspok.at(i)->Get_fogy() < (-1.e-6 * 1000. / 3600.)) {
             if (transp_debug)
-                cout << endl << cspok.at(i)->Get_nev() << ": \n\tbetap miatt adott vizkor: " << cspok.at(i)->Get_dprop("tt") / 60. << "min";
+                cout << endl << cspok.at(i)->Get_nev() << ": \n\tbetap miatt adott vizkor: "
+                     << cspok.at(i)->Get_dprop("tt") / 60. << "min";
             //cin.get();
-        }
-        else {
+        } else {
             // Tomegarammal sulyozott atlag
             szaml = 0.0;
             nevezo = 0.0;
@@ -2531,7 +2481,7 @@ void Staci::residence_time_step(string& max_ID, double& max_VAL, double& mean_VA
                 cout << endl << cspok.at(i)->Get_nev() << ": \n\tbemeno agak: (";
             temp.clear();
             temp = cspok.at(i)->ag_be;
-            length_be = temp.size();
+            // length_be = temp.size();
             if (transp_debug)
                 cout << temp.size() << "db)";
 
@@ -2558,7 +2508,7 @@ void Staci::residence_time_step(string& max_ID, double& max_VAL, double& mean_VA
                 cout << endl << "\n\tkimeno agak: (";
             temp.clear();
             temp = cspok.at(i)->ag_ki;
-            length_ki = temp.size();
+            // length_ki = temp.size();
             if (transp_debug)
                 cout << temp.size() << "db)";
 
@@ -2587,13 +2537,12 @@ void Staci::residence_time_step(string& max_ID, double& max_VAL, double& mean_VA
             sum = sum + szaml / nevezo;
 
             if (transp_debug)
-                cout <<  "\n\t atlagos vizkor= " << cspok.at(i)->Get_dprop("tt") / 60 << "min";
+                cout << "\n\t atlagos vizkor= " << cspok.at(i)->Get_dprop("tt") / 60 << "min";
         }
     }
 
-    for (unsigned int i = 0; i < cspok.size(); i++)
-    {
-        if ((cspok.at(i)->Get_dprop("tt"))>MAX_TIME)
+    for (unsigned int i = 0; i < cspok.size(); i++) {
+        if ((cspok.at(i)->Get_dprop("tt")) > MAX_TIME)
             cspok.at(i)->Set_dprop("tt", MAX_TIME);
     }
 
@@ -2618,17 +2567,16 @@ void Staci::residence_time_step(string& max_ID, double& max_VAL, double& mean_VA
                     tt_e = cspok.at(cspv_id)->Get_dprop("tt");
                     v = TINY_VEL;
                     if (tt_s > tt_e)
-                        tt_e = tt_s+ L / v;
+                        tt_e = tt_s + L / v;
                     else
-                        tt_s = tt_e+ L / v;
+                        tt_s = tt_e + L / v;
 
-                    if (tt_s>MAX_TIME)
-                        tt_s=MAX_TIME;
+                    if (tt_s > MAX_TIME)
+                        tt_s = MAX_TIME;
 
-                    if (tt_e>MAX_TIME)
-                        tt_e=MAX_TIME;
-                }
-                else {
+                    if (tt_e > MAX_TIME)
+                        tt_e = MAX_TIME;
+                } else {
                     int cspe_id = agelemek.at(i)->Get_Cspe_Index();
                     tt_s = cspok.at(cspe_id)->Get_dprop("tt");
                     tt_e = tt_s + L / v;
@@ -2638,7 +2586,7 @@ void Staci::residence_time_step(string& max_ID, double& max_VAL, double& mean_VA
                 // Get maximum value
                 if (tt_e > mv) {
                     max_VAL = tt_e;
-                    mv      = tt_e;
+                    mv = tt_e;
                     max_ID = agelemek.at(i)->Get_nev();
                 }
                 // }
@@ -2654,33 +2602,31 @@ void Staci::residence_time_step(string& max_ID, double& max_VAL, double& mean_VA
 
                 if (transp_debug)
                     cout << endl << agelemek.at(i)->Get_nev() << ": v=" << v << "m/s, L=" << L << "m, tt_start=" <<
-                    (tt_s / 60.) << "min, tt_end=" << (tt_e / 60.) << "min";
-            }
-            else {
+                         (tt_s / 60.) << "min, tt_end=" << (tt_e / 60.) << "min";
+            } else {
                 if (v > -TINY_VEL) {
                     tt_s = cspok.at(cspe_id)->Get_dprop("tt");
                     tt_e = cspok.at(cspv_id)->Get_dprop("tt");
                     v = -TINY_VEL; // Ki volt kommentelve
                     if (tt_s > tt_e)
-                        tt_e = tt_s- L / v;
+                        tt_e = tt_s - L / v;
                     else
-                        tt_s = tt_e- L / v;
-                    if (tt_s>MAX_TIME)
-                        tt_s=MAX_TIME;
+                        tt_s = tt_e - L / v;
+                    if (tt_s > MAX_TIME)
+                        tt_s = MAX_TIME;
 
-                    if (tt_e>MAX_TIME)
-                        tt_e=MAX_TIME;
-                }
-                else {
+                    if (tt_e > MAX_TIME)
+                        tt_e = MAX_TIME;
+                } else {
                     int cspv_id = agelemek.at(i)->Get_Cspv_Index();
                     tt_e = cspok.at(cspv_id)->Get_dprop("tt");
                     tt_s = tt_e - L / v;
-                    if (tt_s>MAX_TIME)
-                        tt_s=MAX_TIME;
+                    if (tt_s > MAX_TIME)
+                        tt_s = MAX_TIME;
 
                     if (tt_s > mv) {
                         max_VAL = tt_s;
-                        mv      = tt_s;
+                        mv = tt_s;
                         max_ID = agelemek.at(i)->Get_nev();
                     }
                 }
@@ -2703,39 +2649,38 @@ void Staci::residence_time_step(string& max_ID, double& max_VAL, double& mean_VA
             // }
 
             // cin.get();
-        }
-        else {
+        } else {
             double v = agelemek.at(i)->Get_v();
             double mp = agelemek.at(i)->Get_mp();
 
             //cout << endl << "!!!!! "<<agelemek.at(i)->Get_nev()<< " type: "<<type<<endl;
 
-            if ((type.compare("KonstNyomas") == 0) || (type.compare("Vegakna") == 0))  {
-                if (mp<0) {
+            if ((type.compare("KonstNyomas") == 0) || (type.compare("Vegakna") == 0)) {
+                if (mp < 0) {
                     // Ez esetben a rendszerbe befele aramlik a kozeg, nem bantjuk a vizkort
                     tt_s = agelemek.at(i)->Get_tt_start();
                     //tt_e = agelemek.at(i)->Get_tt_end();
 
                     if (transp_debug) {
                         cout << endl << agelemek.at(i)->Get_nev() <<
-                        ": \n\t flow TO the system FROM the element (v=" << v << "m/s) -> prescribed age: tt_start = " << tt_s / 60. <<
-                        "min";
+                             ": \n\t flow TO the system FROM the element (v=" << v
+                             << "m/s) -> prescribed age: tt_start = " << tt_s / 60. <<
+                             "min";
                         //<< ", tt_end = " << tte / 60. << "min";
                         //cin.get();
                     }
-                }
-                else{
+                } else {
                     if (transp_debug) {
                         tt_s = cspok.at(cspe_id)->Get_dprop("tt");
                         agelemek.at(i)->Set_tt_start(tt_s);
                         cout << endl << agelemek.at(i)->Get_nev() <<
-                        ": \n\t flow FROM the system TO the element (v=" << v << "m/s) -> age: tt_start = " << tt_s / 60. <<
-                        "min";
+                             ": \n\t flow FROM the system TO the element (v=" << v << "m/s) -> age: tt_start = "
+                             << tt_s / 60. <<
+                             "min";
                         //cin.get();
                     }
                 }
-            }
-            else {
+            } else {
                 double tt;
 
                 if (fabs(v) < TINY_VEL) {
@@ -2745,8 +2690,7 @@ void Staci::residence_time_step(string& max_ID, double& max_VAL, double& mean_VA
                         tt = tt1;
                     else
                         tt = tt2;
-                }
-                else {
+                } else {
                     if (v > 0)
                         tt = cspok.at(cspe_id)->Get_dprop("tt");
                     else {
@@ -2763,7 +2707,7 @@ void Staci::residence_time_step(string& max_ID, double& max_VAL, double& mean_VA
                 agelemek.at(i)->Set_tt_end(tt);
                 if (transp_debug) {
                     cout << endl << agelemek.at(i)->Get_nev() <<
-                    ": \n\tvizkor: " << tt / 60. << "min";
+                         ": \n\tvizkor: " << tt / 60. << "min";
                     //cin.get();
                 }
             }
@@ -2779,6 +2723,6 @@ string Staci::convert_to_hr_min(double input_seconds) {
     int hours = (int) (seconds / 60 / 60) % 24;
     int minutes = (int) (seconds / 60) % 60;
 
-    str << days <<" d, " << hours << " h, " << minutes << " m";
+    str << days << " d, " << hours << " h, " << minutes << " m";
     return str.str();
 }
