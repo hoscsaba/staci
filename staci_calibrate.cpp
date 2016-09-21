@@ -7,6 +7,7 @@
 #include <numeric>
 #include <list>
 #include "xmlParser.h"
+#include <fstream>
 
 using namespace std;
 using namespace boost;
@@ -93,7 +94,7 @@ int main(int argc, char **argv) {
     last_computation_OK = false;
 
     // Clear logfile
-    ofstream ofs(logfilename, std::ios::out | std::ios::trunc);
+    ofstream ofs(logfilename.c_str(), std::ios::out | std::ios::trunc);
     ofs.close();
 
     // Load WDSs and data files
@@ -403,7 +404,7 @@ void Load_FVM_Datafiles() {
     tmp.str("");
     tmp << dir_name << FVM_dfile;
 
-    std::ifstream in(tmp.str());
+    std::ifstream in(tmp.str().c_str());
 
     if (in.fail()) {
         cout << endl << "Load_FVM_Datafiles() -> CANNOT FIND DATAFILE " << tmp.str() << "!!!!" << endl;
@@ -428,7 +429,7 @@ void Load_FVM_Datafiles() {
             FVM_Pool_Info.push_back(tmpstr);
             vector<double> vals;
             for (unsigned int j = 3; j < lines.at(i).size(); j++)
-                vals.push_back(stod(lines.at(i).at(j)));
+                vals.push_back(atof(lines.at(i).at(j).c_str()));
             FVM_Pool_tmp_Values.push_back(vals);
             //cout << " added " << vals.size() << " data";
             // Make space for Staci values
@@ -454,7 +455,7 @@ void Load_FVM_Datafiles() {
     tmp.str("");
     tmp << dir_name << Eredmenyek_FVM_dfile;
 
-    std::ifstream in1(tmp.str());
+    std::ifstream in1(tmp.str().c_str());
     //in1(tmp.str());
 
     if (in1.fail()) {
@@ -483,7 +484,7 @@ void Load_FVM_Datafiles() {
             FVM_Pressure_Info.push_back(tmpstr);
             vector<double> vals;
             for (unsigned int j = 4; j < lines.at(i).size(); j++)
-                vals.push_back(stod(lines.at(i).at(j)));
+                vals.push_back(atof(lines.at(i).at(j).c_str()));
             FVM_Pressure_Values.push_back(vals);
             // Make space for Staci values
             vector<double> tmpvec(vals.size());
@@ -651,7 +652,7 @@ void Define_Pools() {
 void logfile_write(string msg, int debug_level) {
     if (global_debug_level >= debug_level) {
         ofstream logfile;
-        logfile.open(logfilename, ios::app);
+        logfile.open(logfilename.c_str(), ios::app);
         logfile << msg;
         logfile.close();
 

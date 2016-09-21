@@ -34,15 +34,15 @@ endif
 
 -include ../makefile.defs
 
-include /Users/hoscsaba/Utils/SuiteSparse/SuiteSparse_config/SuiteSparse_config.mk
+#include /Users/hoscsaba/Utils/SuiteSparse/SuiteSparse_config/SuiteSparse_config.mk
 
-LDFLAGS:   -L/usr/local/lib -L/Users/hoscsaba/Utils/SuiteSparse/UMFPACK/Lib	
-CPPFLAGS:  -I/usr/local/include
+LDFLAGS:   -L/usr/local/lib -L/usr/lib	
+CPPFLAGS:  -I/usr/local/include 
 LIBS = $(LAPACK) $(BLAS) $(XERBLA) $(LIB) $(LIB_WITH_CHOLMOD) $(LIB_WITH_PARTITION) $(CUBLAS_LIB) $(CUDART_LIB)
-UMFPACK = /Users/hoscsaba/Utils/SuiteSparse/UMFPACK/Lib/libumfpack.a /Users/hoscsaba/Utils/SuiteSparse/AMD/Lib/libamd.a \
+#UMFPACK = /Users/hoscsaba/Utils/SuiteSparse/UMFPACK/Lib/libumfpack.a /Users/hoscsaba/Utils/SuiteSparse/AMD/Lib/libamd.a \
     /Users/hoscsaba/Utils/SuiteSparse/SuiteSparse_config/libsuitesparseconfig.a 
 
-INC:-I/Users/hoscsaba/Utils/SuiteSparse/UMFPACK/Include -I/Users/hoscsaba/Utils/SuiteSparse/AMD/Include -I/Users/hoscsaba/Utils/SuiteSparse/SuiteSparse_config
+#INC:-I/Users/hoscsaba/Utils/SuiteSparse/UMFPACK/Include -I/Users/hoscsaba/Utils/SuiteSparse/AMD/Include -I/Users/hoscsaba/Utils/SuiteSparse/SuiteSparse_config
 
 # Add inputs and outputs from these tool invocations to the build variables 
 
@@ -52,19 +52,11 @@ all: staci_calibrate
 staci_calibrate: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C++ Linker'
-	g++ -I/Users/hoscsaba/Utils/SuiteSparse/UMFPACK/Include\
-	    -I/Users/hoscsaba/Utils/SuiteSparse/AMD/Include\
-	    -I/Users/hoscsaba/Utils/SuiteSparse/SuiteSparse_config\
-	    -o "staci_calibrate" $(OBJS) $(USER_OBJS) $(LIBS) $(UMFPACK)\
-	    /Users/hoscsaba/Utils/SuiteSparse/UMFPACK/Lib/libumfpack.a\
-		/Users/hoscsaba/Utils/SuiteSparse/AMD/Lib/libamd.a\
-		/Users/hoscsaba/Utils/SuiteSparse/SuiteSparse_config/libsuitesparseconfig.a\
-		/Users/hoscsaba/Utils/SuiteSparse/CHOLMOD/Lib/libcholmod.a\
-		/Users/hoscsaba/Utils/SuiteSparse/COLAMD/Lib/libcolamd.a\
-	    -L/usr/local/lib\
-	    -L/Users/hoscsaba/Utils/SuiteSparse/UMFPACK/Lib\
-	    $(LDFLAGS)\
-	    -lga -lm 
+	g++ -o "staci_calibrate" $(OBJS) $(USER_OBJS) $(LIBS)\
+        /usr/lib/x86_64-linux-gnu/libumfpack.a\	    
+	-L/usr/local/lib\
+	$(LDFLAGS)\
+	-lga -lm 
 	@echo 'Finished building target: $@'
 	@echo ' '
 
