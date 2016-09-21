@@ -710,8 +710,8 @@ void Load_Settings() {
     Num_of_Periods = atoi(xMainNode.getChildNode("Num_of_Periods").getText());
     popsize = atoi(xMainNode.getChildNode("popsize").getText());
     ngen = atoi(xMainNode.getChildNode("ngen").getText());
-    pmut = stod(xMainNode.getChildNode("pmut").getText());
-    pcross = stod(xMainNode.getChildNode("pcross").getText());
+    pmut = atof(xMainNode.getChildNode("pmut").getText());
+    pcross = atof(xMainNode.getChildNode("pcross").getText());
 
 /*global_debug_level = 1;
     Staci_debug_level = 0;

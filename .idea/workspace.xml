@@ -13,8 +13,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f72ed067-d179-4092-9461-72fee8098102" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.o" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.o" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/staci_calibrate.cpp" afterPath="$PROJECT_DIR$/staci_calibrate.cpp" />
     </list>
@@ -39,8 +37,8 @@
       <file leaf-file-name="staci_calibrate.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/staci_calibrate.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="498">
-              <caret line="727" column="0" selection-start-line="727" selection-start-column="0" selection-end-line="727" selection-end-column="0" />
+            <state relative-caret-position="288">
+              <caret line="713" column="17" selection-start-line="713" selection-start-column="17" selection-end-line="713" selection-end-column="17" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -351,7 +349,7 @@
       <updated>1460474776714</updated>
       <workItem from="1474022625978" duration="11012000" />
       <workItem from="1474290495231" duration="51104000" />
-      <workItem from="1474491760913" duration="101000" />
+      <workItem from="1474491760913" duration="505000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed issue with residential time computation.">
       <created>1460530738994</created>
@@ -364,7 +362,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="62217000" />
+    <option name="totallyTimeSpent" value="62621000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -785,6 +783,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
           <caret line="228" column="11" selection-start-line="228" selection-start-column="4" selection-end-line="228" selection-end-column="11" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -797,8 +796,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/staci_calibrate.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="498">
-          <caret line="727" column="0" selection-start-line="727" selection-start-column="0" selection-end-line="727" selection-end-column="0" />
+        <state relative-caret-position="288">
+          <caret line="713" column="17" selection-start-line="713" selection-start-column="17" selection-end-line="713" selection-end-column="17" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>
