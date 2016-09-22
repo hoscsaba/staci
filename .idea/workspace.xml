@@ -13,11 +13,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f72ed067-d179-4092-9461-72fee8098102" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Staci.o" afterPath="$PROJECT_DIR$/Staci@Mac/Staci.o" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.o" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.o" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci.cpp" afterPath="$PROJECT_DIR$/Staci.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/bog.dat" afterPath="$PROJECT_DIR$/Staci@Mac/bog.dat" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_1.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_1.spr.ros" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_2.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_2.spr.ros" />
@@ -25,6 +23,8 @@
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_4.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_4.spr.ros" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_5.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_5.spr.ros" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.log" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.log" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Wylie/makefile_calibrate.mk" afterPath="$PROJECT_DIR$/Staci@Wylie/makefile_calibrate.mk" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/staci_calibrate.cpp" afterPath="$PROJECT_DIR$/staci_calibrate.cpp" />
     </list>
     <ignored path="staci.iws" />
@@ -48,8 +48,8 @@
       <file leaf-file-name="staci_calibrate.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/staci_calibrate.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="451">
-              <caret line="232" column="26" selection-start-line="232" selection-start-column="26" selection-end-line="232" selection-end-column="26" />
+            <state relative-caret-position="181">
+              <caret line="221" column="0" selection-start-line="221" selection-start-column="0" selection-end-line="221" selection-end-column="0" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -57,23 +57,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Staci.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Staci.cpp">
+      <file leaf-file-name="staci_calibrate_settings.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="124">
-              <caret line="1491" column="40" selection-start-line="1491" selection-start-column="40" selection-end-line="1491" selection-end-column="40" />
-              <folding>
-                <element signature="e#0#19#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Staci.h" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Staci.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="166">
-              <caret line="119" column="25" selection-start-line="119" selection-start-column="25" selection-end-line="119" selection-end-column="25" />
+            <state relative-caret-position="45">
+              <caret line="3" column="16" selection-start-line="3" selection-start-column="16" selection-end-line="3" selection-end-column="16" />
               <folding />
             </state>
           </provider>
@@ -109,6 +97,7 @@
         <option value="$PROJECT_DIR$/Staci@Wylie/makefile_calibrate.mk" />
         <option value="$PROJECT_DIR$/Staci.cpp" />
         <option value="$PROJECT_DIR$/staci_calibrate.cpp" />
+        <option value="$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml" />
       </list>
     </option>
   </component>
@@ -150,7 +139,38 @@
     </navigator>
     <panes>
       <pane id="ProjectPane">
-        <subPane />
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="staci" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="staci" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="staci" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="staci" />
+              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="staci" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Staci@Mac" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
       </pane>
     </panes>
   </component>
@@ -361,6 +381,7 @@
       <workItem from="1474496273008" duration="10000" />
       <workItem from="1474545257433" duration="78000" />
       <workItem from="1474546057611" duration="3025000" />
+      <workItem from="1474558446705" duration="5752000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed issue with residential time computation.">
       <created>1460530738994</created>
@@ -373,7 +394,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="66249000" />
+    <option name="totallyTimeSpent" value="72001000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -385,7 +406,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1680" height="978" extended-state="6" />
+    <frame x="0" y="23" width="1680" height="978" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24231465" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -394,7 +415,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40519187" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31344184" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21699819" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -437,20 +458,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Csatorna.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1590">
-          <caret line="106" column="23" selection-start-line="106" selection-start-column="23" selection-end-line="106" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Staci.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="24" selection-start-line="9" selection-start-column="24" selection-end-line="9" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/data_io.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="285">
@@ -750,7 +757,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="405">
           <caret line="38" column="40" selection-start-line="38" selection-start-column="40" selection-end-line="38" selection-end-column="40" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -758,7 +764,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="630">
           <caret line="42" column="0" selection-start-line="42" selection-start-column="0" selection-end-line="42" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -766,13 +771,12 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="828">
           <caret line="66" column="0" selection-start-line="66" selection-start-column="0" selection-end-line="66" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Staci.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="166">
+        <state relative-caret-position="1785">
           <caret line="119" column="25" selection-start-line="119" selection-start-column="25" selection-end-line="119" selection-end-column="25" />
           <folding />
         </state>
@@ -780,7 +784,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Staci.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="124">
+        <state relative-caret-position="22365">
           <caret line="1491" column="40" selection-start-line="1491" selection-start-column="40" selection-end-line="1491" selection-end-column="40" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
@@ -788,10 +792,26 @@
         </state>
       </provider>
     </entry>
+    <entry file="file:///usr/local/include/ga/GAGenome.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="237" column="12" selection-start-line="237" selection-start-column="12" selection-end-line="237" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="16" selection-start-line="3" selection-start-column="16" selection-end-line="3" selection-end-column="16" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/staci_calibrate.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="451">
-          <caret line="232" column="26" selection-start-line="232" selection-start-column="26" selection-end-line="232" selection-end-column="26" />
+        <state relative-caret-position="181">
+          <caret line="221" column="0" selection-start-line="221" selection-start-column="0" selection-end-line="221" selection-end-column="0" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

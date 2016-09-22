@@ -8,7 +8,7 @@
 	<FVM_dfile> FV_input_2012_11_06_barlang_nelkul.csv</FVM_dfile>
 	<Num_of_Periods> 5</Num_of_Periods>
 	<popsize> 50</popsize>
-	<ngen> 100</ngen>
+	<ngen> 10</ngen>
 	<pmut> 0.01</pmut>
 	<pcross> 0.6</pcross>
 </settings>

@@ -31,29 +31,29 @@ void Update_Reservoirs(unsigned int);
 void logfile_write(string msg, int debug_level);
 
 int Num_of_Periods;
-vector<string> pipe_names;
+vector <string> pipe_names;
 vector<Staci *> wds;
 
-vector<string> FVM_Pressure_StaciID;
+vector <string> FVM_Pressure_StaciID;
 vector<int> FVM_Pressure_Staci_Idx;
-vector<string> FVM_Pressure_Info;
-vector<vector<double> > FVM_Pressure_Values;
-vector<vector<double> > Staci_Pressure_Values;
+vector <string> FVM_Pressure_Info;
+vector < vector<double> > FVM_Pressure_Values;
+vector < vector<double> > Staci_Pressure_Values;
 
-vector<string> FVM_Pool_StaciID;
+vector <string> FVM_Pool_StaciID;
 vector<int> FVM_Pool_Staci_Idx;
-vector<string> FVM_Pool_Info;
-vector<vector<double> > FVM_Pool_tmp_Values;
-vector<vector<double> > FVM_Pool_Values;
-vector<vector<double> > Staci_Pool_Values;
+vector <string> FVM_Pool_Info;
+vector <vector<double> > FVM_Pool_tmp_Values;
+vector <vector<double> > FVM_Pool_Values;
+vector <vector<double> > Staci_Pool_Values;
 
-vector<string> FVM_Pool_IDs;
-vector<string> FVM_Pool_Names;
+vector <string> FVM_Pool_IDs;
+vector <string> FVM_Pool_Names;
 vector<int> FVM_Pool_Name_Idx; // this staci element refers to the actual FVM Pool
 
 vector<double> PoolSurfs;
 
-vector<string> pipe_name;
+vector <string> pipe_name;
 vector<bool> pipe_is_active;
 unsigned int num_of_active_pipes;
 
@@ -78,6 +78,8 @@ std::vector<std::string> csv_read_row(std::string &in, char delimiter);
 int Obj_Eval;
 
 string Load_Settings();
+
+void PrintBestDataFile();
 
 bool last_computation_OK;
 int popsize;
@@ -165,7 +167,7 @@ int main(int argc, char **argv) {
             msg << endl << "\t" << pipe_name.at(i) << " D=" << dia << ", LB=" << LOWER_BOUND << ", UB=" << UPPER_BOUND;
         }
     }
-    msg<<endl;
+    msg << endl;
     logfile_write(msg.str(), 1);
 
     // Create the template genome using the phenotype map we just made.
@@ -177,30 +179,44 @@ int main(int argc, char **argv) {
 
     GASimpleGA ga(genome);
     GASigmaTruncationScaling scaling;
+    ga.minimize();
     ga.populationSize(popsize);
     ga.nGenerations(ngen);
     ga.pMutation(pmut);
     ga.pCrossover(pcross);
     ga.scaling(scaling);
-    ga.scoreFilename("bog.dat");
+
     ga.scoreFrequency(10);
     ga.flushFrequency(10);
+    ga.scoreFilename("bog.dat");
     ga.evolve(seed);
 
-
-    // Dump the results of the GA to the screen.
-    /*genome = ga.statistics().bestIndividual();
-    cout << "Solution found by the GA:";
-    for (unsigned int i = 0; i < pipe_name.size(); i++) {
-        printf("\n %10s: %5.3f (=? %5.3f, origD: %5.3f)", pipe_name.at(i).c_str(),
-               feladat->get_dprop(pipe_name.at(i), "diameter"), genome.phenotype(i), origD.at(i));
-    }
-    cout << "best of generation data are in '" << ga.scoreFilename() << "'\n";*/
-
+    ga.statistics().write("bog_stats.dat");
+    genome = ga.statistics().bestIndividual();
+    Objective(genome);
+    PrintBestDataFile();
 
     return 0;
 }
 
+void PrintBestDataFile() {
+    ofstream resfile;
+    resfile.open("best.dat", ios::out);
+    resfile << scientific << setprecision(5);
+    for (unsigned int i = 0; i < FVM_Pool_Names.size(); i++)
+        resfile << "FVM " << FVM_Pool_Names.at(i) << " ; " << FVM_Pool_Names.at(i) << " ; ";
+    for (unsigned int i = 0; i < FVM_Pressure_StaciID.size(); i++)
+        resfile << "FVM " << FVM_Pressure_StaciID.at(i) << " ; " << FVM_Pressure_StaciID.at(i) << " ; ";
+
+    for (unsigned int j = 0; j < Num_of_Periods; j++) {
+        resfile << endl;
+        for (unsigned int i = 0; i < FVM_Pool_Names.size(); i++)
+            resfile << FVM_Pool_Values.at(i).at(j) << " ; " << Staci_Pool_Values.at(i).at(j) << " ; ";
+        for (unsigned int i = 0; i < FVM_Pressure_StaciID.size(); i++)
+            resfile << FVM_Pressure_Values.at(i).at(j) << " ; " << Staci_Pressure_Values.at(i).at(j) << " ; ";
+    }
+    resfile.close();
+}
 
 float
 Objective(GAGenome &x) {
@@ -230,10 +246,10 @@ Objective(GAGenome &x) {
     double err;
     if (last_computation_OK) {
         err = Compute_Error();
-        if ((Obj_Eval % 100)==0) {
+        if ((Obj_Eval % 100) == 0) {
             stringstream str;
             str.str("");
-            str << "\n Objective evaluation #" << Obj_Eval<< "\tError: " << err;
+            str << "\n Objective evaluation #" << Obj_Eval << "\tError: " << err;
             logfile_write(str.str(), 1);
         }
     } else {
@@ -246,7 +262,7 @@ Objective(GAGenome &x) {
 
     Obj_Eval++;
 
-    return (1.e6-err);
+    return err;
 }
 
 
@@ -392,7 +408,7 @@ void Update_Reservoirs(unsigned int i) {
 
 void Load_FVM_Datafiles() {
     stringstream tmp, msg;
-    vector<vector<string> > lines;
+    vector <vector<string> > lines;
 
     // POOL DATA FILE
     tmp.str("");
@@ -654,15 +670,15 @@ void logfile_write(string msg, int debug_level) {
     }
 }
 
-std::vector<std::string> csv_read_row(std::string &line, char delimiter) {
-    std::stringstream ss(line);
+vector<string> csv_read_row(string &line, char delimiter) {
+    stringstream ss(line);
     return csv_read_row(ss, delimiter);
 }
 
-std::vector<std::string> csv_read_row(std::istream &in, char delimiter) {
-    std::stringstream ss;
+vector<string> csv_read_row(istream &in, char delimiter) {
+    stringstream ss;
     bool inquotes = false;
-    std::vector<std::string> row;//relying on RVO
+    vector<string> row;//relying on RVO
     while (in.good()) {
         char c = in.get();
         if (!inquotes && c == '"') //beginquotechar
@@ -710,18 +726,18 @@ string Load_Settings() {
 
     stringstream msg;
     msg.str("");
-    msg << "Settings:"<<endl;
-    msg << "\t global_debug_level   : " << global_debug_level<<endl;
-    msg << "\t Staci_debug_level    : " << Staci_debug_level<<endl<<endl;
-    msg << "\t dir_name             : " << dir_name<<endl;
-    msg << "\t fname_prefix         : " << fname_prefix<<endl;
-    msg << "\t logfilename          : " << logfilename<<endl;
-    msg << "\t Eredmenyek_FVM_dfile : " << FVM_dfile<<endl;
-    msg << "\t Num_of_Periods       : " << Num_of_Periods<<endl<<endl;
-    msg << "\t popsize : " << popsize<<endl;
-    msg << "\t ngen    : " << ngen<<endl;
-    msg << "\t pmut    : " << pmut<<endl;
-    msg << "\t pcross  : " << pcross << endl<<endl;
+    msg << "Settings:" << endl;
+    msg << "\t global_debug_level   : " << global_debug_level << endl;
+    msg << "\t Staci_debug_level    : " << Staci_debug_level << endl << endl;
+    msg << "\t dir_name             : " << dir_name << endl;
+    msg << "\t fname_prefix         : " << fname_prefix << endl;
+    msg << "\t logfilename          : " << logfilename << endl;
+    msg << "\t Eredmenyek_FVM_dfile : " << FVM_dfile << endl;
+    msg << "\t Num_of_Periods       : " << Num_of_Periods << endl << endl;
+    msg << "\t popsize : " << popsize << endl;
+    msg << "\t ngen    : " << ngen << endl;
+    msg << "\t pmut    : " << pmut << endl;
+    msg << "\t pcross  : " << pcross << endl << endl;
 
     return msg.str();
 }

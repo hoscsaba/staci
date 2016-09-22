@@ -4,12 +4,13 @@
 
 -include subdir_calibrate.mk
 
-LDFLAGS:   -L/usr/local/lib -L/usr/lib	
+LDFLAGS:   -L/usr/local/lib -L/usr/lib
+GA_LIB_DIRS = -L/home/cshos/GA/ga
 
 all: staci_calibrate
 
 staci_calibrate: $(OBJS) $(USER_OBJS)
-	g++ -o staci_calibrate $(OBJS) $(USER_OBJS) -lga -lm -lumfpack
+	g++ -o staci_calibrate $(OBJS) $(USER_OBJS) $(GA_LIBDIRS) -lga -lm -lumfpack
 
 clean:
 	-rm $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) staci_calibrate
