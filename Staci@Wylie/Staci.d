@@ -1,7 +1,8 @@
 Staci.d: ../Staci.cpp ../Staci.h ../AnyOption.h ../Csomopont.h \
  ../Agelem.h ../nr.h ../nrutil.h ../nrutil_nr.h ../nrtypes.h \
  ../nrtypes_nr.h ../StaciException.h ../data_io.h ../xmlParser.h \
- /usr/include/suitesparse/umfpack.h /usr/include/suitesparse/UFconfig.h \
+ /usr/include/suitesparse/umfpack.h \
+ /usr/include/suitesparse/SuiteSparse_config.h \
  /usr/include/suitesparse/umfpack_symbolic.h \
  /usr/include/suitesparse/umfpack_numeric.h \
  /usr/include/suitesparse/umfpack_solve.h \
@@ -61,7 +62,7 @@ Staci.d: ../Staci.cpp ../Staci.h ../AnyOption.h ../Csomopont.h \
 
 /usr/include/suitesparse/umfpack.h:
 
-/usr/include/suitesparse/UFconfig.h:
+/usr/include/suitesparse/SuiteSparse_config.h:
 
 /usr/include/suitesparse/umfpack_symbolic.h:
 
