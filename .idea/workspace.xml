@@ -13,18 +13,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f72ed067-d179-4092-9461-72fee8098102" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.o" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.o" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/bog.dat" afterPath="$PROJECT_DIR$/Staci@Mac/bog.dat" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_1.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_1.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_2.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_2.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_3.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_3.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_4.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_4.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_5.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_5.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.log" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.log" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Wylie/makefile_calibrate.mk" afterPath="$PROJECT_DIR$/Staci@Wylie/makefile_calibrate.mk" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/staci_calibrate.cpp" afterPath="$PROJECT_DIR$/staci_calibrate.cpp" />
     </list>
     <ignored path="staci.iws" />
@@ -48,8 +37,8 @@
       <file leaf-file-name="staci_calibrate.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/staci_calibrate.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="181">
-              <caret line="221" column="0" selection-start-line="221" selection-start-column="0" selection-end-line="221" selection-end-column="0" />
+            <state relative-caret-position="678">
+              <caret line="738" column="47" selection-start-line="738" selection-start-column="47" selection-end-line="738" selection-end-column="47" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -96,8 +85,8 @@
         <option value="$PROJECT_DIR$/Staci@Wylie/makefile_calibrate" />
         <option value="$PROJECT_DIR$/Staci@Wylie/makefile_calibrate.mk" />
         <option value="$PROJECT_DIR$/Staci.cpp" />
-        <option value="$PROJECT_DIR$/staci_calibrate.cpp" />
         <option value="$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml" />
+        <option value="$PROJECT_DIR$/staci_calibrate.cpp" />
       </list>
     </option>
   </component>
@@ -139,38 +128,7 @@
     </navigator>
     <panes>
       <pane id="ProjectPane">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="staci" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="staci" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="staci" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="staci" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="staci" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Staci@Mac" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
+        <subPane />
       </pane>
     </panes>
   </component>
@@ -381,7 +339,8 @@
       <workItem from="1474496273008" duration="10000" />
       <workItem from="1474545257433" duration="78000" />
       <workItem from="1474546057611" duration="3025000" />
-      <workItem from="1474558446705" duration="5752000" />
+      <workItem from="1474558446705" duration="5987000" />
+      <workItem from="1474579852113" duration="140000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed issue with residential time computation.">
       <created>1460530738994</created>
@@ -394,7 +353,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="72001000" />
+    <option name="totallyTimeSpent" value="72376000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -406,14 +365,13 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1680" height="978" extended-state="0" />
+    <frame x="0" y="23" width="1680" height="978" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24231465" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40519187" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21699819" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -425,6 +383,7 @@
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.40519187" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
@@ -796,7 +755,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="286">
           <caret line="237" column="12" selection-start-line="237" selection-start-column="12" selection-end-line="237" selection-end-column="12" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -810,8 +768,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/staci_calibrate.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="181">
-          <caret line="221" column="0" selection-start-line="221" selection-start-column="0" selection-end-line="221" selection-end-column="0" />
+        <state relative-caret-position="678">
+          <caret line="738" column="47" selection-start-line="738" selection-start-column="47" selection-end-line="738" selection-end-column="47" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
           </folding>

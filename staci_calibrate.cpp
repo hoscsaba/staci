@@ -58,6 +58,7 @@ vector<bool> pipe_is_active;
 unsigned int num_of_active_pipes;
 
 void Set_Up_Active_Pipes();
+double Dmin;
 
 int Find_Pressure_Index(string PressureName);
 
@@ -272,7 +273,7 @@ void Set_Up_Active_Pipes() {
     for (unsigned int i = 0; i < wds.at(0)->agelemek.size(); i++)
         if (strcmp(wds.at(0)->agelemek.at(i)->Get_Tipus().c_str(), "Cso") == 0) {
             pipe_name.push_back(wds.at(0)->agelemek.at(i)->Get_nev());
-            if (wds.at(0)->agelemek.at(i)->Get_dprop("diameter") > 0.) {
+            if (wds.at(0)->agelemek.at(i)->Get_dprop("diameter") > Dmin) {
                 pipe_is_active.push_back(true);
                 num_of_active_pipes++;
             } else
@@ -719,6 +720,7 @@ string Load_Settings() {
     Eredmenyek_FVM_dfile = xMainNode.getChildNode("Eredmenyek_FVM_dfile").getText();
     FVM_dfile = xMainNode.getChildNode("FVM_dfile").getText();
     Num_of_Periods = atoi(xMainNode.getChildNode("Num_of_Periods").getText());
+    Dmin = atof(xMainNode.getChildNode("Dmin").getText());
     popsize = atoi(xMainNode.getChildNode("popsize").getText());
     ngen = atoi(xMainNode.getChildNode("ngen").getText());
     pmut = atof(xMainNode.getChildNode("pmut").getText());
@@ -733,7 +735,8 @@ string Load_Settings() {
     msg << "\t fname_prefix         : " << fname_prefix << endl;
     msg << "\t logfilename          : " << logfilename << endl;
     msg << "\t Eredmenyek_FVM_dfile : " << FVM_dfile << endl;
-    msg << "\t Num_of_Periods       : " << Num_of_Periods << endl << endl;
+    msg << "\t Num_of_Periods       : " << Num_of_Periods << endl;
+    msg << "\t Dmin                 : " << Dmin << endl << endl;
     msg << "\t popsize : " << popsize << endl;
     msg << "\t ngen    : " << ngen << endl;
     msg << "\t pmut    : " << pmut << endl;
