@@ -14,9 +14,9 @@
 //#include "time.h"
 
 // Wiley:
-// #include "/usr/include/suitesparse/umfpack.h"
+#include "/usr/include/suitesparse/umfpack.h"
 // Mac:
-#include "/usr/local/include/umfpack.h"
+// #include "/usr/local/include/umfpack.h"
 
 // TODO: Clear up debug level behaviour in the doc!
 // TODO: log file cleanup!
