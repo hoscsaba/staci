@@ -1049,7 +1049,7 @@ bool Staci::solve_system() {
 
     // Iteracio!!!
     bool comp_ok = true;
-
+    //cout<<endl<<"debug_level:"<<debug_level<<endl; cin.get();
     while ((iter < iter_max + 1) && (!konv_ok)) {
         if (debug_level > 0)
             progress_file_write((double) iter / iter_max * 100.0);
@@ -1162,6 +1162,7 @@ bool Staci::solve_system_old() {
 
     // Iteracio!!!
     while ((iter < iter_max) && (!konv_ok)) {
+        cout<<endl<<"debug_level:"<<debug_level<<endl; cin.get();
         if (debug_level > 0)
             progress_file_write((double) iter / iter_max * 100.0);
 
