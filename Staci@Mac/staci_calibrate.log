@@ -1,66 +1,819 @@
-Building WDS systems....
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_1.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_2.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_3.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_4.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_5.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_6.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_7.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_8.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_9.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_10.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_11.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_12.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_13.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_14.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_15.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_16.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_17.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_18.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_19.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_20.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_21.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_22.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_23.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_24.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_25.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_26.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_27.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_28.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_29.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_30.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_31.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_32.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_33.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_34.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_35.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_36.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_37.spr
-	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_38.sprSettings:
-	 global_debug_level:	1
-	 Staci_debug_level	0
-	 dir_name	data/foviz_halozat/2012_11_06/
-	 fname_prefix	FV_input_2012_11_06_barlang_nelkul_
-	 logfilename	staci_calibrate.log
-	 Eredmenyek_FVM_dfile	FV_input_2012_11_06_barlang_nelkul.csv
-	 Num_of_Periods	5
-	 popsize	50
-	 ngen	100
-	 pmut	0.01
-	 pcross	0.6
-
 Settings:
 	 global_debug_level   : 1
 	 Staci_debug_level    : 0
 
 	 dir_name             : data/foviz_halozat/2012_11_06/
 	 fname_prefix         : FV_input_2012_11_06_barlang_nelkul_
-	 logfilename          :staci_calibrate.log
+	 logfilename          : staci_calibrate.log
 	 Eredmenyek_FVM_dfile : FV_input_2012_11_06_barlang_nelkul.csv
-	 Num_of_Periods       :5
+	 Num_of_Periods       : 5
 
 	 popsize : 50
 	 ngen    : 100
 	 pmut    : 0.01
 	 pcross  : 0.6
 
+Building WDS systems....
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_1.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_2.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_3.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_4.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_5.spr
+
+Reading datafile data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul.csv ...
+ #med_cinkota, number of data: 48, info: K_EP_CINK_MED_01KAM_HS_M-AVGHALF, Vizszint (m)
+ #med_gilice, number of data: 48, info: K_DP_GILI_UMED_KAM_HS_M-AVGHALF, Vizszint (m)
+ #med_kob_regi, number of data: 48, info: K_DP_KOBA_RMED_01KAM_HS_M-AVGHALF, Vizszint (m)
+ #med_kob_uj, number of data: 48, info: K_DP_KOBA_UMED_02KAM_HS_M-AVGHALF, Vizszint (m)
+ #med_krisztina, number of data: 48, info: K_KB_KRIS_UMED_01KAM_HS_M-AVGHALF, Vizszint (m)
+ #med_rakossz, number of data: 48, info: K_EP_RSZM_MED_KAM_HS_M-AVGHALF, Vizszint (m)
+ #med_sanc, number of data: 48, info: K_KB_SANC_MED_02KAM_HS_M-AVGHALF, Vizszint (m)
+
+Reading datafile data/foviz_halozat/2012_11_06/Eredmenyek_FV_input_2012_11_06_barlang_nelkul.csv ...
+ A_CSEPEL_BF, number of data: 48, info: Csepel g�ph�z , Sz�m. �tlagos nyom�s
+ A_BEKAS_PUM, number of data: 48, info: Bmegyer II.gh.(alapz�na) , Nyom�s                                 
+ A_KM4_Q1600, number of data: 48, info: Nagynyom�s� gh. , �lagos nyom�s
+ A_KPM1-3, number of data: 48, info: Kmegyer I.g�ph�z , H�l�zati nyom�s
+ A_BUDAORSI_UT, number of data: 48, info: DB Buda�rsi �t (24) g�ph�z , Sziv�oldali nyom�s
+ A_ARPAD_UT, number of data: 48, info: DP �p�d �t (37) g�ph�z , Sziv�oldali nyom�s
+ A_GILICE_UJ_GH, number of data: 48, info: DP Gilice t�r (31) , Alapz�na nyom�s                        
+ K_GILICE_UJ_KEPE_GH, number of data: 48, info: DP Gilice t�r (31) � KEPE g�ph�z , Nyom�oldali nyom�s
+ A_KOB_TOV, number of data: 48, info: DP K��nya (29) g�ph�z , Alapz�na 1 nyom�s
+ K_KOBANYA_GH, number of data: 48, info: DP K��nya (29) g�ph�z , Nyom�oldali nyom�s
+ A_FELSOJH_GH, number of data: 48, info: �B Buda�jlak (13-75) , Alapz�na nyom�s
+ A_Z20-RADNOTI, number of data: 48, info: �B Margitsziget (74) Radn�ti , Nyom�oldali nyom�s
+ K_CINKOTA_MED, number of data: 48, info: �P Cinkotai �t (28) Medence 1. kamra , V�zszint
+ K_FERIHEGYI_RH_GH, number of data: 48, info: �P Ferihegyi �t(26) Rcsaba gh. , Sziv�oldali nyom�s
+ K_MATYASFOLDI_GH, number of data: 48, info: �P M�ty�sf�ld (25) g�ph�z , Sziv�oldali nyom�s
+ A_1, number of data: 48, info: �P R�kosszentmih�ly (27) gh. , Alapz�na nyom�s
+ K_RSZM_GH, number of data: 48, info: �P R�kosszentmih�ly (27) gh. , Nyom�oldali nyom�s
+ A_UTEG_GH, number of data: 48, info: �P �teg u.(8) G�ph�z , Sziv�oldali nyom�s
+ A_BARLANG_HNY, number of data: 48, info: KB Gell�rt (1) Kelenhegyi gh. , Nyom�s
+ A_NODE265, number of data: 48, info: KB Krisztina (79_85) , Nagyenyed NA800 nyom�s
+
+ Setting up pools...
+	 Pool name: #med_cinkota, 	ID: POOL288, i.e. agelemek.at(233) aka POOL288 -> H0 = 2.62299
+	 Pool name: #med_gilice, 	ID: POOL315, i.e. agelemek.at(241) aka POOL315 -> H0 = 2.11036
+	 Pool name: #med_kob_regi, 	ID: POOL327, i.e. agelemek.at(245) aka POOL327 -> H0 = 5.08908
+	 Pool name: #med_kob_uj, 	ID: POOL324, i.e. agelemek.at(244) aka POOL324 -> H0 = 3.15535
+	 Pool name: #med_krisztina, 	ID: POOL276, i.e. agelemek.at(232) aka POOL276 -> H0 = 2.13795
+	 Pool name: #med_rakossz, 	ID: POOL303, i.e. agelemek.at(237) aka POOL303 -> H0 = 4.99259
+	 Pool name: #med_sanc, 	ID: POOL336, i.e. agelemek.at(246) aka POOL336 -> H0 = 2.70876
+
+Evaluating initial state:
+
+Starting optimization.
+ Active pipes (number: 238):
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 40 41 42 44 47 48 49 50 57 58 60 61 62 63 64 65 66 69 72 74 75 76 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 145 146 147 148 149 150 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 189 191 192 193 194 195 196 197 198 199 200 201 202 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 223 224 225 226 227 228 229 230 231 233 234 235 241 242 243 244 246 248 249 250 251 252 253 254 255 256 257 258 259 260 263 264 PIPE538 PIPE541 PIPE548 PIPE591 PIPE689 PIPE693 PIPE697 PIPE702 PIPE705 
+
+Setting up LOWER_BOUND, UPPER_BOUND:
+	1 D=0.5, LB=0.25, UB=1
+	2 D=0.4, LB=0.2, UB=0.8
+	3 D=0.5, LB=0.25, UB=1
+	4 D=1, LB=0.5, UB=2
+	5 D=0.8, LB=0.4, UB=1.6
+	6 D=0.5, LB=0.25, UB=1
+	7 D=0.4, LB=0.2, UB=0.8
+	8 D=0.5, LB=0.25, UB=1
+	9 D=0.4, LB=0.2, UB=0.8
+	10 D=0.707107, LB=0.353554, UB=1.41421
+	11 D=0.5, LB=0.25, UB=1
+	12 D=0.5, LB=0.25, UB=1
+	13 D=0.5, LB=0.25, UB=1
+	14 D=0.5, LB=0.25, UB=1
+	15 D=0.3, LB=0.15, UB=0.6
+	16 D=0.4, LB=0.2, UB=0.8
+	17 D=0.6, LB=0.3, UB=1.2
+	18 D=0.4, LB=0.2, UB=0.8
+	19 D=0.5, LB=0.25, UB=1
+	20 D=0.6, LB=0.3, UB=1.2
+	21 D=0.4, LB=0.2, UB=0.8
+	22 D=0.6, LB=0.3, UB=1.2
+	23 D=0.3, LB=0.15, UB=0.6
+	24 D=0.424264, LB=0.212132, UB=0.848528
+	25 D=1.11803, LB=0.559017, UB=2.23607
+	26 D=0.583095, LB=0.291548, UB=1.16619
+	27 D=0.67082, LB=0.33541, UB=1.34164
+	28 D=0.8, LB=0.4, UB=1.6
+	29 D=0.848528, LB=0.424264, UB=1.69706
+	30 D=0.6, LB=0.3, UB=1.2
+	31 D=1.20416, LB=0.602079, UB=2.40832
+	32 D=0.5, LB=0.25, UB=1
+	33 D=0.707107, LB=0.353554, UB=1.41421
+	34 D=0.8, LB=0.4, UB=1.6
+	35 D=0.824621, LB=0.412311, UB=1.64924
+	36 D=0.4, LB=0.2, UB=0.8
+	37 D=0.4, LB=0.2, UB=0.8
+	38 D=0.6, LB=0.3, UB=1.2
+	40 D=0.4, LB=0.2, UB=0.8
+	41 D=0.5, LB=0.25, UB=1
+	42 D=1, LB=0.5, UB=2
+	44 D=1, LB=0.5, UB=2
+	47 D=1.2, LB=0.6, UB=2.4
+	48 D=1.2, LB=0.6, UB=2.4
+	49 D=0.8, LB=0.4, UB=1.6
+	50 D=0.8, LB=0.4, UB=1.6
+	57 D=0.7, LB=0.35, UB=1.4
+	58 D=0.8, LB=0.4, UB=1.6
+	60 D=0.5, LB=0.25, UB=1
+	61 D=0.6, LB=0.3, UB=1.2
+	62 D=0.6, LB=0.3, UB=1.2
+	63 D=0.7, LB=0.35, UB=1.4
+	64 D=1, LB=0.5, UB=2
+	65 D=0.7, LB=0.35, UB=1.4
+	66 D=0.5, LB=0.25, UB=1
+	69 D=0.6, LB=0.3, UB=1.2
+	72 D=0.8, LB=0.4, UB=1.6
+	74 D=1.56205, LB=0.781025, UB=3.1241
+	75 D=1.4, LB=0.7, UB=2.8
+	76 D=1.4, LB=0.7, UB=2.8
+	78 D=1.13137, LB=0.565685, UB=2.26274
+	79 D=1, LB=0.5, UB=2
+	80 D=1.2, LB=0.6, UB=2.4
+	81 D=1.2, LB=0.6, UB=2.4
+	82 D=0.8, LB=0.4, UB=1.6
+	83 D=0.8, LB=0.4, UB=1.6
+	84 D=0.8, LB=0.4, UB=1.6
+	85 D=1.13137, LB=0.565685, UB=2.26274
+	86 D=0.8, LB=0.4, UB=1.6
+	87 D=0.8, LB=0.4, UB=1.6
+	88 D=0.8, LB=0.4, UB=1.6
+	89 D=1, LB=0.5, UB=2
+	90 D=0.8, LB=0.4, UB=1.6
+	91 D=0.8, LB=0.4, UB=1.6
+	92 D=0.8, LB=0.4, UB=1.6
+	93 D=0.8, LB=0.4, UB=1.6
+	94 D=1.41421, LB=0.707107, UB=2.82843
+	95 D=1.2, LB=0.6, UB=2.4
+	96 D=1, LB=0.5, UB=2
+	97 D=0.8, LB=0.4, UB=1.6
+	98 D=0.8, LB=0.4, UB=1.6
+	99 D=1.84391, LB=0.921955, UB=3.68782
+	100 D=1.2, LB=0.6, UB=2.4
+	101 D=1.2, LB=0.6, UB=2.4
+	102 D=0.6, LB=0.3, UB=1.2
+	103 D=0.8, LB=0.4, UB=1.6
+	104 D=1.16619, LB=0.583095, UB=2.33238
+	105 D=0.8, LB=0.4, UB=1.6
+	106 D=0.5, LB=0.25, UB=1
+	107 D=1.34164, LB=0.670821, UB=2.68328
+	108 D=1.4, LB=0.7, UB=2.8
+	109 D=1.4, LB=0.7, UB=2.8
+	110 D=1.6, LB=0.8, UB=3.2
+	111 D=0.6, LB=0.3, UB=1.2
+	112 D=1.2, LB=0.6, UB=2.4
+	113 D=1.69706, LB=0.848528, UB=3.39411
+	114 D=0.8, LB=0.4, UB=1.6
+	115 D=1.6, LB=0.8, UB=3.2
+	116 D=1.4, LB=0.7, UB=2.8
+	117 D=1.2, LB=0.6, UB=2.4
+	118 D=1.4, LB=0.7, UB=2.8
+	119 D=1.3, LB=0.65, UB=2.6
+	120 D=1, LB=0.5, UB=2
+	121 D=1.44222, LB=0.72111, UB=2.88444
+	122 D=0.8, LB=0.4, UB=1.6
+	123 D=1, LB=0.5, UB=2
+	124 D=1.2, LB=0.6, UB=2.4
+	125 D=0.6, LB=0.3, UB=1.2
+	126 D=0.5, LB=0.25, UB=1
+	127 D=1.2, LB=0.6, UB=2.4
+	128 D=1.6, LB=0.8, UB=3.2
+	129 D=0.5, LB=0.25, UB=1
+	130 D=1.05, LB=0.525, UB=2.1
+	131 D=1, LB=0.5, UB=2
+	132 D=0.6, LB=0.3, UB=1.2
+	133 D=0.8, LB=0.4, UB=1.6
+	134 D=0.781025, LB=0.390512, UB=1.56205
+	135 D=1.4, LB=0.7, UB=2.8
+	136 D=0.8, LB=0.4, UB=1.6
+	137 D=1, LB=0.5, UB=2
+	138 D=1.6, LB=0.8, UB=3.2
+	139 D=0.8, LB=0.4, UB=1.6
+	140 D=0.8, LB=0.4, UB=1.6
+	141 D=1, LB=0.5, UB=2
+	142 D=1.2, LB=0.6, UB=2.4
+	143 D=1.2, LB=0.6, UB=2.4
+	145 D=0.5, LB=0.25, UB=1
+	146 D=0.707107, LB=0.353554, UB=1.41421
+	147 D=1.87617, LB=0.938083, UB=3.75233
+	148 D=1.2, LB=0.6, UB=2.4
+	149 D=0.6, LB=0.3, UB=1.2
+	150 D=1.2, LB=0.6, UB=2.4
+	152 D=1, LB=0.5, UB=2
+	153 D=0.6, LB=0.3, UB=1.2
+	154 D=0.8, LB=0.4, UB=1.6
+	155 D=1.6, LB=0.8, UB=3.2
+	156 D=0.6, LB=0.3, UB=1.2
+	157 D=0.5, LB=0.25, UB=1
+	158 D=0.7, LB=0.35, UB=1.4
+	159 D=1.44222, LB=0.72111, UB=2.88444
+	160 D=0.8, LB=0.4, UB=1.6
+	161 D=0.8, LB=0.4, UB=1.6
+	162 D=0.8, LB=0.4, UB=1.6
+	163 D=1, LB=0.5, UB=2
+	164 D=1, LB=0.5, UB=2
+	165 D=1.2, LB=0.6, UB=2.4
+	166 D=1, LB=0.5, UB=2
+	168 D=0.6, LB=0.3, UB=1.2
+	169 D=0.8, LB=0.4, UB=1.6
+	170 D=1.2, LB=0.6, UB=2.4
+	171 D=1.2, LB=0.6, UB=2.4
+	172 D=0.7, LB=0.35, UB=1.4
+	173 D=0.707107, LB=0.353554, UB=1.41421
+	174 D=0.5, LB=0.25, UB=1
+	175 D=0.5, LB=0.25, UB=1
+	176 D=0.6, LB=0.3, UB=1.2
+	177 D=0.8, LB=0.4, UB=1.6
+	178 D=1, LB=0.5, UB=2
+	179 D=1.28062, LB=0.640312, UB=2.56125
+	180 D=1, LB=0.5, UB=2
+	181 D=0.5, LB=0.25, UB=1
+	182 D=1.58509, LB=0.792543, UB=3.17017
+	183 D=0.8, LB=0.4, UB=1.6
+	184 D=1, LB=0.5, UB=2
+	185 D=0.8, LB=0.4, UB=1.6
+	189 D=1.84391, LB=0.921955, UB=3.68782
+	191 D=0.848528, LB=0.424264, UB=1.69706
+	192 D=1, LB=0.5, UB=2
+	193 D=0.8, LB=0.4, UB=1.6
+	194 D=0.7, LB=0.35, UB=1.4
+	195 D=0.8, LB=0.4, UB=1.6
+	196 D=1.6, LB=0.8, UB=3.2
+	197 D=1, LB=0.5, UB=2
+	198 D=1.53623, LB=0.768115, UB=3.07246
+	199 D=1.2, LB=0.6, UB=2.4
+	200 D=0.8, LB=0.4, UB=1.6
+	201 D=0.55, LB=0.275, UB=1.1
+	202 D=0.8, LB=0.4, UB=1.6
+	204 D=1.6, LB=0.8, UB=3.2
+	205 D=1.6, LB=0.8, UB=3.2
+	206 D=1, LB=0.5, UB=2
+	207 D=0.8, LB=0.4, UB=1.6
+	208 D=1.13137, LB=0.565685, UB=2.26274
+	209 D=1.2, LB=0.6, UB=2.4
+	210 D=1.4, LB=0.7, UB=2.8
+	211 D=1.4, LB=0.7, UB=2.8
+	212 D=0.7, LB=0.35, UB=1.4
+	213 D=1, LB=0.5, UB=2
+	214 D=0.8, LB=0.4, UB=1.6
+	215 D=0.5, LB=0.25, UB=1
+	216 D=1, LB=0.5, UB=2
+	217 D=0.6, LB=0.3, UB=1.2
+	218 D=0.8, LB=0.4, UB=1.6
+	219 D=1.2, LB=0.6, UB=2.4
+	220 D=1.69706, LB=0.848528, UB=3.39411
+	221 D=0.8, LB=0.4, UB=1.6
+	222 D=0.8, LB=0.4, UB=1.6
+	223 D=1.2, LB=0.6, UB=2.4
+	224 D=0.8, LB=0.4, UB=1.6
+	225 D=1.6, LB=0.8, UB=3.2
+	226 D=1.6, LB=0.8, UB=3.2
+	227 D=1, LB=0.5, UB=2
+	228 D=1.4, LB=0.7, UB=2.8
+	229 D=0.8, LB=0.4, UB=1.6
+	230 D=1.2, LB=0.6, UB=2.4
+	231 D=0.8, LB=0.4, UB=1.6
+	233 D=0.8, LB=0.4, UB=1.6
+	234 D=0.6, LB=0.3, UB=1.2
+	235 D=1.2, LB=0.6, UB=2.4
+	241 D=1.4, LB=0.7, UB=2.8
+	242 D=1.4, LB=0.7, UB=2.8
+	243 D=1.6, LB=0.8, UB=3.2
+	244 D=1.2, LB=0.6, UB=2.4
+	246 D=0.8, LB=0.4, UB=1.6
+	248 D=1, LB=0.5, UB=2
+	249 D=1.2, LB=0.6, UB=2.4
+	250 D=1.6, LB=0.8, UB=3.2
+	251 D=0.8, LB=0.4, UB=1.6
+	252 D=0.8, LB=0.4, UB=1.6
+	253 D=1.6, LB=0.8, UB=3.2
+	254 D=0.8, LB=0.4, UB=1.6
+	255 D=0.6, LB=0.3, UB=1.2
+	256 D=0.8, LB=0.4, UB=1.6
+	257 D=0.8, LB=0.4, UB=1.6
+	258 D=1, LB=0.5, UB=2
+	259 D=1, LB=0.5, UB=2
+	260 D=2, LB=1, UB=4
+	263 D=0.8, LB=0.4, UB=1.6
+	264 D=0.8, LB=0.4, UB=1.6
+	PIPE538 D=1, LB=0.5, UB=2
+	PIPE541 D=1, LB=0.5, UB=2
+	PIPE548 D=1, LB=0.5, UB=2
+	PIPE591 D=1.4, LB=0.7, UB=2.8
+	PIPE689 D=1, LB=0.5, UB=2
+	PIPE693 D=0.2, LB=0.1, UB=0.4
+	PIPE697 D=0.56209, LB=0.281045, UB=1.12418
+	PIPE702 D=0.3, LB=0.15, UB=0.6
+	PIPE705 D=1, LB=0.5, UB=2
+
+ Objective evaluation #0	Error: 2713.04
+ Objective evaluation #10	Error: 2762.57
+ Objective evaluation #20	Error: 2838.91
+ Objective evaluation #30	Error: 2793.46
+ Objective evaluation #40	Error: 2746.89
+ Objective evaluation #50	Error: 2729.79
+ Objective evaluation #60	Error: 2760.52
+ Objective evaluation #70	Error: 2618.2
+ Objective evaluation #80	Error: 2865
+ Objective evaluation #90	Error: 2772.62
+ Objective evaluation #100	Error: 2852.08
+ Objective evaluation #110	Error: 2782.66
+ Objective evaluation #120	Error: 2704.88
+ Objective evaluation #130	Error: 2777.46
+ Objective evaluation #140	Error: 2679.43
+ Objective evaluation #150	Error: 2925.4
+ Objective evaluation #160	Error: 2804.72
+ Objective evaluation #170	Error: 2855
+ Objective evaluation #180	Error: 3020.58
+ Objective evaluation #190	Error: 2788.65
+ Objective evaluation #200	Error: 2875.76
+ Objective evaluation #210	Error: 2695.99
+ Objective evaluation #220	Error: 2792.56
+ Objective evaluation #230	Error: 2959.68
+ Objective evaluation #240	Error: 2796.45
+ Objective evaluation #250	Error: 2922.35
+ Objective evaluation #260	Error: 2723.41
+ Objective evaluation #270	Error: 2850.48
+ Objective evaluation #280	Error: 2887.12
+ Objective evaluation #290	Error: 2825.26
+ Objective evaluation #300	Error: 2942.36
+ Objective evaluation #310	Error: 2993.27
+ Objective evaluation #320	Error: 2821.49
+ Objective evaluation #330	Error: 2892.05
+ Objective evaluation #340	Error: 2991.56
+ Objective evaluation #350	Error: 2926.53
+ Objective evaluation #360	Error: 3004.2
+ Objective evaluation #370	Error: 3040.88
+ Objective evaluation #380	Error: 2839.7
+ Objective evaluation #390	Error: 3042.98
+ Objective evaluation #400	Error: 2992.21
+ Objective evaluation #410	Error: 3080.63
+ Objective evaluation #420	Error: 3046.09
+ Objective evaluation #430	Error: 2994.51
+ Objective evaluation #440	Error: 2959.12
+ Objective evaluation #450	Error: 3048.34
+ Objective evaluation #460	Error: 2992.35
+ Objective evaluation #470	Error: 3019
+ Objective evaluation #480	Error: 3035.4
+ Objective evaluation #490	Error: 3006.73
+ Objective evaluation #500	Error: 2799.44
+ Objective evaluation #510	Error: 2987.15
+ Objective evaluation #520	Error: 2978.42
+ Objective evaluation #530	Error: 2959.3
+ Objective evaluation #540	Error: 3057.66
+ Objective evaluation #550	Error: 3020.95
+ Objective evaluation #560	Error: 3031.22
+ Objective evaluation #570	Error: 3022.01
+ Objective evaluation #580	Error: 2994.84
+ Objective evaluation #590	Error: 3112.03
+ Objective evaluation #600	Error: 3031.37
+ Objective evaluation #610	Error: 3014.2
+ Objective evaluation #620	Error: 3159.07
+ Objective evaluation #630	Error: 3019.88
+ Objective evaluation #640	Error: 3008.41
+ Objective evaluation #650	Error: 3004.31
+ Objective evaluation #660	Error: 2980.5
+ Objective evaluation #670	Error: 3034.7
+ Objective evaluation #680	Error: 3014.15
+ Objective evaluation #690	Error: 2862.04
+ Objective evaluation #700	Error: 3032.74
+ Objective evaluation #710	Error: 2913.25
+ Objective evaluation #720	Error: 3085.92
+ Objective evaluation #730	Error: 3130.54
+ Objective evaluation #740	Error: 3040.45
+ Objective evaluation #750	Error: 3063.35
+ Objective evaluation #760	Error: 3067.77
+ Objective evaluation #770	Error: 3087.04
+ Objective evaluation #780	Error: 3093.92
+ Objective evaluation #790	Error: 3118.01
+ Objective evaluation #800	Error: 3115.13
+ Objective evaluation #810	Error: 3095.95
+ Objective evaluation #820	Error: 3108.43
+ Objective evaluation #830	Error: 3013.09
+ Objective evaluation #840	Error: 3104.93
+ Objective evaluation #850	Error: 3303.18
+ Objective evaluation #860	Error: 2979.38
+ Objective evaluation #870	Error: 3132.03
+ Objective evaluation #880	Error: 3223.15
+ Objective evaluation #890	Error: 3023.06
+ Objective evaluation #900	Error: 3121.68
+ Objective evaluation #910	Error: 3305.14
+ Objective evaluation #920	Error: 3376.42
+ Objective evaluation #930	Error: 3124.45
+ Objective evaluation #940	Error: 3212.47
+ Objective evaluation #950	Error: 3203.69
+ Objective evaluation #960	Error: 3188.58
+ Objective evaluation #970	Error: 3176.27
+ Objective evaluation #980	Error: 3363.4
+ Objective evaluation #990	Error: 3311.13
+ Objective evaluation #1000	Error: 3359.36
+ Objective evaluation #1010	Error: 3009.7
+ Objective evaluation #1020	Error: 3412.77
+ Objective evaluation #1030	Error: 3225.91
+ Objective evaluation #1040	Error: 3028.42
+ Objective evaluation #1050	Error: 3266.91
+ Objective evaluation #1060	Error: 3329.11
+ Objective evaluation #1070	Error: 3158.36
+ Objective evaluation #1080	Error: 3148.45
+ Objective evaluation #1090	Error: 3155.6
+ Objective evaluation #1100	Error: 3442.51
+ Objective evaluation #1110	Error: 3173.66
+ Objective evaluation #1120	Error: 3149.6
+ Objective evaluation #1130	Error: 3205.27
+ Objective evaluation #1140	Error: 3295.2
+ Objective evaluation #1150	Error: 3348.78
+ Objective evaluation #1160	Error: 3079.68
+ Objective evaluation #1170	Error: 3238.86
+ Objective evaluation #1180	Error: 3067.82
+ Objective evaluation #1190	Error: 3156.08
+ Objective evaluation #1200	Error: 3241.83
+ Objective evaluation #1210	Error: 3233.69
+ Objective evaluation #1220	Error: 3073.11
+ Objective evaluation #1230	Error: 3238.16
+ Objective evaluation #1240	Error: 3292.95
+ Objective evaluation #1250	Error: 3368.9
+ Objective evaluation #1260	Error: 3244.07
+ Objective evaluation #1270	Error: 3223.72
+ Objective evaluation #1280	Error: 3395.58
+ Objective evaluation #1290	Error: 3381.64
+ Objective evaluation #1300	Error: 3507.43
+ Objective evaluation #1310	Error: 3367.15
+ Objective evaluation #1320	Error: 3408.9
+ Objective evaluation #1330	Error: 3246.15
+ Objective evaluation #1340	Error: 3178.53
+ Objective evaluation #1350	Error: 3313.46
+ Objective evaluation #1360	Error: 3375.98
+ Objective evaluation #1370	Error: 3454.02
+ Objective evaluation #1380	Error: 3366.14
+ Objective evaluation #1390	Error: 3491.19
+ Objective evaluation #1400	Error: 3403.1
+ Objective evaluation #1410	Error: 3455.57
+ Objective evaluation #1420	Error: 3378.55
+ Objective evaluation #1430	Error: 3160
+ Objective evaluation #1440	Error: 3424
+ Objective evaluation #1450	Error: 3450.2
+ Objective evaluation #1460	Error: 3439.44
+ Objective evaluation #1470	Error: 3433.43
+ Objective evaluation #1480	Error: 3408.66
+ Objective evaluation #1490	Error: 3507.77
+ Objective evaluation #1500	Error: 3451.36
+ Objective evaluation #1510	Error: 3342.89
+ Objective evaluation #1520	Error: 3221.66
+ Objective evaluation #1530	Error: 3352.03
+ Objective evaluation #1540	Error: 3496.23
+ Objective evaluation #1550	Error: 3382.5
+ Objective evaluation #1560	Error: 3417.95
+ Objective evaluation #1570	Error: 3414.19
+ Objective evaluation #1580	Error: 3478.07
+ Objective evaluation #1590	Error: 3430.87
+ Objective evaluation #1600	Error: 3472.17
+ Objective evaluation #1610	Error: 3396.21
+ Objective evaluation #1620	Error: 3419.57
+ Objective evaluation #1630	Error: 3393.04
+ Objective evaluation #1640	Error: 3371.28
+ Objective evaluation #1650	Error: 3114.91
+ Objective evaluation #1660	Error: 3549.5
+ Objective evaluation #1670	Error: 3412.72
+ Objective evaluation #1680	Error: 3495.19
+ Objective evaluation #1690	Error: 3397.82
+ Objective evaluation #1700	Error: 3412.47
+ Objective evaluation #1710	Error: 3480.08
+ Objective evaluation #1720	Error: 3420.81
+ Objective evaluation #1730	Error: 3375.01
+ Objective evaluation #1740	Error: 3428.43
+ Objective evaluation #1750	Error: 3572.88
+ Objective evaluation #1760	Error: 3363.52
+ Objective evaluation #1770	Error: 3178.44
+ Objective evaluation #1780	Error: 3368.2
+ Objective evaluation #1790	Error: 3525.92
+ Objective evaluation #1800	Error: 3347.44
+ Objective evaluation #1810	Error: 3563.41
+ Objective evaluation #1820	Error: 3526.78
+ Objective evaluation #1830	Error: 3417.92
+ Objective evaluation #1840	Error: 3283.22
+ Objective evaluation #1850	Error: 3553.03
+ Objective evaluation #1860	Error: 3572.74
+ Objective evaluation #1870	Error: 3412.35
+ Objective evaluation #1880	Error: 3462.09
+ Objective evaluation #1890	Error: 3433.68
+ Objective evaluation #1900	Error: 3424.61
+ Objective evaluation #1910	Error: 3412.5
+ Objective evaluation #1920	Error: 3473.12
+ Objective evaluation #1930	Error: 3465.08
+ Objective evaluation #1940	Error: 3500.86
+ Objective evaluation #1950	Error: 3335.84
+ Objective evaluation #1960	Error: 3667.58
+ Objective evaluation #1970	Error: 3612.12
+ Objective evaluation #1980	Error: 3527.22
+ Objective evaluation #1990	Error: 3421.54
+ Objective evaluation #2000	Error: 3506.93
+
+ WARNING: problem could not be solved!
+ Objective evaluation #2010	Error: 3519.3
+ Objective evaluation #2020	Error: 3311.7
+ Objective evaluation #2030	Error: 3603.73
+ Objective evaluation #2040	Error: 3567.97
+ Objective evaluation #2050	Error: 3345.72
+ Objective evaluation #2060	Error: 3569.89
+ Objective evaluation #2070	Error: 3144.91
+ Objective evaluation #2080	Error: 3425.72
+ Objective evaluation #2090	Error: 3505.34
+ Objective evaluation #2100	Error: 3604.82
+ Objective evaluation #2110	Error: 3498.62
+ Objective evaluation #2120	Error: 3594.54
+ Objective evaluation #2130	Error: 3594.38
+ Objective evaluation #2140	Error: 3234.28
+ Objective evaluation #2150	Error: 3578.72
+ Objective evaluation #2160	Error: 3580.61
+ Objective evaluation #2170	Error: 3600.92
+ Objective evaluation #2180	Error: 3477.23
+ Objective evaluation #2190	Error: 3567.86
+ Objective evaluation #2200	Error: 3319.35
+ Objective evaluation #2210	Error: 3541.25
+ Objective evaluation #2220	Error: 3017.13
+ Objective evaluation #2230	Error: 3337.55
+ Objective evaluation #2240	Error: 3396.99
+ Objective evaluation #2250	Error: 3591.49
+ Objective evaluation #2260	Error: 3556.19
+ Objective evaluation #2270	Error: 3361.37
+ Objective evaluation #2280	Error: 3596.68
+ Objective evaluation #2290	Error: 3539.54
+ Objective evaluation #2300	Error: 3225.52
+ Objective evaluation #2310	Error: 3216.68
+
+ WARNING: problem could not be solved!
+ Objective evaluation #2320	Error: 3162.12
+ Objective evaluation #2330	Error: 3343.94
+ Objective evaluation #2340	Error: 3593.53
+ Objective evaluation #2350	Error: 3394.93
+ Objective evaluation #2360	Error: 3211.18
+ Objective evaluation #2370	Error: 3236.86
+ Objective evaluation #2380	Error: 3504.91
+ Objective evaluation #2390	Error: 3302.91
+ Objective evaluation #2400	Error: 3485.05
+ Objective evaluation #2410	Error: 3343.7
+ Objective evaluation #2420	Error: 3509.83
+ Objective evaluation #2430	Error: 3149.07
+ Objective evaluation #2440	Error: 3282.89
+ Objective evaluation #2450	Error: 3387.93
+ Objective evaluation #2460	Error: 3539.8
+ Objective evaluation #2470	Error: 3197.15
+ Objective evaluation #2480	Error: 3126.18
+ Objective evaluation #2490	Error: 3290.07
+ Objective evaluation #2500	Error: 3450.82
+ Objective evaluation #2510	Error: 3217.95
+ Objective evaluation #2520	Error: 3136.11
+ Objective evaluation #2530	Error: 3474.15
+ Objective evaluation #2540	Error: 3238.71
+ Objective evaluation #2550	Error: 3112.35
+ Objective evaluation #2560	Error: 3199.78
+ Objective evaluation #2570	Error: 3234.43
+ Objective evaluation #2580	Error: 3456.74
+ Objective evaluation #2590	Error: 3306.37
+ Objective evaluation #2600	Error: 3122.94
+ Objective evaluation #2610	Error: 3085.41
+ Objective evaluation #2620	Error: 3416.01
+ Objective evaluation #2630	Error: 3166.97
+ Objective evaluation #2640	Error: 3201.8
+ Objective evaluation #2650	Error: 3305.55
+ Objective evaluation #2660	Error: 3269.56
+ Objective evaluation #2670	Error: 3195.88
+ Objective evaluation #2680	Error: 3081.76
+ Objective evaluation #2690	Error: 3074.94
+ Objective evaluation #2700	Error: 2936.88
+ Objective evaluation #2710	Error: 3054.16
+ Objective evaluation #2720	Error: 2919.26
+
+ WARNING: problem could not be solved!
+ Objective evaluation #2730	Error: 3302.58
+ Objective evaluation #2740	Error: 3417.98
+ Objective evaluation #2750	Error: 3305.63
+ Objective evaluation #2760	Error: 3446.61
+ Objective evaluation #2770	Error: 3295.61
+ Objective evaluation #2780	Error: 3269.14
+ Objective evaluation #2790	Error: 2876.88
+ Objective evaluation #2800	Error: 3275.95
+ Objective evaluation #2810	Error: 3263.52
+ Objective evaluation #2820	Error: 2994.72
+ Objective evaluation #2830	Error: 3103.3
+ Objective evaluation #2840	Error: 3064.96
+ Objective evaluation #2850	Error: 2977.4
+ Objective evaluation #2860	Error: 3311.76
+ Objective evaluation #2870	Error: 3320.57
+ Objective evaluation #2880	Error: 3332.53
+ Objective evaluation #2890	Error: 3245.69
+ Objective evaluation #2900	Error: 3113.92
+ Objective evaluation #2910	Error: 2975.12
+ Objective evaluation #2920	Error: 3306.88
+ Objective evaluation #2930	Error: 2835.73
+ Objective evaluation #2940	Error: 3264.21
+ Objective evaluation #2950	Error: 2992.59
+ Objective evaluation #2960	Error: 2789.41
+ Objective evaluation #2970	Error: 3025.36
+ Objective evaluation #2980	Error: 2974.4
+ Objective evaluation #2990	Error: 2904.84
+ Objective evaluation #3000	Error: 2962.51
+ Objective evaluation #3010	Error: 2852.41
+ Objective evaluation #3020	Error: 3054.02
+ Objective evaluation #3030	Error: 3021.1
+ Objective evaluation #3040	Error: 2916.27
+ Objective evaluation #3050	Error: 2866.4
+ Objective evaluation #3060	Error: 3249.72
+ Objective evaluation #3070	Error: 2851.92
+ Objective evaluation #3080	Error: 2946.71
+ Objective evaluation #3090	Error: 3302.51
+ Objective evaluation #3100	Error: 2829.66
+ Objective evaluation #3110	Error: 3016.03
+ Objective evaluation #3120	Error: 3269.53
+ Objective evaluation #3130	Error: 3113.34
+ Objective evaluation #3140	Error: 3328.4
+ Objective evaluation #3150	Error: 3050.24
+ Objective evaluation #3160	Error: 3151.98
+ Objective evaluation #3170	Error: 3029.83
+ Objective evaluation #3180	Error: 2834.98
+ Objective evaluation #3190	Error: 3345.06
+ Objective evaluation #3200	Error: 3027.59
+ Objective evaluation #3210	Error: 3084.66
+ Objective evaluation #3220	Error: 3048.76
+ Objective evaluation #3230	Error: 3274.85
+ Objective evaluation #3240	Error: 3359.72
+ Objective evaluation #3250	Error: 3324.18
+ Objective evaluation #3260	Error: 3214.61
+ Objective evaluation #3270	Error: 3231.48
+ Objective evaluation #3280	Error: 3051.2
+ Objective evaluation #3290	Error: 3181.26
+ Objective evaluation #3300	Error: 3089.62
+ Objective evaluation #3310	Error: 3304.42
+ Objective evaluation #3320	Error: 3355.07
+ Objective evaluation #3330	Error: 3051.99
+ Objective evaluation #3340	Error: 3376.15
+ Objective evaluation #3350	Error: 3258.34
+ Objective evaluation #3360	Error: 3128.39
+ Objective evaluation #3370	Error: 3032.49
+ Objective evaluation #3380	Error: 3173.39
+ Objective evaluation #3390	Error: 3166.89
+ Objective evaluation #3400	Error: 3174.12
+ Objective evaluation #3410	Error: 3309.46
+ Objective evaluation #3420	Error: 3299.21
+ Objective evaluation #3430	Error: 3500.59
+ Objective evaluation #3440	Error: 3065.51
+ Objective evaluation #3450	Error: 3125.83
+ Objective evaluation #3460	Error: 3197.11
+ Objective evaluation #3470	Error: 3157.73
+ Objective evaluation #3480	Error: 3244.76
+ Objective evaluation #3490	Error: 3030.35
+ Objective evaluation #3500	Error: 3251.05
+ Objective evaluation #3510	Error: 3241.78
+ Objective evaluation #3520	Error: 2927.81
+ Objective evaluation #3530	Error: 3353.24
+ Objective evaluation #3540	Error: 3112.25
+ Objective evaluation #3550	Error: 2954.27
+ Objective evaluation #3560	Error: 3208.02
+ Objective evaluation #3570	Error: 3240.6
+ Objective evaluation #3580	Error: 3133.58
+ Objective evaluation #3590	Error: 3163.24
+ Objective evaluation #3600	Error: 3028.69
+ Objective evaluation #3610	Error: 3045.45
+ Objective evaluation #3620	Error: 3175.11
+ Objective evaluation #3630	Error: 3118.48
+ Objective evaluation #3640	Error: 3345.99
+ Objective evaluation #3650	Error: 3011.6
+ Objective evaluation #3660	Error: 3110.19
+ Objective evaluation #3670	Error: 3284.53
+ Objective evaluation #3680	Error: 2961.72
+ Objective evaluation #3690	Error: 3404.25
+ Objective evaluation #3700	Error: 3285.61
+ Objective evaluation #3710	Error: 3312.33
+ Objective evaluation #3720	Error: 3357.57
+ Objective evaluation #3730	Error: 3349.81
+ Objective evaluation #3740	Error: 3293.89
+ Objective evaluation #3750	Error: 2791.14
+ Objective evaluation #3760	Error: 3142.23
+ Objective evaluation #3770	Error: 3298.44
+ Objective evaluation #3780	Error: 3189.65
+ Objective evaluation #3790	Error: 3028.78
+ Objective evaluation #3800	Error: 2956.81
+ Objective evaluation #3810	Error: 3238.52
+ Objective evaluation #3820	Error: 3055.76
+ Objective evaluation #3830	Error: 3184.26
+ Objective evaluation #3840	Error: 3224.64
+ Objective evaluation #3850	Error: 3332.5
+ Objective evaluation #3860	Error: 3062.78
+ Objective evaluation #3870	Error: 3158.69
+ Objective evaluation #3880	Error: 2959.59
+ Objective evaluation #3890	Error: 3076.4
+ Objective evaluation #3900	Error: 3120.13
+ Objective evaluation #3910	Error: 3080.26
+ Objective evaluation #3920	Error: 2975.54
+ Objective evaluation #3930	Error: 2754.79
+ Objective evaluation #3940	Error: 2923.7
+ Objective evaluation #3950	Error: 3087.32
+ Objective evaluation #3960	Error: 3072.14
+ Objective evaluation #3970	Error: 3321.06
+ Objective evaluation #3980	Error: 3315.27
+ Objective evaluation #3990	Error: 3331.29
+ Objective evaluation #4000	Error: 3153.51
+ Objective evaluation #4010	Error: 3066.8
+ Objective evaluation #4020	Error: 3080.8
+ Objective evaluation #4030	Error: 3182.58
+ Objective evaluation #4040	Error: 3010.73
+ Objective evaluation #4050	Error: 2838.11
+ Objective evaluation #4060	Error: 3084.57
+ Objective evaluation #4070	Error: 3022.28
+ Objective evaluation #4080	Error: 2913.12
+ Objective evaluation #4090	Error: 3334.15
+ Objective evaluation #4100	Error: 3218.81
+ Objective evaluation #4110	Error: 3358.11
+ Objective evaluation #4120	Error: 3076.61
+ Objective evaluation #4130	Error: 3094.7
+ Objective evaluation #4140	Error: 3202.73
+ Objective evaluation #4150	Error: 2896.15
+ Objective evaluation #4160	Error: 2901.33
+ Objective evaluation #4170	Error: 3277.66
+ Objective evaluation #4180	Error: 3186.34
+ Objective evaluation #4190	Error: 3293.87
+ Objective evaluation #4200	Error: 3188.25
+ Objective evaluation #4210	Error: 3047.05
+ Objective evaluation #4220	Error: 3319.32
+ Objective evaluation #4230	Error: 3295.44
+ Objective evaluation #4240	Error: 3012.83
+ Objective evaluation #4250	Error: 2958.28
+ Objective evaluation #4260	Error: 3206.51
+ Objective evaluation #4270	Error: 2989.97
+ Objective evaluation #4280	Error: 3311.76
+ Objective evaluation #4290	Error: 3019.67
+ Objective evaluation #4300	Error: 3175.95
+ Objective evaluation #4310	Error: 2962.28
+ Objective evaluation #4320	Error: 3087.92
+ Objective evaluation #4330	Error: 3073.03
+ Objective evaluation #4340	Error: 2995.89
+ Objective evaluation #4350	Error: 2937.58
+ Objective evaluation #4360	Error: 3026.98
+ Objective evaluation #4370	Error: 3345.15
+ Objective evaluation #4380	Error: 3265.21
+ Objective evaluation #4390	Error: 3057.75
+ Objective evaluation #4400	Error: 3043.83
+ Objective evaluation #4410	Error: 3006.14
+ Objective evaluation #4420	Error: 3065.16
+ Objective evaluation #4430	Error: 2888.94
+ Objective evaluation #4440	Error: 3156.88
+ Objective evaluation #4450	Error: 3112.07
+ Objective evaluation #4460	Error: 3127.74
+ Objective evaluation #4470	Error: 3034.05
+ Objective evaluation #4480	Error: 3247.02
+ Objective evaluation #4490	Error: 3100.31
+ Objective evaluation #4500	Error: 2992.35
+ Objective evaluation #4510	Error: 3064.46
+ Objective evaluation #4520	Error: 3180.83
+ Objective evaluation #4530	Error: 3201.78
+ Objective evaluation #4540	Error: 3022.7
+ Objective evaluation #4550	Error: 3250.49
+ Objective evaluation #4560	Error: 3338.99
+ Objective evaluation #4570	Error: 3302.83
+ Objective evaluation #4580	Error: 3093.75
+ Objective evaluation #4590	Error: 3344.62
+ Objective evaluation #4600	Error: 3271.82
+ Objective evaluation #4610	Error: 3038.41
+ Objective evaluation #4620	Error: 3022.54
+ Objective evaluation #4630	Error: 3308.75
+ Objective evaluation #4640	Error: 2908.42
+ Objective evaluation #4650	Error: 3117.55
+ Objective evaluation #4660	Error: 3330.68
+ Objective evaluation #4670	Error: 3248.58
+ Objective evaluation #4680	Error: 3297.74
+ Objective evaluation #4690	Error: 3304.44
+ Objective evaluation #4700	Error: 3022.74
+ Objective evaluation #4710	Error: 3033.64
+ Objective evaluation #4720	Error: 3329.76
+ Objective evaluation #4730	Error: 3048.15
+ Objective evaluation #4740	Error: 3021.6
+ Objective evaluation #4750	Error: 2913.17
+ Objective evaluation #4760	Error: 3078
+ Objective evaluation #4770	Error: 3219.94
+ Objective evaluation #4780	Error: 3426.48
+ Objective evaluation #4790	Error: 3125.72
+ Objective evaluation #4800	Error: 3045.11
+ Objective evaluation #4810	Error: 3354.65
+ Objective evaluation #4820	Error: 3076.41
+ Objective evaluation #4830	Error: 3111.51
+ Objective evaluation #4840	Error: 3184.7
+ Objective evaluation #4850	Error: 3086.25
+ Objective evaluation #4860	Error: 3243.56
+ Objective evaluation #4870	Error: 3289.67
+ Objective evaluation #4880	Error: 3361.4
+ Objective evaluation #4890	Error: 3200.28
+ Objective evaluation #4900	Error: 3267.71
+ Objective evaluation #4910	Error: 3346.67
+ Objective evaluation #4920	Error: 3248.21
+ Objective evaluation #4930	Error: 3331.55
+ Objective evaluation #4940	Error: 2990.94
+ Objective evaluation #4950	Error: 3072.95
+ Objective evaluation #4960	Error: 3318.39
+ Objective evaluation #4970	Error: 3026.08
+ Objective evaluation #4980	Error: 3037.65
+ Objective evaluation #4990	Error: 3301.17
+ Objective evaluation #5000	Error: 3294.32
+ Objective evaluation #5010	Error: 3283.43
+ Objective evaluation #5020	Error: 3334.45
+ Objective evaluation #5030	Error: 3185.46
+ Objective evaluation #5040	Error: 2999.62

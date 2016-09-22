@@ -1,22 +1,16 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-//#include <iomanip>
 #include <sstream>
 #include <cmath>
-//#include <ctime>
-//#include <string>
-//#include <ios>
 #include "Staci.h"
-//#include "nr.h"
 #include "StaciException.h"
 #include "data_io.h"
-//#include "time.h"
 
 // Wiley:
-#include "/usr/include/suitesparse/umfpack.h"
+//#include "/usr/include/suitesparse/umfpack.h"
 // Mac:
-// #include "/usr/local/include/umfpack.h"
+#include "/usr/local/include/umfpack.h"
 
 // TODO: Clear up debug level behaviour in the doc!
 // TODO: log file cleanup!
@@ -527,7 +521,7 @@ void Staci::build_system() {
                     ostringstream msg;
                     msg << "\n HIBA: Azonos nevu elemek!!!" << nev1.c_str();
                     cout << msg.str();
-                    logfile_write(msg.str(), 0);
+                    logfile_write(msg.str(), 1);
                     stop = true;
                 }
             }
@@ -545,7 +539,7 @@ void Staci::build_system() {
                     ostringstream msg("");
                     msg << "\n HIBA: Azonos nevu csomopontok!!!" << nev1.c_str();
                     cout << msg.str();
-                    logfile_write(msg.str(), 0);
+                    logfile_write(msg.str(), 1);
                     stop = true;
                 }
             }
@@ -1050,16 +1044,16 @@ bool Staci::solve_system() {
     bool comp_ok = true;
 
     while ((iter < iter_max + 1) && (!konv_ok)) {
-
-        progress_file_write((double) iter / iter_max * 100.0);
+        if (debug_level > 0)
+            progress_file_write((double) iter / iter_max * 100.0);
 
         if ((e_mp > 0.1 || e_p > 0.1) || (iter % 5 == 0))
             build_vectors(x, f, false);
         else {
             build_vectors_frozen_Jacobian(x, f);
             //if (debug_level > 1) {
-                //cout << endl << "\t Using frozen Jacobian...";
-                //cin.get();
+            //cout << endl << "\t Using frozen Jacobian...";
+            //cin.get();
             //}
         }
 
@@ -1161,8 +1155,8 @@ bool Staci::solve_system_old() {
 
     // Iteracio!!!
     while ((iter < iter_max) && (!konv_ok)) {
-
-        progress_file_write((double) iter / iter_max * 100.0);
+        if (debug_level > 0)
+            progress_file_write((double) iter / iter_max * 100.0);
 
         strstrm.str("");
         strstrm.setf(ios::dec);
@@ -1435,7 +1429,7 @@ bool Staci::solve_system_old() {
     if (konv_ok) {
         strstrm << endl << endl << "Normal befejezes...  :)" << endl;
         strstrm << list_results();
-        logfile_write(strstrm.str(), 0);
+        logfile_write(strstrm.str(), 1);
         cout << strstrm.str();
 
         //      for (unsigned int i=0; i<agelemek.size(); i++) {
@@ -1448,7 +1442,7 @@ bool Staci::solve_system_old() {
     } else
         strstrm << endl << endl << "HIBA: Maximalis lepesszamot elertem, de a megadott hibahatar felett vagyok..."
                 << endl;
-    logfile_write(strstrm.str(), 0);
+    logfile_write(strstrm.str(), 1);
     //int int1; cin>>int1;
     return konv_ok;
 }
@@ -1497,12 +1491,12 @@ void Staci::ini() {
     if (debug_level > 0) {
         logfile_write(strstrm.str(), 1);
         cout << strstrm.str();
-    }
 
-    // Progress file torlese
-    ofstream pfile(progress_file.c_str(), ios::trunc);
-    pfile << fixed << setprecision(1) << 0.0 << "\n";
-    pfile.close();
+        // Progress file torlese
+        ofstream pfile(progress_file.c_str(), ios::trunc);
+        pfile << fixed << setprecision(1) << 0.0 << "\n";
+        pfile.close();
+    }
 
     // Set log file
     for (unsigned int i = 0; i < agelemek.size(); i++) {
@@ -1516,16 +1510,18 @@ void Staci::ini() {
 //--------------------------------------------------------------
 void Staci::ini(const Staci *IniStaci) {
 
-        for (unsigned int i = 0; i < cspok.size(); i++)
-            cspok.at(i)->Set_p(IniStaci->cspok.at(i)->Get_p());
+    for (unsigned int i = 0; i < cspok.size(); i++)
+        cspok.at(i)->Set_p(IniStaci->cspok.at(i)->Get_p());
 
-        for (unsigned int i = 0; i < agelemek.size(); i++)
-            agelemek.at(i)->Set_mp(IniStaci->agelemek.at(i)->Get_mp());
+    for (unsigned int i = 0; i < agelemek.size(); i++)
+        agelemek.at(i)->Set_mp(IniStaci->agelemek.at(i)->Get_mp());
 
     // Progress file torlese
-    ofstream pfile(progress_file.c_str(), ios::trunc);
-    pfile << fixed << setprecision(1) << 0.0 << "\n";
-    pfile.close();
+    if (debug_level > 0) {
+        ofstream pfile(progress_file.c_str(), ios::trunc);
+        pfile << fixed << setprecision(1) << 0.0 << "\n";
+        pfile.close();
+    }
 
     // Set log file
     for (unsigned int i = 0; i < agelemek.size(); i++) {
@@ -1646,7 +1642,8 @@ void Staci::solve_transport(int mode) {
     while (ido < tt_length * 3600) {
         szazalek = round(ido / (tt_length * 3600) * 100);
         //szazalek=round(10*szazalek)/10;
-        progress_file_write(szazalek);
+        if ((debug_level) > 0)
+            progress_file_write(szazalek);
         if (counter < szazalek) {
             cout << "\n\t\t" << szazalek << " %, time = " << (ido / 3600.);
             cout << "h, oldest fluid particle: " << (get_oldest() / 3600.) << "h";

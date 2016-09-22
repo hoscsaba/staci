@@ -7,7 +7,6 @@
 #include <numeric>
 #include <list>
 #include "xmlParser.h"
-#include <fstream>
 
 using namespace std;
 using namespace boost;
@@ -78,7 +77,7 @@ std::vector<std::string> csv_read_row(std::string &in, char delimiter);
 
 int Obj_Eval;
 
-void Load_Settings();
+string Load_Settings();
 
 bool last_computation_OK;
 int popsize;
@@ -88,14 +87,18 @@ float pcross;
 
 int main(int argc, char **argv) {
 
-    Load_Settings();
-
     Obj_Eval = 0;
     last_computation_OK = false;
+
+    // Load parameters, including logfile name
+    string msg_set = Load_Settings();
 
     // Clear logfile
     ofstream ofs(logfilename.c_str(), std::ios::out | std::ios::trunc);
     ofs.close();
+
+    // Write Settings to logfile
+    logfile_write(msg_set, 0);
 
     // Load WDSs and data files
     Load_WDS_Systems();
@@ -162,6 +165,7 @@ int main(int argc, char **argv) {
             msg << endl << "\t" << pipe_name.at(i) << " D=" << dia << ", LB=" << LOWER_BOUND << ", UB=" << UPPER_BOUND;
         }
     }
+    msg<<endl;
     logfile_write(msg.str(), 1);
 
     // Create the template genome using the phenotype map we just made.
@@ -180,7 +184,7 @@ int main(int argc, char **argv) {
     ga.scaling(scaling);
     ga.scoreFilename("bog.dat");
     ga.scoreFrequency(10);
-    ga.flushFrequency(50);
+    ga.flushFrequency(10);
     ga.evolve(seed);
 
 
@@ -202,29 +206,16 @@ float
 Objective(GAGenome &x) {
     GABin2DecGenome &genome = (GABin2DecGenome &) x;
 
-    Obj_Eval++;
-
-    stringstream str;
-    str.str("");
-    str << "\n\n Objective evaluation #" << Obj_Eval << "\n\t x=";
-    for (unsigned int i = 0; i < num_of_active_pipes; i++)
-        str << genome.phenotype(i) << " ";
-
-    logfile_write(str.str(), 1);
-
     bool success = false;
 
     for (unsigned int i = 0; i < wds.size(); i++) {
         int k = 0;
-        //if (!last_computation_OK)
         if (i > 0) {
             wds.at(i)->ini(wds.at(i - 1));
         } else
             wds.at(i)->ini();
         for (unsigned int j = 0; j < pipe_name.size(); j++)
             if (pipe_is_active.at(j)) {
-                //cout<<endl<<"Setting "<<pipe_name.at(j)<<" to "<<genome.phenotype(k);
-                //cin.get();
                 wds.at(i)->set_dprop(pipe_name.at(j), "diameter", genome.phenotype(k));
                 k++;
             }
@@ -232,27 +223,30 @@ Objective(GAGenome &x) {
         if (last_computation_OK) {
             Update_Reservoirs(i);
         } else {
-            cin.get();
             break;
         }
-
     }
 
     double err;
     if (last_computation_OK) {
         err = Compute_Error();
-        str.str("");
-        str << "\n Error: " << err;
-        logfile_write(str.str(), 1);
+        if ((Obj_Eval % 100)==0) {
+            stringstream str;
+            str.str("");
+            str << "\n Objective evaluation #" << Obj_Eval<< "\tError: " << err;
+            logfile_write(str.str(), 1);
+        }
     } else {
         stringstream msg;
         msg.str("");
         msg << "\n\n WARNING: problem could not be solved!";
         logfile_write(msg.str(), 0);
-        //exit(-1);
-        err = 1.e10;
+        err = 1.e5;
     }
-    return err;
+
+    Obj_Eval++;
+
+    return (1.e6-err);
 }
 
 
@@ -697,7 +691,7 @@ std::vector<std::string> csv_read_row(std::istream &in, char delimiter) {
     }
 }
 
-void Load_Settings() {
+string Load_Settings() {
 
     XMLNode xMainNode = XMLNode::openFileHelper("staci_calibrate_settings.xml", "settings");
 
@@ -714,19 +708,6 @@ void Load_Settings() {
     pmut = atof(xMainNode.getChildNode("pmut").getText());
     pcross = atof(xMainNode.getChildNode("pcross").getText());
 
-/*global_debug_level = 1;
-    Staci_debug_level = 0;
-    dir_name = "data/foviz_halozat/2012_11_06/";
-    fname_prefix = "FV_input_2012_11_06_barlang_nelkul_";
-    logfilename = "staci_calibrate.log";
-    Eredmenyek_FVM_dfile = "Eredmenyek_FV_input_2012_11_06_barlang_nelkul.csv";
-    FVM_dfile = "FV_input_2012_11_06_barlang_nelkul.csv";
-    Num_of_Periods = 47;
-    popsize = 50;
-    ngen = 100;
-    pmut = 0.01;
-    pcross = 0.6;*/
-
     stringstream msg;
     msg.str("");
     msg << "Settings:"<<endl;
@@ -740,8 +721,7 @@ void Load_Settings() {
     msg << "\t popsize : " << popsize<<endl;
     msg << "\t ngen    : " << ngen<<endl;
     msg << "\t pmut    : " << pmut<<endl;
-    msg << "\t pcross  : " << pcross << endl;
+    msg << "\t pcross  : " << pcross << endl<<endl;
 
-    logfile_write(msg.str(), 0);
-    cin.get();
+    return msg.str();
 }
