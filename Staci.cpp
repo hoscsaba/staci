@@ -1028,6 +1028,13 @@ bool Staci::solve_system() {
     double e_mp = 1e10, e_p = 1e10, e_mp_r = 1e10, e_p_r = 1e10;
     bool konv_ok = false;
 
+    // Progress file torlese
+    if (debug_level > 0) {
+        ofstream pfile(progress_file.c_str(), ios::trunc);
+        pfile << fixed << setprecision(1) << 0.0 << "\n";
+        pfile.close();
+    }
+
 
     m_ss.str("");
     m_ss << "\n\nSolving system...\n====================================" << endl;
@@ -1492,10 +1499,7 @@ void Staci::ini() {
         logfile_write(strstrm.str(), 1);
         cout << strstrm.str();
 
-        // Progress file torlese
-        ofstream pfile(progress_file.c_str(), ios::trunc);
-        pfile << fixed << setprecision(1) << 0.0 << "\n";
-        pfile.close();
+
     }
 
     // Set log file
@@ -1516,12 +1520,6 @@ void Staci::ini(const Staci *IniStaci) {
     for (unsigned int i = 0; i < agelemek.size(); i++)
         agelemek.at(i)->Set_mp(IniStaci->agelemek.at(i)->Get_mp());
 
-    // Progress file torlese
-    if (debug_level > 0) {
-        ofstream pfile(progress_file.c_str(), ios::trunc);
-        pfile << fixed << setprecision(1) << 0.0 << "\n";
-        pfile.close();
-    }
 
     // Set log file
     for (unsigned int i = 0; i < agelemek.size(); i++) {
