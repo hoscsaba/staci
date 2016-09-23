@@ -1,0 +1,358 @@
+Settings:
+	 global_debug_level   : 1
+	 Staci_debug_level    : 0
+
+	 dir_name             : data/foviz_halozat/2012_11_06/
+	 fname_prefix         : FV_input_2012_11_06_barlang_nelkul_
+	 logfilename          : staci_calibrate.log
+	 best_logfilename     : bests.log
+	 Eredmenyek_FVM_dfile : FV_input_2012_11_06_barlang_nelkul.csv
+	 Num_of_Periods       : 47
+	 Dmin                 : 0
+
+	 popsize : 50
+	 ngen    : 10
+	 pmut    : 0.01
+	 pcross  : 0.6
+
+Building WDS systems....
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_1.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_2.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_3.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_4.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_5.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_6.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_7.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_8.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_9.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_10.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_11.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_12.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_13.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_14.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_15.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_16.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_17.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_18.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_19.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_20.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_21.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_22.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_23.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_24.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_25.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_26.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_27.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_28.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_29.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_30.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_31.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_32.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_33.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_34.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_35.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_36.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_37.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_38.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_39.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_40.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_41.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_42.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_43.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_44.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_45.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_46.spr
+	data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_47.spr
+
+Reading datafile data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul.csv ...
+ #med_cinkota, number of data: 48, info: K_EP_CINK_MED_01KAM_HS_M-AVGHALF, Vizszint (m)
+ #med_gilice, number of data: 48, info: K_DP_GILI_UMED_KAM_HS_M-AVGHALF, Vizszint (m)
+ #med_kob_regi, number of data: 48, info: K_DP_KOBA_RMED_01KAM_HS_M-AVGHALF, Vizszint (m)
+ #med_kob_uj, number of data: 48, info: K_DP_KOBA_UMED_02KAM_HS_M-AVGHALF, Vizszint (m)
+ #med_krisztina, number of data: 48, info: K_KB_KRIS_UMED_01KAM_HS_M-AVGHALF, Vizszint (m)
+ #med_rakossz, number of data: 48, info: K_EP_RSZM_MED_KAM_HS_M-AVGHALF, Vizszint (m)
+ #med_sanc, number of data: 48, info: K_KB_SANC_MED_02KAM_HS_M-AVGHALF, Vizszint (m)
+
+Reading datafile data/foviz_halozat/2012_11_06/Eredmenyek_FV_input_2012_11_06_barlang_nelkul.csv ...
+ A_CSEPEL_BF, number of data: 48, info: Csepel g�ph�z , Sz�m. �tlagos nyom�s
+ A_BEKAS_PUM, number of data: 48, info: Bmegyer II.gh.(alapz�na) , Nyom�s                                 
+ A_KM4_Q1600, number of data: 48, info: Nagynyom�s� gh. , �lagos nyom�s
+ A_KPM1-3, number of data: 48, info: Kmegyer I.g�ph�z , H�l�zati nyom�s
+ A_BUDAORSI_UT, number of data: 48, info: DB Buda�rsi �t (24) g�ph�z , Sziv�oldali nyom�s
+ A_ARPAD_UT, number of data: 48, info: DP �p�d �t (37) g�ph�z , Sziv�oldali nyom�s
+ A_GILICE_UJ_GH, number of data: 48, info: DP Gilice t�r (31) , Alapz�na nyom�s                        
+ K_GILICE_UJ_KEPE_GH, number of data: 48, info: DP Gilice t�r (31) � KEPE g�ph�z , Nyom�oldali nyom�s
+ A_KOB_TOV, number of data: 48, info: DP K��nya (29) g�ph�z , Alapz�na 1 nyom�s
+ K_KOBANYA_GH, number of data: 48, info: DP K��nya (29) g�ph�z , Nyom�oldali nyom�s
+ A_FELSOJH_GH, number of data: 48, info: �B Buda�jlak (13-75) , Alapz�na nyom�s
+ A_Z20-RADNOTI, number of data: 48, info: �B Margitsziget (74) Radn�ti , Nyom�oldali nyom�s
+ K_CINKOTA_MED, number of data: 48, info: �P Cinkotai �t (28) Medence 1. kamra , V�zszint
+ K_FERIHEGYI_RH_GH, number of data: 48, info: �P Ferihegyi �t(26) Rcsaba gh. , Sziv�oldali nyom�s
+ K_MATYASFOLDI_GH, number of data: 48, info: �P M�ty�sf�ld (25) g�ph�z , Sziv�oldali nyom�s
+ A_1, number of data: 48, info: �P R�kosszentmih�ly (27) gh. , Alapz�na nyom�s
+ K_RSZM_GH, number of data: 48, info: �P R�kosszentmih�ly (27) gh. , Nyom�oldali nyom�s
+ A_UTEG_GH, number of data: 48, info: �P �teg u.(8) G�ph�z , Sziv�oldali nyom�s
+ A_BARLANG_HNY, number of data: 48, info: KB Gell�rt (1) Kelenhegyi gh. , Nyom�s
+ A_NODE265, number of data: 48, info: KB Krisztina (79_85) , Nagyenyed NA800 nyom�s
+
+ Setting up pools...
+	 Pool name: #med_cinkota, 	ID: POOL288, i.e. agelemek.at(233) aka POOL288 -> H0 = 2.62299
+	 Pool name: #med_gilice, 	ID: POOL315, i.e. agelemek.at(241) aka POOL315 -> H0 = 2.11036
+	 Pool name: #med_kob_regi, 	ID: POOL327, i.e. agelemek.at(245) aka POOL327 -> H0 = 5.08908
+	 Pool name: #med_kob_uj, 	ID: POOL324, i.e. agelemek.at(244) aka POOL324 -> H0 = 3.15535
+	 Pool name: #med_krisztina, 	ID: POOL276, i.e. agelemek.at(232) aka POOL276 -> H0 = 2.13795
+	 Pool name: #med_rakossz, 	ID: POOL303, i.e. agelemek.at(237) aka POOL303 -> H0 = 4.99259
+	 Pool name: #med_sanc, 	ID: POOL336, i.e. agelemek.at(246) aka POOL336 -> H0 = 2.70876
+
+Evaluating initial state:
+
+Starting optimization.
+ Active pipes (number: 238):
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 40 41 42 44 47 48 49 50 57 58 60 61 62 63 64 65 66 69 72 74 75 76 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 145 146 147 148 149 150 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 189 191 192 193 194 195 196 197 198 199 200 201 202 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 223 224 225 226 227 228 229 230 231 233 234 235 241 242 243 244 246 248 249 250 251 252 253 254 255 256 257 258 259 260 263 264 PIPE538 PIPE541 PIPE548 PIPE591 PIPE689 PIPE693 PIPE697 PIPE702 PIPE705 
+
+Setting up LOWER_BOUND, UPPER_BOUND:
+	1 D=0.5, LB=0.25, UB=1
+	2 D=0.4, LB=0.2, UB=0.8
+	3 D=0.5, LB=0.25, UB=1
+	4 D=1, LB=0.5, UB=2
+	5 D=0.8, LB=0.4, UB=1.6
+	6 D=0.5, LB=0.25, UB=1
+	7 D=0.4, LB=0.2, UB=0.8
+	8 D=0.5, LB=0.25, UB=1
+	9 D=0.4, LB=0.2, UB=0.8
+	10 D=0.707107, LB=0.353554, UB=1.41421
+	11 D=0.5, LB=0.25, UB=1
+	12 D=0.5, LB=0.25, UB=1
+	13 D=0.5, LB=0.25, UB=1
+	14 D=0.5, LB=0.25, UB=1
+	15 D=0.3, LB=0.15, UB=0.6
+	16 D=0.4, LB=0.2, UB=0.8
+	17 D=0.6, LB=0.3, UB=1.2
+	18 D=0.4, LB=0.2, UB=0.8
+	19 D=0.5, LB=0.25, UB=1
+	20 D=0.6, LB=0.3, UB=1.2
+	21 D=0.4, LB=0.2, UB=0.8
+	22 D=0.6, LB=0.3, UB=1.2
+	23 D=0.3, LB=0.15, UB=0.6
+	24 D=0.424264, LB=0.212132, UB=0.848528
+	25 D=1.11803, LB=0.559017, UB=2.23607
+	26 D=0.583095, LB=0.291548, UB=1.16619
+	27 D=0.67082, LB=0.33541, UB=1.34164
+	28 D=0.8, LB=0.4, UB=1.6
+	29 D=0.848528, LB=0.424264, UB=1.69706
+	30 D=0.6, LB=0.3, UB=1.2
+	31 D=1.20416, LB=0.602079, UB=2.40832
+	32 D=0.5, LB=0.25, UB=1
+	33 D=0.707107, LB=0.353554, UB=1.41421
+	34 D=0.8, LB=0.4, UB=1.6
+	35 D=0.824621, LB=0.412311, UB=1.64924
+	36 D=0.4, LB=0.2, UB=0.8
+	37 D=0.4, LB=0.2, UB=0.8
+	38 D=0.6, LB=0.3, UB=1.2
+	40 D=0.4, LB=0.2, UB=0.8
+	41 D=0.5, LB=0.25, UB=1
+	42 D=1, LB=0.5, UB=2
+	44 D=1, LB=0.5, UB=2
+	47 D=1.2, LB=0.6, UB=2.4
+	48 D=1.2, LB=0.6, UB=2.4
+	49 D=0.8, LB=0.4, UB=1.6
+	50 D=0.8, LB=0.4, UB=1.6
+	57 D=0.7, LB=0.35, UB=1.4
+	58 D=0.8, LB=0.4, UB=1.6
+	60 D=0.5, LB=0.25, UB=1
+	61 D=0.6, LB=0.3, UB=1.2
+	62 D=0.6, LB=0.3, UB=1.2
+	63 D=0.7, LB=0.35, UB=1.4
+	64 D=1, LB=0.5, UB=2
+	65 D=0.7, LB=0.35, UB=1.4
+	66 D=0.5, LB=0.25, UB=1
+	69 D=0.6, LB=0.3, UB=1.2
+	72 D=0.8, LB=0.4, UB=1.6
+	74 D=1.56205, LB=0.781025, UB=3.1241
+	75 D=1.4, LB=0.7, UB=2.8
+	76 D=1.4, LB=0.7, UB=2.8
+	78 D=1.13137, LB=0.565685, UB=2.26274
+	79 D=1, LB=0.5, UB=2
+	80 D=1.2, LB=0.6, UB=2.4
+	81 D=1.2, LB=0.6, UB=2.4
+	82 D=0.8, LB=0.4, UB=1.6
+	83 D=0.8, LB=0.4, UB=1.6
+	84 D=0.8, LB=0.4, UB=1.6
+	85 D=1.13137, LB=0.565685, UB=2.26274
+	86 D=0.8, LB=0.4, UB=1.6
+	87 D=0.8, LB=0.4, UB=1.6
+	88 D=0.8, LB=0.4, UB=1.6
+	89 D=1, LB=0.5, UB=2
+	90 D=0.8, LB=0.4, UB=1.6
+	91 D=0.8, LB=0.4, UB=1.6
+	92 D=0.8, LB=0.4, UB=1.6
+	93 D=0.8, LB=0.4, UB=1.6
+	94 D=1.41421, LB=0.707107, UB=2.82843
+	95 D=1.2, LB=0.6, UB=2.4
+	96 D=1, LB=0.5, UB=2
+	97 D=0.8, LB=0.4, UB=1.6
+	98 D=0.8, LB=0.4, UB=1.6
+	99 D=1.84391, LB=0.921955, UB=3.68782
+	100 D=1.2, LB=0.6, UB=2.4
+	101 D=1.2, LB=0.6, UB=2.4
+	102 D=0.6, LB=0.3, UB=1.2
+	103 D=0.8, LB=0.4, UB=1.6
+	104 D=1.16619, LB=0.583095, UB=2.33238
+	105 D=0.8, LB=0.4, UB=1.6
+	106 D=0.5, LB=0.25, UB=1
+	107 D=1.34164, LB=0.670821, UB=2.68328
+	108 D=1.4, LB=0.7, UB=2.8
+	109 D=1.4, LB=0.7, UB=2.8
+	110 D=1.6, LB=0.8, UB=3.2
+	111 D=0.6, LB=0.3, UB=1.2
+	112 D=1.2, LB=0.6, UB=2.4
+	113 D=1.69706, LB=0.848528, UB=3.39411
+	114 D=0.8, LB=0.4, UB=1.6
+	115 D=1.6, LB=0.8, UB=3.2
+	116 D=1.4, LB=0.7, UB=2.8
+	117 D=1.2, LB=0.6, UB=2.4
+	118 D=1.4, LB=0.7, UB=2.8
+	119 D=1.3, LB=0.65, UB=2.6
+	120 D=1, LB=0.5, UB=2
+	121 D=1.44222, LB=0.72111, UB=2.88444
+	122 D=0.8, LB=0.4, UB=1.6
+	123 D=1, LB=0.5, UB=2
+	124 D=1.2, LB=0.6, UB=2.4
+	125 D=0.6, LB=0.3, UB=1.2
+	126 D=0.5, LB=0.25, UB=1
+	127 D=1.2, LB=0.6, UB=2.4
+	128 D=1.6, LB=0.8, UB=3.2
+	129 D=0.5, LB=0.25, UB=1
+	130 D=1.05, LB=0.525, UB=2.1
+	131 D=1, LB=0.5, UB=2
+	132 D=0.6, LB=0.3, UB=1.2
+	133 D=0.8, LB=0.4, UB=1.6
+	134 D=0.781025, LB=0.390512, UB=1.56205
+	135 D=1.4, LB=0.7, UB=2.8
+	136 D=0.8, LB=0.4, UB=1.6
+	137 D=1, LB=0.5, UB=2
+	138 D=1.6, LB=0.8, UB=3.2
+	139 D=0.8, LB=0.4, UB=1.6
+	140 D=0.8, LB=0.4, UB=1.6
+	141 D=1, LB=0.5, UB=2
+	142 D=1.2, LB=0.6, UB=2.4
+	143 D=1.2, LB=0.6, UB=2.4
+	145 D=0.5, LB=0.25, UB=1
+	146 D=0.707107, LB=0.353554, UB=1.41421
+	147 D=1.87617, LB=0.938083, UB=3.75233
+	148 D=1.2, LB=0.6, UB=2.4
+	149 D=0.6, LB=0.3, UB=1.2
+	150 D=1.2, LB=0.6, UB=2.4
+	152 D=1, LB=0.5, UB=2
+	153 D=0.6, LB=0.3, UB=1.2
+	154 D=0.8, LB=0.4, UB=1.6
+	155 D=1.6, LB=0.8, UB=3.2
+	156 D=0.6, LB=0.3, UB=1.2
+	157 D=0.5, LB=0.25, UB=1
+	158 D=0.7, LB=0.35, UB=1.4
+	159 D=1.44222, LB=0.72111, UB=2.88444
+	160 D=0.8, LB=0.4, UB=1.6
+	161 D=0.8, LB=0.4, UB=1.6
+	162 D=0.8, LB=0.4, UB=1.6
+	163 D=1, LB=0.5, UB=2
+	164 D=1, LB=0.5, UB=2
+	165 D=1.2, LB=0.6, UB=2.4
+	166 D=1, LB=0.5, UB=2
+	168 D=0.6, LB=0.3, UB=1.2
+	169 D=0.8, LB=0.4, UB=1.6
+	170 D=1.2, LB=0.6, UB=2.4
+	171 D=1.2, LB=0.6, UB=2.4
+	172 D=0.7, LB=0.35, UB=1.4
+	173 D=0.707107, LB=0.353554, UB=1.41421
+	174 D=0.5, LB=0.25, UB=1
+	175 D=0.5, LB=0.25, UB=1
+	176 D=0.6, LB=0.3, UB=1.2
+	177 D=0.8, LB=0.4, UB=1.6
+	178 D=1, LB=0.5, UB=2
+	179 D=1.28062, LB=0.640312, UB=2.56125
+	180 D=1, LB=0.5, UB=2
+	181 D=0.5, LB=0.25, UB=1
+	182 D=1.58509, LB=0.792543, UB=3.17017
+	183 D=0.8, LB=0.4, UB=1.6
+	184 D=1, LB=0.5, UB=2
+	185 D=0.8, LB=0.4, UB=1.6
+	189 D=1.84391, LB=0.921955, UB=3.68782
+	191 D=0.848528, LB=0.424264, UB=1.69706
+	192 D=1, LB=0.5, UB=2
+	193 D=0.8, LB=0.4, UB=1.6
+	194 D=0.7, LB=0.35, UB=1.4
+	195 D=0.8, LB=0.4, UB=1.6
+	196 D=1.6, LB=0.8, UB=3.2
+	197 D=1, LB=0.5, UB=2
+	198 D=1.53623, LB=0.768115, UB=3.07246
+	199 D=1.2, LB=0.6, UB=2.4
+	200 D=0.8, LB=0.4, UB=1.6
+	201 D=0.55, LB=0.275, UB=1.1
+	202 D=0.8, LB=0.4, UB=1.6
+	204 D=1.6, LB=0.8, UB=3.2
+	205 D=1.6, LB=0.8, UB=3.2
+	206 D=1, LB=0.5, UB=2
+	207 D=0.8, LB=0.4, UB=1.6
+	208 D=1.13137, LB=0.565685, UB=2.26274
+	209 D=1.2, LB=0.6, UB=2.4
+	210 D=1.4, LB=0.7, UB=2.8
+	211 D=1.4, LB=0.7, UB=2.8
+	212 D=0.7, LB=0.35, UB=1.4
+	213 D=1, LB=0.5, UB=2
+	214 D=0.8, LB=0.4, UB=1.6
+	215 D=0.5, LB=0.25, UB=1
+	216 D=1, LB=0.5, UB=2
+	217 D=0.6, LB=0.3, UB=1.2
+	218 D=0.8, LB=0.4, UB=1.6
+	219 D=1.2, LB=0.6, UB=2.4
+	220 D=1.69706, LB=0.848528, UB=3.39411
+	221 D=0.8, LB=0.4, UB=1.6
+	222 D=0.8, LB=0.4, UB=1.6
+	223 D=1.2, LB=0.6, UB=2.4
+	224 D=0.8, LB=0.4, UB=1.6
+	225 D=1.6, LB=0.8, UB=3.2
+	226 D=1.6, LB=0.8, UB=3.2
+	227 D=1, LB=0.5, UB=2
+	228 D=1.4, LB=0.7, UB=2.8
+	229 D=0.8, LB=0.4, UB=1.6
+	230 D=1.2, LB=0.6, UB=2.4
+	231 D=0.8, LB=0.4, UB=1.6
+	233 D=0.8, LB=0.4, UB=1.6
+	234 D=0.6, LB=0.3, UB=1.2
+	235 D=1.2, LB=0.6, UB=2.4
+	241 D=1.4, LB=0.7, UB=2.8
+	242 D=1.4, LB=0.7, UB=2.8
+	243 D=1.6, LB=0.8, UB=3.2
+	244 D=1.2, LB=0.6, UB=2.4
+	246 D=0.8, LB=0.4, UB=1.6
+	248 D=1, LB=0.5, UB=2
+	249 D=1.2, LB=0.6, UB=2.4
+	250 D=1.6, LB=0.8, UB=3.2
+	251 D=0.8, LB=0.4, UB=1.6
+	252 D=0.8, LB=0.4, UB=1.6
+	253 D=1.6, LB=0.8, UB=3.2
+	254 D=0.8, LB=0.4, UB=1.6
+	255 D=0.6, LB=0.3, UB=1.2
+	256 D=0.8, LB=0.4, UB=1.6
+	257 D=0.8, LB=0.4, UB=1.6
+	258 D=1, LB=0.5, UB=2
+	259 D=1, LB=0.5, UB=2
+	260 D=2, LB=1, UB=4
+	263 D=0.8, LB=0.4, UB=1.6
+	264 D=0.8, LB=0.4, UB=1.6
+	PIPE538 D=1, LB=0.5, UB=2
+	PIPE541 D=1, LB=0.5, UB=2
+	PIPE548 D=1, LB=0.5, UB=2
+	PIPE591 D=1.4, LB=0.7, UB=2.8
+	PIPE689 D=1, LB=0.5, UB=2
+	PIPE693 D=0.2, LB=0.1, UB=0.4
+	PIPE697 D=0.56209, LB=0.281045, UB=1.12418
+	PIPE702 D=0.3, LB=0.15, UB=0.6
+	PIPE705 D=1, LB=0.5, UB=2
+
+ Objective evaluation #0	Error: 3197.06
+ Objective evaluation #100	Error: 2031.25
+ Objective evaluation #200	Error: 2643.36
+ Objective evaluation #300	Error: 4490.04
+ Objective evaluation #400	Error: 2662.88
+ Objective evaluation #500	Error: 2006.88

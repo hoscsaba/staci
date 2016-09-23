@@ -13,10 +13,58 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f72ed067-d179-4092-9461-72fee8098102" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Staci.o" afterPath="$PROJECT_DIR$/Staci@Mac/Staci.o" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.o" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.o" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci.cpp" afterPath="$PROJECT_DIR$/Staci.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_1.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_1.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_10.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_10.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_11.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_11.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_12.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_12.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_13.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_13.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_14.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_14.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_15.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_15.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_16.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_16.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_17.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_17.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_18.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_18.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_19.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_19.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_2.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_2.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_20.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_20.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_21.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_21.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_22.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_22.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_23.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_23.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_24.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_24.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_25.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_25.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_26.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_26.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_27.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_27.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_28.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_28.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_29.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_29.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_3.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_3.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_30.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_30.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_31.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_31.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_32.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_32.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_33.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_33.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_34.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_34.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_35.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_35.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_36.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_36.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_37.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_37.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_38.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_38.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_39.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_39.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_4.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_4.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_40.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_40.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_41.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_41.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_42.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_42.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_43.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_43.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_44.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_44.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_45.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_45.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_46.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_46.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_47.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_47.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_5.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_5.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_6.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_6.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_7.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_7.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_8.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_8.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_9.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_9.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/staci_calibrate.cpp" afterPath="$PROJECT_DIR$/staci_calibrate.cpp" />
     </list>
     <ignored path="staci.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -36,11 +84,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="staci_calibrate.cpp" pinned="false" current-in-tab="false">
+      <file leaf-file-name="staci_calibrate.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/staci_calibrate.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="105" column="31" selection-start-line="105" selection-start-column="31" selection-end-line="105" selection-end-column="31" />
+            <state relative-caret-position="277">
+              <caret line="209" column="5" selection-start-line="209" selection-start-column="5" selection-end-line="209" selection-end-column="5" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
               </folding>
@@ -48,10 +96,10 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Staci.cpp" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Staci.cpp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Staci.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="142">
+            <state relative-caret-position="1035">
               <caret line="69" column="0" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
@@ -63,7 +111,7 @@
       <file leaf-file-name="Staci.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Staci.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="277">
+            <state relative-caret-position="885">
               <caret line="59" column="19" selection-start-line="59" selection-start-column="13" selection-end-line="59" selection-end-column="19" />
               <folding />
             </state>
@@ -73,8 +121,8 @@
       <file leaf-file-name="staci_calibrate_settings.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="16" selection-start-line="3" selection-start-column="16" selection-end-line="3" selection-end-column="16" />
+            <state relative-caret-position="150">
+              <caret line="10" column="19" selection-start-line="10" selection-start-column="19" selection-end-line="10" selection-end-column="19" />
               <folding />
             </state>
           </provider>
@@ -108,9 +156,9 @@
         <option value="$PROJECT_DIR$/Staci@Mac/staci_calibrate.log" />
         <option value="$PROJECT_DIR$/Staci@Wylie/makefile_calibrate" />
         <option value="$PROJECT_DIR$/Staci@Wylie/makefile_calibrate.mk" />
+        <option value="$PROJECT_DIR$/Staci.cpp" />
         <option value="$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml" />
         <option value="$PROJECT_DIR$/staci_calibrate.cpp" />
-        <option value="$PROJECT_DIR$/Staci.cpp" />
       </list>
     </option>
   </component>
@@ -152,24 +200,7 @@
     </navigator>
     <panes>
       <pane id="ProjectPane">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="staci" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="staci" />
-              <option name="myItemType" value="com.jetbrains.cidr.projectView.CidrFilesViewHelper$MyProjectTreeStructure$1" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="staci" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
+        <subPane />
       </pane>
     </panes>
   </component>
@@ -382,7 +413,8 @@
       <workItem from="1474546057611" duration="3025000" />
       <workItem from="1474558446705" duration="5987000" />
       <workItem from="1474579852113" duration="233000" />
-      <workItem from="1474580771486" duration="1926000" />
+      <workItem from="1474580771486" duration="2219000" />
+      <workItem from="1474625149892" duration="2644000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed issue with residential time computation.">
       <created>1460530738994</created>
@@ -395,7 +427,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="74395000" />
+    <option name="totallyTimeSpent" value="77332000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -407,15 +439,15 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1680" height="978" extended-state="6" />
-    <editor active="true" />
+    <frame x="0" y="23" width="1680" height="978" extended-state="0" />
+    <editor active="false" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24231465" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24231465" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21699819" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21699819" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -770,27 +802,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="16" selection-start-line="3" selection-start-column="16" selection-end-line="3" selection-end-column="16" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/staci_calibrate.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="105" column="31" selection-start-line="105" selection-start-column="31" selection-end-line="105" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Staci.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="277">
+        <state relative-caret-position="885">
           <caret line="59" column="19" selection-start-line="59" selection-start-column="13" selection-end-line="59" selection-end-column="19" />
           <folding />
         </state>
@@ -798,10 +812,28 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Staci.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="142">
+        <state relative-caret-position="1035">
           <caret line="69" column="0" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="0" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="19" selection-start-line="10" selection-start-column="19" selection-end-line="10" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/staci_calibrate.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="277">
+          <caret line="209" column="5" selection-start-line="209" selection-start-column="5" selection-end-line="209" selection-end-column="5" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>

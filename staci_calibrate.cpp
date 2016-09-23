@@ -19,6 +19,7 @@ int Staci_debug_level;
 string dir_name;
 string fname_prefix;
 string logfilename;
+string best_logfilename;
 string Eredmenyek_FVM_dfile;
 string FVM_dfile;
 
@@ -31,33 +32,35 @@ void Update_Reservoirs(unsigned int);
 void logfile_write(string msg, int debug_level);
 
 int Num_of_Periods;
-vector <string> pipe_names;
+//vector<string> pipe_names;
 vector<Staci *> wds;
 
-vector <string> FVM_Pressure_StaciID;
+vector<string> FVM_Pressure_StaciID;
 vector<int> FVM_Pressure_Staci_Idx;
-vector <string> FVM_Pressure_Info;
-vector < vector<double> > FVM_Pressure_Values;
-vector < vector<double> > Staci_Pressure_Values;
+vector<string> FVM_Pressure_Info;
+vector<vector<double> > FVM_Pressure_Values;
+vector<vector<double> > Staci_Pressure_Values;
 
-vector <string> FVM_Pool_StaciID;
+vector<string> FVM_Pool_StaciID;
 vector<int> FVM_Pool_Staci_Idx;
-vector <string> FVM_Pool_Info;
-vector <vector<double> > FVM_Pool_tmp_Values;
-vector <vector<double> > FVM_Pool_Values;
-vector <vector<double> > Staci_Pool_Values;
+vector<string> FVM_Pool_Info;
+vector<vector<double> > FVM_Pool_tmp_Values;
+vector<vector<double> > FVM_Pool_Values;
+vector<vector<double> > Staci_Pool_Values;
 
-vector <string> FVM_Pool_IDs;
-vector <string> FVM_Pool_Names;
+vector<string> FVM_Pool_IDs;
+vector<string> FVM_Pool_Names;
 vector<int> FVM_Pool_Name_Idx; // this staci element refers to the actual FVM Pool
 
 vector<double> PoolSurfs;
 
-vector <string> pipe_name;
+vector<string> pipe_name;
 vector<bool> pipe_is_active;
 unsigned int num_of_active_pipes;
+vector<double> pipe_origD;
 
 void Set_Up_Active_Pipes();
+
 double Dmin;
 
 int Find_Pressure_Index(string PressureName);
@@ -80,25 +83,29 @@ int Obj_Eval;
 
 string Load_Settings();
 
-void PrintBestDataFile();
+void PrintBestDataFile(GAGenome &);
 
 bool last_computation_OK;
 int popsize;
 int ngen;
 float pmut;
 float pcross;
+float best_obj;
 
 int main(int argc, char **argv) {
 
     Obj_Eval = 0;
+    best_obj = 1.e10;
     last_computation_OK = false;
 
     // Load parameters, including logfile name
     string msg_set = Load_Settings();
 
-    // Clear logfile
+    // Clear logfile and best_individual.txt
     ofstream ofs(logfilename.c_str(), std::ios::out | std::ios::trunc);
     ofs.close();
+    ofstream ofs1(best_logfilename.c_str(), std::ios::out | std::ios::trunc);
+    ofs1.close();
 
     // Write Settings to logfile
     logfile_write(msg_set, 0);
@@ -195,15 +202,31 @@ int main(int argc, char **argv) {
     ga.statistics().write("bog_stats.dat");
     genome = ga.statistics().bestIndividual();
     Objective(genome);
-    PrintBestDataFile();
+    PrintBestDataFile(genome);
 
     return 0;
 }
 
-void PrintBestDataFile() {
+void PrintBestDataFile(GAGenome &x) {
+    GABin2DecGenome &genome = (GABin2DecGenome &) x;
+
+
     ofstream resfile;
     resfile.open("best.dat", ios::out);
     resfile << scientific << setprecision(5);
+
+    for (unsigned int j = 0; j < genome.nPhenotypes(); j++)
+        if (pipe_is_active.at(j))
+            resfile << pipe_name.at(j) << " ; ";
+    resfile << endl;
+    for (unsigned int j = 0; j < genome.nPhenotypes(); j++)
+        resfile << genome.phenotype(j) << " ; ";
+    resfile << endl;
+    for (unsigned int j = 0; j < genome.nPhenotypes(); j++)
+        resfile << genome.phenotype(j)/pipe_origD.at(j) << " ; ";
+    resfile << endl;
+
+
     for (unsigned int i = 0; i < FVM_Pool_Names.size(); i++)
         resfile << "FVM " << FVM_Pool_Names.at(i) << " ; " << FVM_Pool_Names.at(i) << " ; ";
     for (unsigned int i = 0; i < FVM_Pressure_StaciID.size(); i++)
@@ -261,6 +284,19 @@ Objective(GAGenome &x) {
         err = 1.e5;
     }
 
+    // Save best into the best_logfile
+    if (err < best_obj) {
+        best_obj = err;
+        ofstream best_logfile;
+        best_logfile.open(best_logfilename.c_str(), ios::app);
+        best_logfile << Obj_Eval << "; " << err << scientific << setprecision(5);
+        for (unsigned int i = 0; i < genome.nPhenotypes(); i++)
+            best_logfile << "; " << genome.phenotype(i);
+        best_logfile << endl;
+        best_logfile.close();
+        PrintBestDataFile(genome);
+    }
+
     Obj_Eval++;
 
     return err;
@@ -270,8 +306,10 @@ Objective(GAGenome &x) {
 void Set_Up_Active_Pipes() {
 
     num_of_active_pipes = 0;
+
     for (unsigned int i = 0; i < wds.at(0)->agelemek.size(); i++)
         if (strcmp(wds.at(0)->agelemek.at(i)->Get_Tipus().c_str(), "Cso") == 0) {
+            pipe_origD.push_back(wds.at(0)->agelemek.at(i)->Get_dprop("diameter"));
             pipe_name.push_back(wds.at(0)->agelemek.at(i)->Get_nev());
             if (wds.at(0)->agelemek.at(i)->Get_dprop("diameter") > Dmin) {
                 pipe_is_active.push_back(true);
@@ -409,7 +447,7 @@ void Update_Reservoirs(unsigned int i) {
 
 void Load_FVM_Datafiles() {
     stringstream tmp, msg;
-    vector <vector<string> > lines;
+    vector<vector<string> > lines;
 
     // POOL DATA FILE
     tmp.str("");
@@ -717,6 +755,7 @@ string Load_Settings() {
     dir_name = xMainNode.getChildNode("dir_name").getText();
     fname_prefix = xMainNode.getChildNode("fname_prefix").getText();
     logfilename = xMainNode.getChildNode("logfilename").getText();
+    best_logfilename = xMainNode.getChildNode("best_logfilename").getText();
     Eredmenyek_FVM_dfile = xMainNode.getChildNode("Eredmenyek_FVM_dfile").getText();
     FVM_dfile = xMainNode.getChildNode("FVM_dfile").getText();
     Num_of_Periods = atoi(xMainNode.getChildNode("Num_of_Periods").getText());
@@ -734,6 +773,7 @@ string Load_Settings() {
     msg << "\t dir_name             : " << dir_name << endl;
     msg << "\t fname_prefix         : " << fname_prefix << endl;
     msg << "\t logfilename          : " << logfilename << endl;
+    msg << "\t best_logfilename     : " << best_logfilename << endl;
     msg << "\t Eredmenyek_FVM_dfile : " << FVM_dfile << endl;
     msg << "\t Num_of_Periods       : " << Num_of_Periods << endl;
     msg << "\t Dmin                 : " << Dmin << endl << endl;
