@@ -2,7 +2,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
+plt.close('all')
+
 filename = str(sys.argv[1])
+
+print("")
 print("Datafile plotted: %s" % filename)
 
 pipe_names = []
@@ -37,95 +41,22 @@ print("Size of pipe_dia is     %d" % len(pipe_dia))
 print("Size of pipe_dia_mul is %d" % len(pipe_dia_mul))
 print("Size of titles is       %d" % len(titles))
 print("Number of rows in data: %d" % len(data))
+print("")
+
+for i in range(0, len(titles)/2):
+    print(" %2d - %s" % (i, titles[2*i+1]))
+
+plot_this = input("Choose data to plot: ")
 
 x = np.linspace(0, len(data), len(data))/2
 data = np.array(data)
 
 plt.figure(1)
-for i in range(0, 7):
-    plt.subplot(3, 3, i+1)
-    plt.plot(x, data[:, 2*i], x, data[:, 2*i+1])
-    plt.xlim([0, 24])
-    plt.title(titles[2*i+1])
-    if i > 5:
-        plt.xlabel("time (hours)")
-    if (i == 0) or (i == 3) or (i == 6):
-        plt.ylabel("Pool water level (m)")
-    if i < 6:
-        plt.gca().axes.xaxis.set_ticklabels([])
-    plt.grid(True)
-
-# plt.show()
-plt.savefig("pools.pdf")
-
-plt.figure(2)
-sf = 8
-for i in range(0, 9):
-    plt.subplot(3, 3, i+1)
-    plt.plot(x, data[:, sf+2*i], x, data[:, sf+2*i+1])
-    plt.xlim([0, 24])
-    plt.title(titles[sf+2*i+1])
-    if i > 5:
-        plt.xlabel("time (hours)")
-    if (i == 0) or (i == 3) or (i == 6):
-        plt.ylabel("pressure (mwc)")
-    if i < 6:
-        plt.gca().axes.xaxis.set_ticklabels([])
-    plt.grid(True)
-
-# plt.show()
-plt.savefig("pressures1.pdf")
-
-plt.figure(3)
-sf = 2*9
-for i in range(0, 9):
-    plt.subplot(3, 3, i+1)
-    plt.plot(x, data[:, sf+2*i], x, data[:, sf+2*i+1])
-    plt.xlim([0, 24])
-    plt.title(titles[sf+2*i+1])
-    if i > 5:
-        plt.xlabel("time (hours)")
-    if (i == 0) or (i == 3) or (i == 6):
-        plt.ylabel("pressure (mwc)")
-    if i < 6:
-        plt.gca().axes.xaxis.set_ticklabels([])
-    plt.grid(True)
-
-# plt.show()
-plt.savefig("pressures2.pdf")
-
-plt.figure(4)
-sf = 3*9
-for i in range(0, 9):
-    plt.subplot(3, 3, i+1)
-    plt.plot(x, data[:, sf+2*i], x, data[:, sf+2*i+1])
-    plt.xlim([0, 24])
-    plt.title(titles[sf+2*i+1])
-    if i > 5:
-        plt.xlabel("time (hours)")
-    if (i == 0) or (i == 3) or (i == 6):
-        plt.ylabel("pressure (mwc)")
-    if i < 6:
-        plt.gca().axes.xaxis.set_ticklabels([])
-    plt.grid(True)
-
-# plt.show()
-plt.savefig("pressures3.pdf")
-
-plt.figure(5)
-sf = 4*9
-for i in range(0, 9):
-    plt.subplot(3, 3, i+1)
-    plt.plot(x, data[:, sf+2*i], x, data[:, sf+2*i+1])
-    plt.xlim([0, 24])
-    plt.title(titles[sf+2*i+1])
-    if i > 5:
-        plt.xlabel("time (hours)")
-    if (i == 0) or (i == 3) or (i == 6):
-        plt.ylabel("pressure (mwc)")
-    if i < 6:
-        plt.gca().axes.xaxis.set_ticklabels([])
-    plt.grid(True)
-
-# plt.show()
-plt.savefig("pressures4.pdf")
+plt.plot(x, data[:, 2*plot_this], x, data[:, 2*plot_this+1])
+plt.xlim([0, 24])
+plt.title(titles[2*plot_this+1])
+plt.xlabel("time (hours)")
+plt.ylabel("Pool water level (m)")
+plt.grid(True)
+plt.show()
+# plt.savefig("pools.pdf")

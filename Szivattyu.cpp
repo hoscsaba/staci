@@ -1,4 +1,5 @@
 using namespace std;
+
 #include <iomanip>
 #include <string>
 #include <vector>
@@ -7,9 +8,8 @@ using namespace std;
 #include "nr.h"
 
 Szivattyu::Szivattyu(const string a_nev, const string a_cspe_nev,
-                     const string a_cspv_nev, const double a_ro, const double Aref , vector<double> a_q,
-                     vector<double> a_H, const double a_mp): Agelem(a_nev, Aref, a_mp,a_ro)
-{
+                     const string a_cspv_nev, const double a_ro, const double Aref, vector<double> a_q,
+                     vector<double> a_H, const double a_mp) : Agelem(a_nev, Aref, a_mp, a_ro) {
     //Kotelezo adatok minden Agelemnel:
     tipus = "Szivattyu";
     csp_db = 2;
@@ -30,14 +30,12 @@ Szivattyu::Szivattyu(const string a_nev, const string a_cspe_nev,
     DP d;
     //    for (int i=0; i<q.size(); i++) cout<<endl<<"++++ q("<<i<<")="<<q.at(i)<<", H("<<i<<")="<<H.at(i);
     // b eloallitasa:
-    for (int i = 0; i < fokszam; i++)
-    {
+    for (int i = 0; i < fokszam; i++) {
         b[i] = 0.0;
         for (unsigned int k = 0; k < q.size(); k++)
             b[i] += H.at(k) * pow(q.at(k), i);
         //        cout<<"\nb["<<i<<"]="<<b[i]<<endl<<"A["<<i<<",:]=";
-        for (int j = 0; j < fokszam; j++)
-        {
+        for (int j = 0; j < fokszam; j++) {
             A[i][j] = 0.0;
             for (unsigned int k = 0; k < q.size(); k++)
                 A[i][j] += pow(q.at(k), i) * pow(q.at(k), j);
@@ -55,10 +53,8 @@ Szivattyu::Szivattyu(const string a_nev, const string a_cspe_nev,
     mer_szorzo = 10;
 
     if (p.at(1) > 0)
-    {
-        cout << endl << "\tWarning! PUMP: " << nev << ":  dH/dQ(0)=" << p.at(1) << " > 0 !!!";
-        //cin.get();
-    }
+        if (debug_level > 0)
+            cout << endl << "\tWarning! PUMP: " << nev << ":  dH/dQ(0)=" << p.at(1) << " > 0 !!!";
 
     //cout<<endl<<"Az illesztett polinom egyenlete:"<<endl;
     //for (int i=0; i<fokszam; i++) cout<<"\t"<<p[i];
@@ -89,11 +85,11 @@ Szivattyu::Szivattyu(const string a_nev, const string a_cspe_nev,
 Szivattyu::~Szivattyu() {}
 
 //--------------------------------------------------------------
-string Szivattyu::Info()
-{
+string Szivattyu::Info() {
     ostringstream strstrm;
     strstrm << Agelem::Info();
-    strstrm << endl << "  kapcsolodas : " << cspe_nev << "(index:" << cspe_index << ") --> " << cspv_nev << "(index:" << cspv_index << ")\n";
+    strstrm << endl << "  kapcsolodas : " << cspe_nev << "(index:" << cspe_index << ") --> " << cspv_nev << "(index:"
+            << cspv_index << ")\n";
     cout << setprecision(3);
     vector<double>::iterator it;
     strstrm << "       adatok : Q [m3/h]= ";
@@ -119,8 +115,7 @@ The function evaluates the curve fit by the constructor \sa Szivattyu()
 \param x(3)=zend
 \return (double) function error (should be zero)
 \sa PumpCharCurve()
-*/double Szivattyu::f(vector<double> x)
-{
+*/double Szivattyu::f(vector<double> x) {
     double ere;
     double pe = x[0] * ro * g;
     double pv = x[1] * ro * g;
@@ -139,25 +134,24 @@ The function evaluates the curve fit by the constructor \sa Szivattyu()
 \return (double) head in m
 \sa Szivattyu() and f()
 */
-double Szivattyu::PumpCharCurve(double qq)
-{
+double Szivattyu::PumpCharCurve(double qq) {
 
     double He = 0.0;
     double qmax = q.at(q.size() - 1);
     double Hmin = H.at(H.size() - 1);
-    if (qq < 0)
-    {
+    if (qq < 0) {
         He = -mer_szorzo * p[0] / qmax * qq + p[0];
-        cout << endl << "\tWarning! PUMP: " << nev << ": Q=" << (qq * 3600) << " m^3/h < 0, H=" << He << " m, p[0]=H(0)=" << p[0];
-    }
-    else
-    {
+        if (debug_level > 0)
+            cout << endl << "\tWarning! PUMP: " << nev << ": Q=" << (qq * 3600) << " m^3/h < 0, H=" << He
+                 << " m, p[0]=H(0)=" << p[0];
+    } else {
         if (qq < qmax)
             for (int i = 0; i < fokszam; i++) He += p[i] * pow(qq, i);
-        else
-        {
+        else {
             He = -mer_szorzo * p[0] / qmax * (qq - qmax) + Hmin;
-            cout << endl << "\tWarning! PUMP: " << nev << ": Q=" << (qq * 3600) << " m^3/h > Qmax, extrapolating on the performace curve gives H=" << He << " m";
+            if (debug_level > 0)
+                cout << endl << "\tWarning! PUMP: " << nev << ": Q=" << (qq * 3600)
+                     << " m^3/h > Qmax, extrapolating on the performace curve gives H=" << He << " m";
         }
     }
     return He;
@@ -165,8 +159,7 @@ double Szivattyu::PumpCharCurve(double qq)
 
 
 //--------------------------------------------------------------
-vector<double> Szivattyu::df(vector<double> x)
-{
+vector<double> Szivattyu::df(vector<double> x) {
     vector<double> ere;
     ere.push_back(-1.0);
     ere.push_back(+1.0);
@@ -216,8 +209,7 @@ vector<double> Szivattyu::df(vector<double> x)
 }
 
 //--------------------------------------------------------------
-void Szivattyu::Ini(int mode, double value)
-{
+void Szivattyu::Ini(int mode, double value) {
     //if (mode==0)
     //mp=fabs(q.at(1)-q.at(q.size()-1))/2*ro;
     //else mp=value;
@@ -228,8 +220,7 @@ void Szivattyu::Ini(int mode, double value)
 }
 
 //--------------------------------------------------------------
-void Szivattyu::Set_dprop(string mit, double mire)
-{
+void Szivattyu::Set_dprop(string mit, double mire) {
     //    if (mit=="diameter")
     //      D=mire;
     //    else

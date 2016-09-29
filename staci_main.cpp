@@ -137,8 +137,6 @@ int main(int argc, char* argv[]) {
 		feladat.set_do_save_file(false);
 		solve_hydraulics(feladat,timing.at(2),timing.at(3));
 
-		//feladat.Print_Jacobian();
-		//feladat.Print_dfdmu();
 		feladat.Compute_dxdmu();
 		feladat.Print_dxdmu();
 
@@ -203,25 +201,13 @@ void solve_hydraulics(Staci&  feladat, double& time2, double& time3) {
 		cout<<endl <<      "* !!! THE SOLVER DID NOT CONVERGE, LAST ITERATION RESULTS ARE IN PROBLEM FILE !!! *";
 		cout<<endl <<      "***********************************************************************************" <<endl<<endl;
 
-		// feladat.save_results(false);
-		// //<feladatnev>.hiba.spr beallitasa
-		// string resfile = feladat.get_def_file()+".hiba.spr";
-		// feladat.copy_file(feladat.get_def_file(), resfile);
-		// feladat.set_res_file(resfile);
-		// feladat.save_results(true);
-
-		// ofstream outfile(rrs_file.c_str(), ios::trunc);
-		// outfile<<"ERROR!\n";
-		// outfile.close();
-		// feladat.logfile_write("\n\nERROR!", 0);
 	} else {
 		// Put "OK" to <problem.spr>.rrs
 		ofstream outfile(rrs_file.c_str(), ios::trunc);
 		outfile<<"OK\n";
 		outfile.close();
 		feladat.logfile_write("\n\nOK", 0);
-		
-		// If computation was OK, compute residence time also
+
 		feladat.solve_residence_time();
 	}
 	startTime = clock();
@@ -230,8 +216,4 @@ void solve_hydraulics(Staci&  feladat, double& time2, double& time3) {
 	endTime = clock();
 	time3=double( endTime - startTime ) / CLOCKS_PER_SEC;
 
-		//cout<<feladat.list_results();
-	// }
-
-	
 }

@@ -1,4 +1,5 @@
 using namespace std;
+
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -10,8 +11,7 @@ using namespace std;
 #include "Agelem.h"
 
 
-Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const double a_ro)
-{
+Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const double a_ro) {
     // tipus
     string tipus;
     // tomegaram es suruseg
@@ -31,15 +31,14 @@ Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const
     tt_start = 0.;
     tt_end = 0.;
 
-
     if (fabs(a_ro) < 1.0e-3)
         error("Agelem constructor", "Density (ro) is zero up to machine precision!");
+
 
 }
 
 //--------------------------------------------------------------
-Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const double a_ro, const double a_tt)
-{
+Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const double a_ro, const double a_tt) {
     // tipus
     string tipus;
     // tomegaram es suruseg
@@ -58,20 +57,18 @@ Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const
 
     tt_start = a_tt * 3600; // Az adatfajlbol oraban olvassuk ki, oraban
     tt_end = a_tt * 3600; // Az adatfajlbol oraban olvassuk ki, oraban
- 
+
     if (fabs(a_ro) < 1.0e-3)
         error("Agelem constructor", "Density (ro) is zero up to machine precision!");
 
 }
 
 //--------------------------------------------------------------
-Agelem::~Agelem()
-{
+Agelem::~Agelem() {
 }
 
 //--------------------------------------------------------------
-string Agelem::Info()
-{
+string Agelem::Info() {
     ostringstream strstrm;
     strstrm << "\n Agelem neve  : " << nev;
     strstrm << "\n        tipusa: " << tipus;
@@ -82,28 +79,24 @@ string Agelem::Info()
 }
 
 //--------------------------------------------------------------
-void Agelem::add_csp(const int a_cspe_index, const int a_cspv_index)
-{
+void Agelem::add_csp(const int a_cspe_index, const int a_cspv_index) {
     cspe_index = a_cspe_index;
     cspv_index = a_cspv_index;
 }
 
 //--------------------------------------------------------------
-vector<double> Agelem::Get_res(string mit)
-{
+vector<double> Agelem::Get_res(string mit) {
     vector<double> x;
     return x;
 }
 
 //--------------------------------------------------------------
-vector<double> Agelem::interp(vector<double> x, vector<double> y, vector<double> xg)
-{
+vector<double> Agelem::interp(vector<double> x, vector<double> y, vector<double> xg) {
     vector<double> yg;
     double xp, xn, yp, yn;
 
     double xmin = 1e100, xmax = -1e100;
-    for (unsigned int i = 0; i < x.size(); i++)
-    {
+    for (unsigned int i = 0; i < x.size(); i++) {
         if (x.at(i) < xmin)
             xmin = x.at(i);
         if (x.at(i) > xmax)
@@ -112,10 +105,8 @@ vector<double> Agelem::interp(vector<double> x, vector<double> y, vector<double>
     if (abs(xmin) < 1e-8)
         xmin = 0.0;
 
-    for (unsigned int i = 0; i < xg.size(); i++)
-    {
-        if (xg.at(i) < xmin || xg.at(i) > xmax)
-        {
+    for (unsigned int i = 0; i < xg.size(); i++) {
+        if (xg.at(i) < xmin || xg.at(i) > xmax) {
             cout << endl << endl
                  << "!!!element/basic/interp interp hiba!!! Interpolacio kiserlet a tartmanyon kivulre:";
             cout << endl << "\t xmin=" << xmin << " <? " << xg.at(i) << " <? xmax=" << xmax
@@ -127,12 +118,10 @@ vector<double> Agelem::interp(vector<double> x, vector<double> y, vector<double>
         //          xg.at(i)=xmax;
     }
 
-    for (unsigned int i = 0; i < xg.size(); i++)
-    {
+    for (unsigned int i = 0; i < xg.size(); i++) {
         unsigned int j = 0;
         bool megvan = false;
-        while ((!megvan) && (j < x.size() - 1))
-        {
+        while ((!megvan) && (j < x.size() - 1)) {
             double ize = (xg.at(i) - x.at(j)) * (xg.at(i) - x.at(j + 1));
             //cout<<endl<<"xg="<<xg.at(i)<<"  x.at("<<j<<")="<<x.at(j)<<"  x.at("<<j+1<<")="<<x.at(j+1)<<"  y.at("<<j<<")="<<y.at(j)<<"  y.at("<<j+1<<")="<<y.at(j+1)<<" ize="<<ize;
             if (ize < 1e-10)
@@ -162,8 +151,7 @@ vector<double> Agelem::interp(vector<double> x, vector<double> y, vector<double>
 }
 
 //--------------------------------------------------------------
-void Agelem::set_up_grid(double a_konc, vector<double> a_vel, double a_cL)
-{
+void Agelem::set_up_grid(double a_konc, vector<double> a_vel, double a_cL) {
     //konc.clear(); vel.clear();
     // Vizminoseg adatok:
     for (unsigned int i = 0; i < a_vel.size(); i++)
@@ -176,8 +164,7 @@ void Agelem::set_up_grid(double a_konc, vector<double> a_vel, double a_cL)
 }
 
 //--------------------------------------------------------------
-string Agelem::show_grid(double ido)
-{
+string Agelem::show_grid(double ido) {
     ostringstream strstrm;
     strstrm << endl << "A " << nev << " agelem seb.- es konc.eloszlasa  t=" << ido
             << "s-ban, cL=" << cL << "m, cT=" << cT << "s, cdt=" << cdt << "s\n";
@@ -192,8 +179,7 @@ string Agelem::show_grid(double ido)
 }
 
 //--------------------------------------------------------------
-double Agelem::mean(vector<double> x)
-{
+double Agelem::mean(vector<double> x) {
     double mean = 0;
     for (unsigned int i = 0; i < x.size(); i++)
         mean += x.at(i);
@@ -201,8 +187,7 @@ double Agelem::mean(vector<double> x)
 }
 
 //--------------------------------------------------------------
-void Agelem::error(string fv, string msg)
-{
+void Agelem::error(string fv, string msg) {
     ostringstream strstrm;
     strstrm.str("");
     strstrm << "\n\n******** ERROR *********";
@@ -215,13 +200,10 @@ void Agelem::error(string fv, string msg)
 }
 
 //--------------------------------------------------------------
-void Agelem::logfile_write(string msg, int msg_debug_level)
-{
-    if (debug_level >= msg_debug_level)
-    {
+void Agelem::logfile_write(string msg, int msg_debug_level) {
+    if (debug_level >= msg_debug_level) {
         ofstream outfile(out_file.c_str(), ios::app);
         outfile << msg;
         outfile.close();
     }
-}
-;
+};

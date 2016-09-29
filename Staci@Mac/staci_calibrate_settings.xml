@@ -1,15 +1,17 @@
 <settings>
 	<global_debug_level>1</global_debug_level>
 	<Staci_debug_level> 0</Staci_debug_level>
-	<dir_name> data/foviz_halozat/2012_11_06/</dir_name>
-	<fname_prefix> FV_input_2012_11_06_barlang_nelkul_</fname_prefix>
+	<dir_name> /Users/hoscsaba/Dropbox/000_foviz_szamitasok/Anytown/</dir_name>
+	<fname_prefix> Anytown_DC_</fname_prefix>
 	<logfilename> staci_calibrate.log</logfilename>
 	<best_logfilename> bests.log</best_logfilename>
-	<Eredmenyek_FVM_dfile> Eredmenyek_FV_input_2012_11_06_barlang_nelkul.csv</Eredmenyek_FVM_dfile>
-	<FVM_dfile> FV_input_2012_11_06_barlang_nelkul.csv</FVM_dfile>
-	<Num_of_Periods> 47</Num_of_Periods>
-	<Dmin>0.</Dmin>>
-	<popsize> 50</popsize>
+	<sollwert_dfile> Anytown_data.txt</sollwert_dfile>
+	<Start_of_Periods> 12</Start_of_Periods>
+	<Num_of_Periods> 2</Num_of_Periods>
+	<Spoil_Active_Pipes>yes</Spoil_Active_Pipes>
+	<dt> 1</dt>
+	<Dmin>0.0</Dmin>>
+	<popsize> 10</popsize>
 	<ngen> 10</ngen>
 	<pmut> 0.01</pmut>
 	<pcross> 0.6</pcross>

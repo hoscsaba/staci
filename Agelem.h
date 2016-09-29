@@ -14,9 +14,9 @@ protected:
     /// Referencia keresztmetszet, [m2], a sebesseg kiszamitasahoz hasznaljuk
     double Aref;
     /// Pi
-    const static double pi = 3.1416;
+    static const double pi = 3.1416;
     /// g
-    const static double g = 9.81;
+    static const double g = 9.81;
     /// Az agelem neve
     string nev;
     /// Az agelem tipusa, pl. Cso, Csatorna, stb.

@@ -25,7 +25,6 @@ O_SRCS += \
 ../lubksb.o \
 ../ludcmp.o \
 ../staci_main.o \
-../staci_calibrate.o \
 ../xmlParser.o 
 
 CPP_SRCS += \
@@ -45,7 +44,6 @@ CPP_SRCS += \
 ../lubksb.cpp \
 ../ludcmp.cpp \
 ../staci_main.cpp \
-../staci_calibrate.cpp \
 ../xmlParser.cpp 
 
 OBJS += \
@@ -65,7 +63,6 @@ OBJS += \
 ./lubksb.o \
 ./ludcmp.o \
 ./staci_main.o \
-./staci_calibrate.o \
 ./xmlParser.o 
 
 CPP_DEPS += \
@@ -85,7 +82,6 @@ CPP_DEPS += \
 ./lubksb.d \
 ./ludcmp.d \
 ./staci_main.d \
-./staci_calibrate.d \
 ./xmlParser.d 
 
 

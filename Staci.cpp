@@ -16,6 +16,7 @@
 // TODO: log file cleanup!
 
 Staci::Staci(int argc, char *argv[]) {
+    // Initiate with command line arguments
     opt = new AnyOption();
     get_command_line_options(argc, argv);
     SetInitialParameters();
@@ -23,6 +24,10 @@ Staci::Staci(int argc, char *argv[]) {
 
 Staci::Staci(string spr_filename) {
     mode = 0;
+    // Just to be able to delete in the destructor
+    opt = new AnyOption();
+
+    // Initiate directly from file
     def_file = spr_filename;
     SetInitialParameters();
 }
@@ -90,7 +95,7 @@ void Staci::SetInitialParameters() {
 
     // Add header
     m_ss.str("");
-    m_ss << "STACI v2.0";
+    m_ss << endl << "STACI v2.0";
     m_ss << endl << " (c) BME Dept. of Hydrodynamic Systems";
     m_ss << endl << " (c) C. Hos (csaba.hos@hds.bme.hu)";
     m_ss << endl << " info: www.hds.bme.hu\\staci" << endl;
@@ -392,6 +397,37 @@ void Staci::m_set_dprop() {
 }
 
 //--------------------------------------------------------------
+double Staci::get_sum_of_consumption() {
+    double sum=0.0;
+    for (unsigned int i = 0; i < cspok.size(); i++) {
+        sum += fabs(cspok.at(i)->Get_fogy());
+    }
+    return sum;
+}
+
+//--------------------------------------------------------------
+double Staci::get_sum_of_pos_consumption() {
+    double sum=0.0, cons;
+    for (unsigned int i = 0; i < cspok.size(); i++) {
+        cons = cspok.at(i)->Get_fogy();
+        if (cons > 0.)
+            sum += cons;
+    }
+    return sum;
+}
+
+//--------------------------------------------------------------
+double Staci::get_sum_of_neg_consumption() {
+    double sum=0.0, cons;
+    for (unsigned int i = 0; i < cspok.size(); i++) {
+        cons = cspok.at(i)->Get_fogy();
+        if (cons < 0.)
+            sum += fabs(cons);
+    }
+    return sum;
+}
+
+//--------------------------------------------------------------
 double Staci::get_dprop(string in_element_ID, string in_property_ID) {
     bool elem_megvan = false;
     bool prop_megvan = false;
@@ -511,15 +547,16 @@ void Staci::build_system() {
     for (unsigned int i = 0; i < agelemek.size(); i++) {
         /*printf("\n i=%d",i); cin.get();*/
         //szam = 0;
-        nev1 = agelemek[i]->Get_nev();
+        nev1 = agelemek.at(i)->Get_nev();
         /*cout<<endl<<nev1;
         cin.get();*/
         for (unsigned int j = 0; j < agelemek.size(); j++) {
-            nev2 = agelemek[j]->Get_nev();
+            nev2 = agelemek.at(j)->Get_nev();
+            //cout<<"\n\t"<<nev1 <<"?=?"<<nev2;
             if (i != j) {
                 if (nev1 == nev2) {
                     ostringstream msg;
-                    msg << "\n HIBA: Azonos nevu elemek!!!" << nev1.c_str();
+                    msg << "\n HIBA: Azonos nevu elemek !!!" << nev1;
                     cout << msg.str();
                     logfile_write(msg.str(), 1);
                     stop = true;
@@ -570,6 +607,7 @@ void Staci::build_system() {
             strstrm << "\n\t" << agelemek[i]->Get_nev().c_str() << " cspe: " << agelemek[i]->Get_Cspe_Nev().c_str()
                     << " =? " << cspok[j]->Get_nev().c_str();
             logfile_write(strstrm.str(), 5);
+            //cout<<strstrm.str();
             //cout << strstrm.str();
             if ((agelemek[i]->Get_Cspe_Nev()).compare(cspok[j]->Get_nev()) == 0) {
                 e_megvan = true;
@@ -588,9 +626,9 @@ void Staci::build_system() {
         if (!e_megvan) {
             strstrm.str("");
             strstrm << "\n!!! Nincs meg a " << agelemek[i]->Get_nev().c_str()
-                    << " agelem eleji csomopont!";
+                    << " agelem eleji csomopont: " << agelemek[i]->Get_Cspe_Nev() << " !!!";
             logfile_write(strstrm.str(), 1);
-            //            cout << strstrm.str();
+            cout << strstrm.str();
             StaciException csphiba(strstrm.str());
             throw csphiba;
         } else {
@@ -1162,7 +1200,8 @@ bool Staci::solve_system_old() {
 
     // Iteracio!!!
     while ((iter < iter_max) && (!konv_ok)) {
-        cout<<endl<<"debug_level:"<<debug_level<<endl; cin.get();
+        cout << endl << "debug_level:" << debug_level << endl;
+        cin.get();
         if (debug_level > 0)
             progress_file_write((double) iter / iter_max * 100.0);
 
@@ -2387,9 +2426,6 @@ void Staci::Print_dfdmu() {
 void Staci::Print_dxdmu() {
 
     ostringstream strstrm;
-    // string strstrm_nev;
-    //const unsigned int MAX_NEV_HOSSZ = 15;
-
     strstrm.str("");
     strstrm << scientific << setprecision(3) << showpos;
     strstrm << "Parameter: " << element_ID << ", " << property_ID;
@@ -2406,6 +2442,121 @@ void Staci::Print_dxdmu() {
     OutFile.open("dxdmu.txt");
     OutFile << strstrm.str();
     OutFile.close();
+}
+
+//--------------------------------------------------------------
+void Staci::Compute_Sensitivity_Matrix(string parameter, int scale) {
+    property_ID = parameter;
+    int is_edge_prop = -1; // 0->edge prop, 1-> node prop
+
+    if (strcmp(property_ID.c_str(), "diameter") == 0)
+        is_edge_prop = 0;
+
+    if (strcmp(property_ID.c_str(), "consumption") == 0)
+        is_edge_prop = 1;
+
+    if (is_edge_prop == -1) {
+        cout << "\n\n ERROR!\n\nCompute_Sensitivity_Matrix(string parameter) -> unknown parameter: " << parameter;
+        cout << "\n possible values: diameter|consumption" << endl << endl;
+        exit(-1);
+    }
+
+    // Edge property was selected
+    if (is_edge_prop == 0) {
+        for (unsigned int i = 0; i < agelemek.size(); i++) {
+            element_ID = agelemek.at(i)->Get_nev();
+            SM_row_name.push_back(agelemek.at(i)->Get_nev());
+            Compute_dxdmu();
+
+            vector<double> tmp1;
+            for (unsigned int j = 0; j < agelemek.size(); j++)
+                tmp1.push_back(m_dxdmu.at(j));
+            SM_MassFlowRates.push_back(tmp1);
+
+            vector<double> tmp2;
+            for (unsigned int j = 0; j < cspok.size(); j++)
+                tmp2.push_back(m_dxdmu.at(agelemek.size() + j));
+            SM_Pressures.push_back(tmp2);
+        }
+    }
+
+    // Node property was selected
+    if (is_edge_prop == 1) {
+        for (unsigned int i = 0; i < cspok.size(); i++) {
+            element_ID = cspok.at(i)->Get_nev();
+            SM_row_name.push_back(cspok.at(i)->Get_nev());
+            Compute_dxdmu();
+
+            vector<double> tmp1;
+            for (unsigned int j = 0; j < agelemek.size(); j++)
+                tmp1.push_back(m_dxdmu.at(j));
+            SM_MassFlowRates.push_back(tmp1);
+
+            vector<double> tmp2;
+            for (unsigned int j = 0; j < cspok.size(); j++)
+                tmp2.push_back(m_dxdmu.at(agelemek.size() + j));
+            SM_Pressures.push_back(tmp2);
+        }
+    }
+
+    // Set up column names
+    for (unsigned int j = 0; j < agelemek.size(); j++)
+        SM_col_name.push_back(agelemek.at(j)->Get_nev());
+
+    for (unsigned int j = 0; j < cspok.size(); j++)
+        SM_col_name.push_back(cspok.at(j)->Get_nev());
+
+    // Compute row-wise and column-wise summitation
+    SM_row_sum_MassFlowRates = row_abs_sum(SM_MassFlowRates);
+    SM_row_sum_Pressures = row_abs_sum(SM_Pressures);
+    SM_col_sum_MassFlowRates = col_abs_sum(SM_MassFlowRates);
+    SM_col_sum_Pressures = col_abs_sum(SM_Pressures);
+
+    // if scale == 1, every vector is rescaled by the maximum
+    if (scale == 1) {
+        rescale_vec(SM_row_sum_MassFlowRates);
+        rescale_vec(SM_row_sum_Pressures);
+        rescale_vec(SM_col_sum_MassFlowRates);
+        rescale_vec(SM_col_sum_Pressures);
+    }
+}
+
+//--------------------------------------------------------------
+
+void Staci::rescale_vec(vector<double> &vec) {
+    double maxval = -1.e5;
+    for (unsigned int j = 0; j < vec.size(); j++)
+        if (vec.at(j) > maxval)
+            maxval = vec.at(j);
+
+    for (unsigned int j = 0; j < vec.size(); j++)
+        vec.at(j) = vec.at(j) / maxval;
+
+}
+
+//--------------------------------------------------------------
+
+vector<double> Staci::col_abs_sum(vector<vector<double> > M) {
+    vector<double> out(M.at(0).size(), 0.);
+    for (unsigned int j = 0; j < M.at(0).size(); j++) {
+        double sum = 0.;
+        for (unsigned int i = 0; i < M.size(); i++)
+            sum += fabs(M.at(i).at(j));
+        out.at(j) = sum;
+    }
+    return out;
+}
+
+//--------------------------------------------------------------
+vector<double> Staci::row_abs_sum(vector<vector<double> > M) {
+    vector<double> out(M.size(), 0.);
+    for (unsigned int i = 0; i < M.size(); i++) {
+        double sum = 0.;
+        for (unsigned int j = 0; j < M.at(0).size(); j++)
+            sum += fabs(M.at(i).at(j));
+        out.at(i) = sum;
+    }
+    return out;
 }
 
 //--------------------------------------------------------------

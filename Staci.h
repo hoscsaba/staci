@@ -88,17 +88,31 @@ public:
 
     void list_all_elements();
 
+    vector<vector<double> > SM_MassFlowRates; // Sensitivity Matrix
+    vector<vector<double> > SM_Pressures; // Sensitivity Matrix
+    vector<string> SM_row_name; // name of the row element ID
+    vector<double> SM_row_sum_MassFlowRates; // row-wise sum of SM elements
+    vector<double> SM_row_sum_Pressures; // row-wise sum of SM elements
+    vector<string> SM_col_name; // Name of the column element ID
+    vector<double> SM_col_sum_MassFlowRates; // column-wise sum of SM elements
+    vector<double> SM_col_sum_Pressures; // column-wise sum of SM elements
+
     //void Print_Jacobian(Mat_DP jac);
     //void Print_Jacobian(vector<vector<double> > jac);
     void Print_Jacobian();
     void Print_dfdmu();
     void Print_dxdmu();
     void Compute_dxdmu();
+    void Compute_Sensitivity_Matrix(string parameter,int scale);
 
     void set_do_save_file(const bool save_it)
     {
         do_save_file = save_it;
     }
+
+    double get_sum_of_consumption();
+    double get_sum_of_pos_consumption();
+    double get_sum_of_neg_consumption();
 
 private:
     bool van_ini;
@@ -156,5 +170,9 @@ private:
     string convert_to_hr_min(double seconds);
 
     bool do_save_file;
+
+    vector<double> row_abs_sum(vector<vector<double> > M);
+    vector<double> col_abs_sum(vector<vector<double> > M);
+    void rescale_vec(vector<double>& vec);
 
 };

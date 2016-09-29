@@ -20,39 +20,31 @@ string dir_name;
 string fname_prefix;
 string logfilename;
 string best_logfilename;
-string Eredmenyek_FVM_dfile;
-string FVM_dfile;
+string sollwert_dfile;
 
 void Load_WDS_Systems();
 
-void Load_FVM_Datafiles();
+void Load_Sollwert_Datafiles();
 
 void Update_Reservoirs(unsigned int);
 
 void logfile_write(string msg, int debug_level);
 
 int Num_of_Periods;
-//vector<string> pipe_names;
+int Start_of_Periods;
 vector<Staci *> wds;
 
-vector<string> FVM_Pressure_StaciID;
-vector<int> FVM_Pressure_Staci_Idx;
-vector<string> FVM_Pressure_Info;
-vector<vector<double> > FVM_Pressure_Values;
-vector<vector<double> > Staci_Pressure_Values;
+vector<string> Sollwert_Node_Staci_ID;
+vector<int> Sollwert_Node_Staci_Idx;
+vector<vector<double> > Sollwert_Node_Values;
+vector<vector<double> > Staci_Node_Values;
 
-vector<string> FVM_Pool_StaciID;
-vector<int> FVM_Pool_Staci_Idx;
-vector<string> FVM_Pool_Info;
-vector<vector<double> > FVM_Pool_tmp_Values;
-vector<vector<double> > FVM_Pool_Values;
+vector<string> Sollwert_Pool_Staci_ID;
+vector<int> Sollwert_Pool_Staci_Idx;
+vector<vector<double> > Sollwert_Pool_Values;
 vector<vector<double> > Staci_Pool_Values;
 
-vector<string> FVM_Pool_IDs;
-vector<string> FVM_Pool_Names;
-vector<int> FVM_Pool_Name_Idx; // this staci element refers to the actual FVM Pool
-
-vector<double> PoolSurfs;
+vector<double> Pool_Surfs;
 
 vector<string> pipe_name;
 vector<bool> pipe_is_active;
@@ -61,19 +53,31 @@ vector<double> pipe_origD;
 
 void Set_Up_Active_Pipes();
 
+void Spoil_Active_Pipes();
+
+bool bool_Spoil_Active_Pipes;
 double Dmin;
+
+double dt;
 
 int Find_Pressure_Index(string PressureName);
 
 int Find_Pool_Index(string PressureName);
 
-void Define_Pools();
+void Set_Initial_Pool_Levels();
 
 double get_A(string PoolName);
 
 double Compute_Error();
 
 float Objective(GAGenome &);
+
+bool do_PerformSensitivityAnalysis;
+
+void PerformSensitivityAnalysis();
+
+vector<vector<double> > pipe_Sensitivity_MassFlowRates;
+vector<vector<double> > pipe_Sensitivity_Pressures;
 
 std::vector<std::string> csv_read_row(std::istream &in, char delimiter);
 
@@ -97,6 +101,7 @@ int main(int argc, char **argv) {
     Obj_Eval = 0;
     best_obj = 1.e10;
     last_computation_OK = false;
+    do_PerformSensitivityAnalysis = false;
 
     // Load parameters, including logfile name
     string msg_set = Load_Settings();
@@ -112,15 +117,24 @@ int main(int argc, char **argv) {
 
     // Load WDSs and data files
     Load_WDS_Systems();
-    Load_FVM_Datafiles();
-    Define_Pools();
+    Load_Sollwert_Datafiles();
+    Set_Initial_Pool_Levels();
 
     // Initial computation
     for (unsigned i = 0; i < (wds.size()); i++) {
         wds.at(i)->Set_debug_level(Staci_debug_level);
         bool success = wds.at(i)->solve_system();
         if (success) {
-            Update_Reservoirs(i);
+            wds.at(i)->Compute_Sensitivity_Matrix("diameter", 1);
+
+            /*for (unsigned jj=0; jj<wds.at(i)->SM_row_name.size(); jj++){
+                cout<<endl<<" SM row "<<jj<<": "<<wds.at(i)->SM_row_name.at(jj);
+                cout<<"-> m:"<<wds.at(i)->SM_row_sum_MassFlowRates.at(jj);
+                cout<<", p:"<<wds.at(i)->SM_row_sum_Pressures.at(jj);
+                cin.get();
+            }*/
+            if (i > Start_of_Periods)
+                Update_Reservoirs(i);
         } else {
             stringstream msg;
             msg.str("");
@@ -131,14 +145,14 @@ int main(int argc, char **argv) {
     }
 
     // Get difference
-    logfile_write("\n\nEvaluating initial state:", 1);
+    logfile_write("Evaluating initial state.\n", 0);
     double err_pres = Compute_Error();
 
     // Optimization
-    logfile_write("\n\nStarting optimization.", 0);
 
     Set_Up_Active_Pipes();
-
+    if (bool_Spoil_Active_Pipes)
+        Spoil_Active_Pipes();
 
     // See if we've been given a seed to use (for testing purposes).  When you
     // specify a random seed, the evolution will be exactly the same each time
@@ -163,8 +177,9 @@ int main(int argc, char **argv) {
     GABin2DecPhenotype map;
     double LOWER_BOUND, UPPER_BOUND;
     stringstream msg;
+    logfile_write("Setting up LOWER_BOUND, UPPER_BOUND\n", 0);
     msg.str("");
-    msg << "\n\nSetting up LOWER_BOUND, UPPER_BOUND:";
+    msg << "\n\n:";
     double dia;
     for (unsigned int i = 0; i < pipe_name.size(); i++) {
         if (pipe_is_active.at(i)) {
@@ -185,6 +200,8 @@ int main(int argc, char **argv) {
     // Now create the GA using the genome and run it.  We'll use sigma truncation
     // scaling so that we can handle negative objective scores.
 
+    logfile_write("Starting optimization...\n", 0);
+
     GASimpleGA ga(genome);
     GASigmaTruncationScaling scaling;
     ga.minimize();
@@ -199,17 +216,24 @@ int main(int argc, char **argv) {
     ga.scoreFilename("bog.dat");
     ga.evolve(seed);
 
+    do_PerformSensitivityAnalysis = true;
     ga.statistics().write("bog_stats.dat");
     genome = ga.statistics().bestIndividual();
     Objective(genome);
     PrintBestDataFile(genome);
+
+    do_PerformSensitivityAnalysis = false;
+
+    logfile_write("Optimization finished.\n",0);
+    msg.str("");
+    msg << "Best solution objective is " << Objective(genome) << endl << endl;
+    logfile_write(msg.str(),0);
 
     return 0;
 }
 
 void PrintBestDataFile(GAGenome &x) {
     GABin2DecGenome &genome = (GABin2DecGenome &) x;
-
 
     ofstream resfile;
     resfile.open("best.dat", ios::out);
@@ -223,21 +247,21 @@ void PrintBestDataFile(GAGenome &x) {
         resfile << genome.phenotype(j) << " ; ";
     resfile << endl;
     for (unsigned int j = 0; j < genome.nPhenotypes(); j++)
-        resfile << genome.phenotype(j)/pipe_origD.at(j) << " ; ";
+        resfile << genome.phenotype(j) / pipe_origD.at(j) << " ; ";
     resfile << endl;
 
+    for (unsigned int i = 0; i < Sollwert_Pool_Staci_ID.size(); i++)
+        resfile << "Sollwert " << Sollwert_Pool_Staci_ID.at(i) << " ; " << Sollwert_Pool_Staci_ID.at(i) << " ; ";
 
-    for (unsigned int i = 0; i < FVM_Pool_Names.size(); i++)
-        resfile << "FVM " << FVM_Pool_Names.at(i) << " ; " << FVM_Pool_Names.at(i) << " ; ";
-    for (unsigned int i = 0; i < FVM_Pressure_StaciID.size(); i++)
-        resfile << "FVM " << FVM_Pressure_StaciID.at(i) << " ; " << FVM_Pressure_StaciID.at(i) << " ; ";
+    for (unsigned int i = 0; i < Sollwert_Node_Staci_ID.size(); i++)
+        resfile << "Sollwert " << Sollwert_Node_Staci_ID.at(i) << " ; " << Sollwert_Node_Staci_ID.at(i) << " ; ";
 
     for (unsigned int j = 0; j < Num_of_Periods; j++) {
         resfile << endl;
-        for (unsigned int i = 0; i < FVM_Pool_Names.size(); i++)
-            resfile << FVM_Pool_Values.at(i).at(j) << " ; " << Staci_Pool_Values.at(i).at(j) << " ; ";
-        for (unsigned int i = 0; i < FVM_Pressure_StaciID.size(); i++)
-            resfile << FVM_Pressure_Values.at(i).at(j) << " ; " << Staci_Pressure_Values.at(i).at(j) << " ; ";
+        for (unsigned int i = 0; i < Sollwert_Pool_Staci_ID.size(); i++)
+            resfile << Sollwert_Pool_Values.at(i).at(j) << " ; " << Staci_Pool_Values.at(i).at(j) << " ; ";
+        for (unsigned int i = 0; i < Sollwert_Node_Staci_ID.size(); i++)
+            resfile << Sollwert_Node_Values.at(i).at(j) << " ; " << Staci_Node_Values.at(i).at(j) << " ; ";
     }
     resfile.close();
 }
@@ -261,11 +285,15 @@ Objective(GAGenome &x) {
             }
         last_computation_OK = wds.at(i)->solve_system();
         if (last_computation_OK) {
-            Update_Reservoirs(i);
+            if (i > 0)
+                Update_Reservoirs(i);
         } else {
             break;
         }
     }
+
+    if (do_PerformSensitivityAnalysis)
+        PerformSensitivityAnalysis();
 
     double err;
     if (last_computation_OK) {
@@ -302,6 +330,102 @@ Objective(GAGenome &x) {
     return err;
 }
 
+void PerformSensitivityAnalysis() {
+
+    vector<double> tmp1;
+    vector<double> tmp2;
+    for (unsigned i = 0; i < wds.size(); i++) {
+        tmp1.clear();
+        tmp2.clear();
+        wds.at(i)->Compute_Sensitivity_Matrix("diameter", 1);
+        for (unsigned int j = 0; j < wds.at(i)->agelemek.size(); j++) {
+            string name1 = wds.at(i)->agelemek.at(j)->Get_nev();
+            for (unsigned int k = 0; k < pipe_name.size(); k++) {
+                if (pipe_is_active.at(k)) {
+                    string name2 = pipe_name.at(k);
+                    if (0 == strcmp(name1.c_str(), name2.c_str())) {
+                        tmp1.push_back(wds.at(i)->SM_row_sum_MassFlowRates.at(j));
+                        tmp2.push_back(wds.at(i)->SM_row_sum_Pressures.at(j));
+                        //cout<<endl<<"\t i="<<name1<<" ? "<<name2;
+                        //cout<<" S_MFR: "<<wds.at(i)->SM_row_sum_MassFlowRates.at(j);
+                        //cout<<" S_Prs: "<<wds.at(i)->SM_row_sum_Pressures.at(j);
+                        break;
+                    }
+                }
+            }
+        }
+        pipe_Sensitivity_MassFlowRates.push_back(tmp1);
+        pipe_Sensitivity_Pressures.push_back(tmp2);
+    }
+
+    stringstream msg;
+    msg.str("");
+    msg << "\n Size of pipe_Sensitivity_MassFlowRates is " << pipe_Sensitivity_MassFlowRates.size() << " x "
+         << pipe_Sensitivity_MassFlowRates.at(0).size();
+    msg << "\n Size of pipe_Sensitivity_Pressures     is " << pipe_Sensitivity_Pressures.size() << " x "
+         << pipe_Sensitivity_Pressures.at(0).size();
+    logfile_write(msg.str(),1);
+
+    // Now save to data files
+    // First, Mass Flow Rate sensitivity
+    ofstream resfile;
+    resfile.open("sensitivity_MassFlowRates.dat", ios::out);
+    resfile << scientific << setprecision(5);
+
+
+    for (unsigned int j = 0; j < pipe_name.size(); j++)
+        if (pipe_is_active.at(j))
+            resfile << pipe_name.at(j) << " ; ";
+    resfile << endl;
+
+    vector<double> sum1(num_of_active_pipes, 0.0);
+
+    for (unsigned int i = 0; i < wds.size(); i++) {
+        int k = 0;
+        for (unsigned int j = 0; j < pipe_name.size(); j++) {
+            if (pipe_is_active.at(j)) {
+                resfile << pipe_Sensitivity_MassFlowRates.at(i).at(k) << ";";
+                sum1.at(k) += fabs(pipe_Sensitivity_MassFlowRates.at(i).at(k));
+                k++;
+            }
+        }
+        resfile << endl;
+    }
+
+    for (unsigned int j = 0; j < pipe_name.size(); j++)
+        if (pipe_is_active.at(j))
+            resfile << (sum1.at(j)/wds.size()) << ";";
+    resfile.close();
+
+    // Second, Pressure sensitivity
+    resfile.open("sensitivity_Pressures.dat", ios::out);
+    resfile << scientific << setprecision(5);
+
+    for (unsigned int j = 0; j < pipe_name.size(); j++)
+        if (pipe_is_active.at(j))
+            resfile << pipe_name.at(j) << " ; ";
+    resfile << endl;
+
+    vector<double> sum2(num_of_active_pipes, 0.0);
+
+    for (unsigned int i = 0; i < wds.size(); i++) {
+        int k = 0;
+        for (unsigned int j = 0; j < pipe_name.size(); j++) {
+            if (pipe_is_active.at(j)) {
+                resfile << pipe_Sensitivity_Pressures.at(i).at(k) << ";";
+                sum2.at(k) += fabs(pipe_Sensitivity_Pressures.at(i).at(k));
+                k++;
+            }
+        }
+        resfile << endl;
+    }
+
+    for (unsigned int j = 0; j < pipe_name.size(); j++)
+        if (pipe_is_active.at(j))
+            resfile << (sum2.at(j)/wds.size()) << ";";
+    resfile.close();
+
+}
 
 void Set_Up_Active_Pipes() {
 
@@ -320,11 +444,37 @@ void Set_Up_Active_Pipes() {
 
     stringstream msg;
     msg.str("");
-    msg << "\n Active pipes (number: " << num_of_active_pipes << "):\n";
+    msg << "Setting active pipes (number: " << num_of_active_pipes << ")...\n";
+    logfile_write(msg.str(), 0);
+    msg.str("");
     for (unsigned int i = 0; i < pipe_name.size(); i++)
         if (pipe_is_active.at(i))
             msg << pipe_name.at(i) << " ";
-    logfile_write(msg.str(), 0);
+    logfile_write(msg.str(), 1);
+}
+
+void Spoil_Active_Pipes() {
+
+    stringstream msg;
+    msg.str("");
+    msg << endl << endl << "Spoiling active pipes....";
+    for (unsigned int i = 0; i < wds.at(0)->agelemek.size(); i++) {
+        string name1 = wds.at(0)->agelemek.at(i)->Get_nev();
+        if (strcmp(wds.at(0)->agelemek.at(i)->Get_Tipus().c_str(), "Cso") == 0) {
+            for (unsigned j = 0; j < pipe_name.size(); j++) {
+                string name2 = pipe_name.at(j);
+                if ((pipe_is_active.at(j)) && (0 == strcmp(name1.c_str(), name2.c_str()))) {
+                    float mul = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+                    double Dold = wds.at(0)->agelemek.at(i)->Get_dprop("diameter");
+                    double Dnew = (0.5 + mul) * Dold;
+                    for (unsigned k = 0; k < wds.size(); k++)
+                        wds.at(k)->agelemek.at(i)->Set_dprop("diameter", Dnew);
+                    msg << endl << "\tSpoiling pipe " << name1 << " D = " << Dold << " -> " << Dnew << " m";
+                }
+            }
+        }
+    }
+    logfile_write(msg.str(), 1);
 }
 
 double Compute_Error() {
@@ -335,34 +485,36 @@ double Compute_Error() {
     str_msg.str("");
 
     // Extract data needed...
-    double p_FVM, p_Staci;
-    for (unsigned int i = 0; i < FVM_Pressure_StaciID.size(); i++) {
+    double p_Sollwert, p_Staci;
+    for (unsigned int i = 0; i < Sollwert_Node_Staci_ID.size(); i++) {
         for (unsigned int j = 0; j < Num_of_Periods; j++) {
-            p_FVM = FVM_Pressure_Values.at(i).at(j);
-            p_Staci = wds.at(j)->cspok.at(FVM_Pressure_Staci_Idx.at(i))->Get_p();
-            Staci_Pressure_Values.at(i).at(j) = p_Staci;
+            p_Sollwert = Sollwert_Node_Values.at(i).at(j);
+
+            p_Staci = wds.at(j)->cspok.at(Sollwert_Node_Staci_Idx.at(i))->Get_p();
+
+            Staci_Node_Values.at(i).at(j) = p_Staci;
 
             char msg[100];
             sprintf(msg, "\n\t %s (Staci name: %s): p(%2d)= FVM: %5.2f, Staci: %5.2f bar",
-                    FVM_Pressure_StaciID.at(i).c_str(),
-                    wds.at(j)->cspok.at(FVM_Pressure_Staci_Idx.at(i))->Get_nev().c_str(),
-                    j, p_FVM, p_Staci);
+                    Sollwert_Node_Staci_ID.at(i).c_str(),
+                    wds.at(j)->cspok.at(Sollwert_Node_Staci_Idx.at(i))->Get_nev().c_str(),
+                    j, p_Sollwert, p_Staci);
             str_msg << msg;
         }
         str_msg << endl;
     }
 
     double H_FVM, H_Staci, H_err = 0.;
-    for (unsigned int i = 0; i < FVM_Pool_StaciID.size(); i++) {
+    for (unsigned int i = 0; i < Sollwert_Pool_Staci_ID.size(); i++) {
         for (unsigned int j = 0; j < Num_of_Periods; j++) {
-            H_FVM = FVM_Pool_Values.at(i).at(j);
-            H_Staci = wds.at(j)->agelemek.at(FVM_Pool_Staci_Idx.at(i))->Get_dprop("water_level");
+            H_FVM = Sollwert_Pool_Values.at(i).at(j);
+            H_Staci = wds.at(j)->agelemek.at(Sollwert_Pool_Staci_Idx.at(i))->Get_dprop("water_level");
             Staci_Pool_Values.at(i).at(j) = H_Staci;
 
             char msg[100];
             sprintf(msg, "\n\t %s (Staci name: %s): H(%2d)= FVM: %5.3f, Staci: %5.3f m",
-                    FVM_Pool_StaciID.at(i).c_str(),
-                    wds.at(j)->agelemek.at(FVM_Pool_Staci_Idx.at(i))->Get_nev().c_str(),
+                    Sollwert_Pool_Staci_ID.at(i).c_str(),
+                    wds.at(j)->agelemek.at(Sollwert_Pool_Staci_Idx.at(i))->Get_nev().c_str(),
                     j, H_FVM, H_Staci);
             str_msg << msg;
 
@@ -370,23 +522,22 @@ double Compute_Error() {
         }
         str_msg << endl;
     }
-    logfile_write(str_msg.str(), 2);
 
     // Compute modified pressure error:
     double p_err = 0.0;
-    for (unsigned int i = 0; i < FVM_Pressure_StaciID.size(); i++) {
-        double sum = std::accumulate(Staci_Pressure_Values.at(i).begin(), Staci_Pressure_Values.at(i).end(), 0.0);
-        double Staci_mean = sum / Staci_Pressure_Values.at(i).size();
+    for (unsigned int i = 0; i < Sollwert_Node_Staci_ID.size(); i++) {
+        double sum = std::accumulate(Staci_Node_Values.at(i).begin(), Staci_Node_Values.at(i).end(), 0.0);
+        double Staci_mean = sum / Staci_Node_Values.at(i).size();
 
-        sum = std::accumulate(FVM_Pressure_Values.at(i).begin(), FVM_Pressure_Values.at(i).end(), 0.0);
-        double FVM_mean = sum / FVM_Pressure_Values.at(i).size();
+        sum = std::accumulate(Sollwert_Node_Values.at(i).begin(), Sollwert_Node_Values.at(i).end(), 0.0);
+        double FVM_mean = sum / Sollwert_Node_Values.at(i).size();
         for (unsigned int j = 0; j < Num_of_Periods; j++)
             p_err += fabs(
-                    (Staci_Pressure_Values.at(i).at(j) - Staci_mean) - (FVM_Pressure_Values.at(i).at(j) - FVM_mean));
+                    (Staci_Node_Values.at(i).at(j) - Staci_mean) - (Sollwert_Node_Values.at(i).at(j) - FVM_mean));
 
     }
 
-    double weight_p_err = 1.0;
+    double weight_p_err = 0.01;
     double err = weight_p_err * p_err + (1.0 - weight_p_err) * H_err;
     str_msg.str("");
     str_msg << "\n  p_err = " << p_err << ", weigth= " << weight_p_err;
@@ -402,21 +553,21 @@ void Load_WDS_Systems() {
     stringstream fname;
     stringstream msg;
 
-    logfile_write("Building WDS systems....", 0);
+    logfile_write("Building WDS systems....\n", 0);
 
     for (unsigned int i = 0; i < Num_of_Periods; i++) {
         fname.str("");
-        fname << dir_name << fname_prefix << (i + 1) << ".spr";
+        fname << dir_name << fname_prefix << (Start_of_Periods + i) << ".spr";
 
         msg.str("");
         msg << "\n\t" << fname.str();
-        logfile_write(msg.str(), 0);
+        logfile_write(msg.str(), 2);
 
         wds.push_back(new Staci(fname.str()));
         wds.at(i)->build_system();
         wds.at(i)->ini();
     }
-    logfile_write("\n", 0);
+    logfile_write("\n", 2);
 }
 
 void Update_Reservoirs(unsigned int i) {
@@ -424,39 +575,38 @@ void Update_Reservoirs(unsigned int i) {
     logfile_write("\n\nUpdating Pools...", 2);
 
     for (unsigned int j = 0; j < wds.at(i)->agelemek.size(); j++) {
+
         string type = wds.at(i)->agelemek.at(j)->Get_Tipus();
         if (strcmp(type.c_str(), "Vegakna") == 0) {
             string PoolName = wds.at(i)->agelemek.at(j)->Get_nev();
-            double mp_prev = wds.at(i)->agelemek.at(j)->Get_dprop("mass_flow_rate");
+            double mp_prev = wds.at(i - 1)->agelemek.at(j)->Get_dprop("mass_flow_rate");
             double Q = mp_prev / 1000. * 3600.;
-            double H_prev = wds.at(i)->agelemek.at(j)->Get_dprop("water_level");
+            double H_prev = wds.at(i - 1)->agelemek.at(j)->Get_dprop("water_level");
             double A = get_A(PoolName);
-            double H_next = H_prev + Q * 0.5 / A;
+            double H_next = H_prev + Q * dt / A;
 
-            if (i < Num_of_Periods - 1)
-                wds.at(i + 1)->agelemek.at(j)->Set_dprop("water_level", H_next);
+            wds.at(i)->agelemek.at(j)->Set_dprop("water_level", H_next);
 
             char msg[100];
             sprintf(msg, "\n\t%s: t=%2d, Q=%+5.0fm3/h, A=%4.0fm^2, H(%2d)=%4.2fm -> H(%2d)=%4.2fm",
-                    (wds.at(i)->agelemek.at(j)->Get_nev()).c_str(), i, Q, A, i, H_prev, i + 1, H_next);
+                    (wds.at(i)->agelemek.at(j)->Get_nev()).c_str(), i - 1, Q, A, i - 1, H_prev, i, H_next);
             string str_msg(msg);
             logfile_write(str_msg, 2);
         }
     }
 }
 
-void Load_FVM_Datafiles() {
-    stringstream tmp, msg;
+void Load_Sollwert_Datafiles() {
+    stringstream tmp;
     vector<vector<string> > lines;
 
-    // POOL DATA FILE
     tmp.str("");
-    tmp << dir_name << FVM_dfile;
+    tmp << dir_name << sollwert_dfile;
 
     std::ifstream in(tmp.str().c_str());
 
     if (in.fail()) {
-        cout << endl << "Load_FVM_Datafiles() -> CANNOT FIND DATAFILE " << tmp.str() << "!!!!" << endl;
+        cout << endl << "Load_Sollwert_Datafiles() -> CANNOT FIND DATAFILE " << tmp.str() << "!!!!" << endl;
         exit(-1);
     } else {
         while (in.good())
@@ -464,95 +614,68 @@ void Load_FVM_Datafiles() {
     }
     in.close();
 
-    string tmpstr;
+    stringstream tmpstr;
+    vector<double> tmp_double_vec;
+
+    tmpstr.str("");
+    tmpstr << "\n Reading sollwert file " << sollwert_dfile << " ... ";
+
     for (unsigned int i = 0; i < lines.size(); i++) {
-        char first_char = lines.at(i).at(0).c_str()[0];
-        char second_char = lines.at(i).at(1).c_str()[0];
-        //cout << "\n line " << i << "/" << lines.size() << " first_char=" << first_char << ", second_char="
-        //     << second_char;
-        if ((first_char == '#') && (second_char != '-')) {
-            FVM_Pool_StaciID.push_back(lines.at(i).at(0));
-            tmpstr = lines.at(i).at(1);
-            tmpstr.append(", ");
-            tmpstr.append(lines.at(i).at(2));
-            FVM_Pool_Info.push_back(tmpstr);
-            vector<double> vals;
-            for (unsigned int j = 3; j < lines.at(i).size(); j++)
-                vals.push_back(atof(lines.at(i).at(j).c_str()));
-            FVM_Pool_tmp_Values.push_back(vals);
-            //cout << " added " << vals.size() << " data";
-            // Make space for Staci values
-            vector<double> tmpvec(vals.size());
-            Staci_Pool_Values.push_back(tmpvec);
+        if (lines.at(i).size() < (Start_of_Periods + Num_of_Periods + 2 + 1)) {
+            tmpstr << endl << endl << "!!! ERROR !!!" << endl;
+            tmpstr << "\t in Sollwert file " << sollwert_dfile << ", line " << i << endl;
+            tmpstr << "\t The line contains " << lines.at(i).size()
+                   << " data (separated by ';'), but should be minimum "
+                   << Start_of_Periods + Num_of_Periods + 2 << ", " << endl;
+            tmpstr << " because Start_of_Periods is " << Start_of_Periods;
+            tmpstr << " and Num_of_Periods is " << Num_of_Periods << ". " << endl << endl;
+            logfile_write(tmpstr.str(), 0);
+            exit(-1);
+        }
+
+        string name = lines.at(i).at(0);
+        string type = lines.at(i).at(1);
+        std::transform(type.begin(), type.end(), type.begin(), ::tolower);
+
+        tmp_double_vec.clear();
+
+        // POOL:
+        if (0 == strcmp(type.c_str(), "pool")) {
+            Sollwert_Pool_Staci_ID.push_back(name);
+            Sollwert_Pool_Staci_Idx.push_back(Find_Pool_Index(name));
+            for (unsigned int j = Start_of_Periods; j < Start_of_Periods + Num_of_Periods; j++)
+                tmp_double_vec.push_back(atof(lines.at(i).at(2 + j).c_str()));
+            Sollwert_Pool_Values.push_back(tmp_double_vec);
+
+            // Add surface
+            Pool_Surfs.push_back(get_A(name));
+
+            // Info
+            tmpstr << endl << "\t Found pool: " << name << " H(0) = " << tmp_double_vec.at(0) << " m , A = "
+                   << get_A(name) << " m2";
+
+            // Make space for Staci values:
+            vector<double> aa(tmp_double_vec.size(), 0.);
+            Staci_Pool_Values.push_back(aa);
+        }
+
+        // NODE:
+        if (0 == strcmp(type.c_str(), "node")) {
+            Sollwert_Node_Staci_ID.push_back(name);
+            Sollwert_Node_Staci_Idx.push_back(Find_Pressure_Index(name));
+            for (unsigned int j = Start_of_Periods; j < Start_of_Periods + Num_of_Periods; j++)
+                tmp_double_vec.push_back(atof(lines.at(i).at(2 + j).c_str()));
+            Sollwert_Node_Values.push_back(tmp_double_vec);
+
+            // Info
+            tmpstr << endl << "\t Found node: " << lines.at(i).at(0);
+
+            // Make space for Staci values:
+            vector<double> aa(tmp_double_vec.size(), 0.);
+            Staci_Node_Values.push_back(aa);
         }
     }
-    msg.str("");
-    msg << "\nReading datafile " << tmp.str() << " ...";
-    for (unsigned int i = 0; i < FVM_Pool_StaciID.size(); i++) {
-        msg << "\n " << FVM_Pool_StaciID.at(i) << ", number of data: "
-            << FVM_Pool_tmp_Values.at(i).size() << ", info: " << FVM_Pool_Info.at(i);
-        if (global_debug_level > 1) {
-            msg << endl << "\t";
-            for (unsigned int j = 0; j < FVM_Pool_tmp_Values.at(i).size(); j++)
-                msg << FVM_Pool_tmp_Values.at(i).at(j) << ", ";
-        }
-    }
-    logfile_write(msg.str(), 0);
-
-    // PRESSURE DATA FILE
-    lines.clear();
-    tmp.str("");
-    tmp << dir_name << Eredmenyek_FVM_dfile;
-
-    std::ifstream in1(tmp.str().c_str());
-    //in1(tmp.str());
-
-    if (in1.fail()) {
-        cout << endl << "Load_FVM_Datafiles() -> CANNOT FIND DATAFILE " << tmp.str() << "!!!!" << endl;
-        exit(-1);
-    } else
-        while (in1.good())
-            lines.push_back(csv_read_row(in1, ';'));
-    in1.close();
-
-
-    //string tmpstr;
-    for (unsigned int i = 1; i < lines.size(); i++) {
-        string name = lines.at(i).at(1);
-        if (0 != (strcmp(name.c_str(), "x"))) {
-            //cout<<endl<<"name:"<<name;
-            //cin.get();
-            //int idx = Find_Pressure_Index(name);
-            //cout<< ", idx="<<idx;//<<", staci name: "<<wds.at(0)->cspok.at(idx)->Get_nev();
-            //cin.get();
-            FVM_Pressure_StaciID.push_back(name);
-            FVM_Pressure_Staci_Idx.push_back(Find_Pressure_Index(name));
-            tmpstr = lines.at(i).at(2);
-            tmpstr.append(", ");
-            tmpstr.append(lines.at(i).at(3));
-            FVM_Pressure_Info.push_back(tmpstr);
-            vector<double> vals;
-            for (unsigned int j = 4; j < lines.at(i).size(); j++)
-                vals.push_back(atof(lines.at(i).at(j).c_str()));
-            FVM_Pressure_Values.push_back(vals);
-            // Make space for Staci values
-            vector<double> tmpvec(vals.size());
-            Staci_Pressure_Values.push_back(tmpvec);
-        }
-    }
-
-    msg.str("");
-    msg << "\n\nReading datafile " << tmp.str() << " ...";
-    for (unsigned int i = 0; i < FVM_Pressure_StaciID.size(); i++) {
-        msg << "\n " << FVM_Pressure_StaciID.at(i) << ", number of data: "
-            << FVM_Pressure_Values.at(i).size() << ", info: " << FVM_Pressure_Info.at(i);
-        if (global_debug_level > 1) {
-            msg << endl << "\t";
-            for (unsigned int j = 0; j < FVM_Pressure_Values.at(i).size(); j++)
-                msg << FVM_Pressure_Values.at(i).at(j) << ", ";
-        }
-    }
-    logfile_write(msg.str(), 0);
+    logfile_write(tmpstr.str(), 1);
 }
 
 double get_A(string PoolName) {
@@ -560,17 +683,20 @@ double get_A(string PoolName) {
     bool found = false;
     double A;
 
-    for (unsigned int i = 0; i < FVM_Pool_IDs.size(); i++)
-        if (strcmp(FVM_Pool_IDs.at(i).c_str(), PoolName.c_str()) == 0) {
-            A = PoolSurfs.at(i);
+    for (unsigned int i = 0; i < wds.at(0)->agelemek.size(); i++) {
+        string name = wds.at(0)->agelemek.at(i)->Get_nev();
+        if (strcmp(name.c_str(), PoolName.c_str()) == 0) {
+            A = wds.at(0)->agelemek.at(i)->Get_Aref();
             found = true;
-            break;
 
             stringstream msg;
             msg.str("");
             msg << "\n\t get_A(): " << PoolName << " was found.";
-            logfile_write(msg.str(), 2);
+            logfile_write(msg.str(), 3);
+
+            break;
         }
+    }
 
     if (!found) {
         stringstream msg;
@@ -632,70 +758,24 @@ int Find_Pressure_Index(string PressureName) {
 }
 
 
-void Define_Pools() {
-
-    FVM_Pool_IDs.push_back("POOL288");
-    FVM_Pool_Names.push_back("#med_cinkota");
-    FVM_Pool_Staci_Idx.push_back(Find_Pool_Index("POOL288"));
-    PoolSurfs.push_back(1670.);
-
-    FVM_Pool_IDs.push_back("POOL315");
-    FVM_Pool_Names.push_back("#med_gilice");
-    FVM_Pool_Staci_Idx.push_back(Find_Pool_Index("POOL315"));
-    PoolSurfs.push_back(2783);
-
-    FVM_Pool_IDs.push_back("POOL327");
-    FVM_Pool_Names.push_back("#med_kob_regi");
-    FVM_Pool_Staci_Idx.push_back(Find_Pool_Index("POOL327"));
-    PoolSurfs.push_back(2750. / 2.);
-
-    FVM_Pool_IDs.push_back("POOL324");
-    FVM_Pool_Names.push_back("#med_kob_uj");
-    FVM_Pool_Staci_Idx.push_back(Find_Pool_Index("POOL324"));
-    PoolSurfs.push_back(3333.);
-
-    FVM_Pool_IDs.push_back("POOL276");
-    FVM_Pool_Names.push_back("#med_krisztina");
-    FVM_Pool_Staci_Idx.push_back(Find_Pool_Index("POOL276"));
-    PoolSurfs.push_back(3767.);
-
-    FVM_Pool_IDs.push_back("POOL303");
-    FVM_Pool_Names.push_back("#med_rakossz");
-    FVM_Pool_Staci_Idx.push_back(Find_Pool_Index("POOL303"));
-    PoolSurfs.push_back(1667.);
-
-    FVM_Pool_IDs.push_back("POOL336");
-    FVM_Pool_Names.push_back("#med_sanc");
-    FVM_Pool_Staci_Idx.push_back(Find_Pool_Index("POOL336"));
-    PoolSurfs.push_back(1000.);
+void Set_Initial_Pool_Levels() {
 
     stringstream str;
     str.str("");
-    str << "\n\n Setting up pools...";
-    logfile_write(str.str(), 0);
-    for (unsigned j = 0; j < FVM_Pool_Names.size(); j++) {
+    logfile_write("Setting up initial pool levels...\n", 0);
+
+    for (unsigned j = 0; j < Sollwert_Pool_Staci_ID.size(); j++) {
         str.str("");
-        str << "\n\t Pool name: " << FVM_Pool_Names.at(j) << ", \tID: " << FVM_Pool_IDs.at(j);
-        bool found = false;
-        for (unsigned int i = 0; i < FVM_Pool_tmp_Values.size(); i++)
-            if (0 == strcmp(FVM_Pool_StaciID.at(i).c_str(), FVM_Pool_Names.at(j).c_str())) {
-                //cout << endl << FVM_Pool_StaciID.at(i) << ": H(0)=" << FVM_Pool_tmp_Values.at(i).at(0);
-                FVM_Pool_Values.push_back(FVM_Pool_tmp_Values.at(i));
-                found = true;
-                break;
-            }
-        if (!found) {
-            cout << "\n WTF??????";
-            exit(-1);
-        }
-        double H0 = FVM_Pool_Values.at(j).at(0);
-        int idx = FVM_Pool_Staci_Idx.at(j);
+        str << "\n\t Pool name: " << Sollwert_Pool_Staci_ID.at(j);
+
+        double H0 = Sollwert_Pool_Values.at(j).at(0);
+        int idx = Sollwert_Pool_Staci_Idx.at(j);
         wds.at(0)->agelemek.at(idx)->Set_dprop("water_level", H0);
-        str << ", i.e. agelemek.at(" << idx << ") aka " << wds.at(0)->agelemek.at(idx)->Get_nev() << " -> H0 = " << H0;
 
-        logfile_write(str.str(), 0);
+        str << ", i.e. agelemek.at(" << idx << ") aka " << wds.at(0)->agelemek.at(idx)->Get_nev() << " -> H0 = "
+            << H0;
+        logfile_write(str.str(), 1);
     }
-
 }
 
 void logfile_write(string msg, int debug_level) {
@@ -756,27 +836,38 @@ string Load_Settings() {
     fname_prefix = xMainNode.getChildNode("fname_prefix").getText();
     logfilename = xMainNode.getChildNode("logfilename").getText();
     best_logfilename = xMainNode.getChildNode("best_logfilename").getText();
-    Eredmenyek_FVM_dfile = xMainNode.getChildNode("Eredmenyek_FVM_dfile").getText();
-    FVM_dfile = xMainNode.getChildNode("FVM_dfile").getText();
+    sollwert_dfile = xMainNode.getChildNode("sollwert_dfile").getText();
+    Start_of_Periods = atoi(xMainNode.getChildNode("Start_of_Periods").getText());
     Num_of_Periods = atoi(xMainNode.getChildNode("Num_of_Periods").getText());
+    string Text_Spoil_Active_Pipes = xMainNode.getChildNode("Spoil_Active_Pipes").getText();
+    dt = atof(xMainNode.getChildNode("dt").getText());
     Dmin = atof(xMainNode.getChildNode("Dmin").getText());
     popsize = atoi(xMainNode.getChildNode("popsize").getText());
     ngen = atoi(xMainNode.getChildNode("ngen").getText());
     pmut = atof(xMainNode.getChildNode("pmut").getText());
     pcross = atof(xMainNode.getChildNode("pcross").getText());
 
+    if (0 == strcmp(Text_Spoil_Active_Pipes.c_str(), "yes"))
+        bool_Spoil_Active_Pipes = true;
+    else
+        bool_Spoil_Active_Pipes = false;
+
+
     stringstream msg;
     msg.str("");
     msg << "Settings:" << endl;
-    msg << "\t global_debug_level   : " << global_debug_level << endl;
-    msg << "\t Staci_debug_level    : " << Staci_debug_level << endl << endl;
-    msg << "\t dir_name             : " << dir_name << endl;
-    msg << "\t fname_prefix         : " << fname_prefix << endl;
-    msg << "\t logfilename          : " << logfilename << endl;
-    msg << "\t best_logfilename     : " << best_logfilename << endl;
-    msg << "\t Eredmenyek_FVM_dfile : " << FVM_dfile << endl;
-    msg << "\t Num_of_Periods       : " << Num_of_Periods << endl;
-    msg << "\t Dmin                 : " << Dmin << endl << endl;
+    msg << "\t global_debug_level     : " << global_debug_level << endl;
+    msg << "\t Staci_debug_level      : " << Staci_debug_level << endl << endl;
+    msg << "\t dir_name               : " << dir_name << endl;
+    msg << "\t fname_prefix           : " << fname_prefix << endl;
+    msg << "\t logfilename            : " << logfilename << endl;
+    msg << "\t best_logfilename       : " << best_logfilename << endl;
+    msg << "\t sollwert_dfile         : " << sollwert_dfile << endl;
+    msg << "\t Start_of_Periods       : " << Start_of_Periods << endl;
+    msg << "\t Num_of_Periods         : " << Num_of_Periods << endl;
+    msg << "\t length of periods (dt) : " << dt << " hour " << endl;
+    msg << "\t spoil active pipes     : " << bool_Spoil_Active_Pipes << endl;
+    msg << "\t Dmin                   : " << Dmin << " m" << endl << endl;
     msg << "\t popsize : " << popsize << endl;
     msg << "\t ngen    : " << ngen << endl;
     msg << "\t pmut    : " << pmut << endl;

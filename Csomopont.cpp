@@ -151,7 +151,7 @@ double Csomopont::Get_dprop(string mit)
     if (!megvan)
     {
         cout << endl << endl << "Csomopont::Get_dprop() hibas arg.:" << mit;
-        cout << ", helyes ertekek: konc_be|konc_atlag|consumption|pressure" << endl << endl;
+        cout << ", helyes ertekek: cl_be|konc_atlag|demand|pressure" << endl << endl;
     }
     return outdata;
 }
