@@ -12,6 +12,5 @@ var searchData=
   ['set_5fup_5fgrid',['set_up_grid',['../class_agelem.html#a144892d0f79ad876bcdb3fe70e282edf',1,'Agelem']]],
   ['setlogfile',['SetLogFile',['../class_csatorna.html#a0b0b43ad04feb2e0cf60a6d027387ff9',1,'Csatorna']]],
   ['show_5fgrid',['show_grid',['../class_agelem.html#a1500c8131aaa82f6150193a8cf13050b',1,'Agelem']]],
-  ['staci',['Staci',['../class_staci.html#a6f7ee7b08cba6b9a84a2472610fc9b30',1,'Staci']]],
   ['surlodas',['surlodas',['../class_csatorna.html#a8ca44a377b12883ddad100f0dea9aed2',1,'Csatorna::surlodas()'],['../class_cso.html#a01d6ba01b924fe317638fe196a139d1f',1,'Cso::surlodas()']]]
 ];

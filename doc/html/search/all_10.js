@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['staci',['staci',['../md_README.html',1,'']]],
+  ['staci',['staci',['../md__r_e_a_d_m_e.html',1,'']]],
   ['set_5fdprop',['Set_dprop',['../class_csomopont.html#af64637d5f8124e9f3d121c7d941140fe',1,'Csomopont']]],
   ['set_5ffogy',['Set_fogy',['../class_csomopont.html#afcd4fd1878c4bdd3087097844566901a',1,'Csomopont']]],
   ['set_5ffolyterf',['Set_FolyTerf',['../class_csatorna.html#a4d75a74c04c6a66600068e98f055f2b4',1,'Csatorna']]],
@@ -13,7 +13,7 @@ var searchData=
   ['set_5fup_5fgrid',['set_up_grid',['../class_agelem.html#a144892d0f79ad876bcdb3fe70e282edf',1,'Agelem']]],
   ['setlogfile',['SetLogFile',['../class_csatorna.html#a0b0b43ad04feb2e0cf60a6d027387ff9',1,'Csatorna']]],
   ['show_5fgrid',['show_grid',['../class_agelem.html#a1500c8131aaa82f6150193a8cf13050b',1,'Agelem']]],
-  ['staci',['Staci',['../class_staci.html',1,'Staci'],['../class_staci.html#a6f7ee7b08cba6b9a84a2472610fc9b30',1,'Staci::Staci()']]],
+  ['staci',['Staci',['../class_staci.html',1,'']]],
   ['staciexception',['StaciException',['../class_staci_exception.html',1,'']]],
   ['surlodas',['surlodas',['../class_csatorna.html#a8ca44a377b12883ddad100f0dea9aed2',1,'Csatorna::surlodas()'],['../class_cso.html#a01d6ba01b924fe317638fe196a139d1f',1,'Cso::surlodas()']]],
   ['szivattyu',['Szivattyu',['../class_szivattyu.html',1,'']]]

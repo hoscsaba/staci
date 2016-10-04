@@ -7,12 +7,19 @@
 	<best_logfilename> bests.log</best_logfilename>
 	<sollwert_dfile> Anytown_data.txt</sollwert_dfile>
 	<Start_of_Periods> 12</Start_of_Periods>
-	<Num_of_Periods> 2</Num_of_Periods>
+	<Num_of_Periods> 10</Num_of_Periods>
 	<Spoil_Active_Pipes>yes</Spoil_Active_Pipes>
+	<!-- <type_of_pipe_selection>Dmin</type_of_pipe_selection>
+	<Dmin>0.3</Dmin> -->
+	<!-- <type_of_pipe_selection>most_sensitive</type_of_pipe_selection>
+	<num_of_active_pipes>10</num_of_active_pipes> -->
+	<type_of_pipe_selection>largest_diameter</type_of_pipe_selection>
+	<num_of_active_pipes>10</num_of_active_pipes>
+	<Dmin>0.0</Dmin>
 	<dt> 1</dt>
-	<Dmin>0.0</Dmin>>
-	<popsize> 10</popsize>
-	<ngen> 10</ngen>
+	<weight_p_err>0.5</weight_p_err>
+	<popsize> 50</popsize>
+	<ngen> 100</ngen>
 	<pmut> 0.01</pmut>
 	<pcross> 0.6</pcross>
 </settings>

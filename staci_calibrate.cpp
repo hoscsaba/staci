@@ -56,8 +56,12 @@ void Set_Up_Active_Pipes();
 void Spoil_Active_Pipes();
 
 bool bool_Spoil_Active_Pipes;
+
+int type_of_pipe_selection;
+
 double Dmin;
 
+double weight_p_err;
 double dt;
 
 int Find_Pressure_Index(string PressureName);
@@ -78,6 +82,8 @@ void PerformSensitivityAnalysis();
 
 vector<vector<double> > pipe_Sensitivity_MassFlowRates;
 vector<vector<double> > pipe_Sensitivity_Pressures;
+vector<double> pipe_Sensitivity_MassFlowRates_Sum;
+vector<double> pipe_Sensitivity_Pressures_Sum;
 
 std::vector<std::string> csv_read_row(std::istream &in, char delimiter);
 
@@ -88,6 +94,10 @@ int Obj_Eval;
 string Load_Settings();
 
 void PrintBestDataFile(GAGenome &);
+
+string List_Active_Pipes();
+
+unsigned int Count_Active_Pipes();
 
 bool last_computation_OK;
 int popsize;
@@ -126,19 +136,12 @@ int main(int argc, char **argv) {
         bool success = wds.at(i)->solve_system();
         if (success) {
             wds.at(i)->Compute_Sensitivity_Matrix("diameter", 1);
-
-            /*for (unsigned jj=0; jj<wds.at(i)->SM_row_name.size(); jj++){
-                cout<<endl<<" SM row "<<jj<<": "<<wds.at(i)->SM_row_name.at(jj);
-                cout<<"-> m:"<<wds.at(i)->SM_row_sum_MassFlowRates.at(jj);
-                cout<<", p:"<<wds.at(i)->SM_row_sum_Pressures.at(jj);
-                cin.get();
-            }*/
             if (i > Start_of_Periods)
                 Update_Reservoirs(i);
         } else {
             stringstream msg;
             msg.str("");
-            msg << "\n\n ERROR: wds.at(" << i << ") could not be soled!";
+            msg << "\n\n ERROR: wds.at(" << i << ") could not be solved!";
             logfile_write(msg.str(), 0);
             exit(-1);
         }
@@ -149,10 +152,7 @@ int main(int argc, char **argv) {
     double err_pres = Compute_Error();
 
     // Optimization
-
     Set_Up_Active_Pipes();
-    if (bool_Spoil_Active_Pipes)
-        Spoil_Active_Pipes();
 
     // See if we've been given a seed to use (for testing purposes).  When you
     // specify a random seed, the evolution will be exactly the same each time
@@ -165,21 +165,13 @@ int main(int argc, char **argv) {
         }
     }
 
-    // Declare variables for the GA parameters and set them to some default values.
-
-
-
-    // Create a phenotype for two variables.  The number of bits you can use to
-    // represent any number is limited by the type of computer you are using.  In
-    // this case, we use 16 bits to represent a floating point number whose value
-    // can range from -5 to 5, inclusive.  The bounds on x1 and x2 can be applied
-    // here and/or in the objective function.
+    // Set up GA stuff
     GABin2DecPhenotype map;
     double LOWER_BOUND, UPPER_BOUND;
     stringstream msg;
-    logfile_write("Setting up LOWER_BOUND, UPPER_BOUND\n", 0);
+    logfile_write("\n\nSetting up LOWER_BOUND, UPPER_BOUND...", 0);
     msg.str("");
-    msg << "\n\n:";
+    msg << "\n\n";
     double dia;
     for (unsigned int i = 0; i < pipe_name.size(); i++) {
         if (pipe_is_active.at(i)) {
@@ -187,11 +179,15 @@ int main(int argc, char **argv) {
             LOWER_BOUND = 0.5 * dia;
             UPPER_BOUND = 2.0 * dia;
             map.add(16, LOWER_BOUND, UPPER_BOUND);
-            msg << endl << "\t" << pipe_name.at(i) << " D=" << dia << ", LB=" << LOWER_BOUND << ", UB=" << UPPER_BOUND;
+            msg << "\t" << pipe_name.at(i) << " D=" << dia << ", LB=" << LOWER_BOUND << ", UB=" << UPPER_BOUND << endl;
         }
     }
     msg << endl;
     logfile_write(msg.str(), 1);
+
+    // You might want to spoil the original diameters
+    if (bool_Spoil_Active_Pipes)
+        Spoil_Active_Pipes();
 
     // Create the template genome using the phenotype map we just made.
 
@@ -224,10 +220,10 @@ int main(int argc, char **argv) {
 
     do_PerformSensitivityAnalysis = false;
 
-    logfile_write("Optimization finished.\n",0);
+    logfile_write("\n\nOptimization finished.\n", 0);
     msg.str("");
     msg << "Best solution objective is " << Objective(genome) << endl << endl;
-    logfile_write(msg.str(),0);
+    logfile_write(msg.str(), 0);
 
     return 0;
 }
@@ -331,6 +327,10 @@ Objective(GAGenome &x) {
 }
 
 void PerformSensitivityAnalysis() {
+    pipe_Sensitivity_MassFlowRates.clear();
+    pipe_Sensitivity_MassFlowRates_Sum.clear();
+    pipe_Sensitivity_Pressures.clear();
+    pipe_Sensitivity_Pressures_Sum.clear();
 
     vector<double> tmp1;
     vector<double> tmp2;
@@ -346,9 +346,10 @@ void PerformSensitivityAnalysis() {
                     if (0 == strcmp(name1.c_str(), name2.c_str())) {
                         tmp1.push_back(wds.at(i)->SM_row_sum_MassFlowRates.at(j));
                         tmp2.push_back(wds.at(i)->SM_row_sum_Pressures.at(j));
-                        //cout<<endl<<"\t i="<<name1<<" ? "<<name2;
-                        //cout<<" S_MFR: "<<wds.at(i)->SM_row_sum_MassFlowRates.at(j);
-                        //cout<<" S_Prs: "<<wds.at(i)->SM_row_sum_Pressures.at(j);
+                        /*cout<<endl<<"\t "<<name1<<" ? "<<name2;
+                        cout<<" S_MFR: "<<wds.at(i)->SM_row_sum_MassFlowRates.at(j);
+                        cout<<" S_Prs: "<<wds.at(i)->SM_row_sum_Pressures.at(j);
+                        cin.get();*/
                         break;
                     }
                 }
@@ -358,13 +359,41 @@ void PerformSensitivityAnalysis() {
         pipe_Sensitivity_Pressures.push_back(tmp2);
     }
 
+    // Sum up over time inetarval for each pipe
+    for (unsigned int i = 0; i < pipe_name.size(); i++) {
+        pipe_Sensitivity_MassFlowRates_Sum.push_back(0.0);
+        pipe_Sensitivity_Pressures_Sum.push_back(0.0);
+    }
+
+    for (unsigned int i = 0; i < wds.size(); i++) {
+        int k = 0;
+        for (unsigned int j = 0; j < pipe_name.size(); j++) {
+            if (pipe_is_active.at(j)) {
+                pipe_Sensitivity_MassFlowRates_Sum.at(k) += fabs(pipe_Sensitivity_MassFlowRates.at(i).at(k));
+                k++;
+            }
+        }
+    }
+
+    for (unsigned int i = 0; i < wds.size(); i++) {
+        int k = 0;
+        for (unsigned int j = 0; j < pipe_name.size(); j++) {
+            if (pipe_is_active.at(j)) {
+                pipe_Sensitivity_Pressures_Sum.at(k) += fabs(pipe_Sensitivity_Pressures.at(i).at(k));
+                k++;
+            }
+        }
+    }
+
     stringstream msg;
     msg.str("");
     msg << "\n Size of pipe_Sensitivity_MassFlowRates is " << pipe_Sensitivity_MassFlowRates.size() << " x "
-         << pipe_Sensitivity_MassFlowRates.at(0).size();
+        << pipe_Sensitivity_MassFlowRates.at(0).size();
     msg << "\n Size of pipe_Sensitivity_Pressures     is " << pipe_Sensitivity_Pressures.size() << " x "
-         << pipe_Sensitivity_Pressures.at(0).size();
-    logfile_write(msg.str(),1);
+        << pipe_Sensitivity_Pressures.at(0).size();
+    msg << "\n Size of pipe_Sensitivity_MassFlowRates_Sum is " << pipe_Sensitivity_MassFlowRates_Sum.size();
+    msg << "\n Size of pipe_Sensitivity_Pressures_Sum     is " << pipe_Sensitivity_Pressures_Sum.size() << endl;
+    logfile_write(msg.str(), 2);
 
     // Now save to data files
     // First, Mass Flow Rate sensitivity
@@ -372,29 +401,26 @@ void PerformSensitivityAnalysis() {
     resfile.open("sensitivity_MassFlowRates.dat", ios::out);
     resfile << scientific << setprecision(5);
 
-
     for (unsigned int j = 0; j < pipe_name.size(); j++)
         if (pipe_is_active.at(j))
             resfile << pipe_name.at(j) << " ; ";
     resfile << endl;
-
-    vector<double> sum1(num_of_active_pipes, 0.0);
 
     for (unsigned int i = 0; i < wds.size(); i++) {
         int k = 0;
         for (unsigned int j = 0; j < pipe_name.size(); j++) {
             if (pipe_is_active.at(j)) {
                 resfile << pipe_Sensitivity_MassFlowRates.at(i).at(k) << ";";
-                sum1.at(k) += fabs(pipe_Sensitivity_MassFlowRates.at(i).at(k));
+                //pipe_Sensitivity_MassFlowRates_Sum.at(k) += fabs(pipe_Sensitivity_MassFlowRates.at(i).at(k));
                 k++;
             }
         }
         resfile << endl;
     }
 
-    for (unsigned int j = 0; j < pipe_name.size(); j++)
-        if (pipe_is_active.at(j))
-            resfile << (sum1.at(j)/wds.size()) << ";";
+    for (unsigned int i = 0; i < pipe_Sensitivity_MassFlowRates_Sum.size(); i++)
+        resfile << (pipe_Sensitivity_MassFlowRates_Sum.at(i) / wds.size()) << ";";
+
     resfile.close();
 
     // Second, Pressure sensitivity
@@ -406,58 +432,170 @@ void PerformSensitivityAnalysis() {
             resfile << pipe_name.at(j) << " ; ";
     resfile << endl;
 
-    vector<double> sum2(num_of_active_pipes, 0.0);
+    //for (unsigned int i = 0; i < num_of_active_pipes; i++)
+    //    pipe_Sensitivity_Pressures_Sum.push_back(0.0);
+
 
     for (unsigned int i = 0; i < wds.size(); i++) {
         int k = 0;
         for (unsigned int j = 0; j < pipe_name.size(); j++) {
             if (pipe_is_active.at(j)) {
                 resfile << pipe_Sensitivity_Pressures.at(i).at(k) << ";";
-                sum2.at(k) += fabs(pipe_Sensitivity_Pressures.at(i).at(k));
                 k++;
             }
         }
         resfile << endl;
     }
 
-    for (unsigned int j = 0; j < pipe_name.size(); j++)
-        if (pipe_is_active.at(j))
-            resfile << (sum2.at(j)/wds.size()) << ";";
+    for (unsigned int i = 0; i < pipe_Sensitivity_Pressures_Sum.size(); i++)
+        resfile << (pipe_Sensitivity_Pressures_Sum.at(i) / wds.size()) << ";";
     resfile.close();
 
 }
 
 void Set_Up_Active_Pipes() {
 
-    num_of_active_pipes = 0;
-
+    // Get pipe names
+    pipe_origD.clear();
+    pipe_name.clear();
+    pipe_is_active.clear();
     for (unsigned int i = 0; i < wds.at(0)->agelemek.size(); i++)
         if (strcmp(wds.at(0)->agelemek.at(i)->Get_Tipus().c_str(), "Cso") == 0) {
             pipe_origD.push_back(wds.at(0)->agelemek.at(i)->Get_dprop("diameter"));
             pipe_name.push_back(wds.at(0)->agelemek.at(i)->Get_nev());
-            if (wds.at(0)->agelemek.at(i)->Get_dprop("diameter") > Dmin) {
-                pipe_is_active.push_back(true);
-                num_of_active_pipes++;
-            } else
-                pipe_is_active.push_back(false);
+            pipe_is_active.push_back(true);
         }
+
+    // Selecting pipes based on diameter
+    if (type_of_pipe_selection == 0) {
+        num_of_active_pipes = 0;
+        int k = 0;
+        for (unsigned int i = 0; i < wds.at(0)->agelemek.size(); i++)
+            if (strcmp(wds.at(0)->agelemek.at(i)->Get_Tipus().c_str(), "Cso") == 0) {
+                if (wds.at(0)->agelemek.at(i)->Get_dprop("diameter") > Dmin) {
+                    pipe_is_active.at(k) = true;
+                    num_of_active_pipes++;
+                } else
+                    pipe_is_active.at(k) = false;
+                k++;
+            }
+
+        stringstream msg;
+        msg.str("");
+        msg << "Setting active pipes based on diameter (number: " << num_of_active_pipes << ", Dmin: " << Dmin
+            << ")...\n";
+        logfile_write(msg.str(), 0);
+        msg.str("");
+        for (unsigned int i = 0; i < pipe_name.size(); i++)
+            if (pipe_is_active.at(i))
+                msg << endl << "\t" << pipe_name.at(i) << " D = " << pipe_origD.at(i);
+        msg << endl;
+        logfile_write(msg.str(), 1);
+    }
+
+    // Selecting pipes based on sensitivity
+    if (type_of_pipe_selection == 1) {
+        stringstream msg;
+        msg.str("");
+        msg << "\n\nPerforming sensitivity analysis...";
+        PerformSensitivityAnalysis();
+        msg << " done.\n";
+        logfile_write(msg.str(), 2);
+        msg.str("");
+
+        while (Count_Active_Pipes() > num_of_active_pipes) {
+
+            msg << List_Active_Pipes();
+            msg << endl << endl << "number of active pipes: " << Count_Active_Pipes() << " (desired:"
+                << num_of_active_pipes << ")";
+
+            double min_val = 1.e6;
+            int min_idx = -1;
+            for (unsigned i = 0; i < pipe_is_active.size(); i++) {
+                if ((pipe_Sensitivity_Pressures_Sum.at(i) < min_val) && (pipe_is_active.at(i))) {
+                    min_val = pipe_Sensitivity_Pressures_Sum.at(i);
+                    min_idx = i;
+                }
+            }
+            msg << "\n\nMinimum sensitivity: idx: " << min_idx << ", name: " << pipe_name.at(min_idx) << " removing..."<<endl;
+            pipe_is_active.at(min_idx) = false;
+            logfile_write(msg.str(), 2);
+            msg.str("");
+        }
+
+        msg.str("");
+        msg << "\nSetting active pipes based on sensitivity (number: " << num_of_active_pipes << ")...\n";
+        logfile_write(msg.str(), 0);
+        msg.str("");
+        msg<<List_Active_Pipes();
+        logfile_write(msg.str(), 1);
+    }
+
+    // Selecting pipes based on largest diameters
+    if (type_of_pipe_selection == 2) {
+        stringstream msg;
+        msg.str("");
+        msg << "\n\nPerforming sensitivity analysis...";
+        PerformSensitivityAnalysis();
+        msg << " done.\n";
+        logfile_write(msg.str(), 2);
+        msg.str("");
+
+        while (Count_Active_Pipes() > num_of_active_pipes) {
+
+            msg << List_Active_Pipes();
+            msg << endl << endl << "number of active pipes: " << Count_Active_Pipes() << " (desired:"
+                << num_of_active_pipes << ")";
+
+            double min_val = 1.e6;
+            int min_idx = -1;
+            for (unsigned i = 0; i < pipe_is_active.size(); i++) {
+                if ((pipe_origD.at(i) < min_val) && (pipe_is_active.at(i))) {
+                    min_val = pipe_origD.at(i);
+                    min_idx = i;
+                }
+            }
+            msg << "\n\nMinimum diameter: idx: " << min_idx << ", name: " << pipe_name.at(min_idx) << " removing..."<<endl;
+            pipe_is_active.at(min_idx) = false;
+            logfile_write(msg.str(), 2);
+            msg.str("");
+        }
+
+        msg.str("");
+        msg << "\nSetting active pipes based on largest diameter (number: " << num_of_active_pipes << ")...\n";
+        logfile_write(msg.str(), 0);
+        msg.str("");
+        msg<<List_Active_Pipes();
+        logfile_write(msg.str(), 1);
+    }
+}
+
+unsigned int Count_Active_Pipes() {
+    unsigned int count = 0;
+    for (unsigned j = 0; j < pipe_name.size(); j++)
+        if (pipe_is_active.at(j))
+            count++;
+    return count;
+}
+
+string List_Active_Pipes() {
 
     stringstream msg;
     msg.str("");
-    msg << "Setting active pipes (number: " << num_of_active_pipes << ")...\n";
-    logfile_write(msg.str(), 0);
-    msg.str("");
-    for (unsigned int i = 0; i < pipe_name.size(); i++)
-        if (pipe_is_active.at(i))
-            msg << pipe_name.at(i) << " ";
-    logfile_write(msg.str(), 1);
+    msg << endl  << "Active pipes:" << fixed << setprecision(3);
+    for (unsigned j = 0; j < pipe_name.size(); j++)
+        if (pipe_is_active.at(j))
+            msg << endl << "\t idx:" << j << "  " << pipe_name.at(j) << ", \tD=" << pipe_origD.at(j)
+                << ", Pressures sensitivity: " << pipe_Sensitivity_Pressures_Sum.at(j);
+
+    return msg.str();
 }
 
 void Spoil_Active_Pipes() {
 
     stringstream msg;
     msg.str("");
-    msg << endl << endl << "Spoiling active pipes....";
+    msg << endl << "Spoiling active pipes....";
     for (unsigned int i = 0; i < wds.at(0)->agelemek.size(); i++) {
         string name1 = wds.at(0)->agelemek.at(i)->Get_nev();
         if (strcmp(wds.at(0)->agelemek.at(i)->Get_Tipus().c_str(), "Cso") == 0) {
@@ -474,6 +612,7 @@ void Spoil_Active_Pipes() {
             }
         }
     }
+    msg<<endl;
     logfile_write(msg.str(), 1);
 }
 
@@ -537,7 +676,6 @@ double Compute_Error() {
 
     }
 
-    double weight_p_err = 0.01;
     double err = weight_p_err * p_err + (1.0 - weight_p_err) * H_err;
     str_msg.str("");
     str_msg << "\n  p_err = " << p_err << ", weigth= " << weight_p_err;
@@ -618,7 +756,7 @@ void Load_Sollwert_Datafiles() {
     vector<double> tmp_double_vec;
 
     tmpstr.str("");
-    tmpstr << "\n Reading sollwert file " << sollwert_dfile << " ... ";
+    tmpstr << "\nReading sollwert file " << sollwert_dfile << " ... \n";
 
     for (unsigned int i = 0; i < lines.size(); i++) {
         if (lines.at(i).size() < (Start_of_Periods + Num_of_Periods + 2 + 1)) {
@@ -651,8 +789,8 @@ void Load_Sollwert_Datafiles() {
             Pool_Surfs.push_back(get_A(name));
 
             // Info
-            tmpstr << endl << "\t Found pool: " << name << " H(0) = " << tmp_double_vec.at(0) << " m , A = "
-                   << get_A(name) << " m2";
+            tmpstr << "\t Found pool: " << name << " H(0) = " << tmp_double_vec.at(0) << " m , A = "
+                   << get_A(name) << " m2" << endl;
 
             // Make space for Staci values:
             vector<double> aa(tmp_double_vec.size(), 0.);
@@ -668,13 +806,14 @@ void Load_Sollwert_Datafiles() {
             Sollwert_Node_Values.push_back(tmp_double_vec);
 
             // Info
-            tmpstr << endl << "\t Found node: " << lines.at(i).at(0);
+            tmpstr << "\t Found node: " << lines.at(i).at(0) << endl;
 
             // Make space for Staci values:
             vector<double> aa(tmp_double_vec.size(), 0.);
             Staci_Node_Values.push_back(aa);
         }
     }
+    tmpstr << endl;
     logfile_write(tmpstr.str(), 1);
 }
 
@@ -738,12 +877,9 @@ int Find_Pressure_Index(string PressureName) {
     int idx = -1;
     for (unsigned int j = 0; j < wds.at(0)->cspok.size(); j++) {
         string Name = wds.at(0)->cspok.at(j)->Get_nev();
-        //cout<<endl<<Name;
-        //cin.get();
         if (strcmp(Name.c_str(), PressureName.c_str()) == 0) {
             found = true;
             idx = j;
-            //cin.get();
             break;
         }
     }
@@ -776,6 +912,7 @@ void Set_Initial_Pool_Levels() {
             << H0;
         logfile_write(str.str(), 1);
     }
+    logfile_write("\n\n", 1);
 }
 
 void logfile_write(string msg, int debug_level) {
@@ -841,7 +978,44 @@ string Load_Settings() {
     Num_of_Periods = atoi(xMainNode.getChildNode("Num_of_Periods").getText());
     string Text_Spoil_Active_Pipes = xMainNode.getChildNode("Spoil_Active_Pipes").getText();
     dt = atof(xMainNode.getChildNode("dt").getText());
-    Dmin = atof(xMainNode.getChildNode("Dmin").getText());
+
+    weight_p_err = atof(xMainNode.getChildNode("weight_p_err").getText());
+    if (weight_p_err < 0.)
+        weight_p_err = 0.;
+    if (weight_p_err > 1.)
+        weight_p_err = 1.;
+
+    string text_type_of_pipe_selection = xMainNode.getChildNode("type_of_pipe_selection").getText();
+
+    bool type_of_pipe_selection_is_set = false;
+    if (0 == strcmp(text_type_of_pipe_selection.c_str(), "Dmin")) {
+        Dmin = atof(xMainNode.getChildNode("Dmin").getText());
+        type_of_pipe_selection_is_set = true;
+        type_of_pipe_selection = 0;
+    }
+    if (0 == strcmp(text_type_of_pipe_selection.c_str(), "most_sensitive")) {
+        num_of_active_pipes = atoi(xMainNode.getChildNode("num_of_active_pipes").getText());
+        type_of_pipe_selection_is_set = true;
+        type_of_pipe_selection = 1;
+    }
+    if (0 == strcmp(text_type_of_pipe_selection.c_str(), "largest_diameter")) {
+        num_of_active_pipes = atoi(xMainNode.getChildNode("num_of_active_pipes").getText());
+        type_of_pipe_selection_is_set = true;
+        type_of_pipe_selection = 2;
+    }
+    if (!type_of_pipe_selection_is_set) {
+        /**
+         * @todo Add more informative error message
+         */
+
+        stringstream msg;
+        msg.str("");
+        msg << endl << " Load_Settings() -> text_type_of_pipe_selection???" << endl;
+        logfile_write(msg.str(), 0);
+        exit(-1);
+    }
+
+
     popsize = atoi(xMainNode.getChildNode("popsize").getText());
     ngen = atoi(xMainNode.getChildNode("ngen").getText());
     pmut = atof(xMainNode.getChildNode("pmut").getText());
@@ -855,19 +1029,30 @@ string Load_Settings() {
 
     stringstream msg;
     msg.str("");
-    msg << "Settings:" << endl;
+    msg << "Settings:" << endl << endl;
     msg << "\t global_debug_level     : " << global_debug_level << endl;
     msg << "\t Staci_debug_level      : " << Staci_debug_level << endl << endl;
     msg << "\t dir_name               : " << dir_name << endl;
     msg << "\t fname_prefix           : " << fname_prefix << endl;
     msg << "\t logfilename            : " << logfilename << endl;
     msg << "\t best_logfilename       : " << best_logfilename << endl;
-    msg << "\t sollwert_dfile         : " << sollwert_dfile << endl;
+    msg << "\t sollwert_dfile         : " << sollwert_dfile << endl << endl;
     msg << "\t Start_of_Periods       : " << Start_of_Periods << endl;
     msg << "\t Num_of_Periods         : " << Num_of_Periods << endl;
-    msg << "\t length of periods (dt) : " << dt << " hour " << endl;
-    msg << "\t spoil active pipes     : " << bool_Spoil_Active_Pipes << endl;
-    msg << "\t Dmin                   : " << Dmin << " m" << endl << endl;
+    msg << "\t length of periods (dt) : " << dt << " hour " << endl << endl;
+    msg << "\t spoil active pipes     : " << bool_Spoil_Active_Pipes << endl << endl;
+    msg << "\t weights                : " << endl;
+    msg << "\t\tnodal pressures     : " << weight_p_err << endl;
+    msg << "\t\tpool levels         : " << (1 - weight_p_err) << endl << endl;
+
+    msg << "\t type of pipe selection : " << text_type_of_pipe_selection << endl;
+    if (0 == strcmp(text_type_of_pipe_selection.c_str(), "Dmin"))
+        msg << "\t\t Dmin                 : " << Dmin << " m" << endl << endl;
+    if (0 == strcmp(text_type_of_pipe_selection.c_str(), "most_sensitive"))
+        msg << "\t\t Most sensitive, num. of active pipes : " << num_of_active_pipes << endl << endl;
+    if (0 == strcmp(text_type_of_pipe_selection.c_str(), "largest_diameter"))
+        msg << "\t\t Largest diameter, num. of active pipes : " << num_of_active_pipes << endl << endl;
+
     msg << "\t popsize : " << popsize << endl;
     msg << "\t ngen    : " << ngen << endl;
     msg << "\t pmut    : " << pmut << endl;

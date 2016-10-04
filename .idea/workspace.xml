@@ -13,100 +13,219 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f72ed067-d179-4092-9461-72fee8098102" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/AnyTownBuildDatafiles.cpp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Staci@Mac/makefile_staci.mk" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Agelem.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/AnyOption.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/BukoMutargy.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Cso.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Csomopont.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/JelleggorbesFojtas.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/KonstNyomas.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Staci@Mac/best.dat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Staci@Mac/bests.log" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Staci@Mac/bog.dat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Staci@Mac/bog_stats.dat" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Staci@Mac/makefile_calibrate" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.log" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Szivattyu.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Vegakna.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/VisszacsapoSzelep.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/bjg_tools.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/bjga_main.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/bjga_micro_ga.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/izoterm_cso.m" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lubksb.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/ludcmp.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/staci_calibrate.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/staci_main.o" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/xmlParser.o" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Agelem.o" afterPath="$PROJECT_DIR$/Staci@Mac/Agelem.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Csomopont.o" afterPath="$PROJECT_DIR$/Staci@Mac/Csomopont.o" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Csatorna.o" afterPath="$PROJECT_DIR$/Staci@Mac/Csatorna.o" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Staci.o" afterPath="$PROJECT_DIR$/Staci@Mac/Staci.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Szivattyu.o" afterPath="$PROJECT_DIR$/Staci@Mac/Szivattyu.o" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data_io.o" afterPath="$PROJECT_DIR$/Staci@Mac/data_io.o" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/new_staci" afterPath="$PROJECT_DIR$/Staci@Mac/new_staci" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.dSYM/Contents/Resources/DWARF/staci_calibrate" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.dSYM/Contents/Resources/DWARF/staci_calibrate" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.o" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.o" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_agelem.pdf" afterPath="$PROJECT_DIR$/doc/latex/class_agelem.pdf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_buko_mutargy.pdf" afterPath="$PROJECT_DIR$/doc/latex/class_buko_mutargy.pdf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_buko_mutargy.tex" afterPath="$PROJECT_DIR$/doc/latex/class_buko_mutargy.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_csatorna.pdf" afterPath="$PROJECT_DIR$/doc/latex/class_csatorna.pdf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_cso.pdf" afterPath="$PROJECT_DIR$/doc/latex/class_cso.pdf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_jelleggorbes_fojtas.pdf" afterPath="$PROJECT_DIR$/doc/latex/class_jelleggorbes_fojtas.pdf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_konst_nyomas.pdf" afterPath="$PROJECT_DIR$/doc/latex/class_konst_nyomas.pdf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_szivattyu.pdf" afterPath="$PROJECT_DIR$/doc/latex/class_szivattyu.pdf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_vegakna.pdf" afterPath="$PROJECT_DIR$/doc/latex/class_vegakna.pdf" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_visszacsapo_szelep.pdf" afterPath="$PROJECT_DIR$/doc/latex/class_visszacsapo_szelep.pdf" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Agelem.cpp" afterPath="$PROJECT_DIR$/Agelem.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Agelem.h" afterPath="$PROJECT_DIR$/Agelem.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Csomopont.cpp" afterPath="$PROJECT_DIR$/Csomopont.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Csatorna.cpp" afterPath="$PROJECT_DIR$/Csatorna.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci.cpp" afterPath="$PROJECT_DIR$/Staci.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci.h" afterPath="$PROJECT_DIR$/Staci.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_1.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_1.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_10.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_10.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_11.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_11.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_12.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_12.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_13.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_13.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_14.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_14.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_15.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_15.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_16.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_16.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_17.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_17.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_18.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_18.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_19.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_19.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_2.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_2.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_20.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_20.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_21.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_21.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_22.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_22.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_23.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_23.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_24.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_24.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_25.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_25.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_26.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_26.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_27.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_27.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_28.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_28.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_29.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_29.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_3.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_3.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_30.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_30.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_31.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_31.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_32.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_32.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_33.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_33.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_34.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_34.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_35.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_35.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_36.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_36.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_37.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_37.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_38.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_38.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_39.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_39.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_4.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_4.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_40.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_40.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_41.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_41.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_42.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_42.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_43.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_43.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_44.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_44.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_45.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_45.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_46.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_46.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_47.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_47.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_5.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_5.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_6.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_6.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_7.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_7.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_8.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_8.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_9.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/data/foviz_halozat/2012_11_06/FV_input_2012_11_06_barlang_nelkul_9.spr.ros" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/subdir.mk" afterPath="$PROJECT_DIR$/Staci@Mac/subdir.mk" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Szivattyu.cpp" afterPath="$PROJECT_DIR$/Szivattyu.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_io.cpp" afterPath="$PROJECT_DIR$/data_io.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/python_tools/staci_calibrate_plot_best.py" afterPath="$PROJECT_DIR$/python_tools/staci_calibrate_plot_best.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/_agelem_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/_agelem_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/_any_option_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/_any_option_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/_buko_mutargy_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/_buko_mutargy_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/_csatorna_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/_csatorna_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/_cso_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/_cso_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/_csomopont_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/_csomopont_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/_jelleggorbes_fojtas_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/_jelleggorbes_fojtas_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/_konst_nyomas_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/_konst_nyomas_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/_staci_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/_staci_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/_staci_exception_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/_staci_exception_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/_szivattyu_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/_szivattyu_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/_vegakna_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/_vegakna_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/_visszacsapo_szelep_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/_visszacsapo_szelep_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/annotated.html" afterPath="$PROJECT_DIR$/doc/html/annotated.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_agelem-members.html" afterPath="$PROJECT_DIR$/doc/html/class_agelem-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_agelem.html" afterPath="$PROJECT_DIR$/doc/html/class_agelem.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_any_option-members.html" afterPath="$PROJECT_DIR$/doc/html/class_any_option-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_any_option.html" afterPath="$PROJECT_DIR$/doc/html/class_any_option.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_buko_mutargy-members.html" afterPath="$PROJECT_DIR$/doc/html/class_buko_mutargy-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_buko_mutargy.html" afterPath="$PROJECT_DIR$/doc/html/class_buko_mutargy.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_csatorna-members.html" afterPath="$PROJECT_DIR$/doc/html/class_csatorna-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_csatorna.html" afterPath="$PROJECT_DIR$/doc/html/class_csatorna.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_cso-members.html" afterPath="$PROJECT_DIR$/doc/html/class_cso-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_cso.html" afterPath="$PROJECT_DIR$/doc/html/class_cso.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_csomopont-members.html" afterPath="$PROJECT_DIR$/doc/html/class_csomopont-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_csomopont.html" afterPath="$PROJECT_DIR$/doc/html/class_csomopont.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_jelleggorbes_fojtas-members.html" afterPath="$PROJECT_DIR$/doc/html/class_jelleggorbes_fojtas-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_jelleggorbes_fojtas.html" afterPath="$PROJECT_DIR$/doc/html/class_jelleggorbes_fojtas.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_konst_nyomas-members.html" afterPath="$PROJECT_DIR$/doc/html/class_konst_nyomas-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_konst_nyomas.html" afterPath="$PROJECT_DIR$/doc/html/class_konst_nyomas.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_n_r_mat-members.html" afterPath="$PROJECT_DIR$/doc/html/class_n_r_mat-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_n_r_mat.html" afterPath="$PROJECT_DIR$/doc/html/class_n_r_mat.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_n_r_mat3d-members.html" afterPath="$PROJECT_DIR$/doc/html/class_n_r_mat3d-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_n_r_mat3d.html" afterPath="$PROJECT_DIR$/doc/html/class_n_r_mat3d.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_n_r_vec-members.html" afterPath="$PROJECT_DIR$/doc/html/class_n_r_vec-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_n_r_vec.html" afterPath="$PROJECT_DIR$/doc/html/class_n_r_vec.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_staci-members.html" afterPath="$PROJECT_DIR$/doc/html/class_staci-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_staci.html" afterPath="$PROJECT_DIR$/doc/html/class_staci.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_staci_exception-members.html" afterPath="$PROJECT_DIR$/doc/html/class_staci_exception-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_staci_exception.html" afterPath="$PROJECT_DIR$/doc/html/class_staci_exception.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_szivattyu-members.html" afterPath="$PROJECT_DIR$/doc/html/class_szivattyu-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_szivattyu.html" afterPath="$PROJECT_DIR$/doc/html/class_szivattyu.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_vegakna-members.html" afterPath="$PROJECT_DIR$/doc/html/class_vegakna-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_vegakna.html" afterPath="$PROJECT_DIR$/doc/html/class_vegakna.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_visszacsapo_szelep-members.html" afterPath="$PROJECT_DIR$/doc/html/class_visszacsapo_szelep-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_visszacsapo_szelep.html" afterPath="$PROJECT_DIR$/doc/html/class_visszacsapo_szelep.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_x_m_l_parser_base64_tool-members.html" afterPath="$PROJECT_DIR$/doc/html/class_x_m_l_parser_base64_tool-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/class_x_m_l_parser_base64_tool.html" afterPath="$PROJECT_DIR$/doc/html/class_x_m_l_parser_base64_tool.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/classarithcode-members.html" afterPath="$PROJECT_DIR$/doc/html/classarithcode-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/classarithcode.html" afterPath="$PROJECT_DIR$/doc/html/classarithcode.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/classdata__io-members.html" afterPath="$PROJECT_DIR$/doc/html/classdata__io-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/classdata__io.html" afterPath="$PROJECT_DIR$/doc/html/classdata__io.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/classes.html" afterPath="$PROJECT_DIR$/doc/html/classes.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/classhuffcode-members.html" afterPath="$PROJECT_DIR$/doc/html/classhuffcode-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/classhuffcode.html" afterPath="$PROJECT_DIR$/doc/html/classhuffcode.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/classwavefilt-members.html" afterPath="$PROJECT_DIR$/doc/html/classwavefilt-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/classwavefilt.html" afterPath="$PROJECT_DIR$/doc/html/classwavefilt.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/data__io_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/data__io_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/doxygen.css" afterPath="$PROJECT_DIR$/doc/html/doxygen.css" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/files.html" afterPath="$PROJECT_DIR$/doc/html/files.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/functions.html" afterPath="$PROJECT_DIR$/doc/html/functions.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/functions_func.html" afterPath="$PROJECT_DIR$/doc/html/functions_func.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/functions_vars.html" afterPath="$PROJECT_DIR$/doc/html/functions_vars.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/hierarchy.html" afterPath="$PROJECT_DIR$/doc/html/hierarchy.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/index.html" afterPath="$PROJECT_DIR$/doc/html/index.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/jquery.js" afterPath="$PROJECT_DIR$/doc/html/jquery.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/nr_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/nr_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/nrtypes_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/nrtypes_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/nrtypes__nr_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/nrtypes__nr_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/nrutil_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/nrutil_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/nrutil__nr_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/nrutil__nr_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/pages.html" afterPath="$PROJECT_DIR$/doc/html/pages.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_0.html" afterPath="$PROJECT_DIR$/doc/html/search/all_0.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_1.html" afterPath="$PROJECT_DIR$/doc/html/search/all_1.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_10.html" afterPath="$PROJECT_DIR$/doc/html/search/all_10.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_10.js" afterPath="$PROJECT_DIR$/doc/html/search/all_10.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_11.html" afterPath="$PROJECT_DIR$/doc/html/search/all_11.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_12.html" afterPath="$PROJECT_DIR$/doc/html/search/all_12.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_13.html" afterPath="$PROJECT_DIR$/doc/html/search/all_13.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_14.html" afterPath="$PROJECT_DIR$/doc/html/search/all_14.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_15.html" afterPath="$PROJECT_DIR$/doc/html/search/all_15.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_2.html" afterPath="$PROJECT_DIR$/doc/html/search/all_2.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_3.html" afterPath="$PROJECT_DIR$/doc/html/search/all_3.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_4.html" afterPath="$PROJECT_DIR$/doc/html/search/all_4.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_5.html" afterPath="$PROJECT_DIR$/doc/html/search/all_5.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_6.html" afterPath="$PROJECT_DIR$/doc/html/search/all_6.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_7.html" afterPath="$PROJECT_DIR$/doc/html/search/all_7.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_8.html" afterPath="$PROJECT_DIR$/doc/html/search/all_8.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_9.html" afterPath="$PROJECT_DIR$/doc/html/search/all_9.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_a.html" afterPath="$PROJECT_DIR$/doc/html/search/all_a.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_b.html" afterPath="$PROJECT_DIR$/doc/html/search/all_b.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_c.html" afterPath="$PROJECT_DIR$/doc/html/search/all_c.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_d.html" afterPath="$PROJECT_DIR$/doc/html/search/all_d.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_e.html" afterPath="$PROJECT_DIR$/doc/html/search/all_e.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/all_f.html" afterPath="$PROJECT_DIR$/doc/html/search/all_f.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/classes_0.html" afterPath="$PROJECT_DIR$/doc/html/search/classes_0.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/classes_1.html" afterPath="$PROJECT_DIR$/doc/html/search/classes_1.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/classes_2.html" afterPath="$PROJECT_DIR$/doc/html/search/classes_2.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/classes_3.html" afterPath="$PROJECT_DIR$/doc/html/search/classes_3.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/classes_4.html" afterPath="$PROJECT_DIR$/doc/html/search/classes_4.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/classes_5.html" afterPath="$PROJECT_DIR$/doc/html/search/classes_5.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/classes_6.html" afterPath="$PROJECT_DIR$/doc/html/search/classes_6.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/classes_7.html" afterPath="$PROJECT_DIR$/doc/html/search/classes_7.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/classes_8.html" afterPath="$PROJECT_DIR$/doc/html/search/classes_8.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/classes_9.html" afterPath="$PROJECT_DIR$/doc/html/search/classes_9.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/classes_a.html" afterPath="$PROJECT_DIR$/doc/html/search/classes_a.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/classes_b.html" afterPath="$PROJECT_DIR$/doc/html/search/classes_b.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_0.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_0.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_1.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_1.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_2.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_2.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_3.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_3.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_4.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_4.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_5.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_5.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_6.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_6.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_7.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_7.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_8.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_8.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_9.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_9.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_a.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_a.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_b.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_b.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_c.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_c.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_d.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_d.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_d.js" afterPath="$PROJECT_DIR$/doc/html/search/functions_d.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_e.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_e.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/functions_f.html" afterPath="$PROJECT_DIR$/doc/html/search/functions_f.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/pages_0.html" afterPath="$PROJECT_DIR$/doc/html/search/pages_0.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/pages_0.js" afterPath="$PROJECT_DIR$/doc/html/search/pages_0.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/search.css" afterPath="$PROJECT_DIR$/doc/html/search/search.css" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/variables_0.html" afterPath="$PROJECT_DIR$/doc/html/search/variables_0.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/variables_1.html" afterPath="$PROJECT_DIR$/doc/html/search/variables_1.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/variables_2.html" afterPath="$PROJECT_DIR$/doc/html/search/variables_2.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/variables_3.html" afterPath="$PROJECT_DIR$/doc/html/search/variables_3.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/variables_4.html" afterPath="$PROJECT_DIR$/doc/html/search/variables_4.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/variables_5.html" afterPath="$PROJECT_DIR$/doc/html/search/variables_5.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/variables_6.html" afterPath="$PROJECT_DIR$/doc/html/search/variables_6.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/variables_7.html" afterPath="$PROJECT_DIR$/doc/html/search/variables_7.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/variables_8.html" afterPath="$PROJECT_DIR$/doc/html/search/variables_8.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/variables_9.html" afterPath="$PROJECT_DIR$/doc/html/search/variables_9.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/variables_a.html" afterPath="$PROJECT_DIR$/doc/html/search/variables_a.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/search/variables_b.html" afterPath="$PROJECT_DIR$/doc/html/search/variables_b.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_a_l_l_x_m_l_clear_tag-members.html" afterPath="$PROJECT_DIR$/doc/html/struct_a_l_l_x_m_l_clear_tag-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_a_l_l_x_m_l_clear_tag.html" afterPath="$PROJECT_DIR$/doc/html/struct_a_l_l_x_m_l_clear_tag.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_next_token-members.html" afterPath="$PROJECT_DIR$/doc/html/struct_next_token-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_next_token.html" afterPath="$PROJECT_DIR$/doc/html/struct_next_token.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l-members.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l_attribute-members.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l_attribute-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l_attribute.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l_attribute.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l_character_entity-members.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l_character_entity-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l_character_entity.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l_character_entity.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l_clear-members.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l_clear-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l_clear.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l_clear.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l_node-members.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l_node-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l_node.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l_node.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l_node_contents-members.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l_node_contents-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l_node_contents.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l_node_contents.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l_results-members.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l_results-members.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/struct_x_m_l_results.html" afterPath="$PROJECT_DIR$/doc/html/struct_x_m_l_results.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/tabs.css" afterPath="$PROJECT_DIR$/doc/html/tabs.css" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/html/xml_parser_8h_source.html" afterPath="$PROJECT_DIR$/doc/html/xml_parser_8h_source.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_agelem.tex" afterPath="$PROJECT_DIR$/doc/latex/class_agelem.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_any_option.tex" afterPath="$PROJECT_DIR$/doc/latex/class_any_option.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_csatorna.tex" afterPath="$PROJECT_DIR$/doc/latex/class_csatorna.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_cso.tex" afterPath="$PROJECT_DIR$/doc/latex/class_cso.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_csomopont.tex" afterPath="$PROJECT_DIR$/doc/latex/class_csomopont.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_jelleggorbes_fojtas.tex" afterPath="$PROJECT_DIR$/doc/latex/class_jelleggorbes_fojtas.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_konst_nyomas.tex" afterPath="$PROJECT_DIR$/doc/latex/class_konst_nyomas.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_n_r_mat.tex" afterPath="$PROJECT_DIR$/doc/latex/class_n_r_mat.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_n_r_mat3d.tex" afterPath="$PROJECT_DIR$/doc/latex/class_n_r_mat3d.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_n_r_vec.tex" afterPath="$PROJECT_DIR$/doc/latex/class_n_r_vec.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_staci.tex" afterPath="$PROJECT_DIR$/doc/latex/class_staci.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_staci_exception.tex" afterPath="$PROJECT_DIR$/doc/latex/class_staci_exception.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_szivattyu.tex" afterPath="$PROJECT_DIR$/doc/latex/class_szivattyu.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_vegakna.tex" afterPath="$PROJECT_DIR$/doc/latex/class_vegakna.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_visszacsapo_szelep.tex" afterPath="$PROJECT_DIR$/doc/latex/class_visszacsapo_szelep.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/class_x_m_l_parser_base64_tool.tex" afterPath="$PROJECT_DIR$/doc/latex/class_x_m_l_parser_base64_tool.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/classarithcode.tex" afterPath="$PROJECT_DIR$/doc/latex/classarithcode.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/classdata__io.tex" afterPath="$PROJECT_DIR$/doc/latex/classdata__io.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/classhuffcode.tex" afterPath="$PROJECT_DIR$/doc/latex/classhuffcode.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/classwavefilt.tex" afterPath="$PROJECT_DIR$/doc/latex/classwavefilt.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/doxygen.sty" afterPath="$PROJECT_DIR$/doc/latex/doxygen.sty" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/refman.tex" afterPath="$PROJECT_DIR$/doc/latex/refman.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/struct_a_l_l_x_m_l_clear_tag.tex" afterPath="$PROJECT_DIR$/doc/latex/struct_a_l_l_x_m_l_clear_tag.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/struct_next_token.tex" afterPath="$PROJECT_DIR$/doc/latex/struct_next_token.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/struct_x_m_l.tex" afterPath="$PROJECT_DIR$/doc/latex/struct_x_m_l.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/struct_x_m_l_attribute.tex" afterPath="$PROJECT_DIR$/doc/latex/struct_x_m_l_attribute.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/struct_x_m_l_character_entity.tex" afterPath="$PROJECT_DIR$/doc/latex/struct_x_m_l_character_entity.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/struct_x_m_l_clear.tex" afterPath="$PROJECT_DIR$/doc/latex/struct_x_m_l_clear.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/struct_x_m_l_node.tex" afterPath="$PROJECT_DIR$/doc/latex/struct_x_m_l_node.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/struct_x_m_l_node_contents.tex" afterPath="$PROJECT_DIR$/doc/latex/struct_x_m_l_node_contents.tex" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/doc/latex/struct_x_m_l_results.tex" afterPath="$PROJECT_DIR$/doc/latex/struct_x_m_l_results.tex" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/staci_calibrate.cpp" afterPath="$PROJECT_DIR$/staci_calibrate.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/staci_main.cpp" afterPath="$PROJECT_DIR$/staci_main.cpp" />
     </list>
     <ignored path="staci.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -129,9 +248,11 @@
       <file leaf-file-name="staci_calibrate.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/staci_calibrate.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="822">
-              <caret line="229" column="29" selection-start-line="229" selection-start-column="29" selection-end-line="229" selection-end-column="29" />
-              <folding />
+            <state relative-caret-position="304">
+              <caret line="351" column="31" selection-start-line="351" selection-start-column="24" selection-end-line="351" selection-end-column="31" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -165,12 +286,13 @@
         <option value="$PROJECT_DIR$/Staci@Mac/subdir.mk" />
         <option value="$PROJECT_DIR$/Staci@Mac/makefile_staci.mk" />
         <option value="$PROJECT_DIR$/Staci.h" />
-        <option value="$PROJECT_DIR$/Staci.cpp" />
         <option value="$PROJECT_DIR$/Csomopont.cpp" />
-        <option value="$PROJECT_DIR$/data_io.cpp" />
         <option value="$PROJECT_DIR$/Vegakna.cpp" />
         <option value="$PROJECT_DIR$/Szivattyu.cpp" />
         <option value="$PROJECT_DIR$/Staci@Mac/staci_calibrate_settings.xml" />
+        <option value="$PROJECT_DIR$/Staci.cpp" />
+        <option value="$PROJECT_DIR$/data_io.cpp" />
+        <option value="$PROJECT_DIR$/Csatorna.cpp" />
         <option value="$PROJECT_DIR$/staci_calibrate.cpp" />
       </list>
     </option>
@@ -198,7 +320,7 @@
     <ConfirmationsSetting value="0" id="Remove" />
   </component>
   <component name="ProjectView">
-    <navigator proportions="" version="1">
+    <navigator currentView="ProjectPane" proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -211,7 +333,11 @@
       <manualOrder />
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="ProjectPane">
+        <subPane />
+      </pane>
+    </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -403,9 +529,8 @@
     <option name="remove_strategy" value="false" />
   </component>
   <component name="StructureViewFactory">
-    <option name="AUTOSCROLL_MODE" value="false" />
     <option name="AUTOSCROLL_FROM_SOURCE" value="true" />
-    <option name="ACTIVE_ACTIONS" value=",INHERITORS_AND_CATEGORIES,ALPHA_COMPARATOR,KIND" />
+    <option name="ACTIVE_ACTIONS" value=",ALPHA_COMPARATOR,KIND" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -432,6 +557,10 @@
       <workItem from="1474920509221" duration="9855000" />
       <workItem from="1475011706171" duration="14101000" />
       <workItem from="1475096949801" duration="10754000" />
+      <workItem from="1475158793415" duration="168000" />
+      <workItem from="1475500567366" duration="2868000" />
+      <workItem from="1475574627107" duration="10516000" />
+      <workItem from="1475617569318" duration="137000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed issue with residential time computation.">
       <created>1460530738994</created>
@@ -444,7 +573,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="119740000" />
+    <option name="totallyTimeSpent" value="133429000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -456,15 +585,15 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1680" height="978" extended-state="0" />
-    <editor active="false" />
+    <frame x="0" y="23" width="1680" height="978" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24231465" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21699819" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21699819" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" x="660" y="69" width="360" height="886" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -508,13 +637,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Agelem.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="22" column="16" selection-start-line="22" selection-start-column="16" selection-end-line="22" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Vegakna.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="315">
@@ -781,7 +903,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="421">
           <caret line="114" column="26" selection-start-line="114" selection-start-column="26" selection-end-line="114" selection-end-column="26" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -789,7 +910,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
           <caret line="21" column="7" selection-start-line="21" selection-start-column="7" selection-end-line="21" selection-end-column="7" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -809,27 +929,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Staci.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7285">
-          <caret line="857" column="21" selection-start-line="857" selection-start-column="21" selection-end-line="857" selection-end-column="21" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Staci@Mac/subdir_calibrate.mk">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-105">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/data_io.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="13305">
-          <caret line="903" column="77" selection-start-line="903" selection-start-column="77" selection-end-line="903" selection-end-column="77" />
         </state>
       </provider>
     </entry>
@@ -847,11 +950,36 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/data_io.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="281" column="57" selection-start-line="281" selection-start-column="50" selection-end-line="281" selection-end-column="57" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Csatorna.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="166">
+          <caret line="710" column="0" selection-start-line="710" selection-start-column="0" selection-end-line="710" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Staci.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="19" selection-start-line="5" selection-start-column="19" selection-end-line="5" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/staci_calibrate.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="822">
-          <caret line="229" column="29" selection-start-line="229" selection-start-column="29" selection-end-line="229" selection-end-column="29" />
-          <folding />
+        <state relative-caret-position="304">
+          <caret line="351" column="31" selection-start-line="351" selection-start-column="24" selection-end-line="351" selection-end-column="31" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

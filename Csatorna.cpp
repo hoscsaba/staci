@@ -54,8 +54,7 @@ Csatorna::Csatorna(const string a_nev, const string a_cspe_nev,
                    const double a_ze, const double a_zv, const double a_erd,
                    const int a_int_steps, const int a_debugl, const double a_dia,
                    const double a_cl_k, const double a_cl_w, const bool a_is_reversed, const double a_mp) :
-    Agelem(a_nev, a_dia *a_dia *pi / 4, a_mp, a_ro)
-{
+        Agelem(a_nev, a_dia * a_dia * pi / 4, a_mp, a_ro) {
     //Kotelezo adatok minden Agelemnel:
     tipus = "Csatorna";
     csp_db = 2;
@@ -96,20 +95,18 @@ Csatorna::Csatorna(const string a_nev, const string a_cspe_nev,
         warning("Konstruktor",
                 "A csatorna lejtese kisebb, mint 0.1mm/m (0.01%), ez biztosan helyes adat?");
 
-double (Csatorna::*pt2fun)(double, double, double) = NULL;    
+    double (Csatorna::*pt2fun)(double, double, double) = NULL;
 }
 
 //--------------------------------------------------------------
-Csatorna::~Csatorna()
-{
+Csatorna::~Csatorna() {
 }
 
 /// Info
 /**
  * @return info string
  */
-string Csatorna::Info()
-{
+string Csatorna::Info() {
     ostringstream strstrm;
     strstrm << Agelem::Info();
     cout << setprecision(3);
@@ -125,17 +122,16 @@ string Csatorna::Info()
     strstrm << endl << "                lambda [-]                : " << lambda;
     strstrm << endl << "                Manning surl.teny.(n) [-] : " << surl;
     strstrm << endl << "                geometria tipus           : ";
-    switch (geo_tipus)
-    {
-    case 0:
-        strstrm << B << "m szelessegu, " << Hmax
-                << "m magassagu teglalap keresztmetszet";
-        break;
-    case 1:
-        strstrm << dia << "m atmeroju kor keresztmetszet";
-        break;
-    default:
-        error("Info()", " Ismeretlen geometria tipus!");
+    switch (geo_tipus) {
+        case 0:
+            strstrm << B << "m szelessegu, " << Hmax
+                    << "m magassagu teglalap keresztmetszet";
+            break;
+        case 1:
+            strstrm << dia << "m atmeroju kor keresztmetszet";
+            break;
+        default:
+            error("Info()", " Ismeretlen geometria tipus!");
     }
     strstrm << endl << "                numerikus megoldo beallitasai (db)     : "
             << db;
@@ -149,8 +145,7 @@ string Csatorna::Info()
             << out_file << endl;
 
 
-    if (debug_level > 0)
-    {
+    if (debug_level > 0) {
         time_t ido = time(0);
         ostringstream strstrm1;
         strstrm1 << "Staci\nBME Hidrodinamikai Rendszerek Tanszek\n" << ctime(&ido)
@@ -177,8 +172,7 @@ string Csatorna::Info()
  * Az elj�r�s kisz�m�tja a deriv�ltakat is, �gy @see df csak visszaadja az �rt�ket.
  */
 
-double Csatorna::f(vector<double> x)
-{
+double Csatorna::f(vector<double> x) {
     pe = x[0] * ro * g;
     pv = x[1] * ro * g;
     he = x[2];
@@ -201,13 +195,12 @@ double Csatorna::f(vector<double> x)
 
     jac.clear();
     num_eval_jac.clear();
-    for (unsigned int ii = 0; ii < 3; ii++)
-    {
+    for (unsigned int ii = 0; ii < 3; ii++) {
         jac.push_back(0.0);
         num_eval_jac.push_back(true);
     }
 
-    which_case(ye,yv);
+    which_case(ye, yv);
 
     //***************
     // SZAMITASOK
@@ -221,8 +214,7 @@ double Csatorna::f(vector<double> x)
 
     // dfdye szamitasa:
     logfile_write("\n\n\t  * evaluating df/dye...", 3);
-    if (num_eval_jac[0])
-    {
+    if (num_eval_jac[0]) {
         dx = -0.001 * ye;
         df = (*this.*pt2fun)(ye + dx, yv, mp);
         jac[0] = (df - ff) / dx;
@@ -230,8 +222,7 @@ double Csatorna::f(vector<double> x)
 
     // dfdyv szamitasa:
     logfile_write("\n\n\t  * evaluating df/dyv...", 3);
-    if (num_eval_jac[1])
-    {
+    if (num_eval_jac[1]) {
         dx = -0.001 * yv;
         df = (*this.*pt2fun)(ye, yv + dx, mp);
         jac[1] = (df - ff) / dx;
@@ -239,15 +230,14 @@ double Csatorna::f(vector<double> x)
 
     // dfdmp szamitasa:
     logfile_write("\n\n\t  * evaluating df/dmp...", 3);
-    if (num_eval_jac[2])
-    {
-        double mdot_old=mp;
+    if (num_eval_jac[2]) {
+        double mdot_old = mp;
         dx = -0.001 * mp;
-        mp=mp+dx;
-        which_case(ye,yv);
+        mp = mp + dx;
+        which_case(ye, yv);
         df = (*this.*pt2fun)(ye, yv, mp);
         jac[2] = (df - ff) / dx;
-        mp=mdot_old;
+        mp = mdot_old;
     }
 
     // konstans tag, csak linearizalas eseten van jelentosege
@@ -266,149 +256,129 @@ double Csatorna::f(vector<double> x)
 }
 
 
-void Csatorna::which_case(const double ye, const double yv){ 
+void Csatorna::which_case(const double ye, const double yv) {
     ostringstream strstrm;
 
-    
 
     strstrm.str("");
-    if ((ye > dia) && (yv > dia))
-    {
+    if ((ye > dia) && (yv > dia)) {
         // telt eset
         eset = "teltszelveny";
         strstrm << "\n\n\t " << eset << ": ye=" << ye << "m > D and yv=" << yv << "m >D (D=" << dia << "m)";
         pt2fun = &Csatorna::f_telt;
-    }
-    else
-    {
-        if (ye < 0)
-        {
-            if (yv + zv < ze)
-            {
+    } else {
+        if (ye < 0) {
+            if (yv + zv < ze) {
                 // 0.a. eset
                 eset = "0.a.";
                 strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m <0 and yv=" << yv << "m < ze=" << ze << "m";
                 pt2fun = &Csatorna::f_0;
-            }
-            else
-            {
-                if (mp > 0)
-                {
+            } else {
+                if (mp > 0) {
                     // 0.b.i. eset
                     eset = "0.b.i.";
-                    strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m <0, yv=" << yv << "m >0, mp=" << mp << " kg/s >0";
+                    strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m <0, yv=" << yv << "m >0, mp=" << mp
+                            << " kg/s >0";
 
                     pt2fun = &Csatorna::f_0;
-                }
-                else
-                {
+                } else {
                     // 0.b.ii. eset
                     eset = "0.b.ii.";
-                    strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m <0, yv=" << yv << "m >0, mp=" << mp << " kg/s <0";
+                    strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m <0, yv=" << yv << "m >0, mp=" << mp
+                            << " kg/s <0";
 
                     pt2fun = &Csatorna::f_1;
                     //eval_jac[0]= false;
                 }
             }
-        }
-        else
-        {
-            if (mp < 0)
-            {
+        } else {
+            if (mp < 0) {
                 // 1. eset
                 eset = "1.";
                 strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m >0, mp=" << mp << " kg/s <0";
 
                 pt2fun = &Csatorna::f_1;
-            }
-            else
-            {
+            } else {
                 vector<double> yn = normal_szint(mp / ro);
                 double yc = kritikus_szint(mp / ro);
 
-                switch (yn.size())
-                {
-                case 1:
-                    if (yn[0] > yc)
-                    {
-                        // 2.a.i. eset
-                        eset = "2.a.i.";
-                        strstrm << "\n\n\t case " << eset << ":  ye=" << ye << " m >0, mp=" << mp << " kg/s >0, yn>yc";
-                        strstrm << "\n\t\t(1 db normalszint: yn=" << yn[0] << " m > yc=" << yc << " m)";
+                switch (yn.size()) {
+                    case 1:
+                        if (yn[0] > yc) {
+                            // 2.a.i. eset
+                            eset = "2.a.i.";
+                            strstrm << "\n\n\t case " << eset << ":  ye=" << ye << " m >0, mp=" << mp
+                                    << " kg/s >0, yn>yc";
+                            strstrm << "\n\t\t(1 db normalszint: yn=" << yn[0] << " m > yc=" << yc << " m)";
 
-                        pt2fun = &Csatorna::f_2c;
-                    }
-                    else
-                    {
-                        // 2.a.ii. eset
-                        eset = "2.a.ii.";
-                        strstrm << "\n\n\t case " << eset << ":  ye=" << ye << " m >0, mp=" << mp << " kg/s >0, yn<yc";
-                        strstrm << "\n\t\t(1 db normalszint: yn=" << yn[0] << " m < yc=" << yc << " m)";
-
-                        pt2fun = &Csatorna::f_2aii;
-                    }
-                    break;
-
-                case 2:
-
-                    double yn1, yn2;
-                    // yn1<yn2, rendez�s sz�ks�ges lehet.
-                    if (yn[0] > yn[1])
-                    {
-                        yn1 = yn[1];
-                        yn2 = yn[0];
-                    }
-                    else
-                    {
-                        yn1 = yn[0];
-                        yn2 = yn[1];
-                    }
-
-                    if (yc < yn1)
-                    {
-                        eset = "2.b.i.";
-                        strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m >0, mp=" << mp << "kg/s >0, yc<yn1";
-                        strstrm << "\n\t\t(2 db normalszint: yc=" << yc << "m < yn1=" << yn1 << "m, yn2=" << yn2 << "m)";
-
-                        pt2fun = &Csatorna::f_2c;
-                    }
-                    else
-                    {
-                        if (yc < yn2)
-                        {
-                            eset = "2.b.ii.";
-                            strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m >0, mp=" << mp << "kg/s >0, yn1<yc<yn2";
-                            strstrm << endl << "\n\t\t(2 db normalszint: yn1=" << yn1 << "m < yc=" << yc << "m < yn2=" << yn2 << "m";
+                            pt2fun = &Csatorna::f_2c;
+                        } else {
+                            // 2.a.ii. eset
+                            eset = "2.a.ii.";
+                            strstrm << "\n\n\t case " << eset << ":  ye=" << ye << " m >0, mp=" << mp
+                                    << " kg/s >0, yn<yc";
+                            strstrm << "\n\t\t(1 db normalszint: yn=" << yn[0] << " m < yc=" << yc << " m)";
 
                             pt2fun = &Csatorna::f_2aii;
                         }
-                        else
-                        {
-                            eset = "2.b.iii.";
-                            strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m >0, mp=" << mp << "kg/s >0, yn2<yc";
-                            strstrm << "\n\t\t(2 db normalszint: yn1=" << yn1 << "m < yn2=" << yn2 << "m < yc=" << yc << "m";
+                        break;
 
-                            //pt2fun = &Csatorna::f_2c;
-                                pt2fun = &Csatorna::f_2aii;
+                    case 2:
+
+                        double yn1, yn2;
+                        // yn1<yn2, rendez�s sz�ks�ges lehet.
+                        if (yn[0] > yn[1]) {
+                            yn1 = yn[1];
+                            yn2 = yn[0];
+                        } else {
+                            yn1 = yn[0];
+                            yn2 = yn[1];
                         }
+
+                        if (yc < yn1) {
+                            eset = "2.b.i.";
+                            strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m >0, mp=" << mp
+                                    << "kg/s >0, yc<yn1";
+                            strstrm << "\n\t\t(2 db normalszint: yc=" << yc << "m < yn1=" << yn1 << "m, yn2=" << yn2
+                                    << "m)";
+
+                            pt2fun = &Csatorna::f_2c;
+                        } else {
+                            if (yc < yn2) {
+                                eset = "2.b.ii.";
+                                strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m >0, mp=" << mp
+                                        << "kg/s >0, yn1<yc<yn2";
+                                strstrm << endl << "\n\t\t(2 db normalszint: yn1=" << yn1 << "m < yc=" << yc
+                                        << "m < yn2=" << yn2 << "m";
+
+                                pt2fun = &Csatorna::f_2aii;
+                            } else {
+                                eset = "2.b.iii.";
+                                strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m >0, mp=" << mp
+                                        << "kg/s >0, yn2<yc";
+                                strstrm << "\n\t\t(2 db normalszint: yn1=" << yn1 << "m < yn2=" << yn2 << "m < yc="
+                                        << yc << "m";
+
+                                //pt2fun = &Csatorna::f_2c;
+                                pt2fun = &Csatorna::f_2aii;
+                            }
+                        }
+                        break;
+
+                    case 0:
+                        eset = "2.c.";
+                        strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m >0, mp=" << mp << "kg/s >0, yn nincs";
+                        strstrm << "\n\t\t(0 db normalszint, yc=" << yc << "m)";
+
+                        pt2fun = &Csatorna::f_2c;
+
+                        break;
+
+                    default: {
+                        strstrm.str("Bajjjj van: yn.size()=");
+                        strstrm << yn.size();
+                        error("f()", strstrm.str());
                     }
-                    break;
-
-                case 0:
-                    eset = "2.c.";
-                    strstrm << "\n\n\t case " << eset << ":  ye=" << ye << "m >0, mp=" << mp << "kg/s >0, yn nincs";
-                    strstrm << "\n\t\t(0 db normalszint, yc=" << yc << "m)";
-
-                    pt2fun = &Csatorna::f_2c;
-
-                    break;
-
-                default:
-                {
-                    strstrm.str("Bajjjj van: yn.size()=");
-                    strstrm << yn.size();
-                    error("f()", strstrm.str());
-                }
                 }
             }
         }
@@ -420,8 +390,7 @@ void Csatorna::which_case(const double ye, const double yv){
 /**
  * @return df �rt�ke
  */
-vector<double> Csatorna::df(vector<double> x)
-{
+vector<double> Csatorna::df(vector<double> x) {
     return jac;
 }
 
@@ -431,8 +400,7 @@ vector<double> Csatorna::df(vector<double> x)
  * @param value csak mode=1 eset�n
  */
 
-void Csatorna::Ini(int mode, double value)
-{
+void Csatorna::Ini(int mode, double value) {
     if (mode == 0)
         mp = 1.e-3;
     else
@@ -447,52 +415,44 @@ void Csatorna::Ini(int mode, double value)
  * @param &Rh hidraulikai sug�r (A/B)
  */
 
-void Csatorna::keresztmetszet(const double yy, double &A, double &B, double &Rh)
-{
+void Csatorna::keresztmetszet(const double yy, double &A, double &B, double &Rh) {
     double K = 0.0;
     double y = yy;
-    if (y < 0)
-    {
+    if (y < 0) {
         //ostringstream msg;
         //msg.str("");
         //msg<<"Negat�v szint, y="<<y;
         //warning("keresztmetszet()", msg.str());
         y = dia / 1000.;
-    }
-    else
-    {
-        switch (geo_tipus)
-        {
-        case 0:   // teglalap
-        {
-            A = B * y;
-            K = B + 2 * y;
-            break;
-        }
-        case 1:   // kor
-        {
-            if (y < dia)
+    } else {
+        switch (geo_tipus) {
+            case 0:   // teglalap
             {
-                double teta, R = dia / 2;
-                teta = acos(1 - y / R);
-                K = 2 * R * teta;
-                A = dia * dia / 4.*(teta - sin(teta) * cos(teta));
-                B = dia * sin(teta);
+                A = B * y;
+                K = B + 2 * y;
+                break;
             }
-            else
+            case 1:   // kor
             {
-                double h = dia / 100;
-                A = dia * dia * pi / 4.;
-                B = h;
-                K = dia * pi;
+                if (y < dia) {
+                    double teta, R = dia / 2;
+                    teta = acos(1 - y / R);
+                    K = 2 * R * teta;
+                    A = dia * dia / 4. * (teta - sin(teta) * cos(teta));
+                    B = dia * sin(teta);
+                } else {
+                    double h = dia / 100;
+                    A = dia * dia * pi / 4.;
+                    B = h;
+                    K = dia * pi;
+                }
+                break;
             }
-            break;
-        }
-        default:
-            ostringstream strstrm;
-            strstrm.str("");
-            strstrm << "Ismeretlen geometria tipus:" << geo_tipus;
-            error("keresztmetszet()", strstrm.str());
+            default:
+                ostringstream strstrm;
+                strstrm.str("");
+                strstrm << "Ismeretlen geometria tipus:" << geo_tipus;
+                error("keresztmetszet()", strstrm.str());
         }
 
         Rh = A / K;
@@ -508,8 +468,7 @@ void Csatorna::keresztmetszet(const double yy, double &A, double &B, double &Rh)
  * @return kritikus szint
  */
 
-double Csatorna::kritikus_szint(const double Q)
-{
+double Csatorna::kritikus_szint(const double Q) {
     double fun = 1.0, yj = dia, yb = dia, A, B, Rh, Q2 = Q * Q;
     ostringstream strstrm;
 
@@ -519,16 +478,14 @@ double Csatorna::kritikus_szint(const double Q)
     // Cs�kken� yb mellett keres�nk egy negat�v �rt�ket
     unsigned int iter = 0;
     strstrm << "\n\t\tEl�sz�m�t�s: csokkeno yb menten negativ f ertek keresese:";
-    while (fun > 0)
-    {
+    while (fun > 0) {
         yb /= 2.;
         keresztmetszet(yb, A, B, Rh);
         fun = 1. - Q2 * B / (A * A * A) / g;
         iter++;
 
         strstrm << "\n\t\t\t iter=" << iter << ", y=" << yb << " m, f=" << fun;
-        if (iter > iter_max)
-        {
+        if (iter > iter_max) {
             logfile_write(strstrm.str(), 0);
             error("kritikus_szint()", "HIBA (1) - Nem tal�lok negat�v �rt�ket!");
         }
@@ -548,8 +505,7 @@ double Csatorna::kritikus_szint(const double Q)
     keresztmetszet(yj, A, B, Rh);
     double fj = 1. - Q2 * B / (A * A * A) / g;
 
-    while ((fabs(fun) > 1.e-10) && (fabs(yj - yb) > 1.e-10))
-    {
+    while ((fabs(fun) > 1.e-10) && (fabs(yj - yb) > 1.e-10)) {
         strstrm << "\n\t\t\titer=" << iter << ": yb=" << yb << "(fb=" << fb << "),  yj=" << yj
                 << "(fj=" << fj << ")";
 
@@ -559,21 +515,17 @@ double Csatorna::kritikus_szint(const double Q)
         keresztmetszet(yk, A, B, Rh);
         fun = 1. - Q2 * B / (A * A * A) / g;
 
-        if (fun > 0)
-        {
+        if (fun > 0) {
             yj = yk;
             fj = fun;
-        }
-        else
-        {
+        } else {
             yb = yk;
             fb = fun;
         }
 
         iter++;
 
-        if (iter > iter_max)
-        {
+        if (iter > iter_max) {
             logfile_write(strstrm.str(), 0);
             error("kritkus_szint()", "HIBA (2) - T�l sok iter�ci�!");
         }
@@ -599,8 +551,7 @@ double Csatorna::kritikus_szint(const double Q)
  * @return norm�lszint(ek)
  */
 
-vector<double> Csatorna::normal_szint(const double Q)
-{
+vector<double> Csatorna::normal_szint(const double Q) {
     vector<double> yn;
 
     double y_cs = 0.938181 * dia;
@@ -620,14 +571,12 @@ vector<double> Csatorna::normal_szint(const double Q)
             << "m3/s, Q_D=" << Q_D << "m3/s";
     logfile_write(strstrm.str(), 4);
 
-    if (Q < Q_cs)
-    {
+    if (Q < Q_cs) {
         strstrm.str("\n\n\t\t1. normalszint szamitasa:");
         unsigned int iter = 0;
         double fun = 1.e10;
         double y = dia / 2;
-        while (fun > 0)
-        {
+        while (fun > 0) {
             keresztmetszet(y, A, B, Rh);
             C = pow(Rh, 1.0 / 6.0) / surlodas();
             fun = lejtes - Q2 / A / A / C / C / Rh;
@@ -635,8 +584,7 @@ vector<double> Csatorna::normal_szint(const double Q)
 
             y /= 2.;
             iter++;
-            if (iter > iter_max)
-            {
+            if (iter > iter_max) {
                 logfile_write(strstrm.str(), 0);
                 error("normal_szint()",
                       "HIBA (1) - Nem talalok negativ erteket!");
@@ -660,8 +608,7 @@ vector<double> Csatorna::normal_szint(const double Q)
         C = pow(Rh, 1.0 / 6.0) / surlodas();
         double fj = lejtes - Q2 / A / A / C / C / Rh;
 
-        while ((fabs(fun) > 1e-10) && fabs(yb - yj) > 1e-10)
-        {
+        while ((fabs(fun) > 1e-10) && fabs(yb - yj) > 1e-10) {
             //yk=yb-fb*(yj-yb)/(fj-fb);
             yk = (yb + yj) / 2.;
 
@@ -672,20 +619,16 @@ vector<double> Csatorna::normal_szint(const double Q)
             strstrm << "\n\t\t\titer=" << iter << ": yb=" << yb << "(fb=" << fb << ")  yk="
                     << yk << "(fk=" << fun << "), yj=" << yj << "(fj=" << fj << ")";
             //cout<<"\n\t\t\titer="<<iter<<": yb="<<yb<<"(fb="<<fb<<")  yk=" <<yk <<"(fk="<<fun <<"), yj="<<yj<<"(fj="<<fj<<")";;
-            if (fun > 0)
-            {
+            if (fun > 0) {
                 yj = yk;
                 fj = fun;
-            }
-            else
-            {
+            } else {
                 yb = yk;
                 fb = fun;
             }
             iter++;
 
-            if (iter > iter_max)
-            {
+            if (iter > iter_max) {
                 logfile_write(strstrm.str(), 0);
                 error("normal_szint()",
                       "HIBA (2) - T�l sok iter�ci�, 1. norm�lszint sz�m�t�sa!");
@@ -694,8 +637,7 @@ vector<double> Csatorna::normal_szint(const double Q)
         yn.push_back(yk);
         logfile_write(strstrm.str(), 4);
 
-        if (Q > Q_D)
-        {
+        if (Q > Q_D) {
             // 2. norm�lszint sz�m�t�sa: 0<y<y_cs
             strstrm.str("");
             strstrm << "\n\n\t2. norm�lszint sz�m�t�sa:";
@@ -710,8 +652,7 @@ vector<double> Csatorna::normal_szint(const double Q)
 
             double fun = 1e10, yk;
             unsigned int iter = 0;
-            while ((fabs(fun) > 1e-10) && (fabs(yb - yj) > 1e-10))
-            {
+            while ((fabs(fun) > 1e-10) && (fabs(yb - yj) > 1e-10)) {
                 //yk=yb-fb*(yj-yb)/(fj-fb);
                 yk = (yb + yj) / 2.;
                 keresztmetszet(yk, A, B, Rh);
@@ -721,20 +662,16 @@ vector<double> Csatorna::normal_szint(const double Q)
                 strstrm << "\n\t\t\titer=" << iter << ": yb=" << yb << "(fb=" << fb
                         << ")  yk=" << yk << "(fk=" << fun << "), yj=" << yj << "(fj="
                         << fj << ")  |yb-yj|=" << fabs(yb - yj);
-                if (fun > 0)
-                {
+                if (fun > 0) {
                     yj = yk;
                     fj = fun;
-                }
-                else
-                {
+                } else {
                     yb = yk;
                     fb = fun;
                 }
                 iter++;
 
-                if (iter > iter_max)
-                {
+                if (iter > iter_max) {
                     logfile_write(strstrm.str(), 0);
                     error("normal_szint()",
                           "HIBA (3) - T�l sok iter�ci� h�rm�dszer k�zben, 2. norm�lszint sz�m�t�sa!");
@@ -749,25 +686,24 @@ vector<double> Csatorna::normal_szint(const double Q)
 
     strstrm.str("");
     strstrm << "\n\n\t\tNormalszint(ek):";
-    switch (yn.size())
-    {
-    case 0:
-        strstrm << " Nincs";
-        logfile_write(strstrm.str(), 2);
-        break;
-    case 1:
-        strstrm << " yn1 = " << yn[0] << " m";
-        logfile_write(strstrm.str(), 2);
-        break;
-    case 2:
-        strstrm << " yn1 = " << yn[0] << " m";
-        strstrm << " yn2 = " << yn[1] << " m";
-        logfile_write(strstrm.str(), 2);
-        break;
-    default:
-        strstrm.str("");
-        strstrm << " yn.size()=" << yn.size() << " ???";
-        error("normal_szint", strstrm.str());
+    switch (yn.size()) {
+        case 0:
+            strstrm << " Nincs";
+            logfile_write(strstrm.str(), 2);
+            break;
+        case 1:
+            strstrm << " yn1 = " << yn[0] << " m";
+            logfile_write(strstrm.str(), 2);
+            break;
+        case 2:
+            strstrm << " yn1 = " << yn[0] << " m";
+            strstrm << " yn2 = " << yn[1] << " m";
+            logfile_write(strstrm.str(), 2);
+            break;
+        default:
+            strstrm.str("");
+            strstrm << " yn.size()=" << yn.size() << " ???";
+            error("normal_szint", strstrm.str());
     }
 
     return yn;
@@ -780,48 +716,39 @@ vector<double> Csatorna::normal_szint(const double Q)
  * @return dy/dx �rt�ke
  */
 
-double Csatorna::nyf_ode(const double x, const double y, const double mp)
-{
+double Csatorna::nyf_ode(const double x, const double y, const double mp) {
     double Q, A, B, C, Rh, ere = 0.0;
     Q = mp / ro;
 
-    //  if (y<0)
-    //      error("nyf_ode()", "y<0!");
-    //  else {
-    if (y < dia)
-    {
+    if (y < dia) {
         keresztmetszet(y, A, B, Rh);
         C = pow(Rh, 1. / 6.) / surlodas();
         ere = (lejtes - fabs(Q) * Q / A / A / C / C / Rh) / (1 - Q * Q / A / A / A / g * B);
-    }
-    else
-    {
+    } else {
         A = dia * dia * pi / 4.;
         Rh = dia / 4.0;
         C = pow(Rh, 1. / 6.) / surlodas();
         ere = lejtes - fabs(Q) * Q / A / A / C / C / Rh;
     }
-    //}
+
     return ere;
 }
 
-/// KDE megold�
+/// ODE solver
 /**
- * @param y0  indul� felsz�n: y(x0)
- * @param dx0 kezdeti l�p�sk�z, az integr�l�s k�zben n�het/cs�kkenhet
- * @param x0  indul� x �rt�k, ez hat�rozza meg az integr�l�s ir�ny�t
- * @return y az integr�l�s eredm�nye
+ * @param y0  depth at x=0
+ * @param dx0 initial dx step
+ * @param x0  initial x value (defines direction of integration)
+ * @return y result of integration
  */
 
-double Csatorna::ode_megoldo(double y0, double dx0, double x0, double mp)
-{
+double Csatorna::ode_megoldo(double y0, double dx0, double x0, double mp) {
     ostringstream strstrm;
-    double A, B, Rh, y = y0, x = x0, dx = dx0, sumdx = 0, yy = y;
+    double A, B, Rh, y = y0, x = x0, dx = dx0, sumdx = 0, yy = y0;
     int i = 0;
 
-    // Vektorok t�rl�se �s els� pont ment�se
-    if (write_res)
-    {
+    // clear vectors and save initial point
+    if (write_res) {
         xres.clear();
         yf.clear();
         yres.clear();
@@ -838,40 +765,39 @@ double Csatorna::ode_megoldo(double y0, double dx0, double x0, double mp)
     }
 
     strstrm.str("");
-    strstrm << endl << endl << "\t\t\tAgegyenlet megoldasa a " << nev << " csatorn�ban:"
-            << scientific << setprecision(4) << showpos << " x=" << x << " y=" << y
-            << " (mp=" << mp << " kg/s)";
+    strstrm << endl << endl << "\t\t\tSolving open-surface DE in channel " << nev << " ...\n";
+    strstrm << scientific << setprecision(4) << showpos;
+    strstrm << " x=" << x << " y=" << y << " (mp=" << mp << " kg/s)";
     logfile_write(strstrm.str(), 2);
 
     bool last_step = false;
 
-    while (!last_step)
-    {
+    while (!last_step) {
         strstrm.str("");
         double y1, y2, f_at_y, f_at_y2;
         double hiba_max = 1e-6, dx_min = 1e-10, hiba = 2.0 * hiba_max, dxuj;
 
-        while (hiba > hiba_max)
-        {
-            // Ez az utols� l�p�s?
-            if (x + dx > L)
-            {
+        while (hiba > hiba_max) {
+            // Is this the last step?
+            if (x + dx > L) {
                 dx = L - x;
                 last_step = true;
             }
-            if (x + dx < 0)
-            {
+            if (x + dx < 0) {
                 dx = -x;
                 last_step = true;
             }
 
-            // egy teljes �s k�t f�l l�p�s            .
+            // one full step...        .
             f_at_y = nyf_ode(x, y, mp);
             y1 = y + dx * f_at_y;
 
+            // two falf steps...
             y2 = y + dx / 2 * f_at_y;
             f_at_y2 = nyf_ode(x + dx / 2, y2, mp);
             y2 = y2 + dx / 2 * f_at_y2;
+
+            // compare results
             hiba = fabs(y1 - y2);
 
             // Info
@@ -884,29 +810,23 @@ double Csatorna::ode_megoldo(double y0, double dx0, double x0, double mp)
             strstrm.str("");
 
             // Lepes beallitasa
-            if ((hiba > hiba_max) || (y1 < 0.))
-            {
+            if ((hiba > hiba_max) || (y1 < 0.)) {
                 dxuj = dx / 2.;
                 logfile_write(" dx -> dx/2", 3);
-                if (fabs(dxuj) < dx_min)
-                {
+                if (fabs(dxuj) < dx_min) {
                     strstrm << endl << "!!! Feladom, a " << nev
                             << " csatornaban az eloirt dx_min=" << dx_min
                             << " lepeskozzel sem tudom elerni a megadott "
                             << hiba_max << " hibahatart!!!\n A szamitas folytatodik, de pontatlan lehet!!!" << endl;
 
-                    error("ode_megoldo()", strstrm.str());                    
+                    error("ode_megoldo()", strstrm.str());
                 }
-            }
-            else
-            {
+            } else {
                 logfile_write(" OK", 3);
-                if (hiba < hiba_max / 10)
-                {
+                if (hiba < hiba_max / 10) {
                     dxuj = dx * 2.;
                     logfile_write(" dx -> dx*2", 3);
-                }
-                else
+                } else
                     dxuj = dx;
 
                 // Lepes lezarasa
@@ -918,9 +838,8 @@ double Csatorna::ode_megoldo(double y0, double dx0, double x0, double mp)
             dx = dxuj;
         }
 
-        // Eredm�nyvektor gy�jt�get�se
-        if (write_res)
-        {
+        // Collect results
+        if (write_res) {
             xres.push_back(x);
             if (dx0 > 0)
                 yf.push_back(ze - lejtes * x);
@@ -931,10 +850,9 @@ double Csatorna::ode_megoldo(double y0, double dx0, double x0, double mp)
             vres.push_back(mp / ro / A);
         }
         logfile_write(strstrm.str(), 4);
-
     }
     strstrm.str("");
-    strstrm << "\n\t\t\t => megoldas: x=" << x << " y=" << y;
+    strstrm << "\n\t\t\t => solution: x=" << x << " y=" << y;
     logfile_write(strstrm.str(), 2);
 
     return y;
@@ -964,8 +882,7 @@ double Csatorna::ode_megoldo(double y0, double dx0, double x0, double mp)
  * !!! Folyasiranyban kell rajzolni!
  */
 
-void Csatorna::build_res()
-{
+void Csatorna::build_res() {
     write_res = true;
     res_ready = true;
     double ye = pe / ro / g + he - ze;
@@ -979,8 +896,7 @@ void Csatorna::build_res()
 
     // Ha �res a csatorna, teljesen k�lon kezelj�k
     bool megvolt = false;
-    if (!strcmp(eset.c_str(), "teltszelveny"))
-    {
+    if (!strcmp(eset.c_str(), "teltszelveny")) {
         megvolt = true;
         xres.push_back(0);
         xres.push_back(L);
@@ -990,8 +906,7 @@ void Csatorna::build_res()
         yres.push_back(yv);
     }
 
-    if (!strcmp(eset.c_str(), "0.a.") || !strcmp(eset.c_str(), "0.b.i."))
-    {
+    if (!strcmp(eset.c_str(), "0.a.") || !strcmp(eset.c_str(), "0.b.i.")) {
         // f_0
         megvolt = true;
         xres.push_back(0);
@@ -1002,40 +917,35 @@ void Csatorna::build_res()
         yres.push_back(yv);
     }
 
-    if (!strcmp(eset.c_str(), "0.b.ii.") || !strcmp(eset.c_str(), "1."))
-    {
+    if (!strcmp(eset.c_str(), "0.b.ii.") || !strcmp(eset.c_str(), "1.")) {
         // f_1
         megvolt = true;
-        //double ff = f_1(ye, yv, mp);
+        double ff = f_1(ye, yv, mp);
         // Az eredmenyvektorokat folyasiranyban rajzoljuk fel!
         is_reversed = true;
     }
 
-    if (!strcmp(eset.c_str(), "2.a.ii.") || !strcmp(eset.c_str(), "2.b.ii."))
-    {
+    if (!strcmp(eset.c_str(), "2.a.ii.") || !strcmp(eset.c_str(), "2.b.ii.")) {
         // f_2aii
         megvolt = true;
         double ff = f_2aii(ye, yv, mp);
     }
 
     if (!strcmp(eset.c_str(), "2.a.i.") || !strcmp(eset.c_str(), "2.b.i.")
-            || !strcmp(eset.c_str(), "2.b.iiii.") || !strcmp(eset.c_str(),
-                    "2.c."))
-    {
+        || !strcmp(eset.c_str(), "2.b.iiii.") || !strcmp(eset.c_str(),
+                                                         "2.c.")) {
         // f_2c
         megvolt = true;
-        //double ff = f_2c(ye, yv, mp);
+        double ff = f_2c(ye, yv, mp);
     }
 
-    if (!megvolt)
-    {
+    if (!megvolt) {
         string msg = "Ismeretlen eset: " + eset;
         error("build_res()", msg);
     }
 
     // Hmax korrekcio
-    for (unsigned int i = 0; i < yres.size(); i++)
-    {
+    for (unsigned int i = 0; i < yres.size(); i++) {
 
         if (yres.at(i) > dia)
             Hres.push_back(dia);
@@ -1047,8 +957,7 @@ void Csatorna::build_res()
 
     // Az eredm�nyek konzisztenci�ja miatt mindig utolag szamitjuk yres-bol.
     double A, B, Rh;
-    for (unsigned int i = 0; i < yres.size(); i++)
-    {
+    for (unsigned int i = 0; i < yres.size(); i++) {
         keresztmetszet(Hres.at(i), A, B, Rh);
         vres.push_back(mp / ro / A);
         yf.at(i) -= zv;
@@ -1061,14 +970,12 @@ void Csatorna::build_res()
     }
 
     // Ha meg volt forditva, vissza kell forgatni a cuccost.
-    if (is_reversed)
-    {
+    if (is_reversed) {
         vector<double> tmp_xres(xres.size()), tmp_yf(xres.size()),
-               tmp_yres(xres.size()), tmp_Hres(xres.size()),
-               tmp_vres(xres.size());
+                tmp_yres(xres.size()), tmp_Hres(xres.size()),
+                tmp_vres(xres.size());
         int max = xres.size();
-        for (unsigned int i = 0; i < xres.size(); i++)
-        {
+        for (unsigned int i = 0; i < xres.size(); i++) {
             tmp_xres.at(i) = L - xres.at(max - i - 1);
             tmp_yf.at(i) = yf.at(max - i - 1);
             tmp_yres.at(i) = yres.at(max - i - 1);
@@ -1089,46 +996,39 @@ void Csatorna::build_res()
     }
     // Info
     ostringstream strstrm;
-    strstrm << "\n\n\tEredmeny adatok epitese...";
+    strstrm << "\n\n\tBiulding solution vectors...";
     strstrm << "\n\n\t\t ye+ze = " << (pe / ro / g + he) << "m, ye=" << ye << "m";
     strstrm << "\n\t\t yv+zv = " << (pv / ro / g + hv) << "m, yv=" << ye << "m";
     strstrm << "\n\t\t mp    = " << mp << "kg/s";
-    strstrm << "\n\t\t eset  : " << eset;
-    strstrm << "\n\t\t eredmeny adatvektorok hossza : " << yres.size() << "\n";
+    strstrm << "\n\t\t case  : " << eset;
+    strstrm << "\n\t\t length of solution vectors : " << yres.size() << "\n";
 
-    strstrm << "\n\n Eredmenyvektorok:\n\n";
+    strstrm << "\n\n Solution vectors:\n\n";
     strstrm
-            << "\n\t  i    \t   x[m]   \t   yf[m]   \t   yf+D[m]   \t   y[m]   \t   p[v.o.m.]   \t   yf+p[m]\t   v[m/s]\t   A[m^2]";
+            << "\n\t  i    x      \t   yf     \t  yf+D   \t   y   \t     p (mwc) \t  yf+p    \t   v    \t     A";
     strstrm << scientific << setprecision(3);
     double sumh;
-    //cout << endl << nev << " eredmenyvektor kiirasa:";
+
     double AA, BB, RRh;
-    for (unsigned int i = 0; i < yres.size(); i++)
-    {
+    for (unsigned int i = 0; i < yres.size(); i++) {
         keresztmetszet(Hres.at(i), AA, BB, RRh);
 
         // !!!!!!!!!!!!!!!!!!
         // At kell allitani Aref-et, mert kulonben a sebesseg a teljes keresztmetszettel lesz szamolva es az hulyeseg.
         if (i == 0)
-        {
             Set_Aref(AA);
-            //cout<<endl<<"Csatorna "<< nev<<": referencia keresztmetszet beallitasa: "<<AA<<endl;
-            //cin.get();
-        }
         // !!!!!!!!!!!!!!!!!!
 
         sumh = yf.at(i) + yres.at(i);
-        strstrm << "\n\t  " << i << "\t" << xres.at(i) << "\t" << yf.at(i) << "\t" << (yf.at(i)
-                + dia) << "\t" << Hres.at(i) << "\t" << yres.at(i) << "\t" << sumh << "\t" << vres.at(i) << "\t" << AA;
-        //cout<<".";
+        strstrm << "\n\t  " << i << "\t" << xres.at(i) << "\t" << yf.at(i) << "\t";
+        strstrm << (yf.at(i) + dia) << "\t" << Hres.at(i) << "\t";
+        strstrm << yres.at(i) << "\t" << sumh << "\t" << vres.at(i) << "\t" << AA;
     }
     logfile_write(strstrm.str(), 2);
-    //cout << strstrm.str();
 }
 
 //--------------------------------------------------------------
-vector<double> Csatorna::Get_res(string mit)
-{
+vector<double> Csatorna::Get_res(string mit) {
     vector<double> empty;
 
     if (!res_ready)
@@ -1146,8 +1046,7 @@ vector<double> Csatorna::Get_res(string mit)
         return yres;
     else if (mit == "v")
         return vres;
-    else
-    {
+    else {
         ostringstream strstrm;
         strstrm.str("");
         strstrm << "Nincs ilyen valtozo: " << mit;
@@ -1157,23 +1056,17 @@ vector<double> Csatorna::Get_res(string mit)
 }
 
 //--------------------------------------------------------------
-double Csatorna::surlodas()
-{
+double Csatorna::surlodas() {
     // surl: Manning-allando
-    if (erdesseg <= 0)
-    {
+    if (erdesseg <= 0) {
         lambda = -erdesseg;
         surl = -erdesseg;
-    }
-    else
-    {
-        if (f_count >= 0)
-        {
+    } else {
+        if (f_count >= 0) {
             Hmax = dia;
             double ize = 2.0 * log(14.8 * (Hmax / 2) / (erdesseg / 1000));
             lambda = 1 / ize / ize;
-        }
-        else
+        } else
             lambda = 0.02;
         surl = pow(Hmax / 2., 1. / 6.) * sqrt(lambda / 8.0 / g);
     }
@@ -1183,8 +1076,7 @@ double Csatorna::surlodas()
 }
 
 //--------------------------------------------------------------
-double Csatorna::Get_dprop(string mit)
-{
+double Csatorna::Get_dprop(string mit) {
     double out = 0.0;
     if (mit == "Aref")
         out = Aref;
@@ -1192,13 +1084,11 @@ double Csatorna::Get_dprop(string mit)
         out = lambda;
     else if (mit == "L")
         out = L;
-    else if (mit == "Rh")
-    {
+    else if (mit == "Rh") {
         double A, B, Rh;
         keresztmetszet(Hmax, A, B, Rh);
         out = Rh;
-    }
-    else if (mit == "cl_k")
+    } else if (mit == "cl_k")
         out = cl_k;
     else if (mit == "cl_w")
         out = cl_w;
@@ -1212,8 +1102,7 @@ double Csatorna::Get_dprop(string mit)
         out = zv;
     else if (mit == "lejtes")
         out = lejtes;
-    else
-    {
+    else {
         ostringstream msg;
         msg.str("");
         msg << "Ismeretlen bemenet: mit=" << mit;
@@ -1223,17 +1112,12 @@ double Csatorna::Get_dprop(string mit)
 }
 
 //--------------------------------------------------------------
-void Csatorna::Set_FolyTerf()
-{
+void Csatorna::Set_FolyTerf() {
     double A, B, Rh, szum = 0;
-    if (eset == "-2")
-    {
+    if (eset == "-2") {
         szum = 0;
-    }
-    else
-    {
-        for (unsigned int i = 1; i < Hres.size(); i++)
-        {
+    } else {
+        for (unsigned int i = 1; i < Hres.size(); i++) {
             keresztmetszet(Hres.at(i), A, B, Rh);
             szum += A * fabs(xres.at(i) - xres.at(i - 1));
             //cout<<endl<<"\t\t i="<<i<<", x(i)="<<xere.at(i)<<", x(i-1)="<<xere.at(i
@@ -1252,8 +1136,7 @@ void Csatorna::Set_FolyTerf()
  * @param mp t�meg�ram
  * @return �gegyenlet �rt�ke
  */
-double Csatorna::f_telt(double ye, double yv, double mp)
-{
+double Csatorna::f_telt(double ye, double yv, double mp) {
     // Matlab kod:
     //  Df=D/100;
     //  Af=Df^2*pi/4;
@@ -1268,20 +1151,17 @@ double Csatorna::f_telt(double ye, double yv, double mp)
     double f = ze + ye - (zv + yv) - dh;
 
     // If the pipe was empty in the previous step, we reduce the diameter.
-    if (D_fake > dia)
-    {
+    if (D_fake > dia) {
         strstrm.str("\n\t\t  f_telt: fake pipe, D_fake=");
         strstrm << D_fake << "m > D=" << dia << "m";
-        if (fabs(f) < 1.e-3)
-        {
+        if (fabs(f) < 1.e-3) {
             D_fake /= 2.;
             v = mp / ro / (D_fake * D_fake * pi / 4);
             dh = 0.02 * L / D_fake / 2 / 9.81 * v * fabs(v);
             f = ze + ye - (zv + yv) - dh;
             strstrm << "\n\t\t\t  D=" << D_fake << ", f=" << f;
         }
-    }
-    else
+    } else
         D_fake = dia;
     // end of d_fake update
 
@@ -1304,8 +1184,7 @@ double Csatorna::f_telt(double ye, double yv, double mp)
  * @param mp t�meg�ram
  * @return �gegyenlet �rt�ke
  */
-double Csatorna::f_0(double ye, double yv, double mp)
-{
+double Csatorna::f_0(double ye, double yv, double mp) {
 
     //  Matlab k�d:
     //  Df=D/100;
@@ -1322,8 +1201,7 @@ double Csatorna::f_0(double ye, double yv, double mp)
 
     double f = ze + ye - (zv + yv) - dh;
 
-    if ((fabs(f) < 1.e-3) && (D_fake > dia / 1000.))
-    {
+    if ((fabs(f) < 1.e-3) && (D_fake > dia / 1000.)) {
         D_fake /= 2.;
         v = mp / ro / (D_fake * D_fake * pi / 4);
         dh = 0.02 * L / D_fake / 2 / 9.81 * v * fabs(v);
@@ -1350,8 +1228,7 @@ double Csatorna::f_0(double ye, double yv, double mp)
  * @param mp t�meg�ram
  * @return �gegyenlet �rt�ke
  */
-double Csatorna::f_1(double ye, double yv, double mp)
-{
+double Csatorna::f_1(double ye, double yv, double mp) {
     //  Matlab k�d
     //  eval_jac=[1 1 1];
     //  ykrit=kritikus_szint(Q,D,g,n);
@@ -1371,8 +1248,7 @@ double Csatorna::f_1(double ye, double yv, double mp)
     strstrm.str("");
     strstrm << "\n\t\t\t y_krit=" << ykrit; //<<", ye_min="<<ye_min;
 
-    if (ye < ykrit)
-    {
+    if (ye < ykrit) {
         ye = ykrit * 1.01;
         jac[0] = 0.0;
         num_eval_jac[0] = false;
@@ -1394,52 +1270,40 @@ double Csatorna::f_1(double ye, double yv, double mp)
     return f;
 }
 
-/// �gegyenlet pozit�v t�meg�ram eset�n, yn>yk
+/// Open-channel flow equation for positive flow rate, y_normal > y_crit
 /**
- * @param ye eleje v�zszint
- * @param yv v�ge v�zszint
- * @param mp t�meg�ram
- * @return �gegyenlet �rt�ke
+ * @param ye water depth @ x=0
+ * @param yv water depth @ x=L
+ * @param mp mass flow rate
+ * @return error of branch equation
  */
-double Csatorna::f_2c(double ye, double yv, double mp)
-{
-    //  Matlab k�d:
-    //  eval_jac=[1 1 1];
-    //  ykrit=kritikus_szint(Q,D,g,n);
-    //  if yv<ykrit
-    //      yv=1.01*ykrit;
-    //      eval_jac(2)=0;
-    //  end
-    //  [x,y]=ode15s(@nyf_ode,[L,0],yv,options,Q);
-    //  ff=ye-y(end);
-
+double Csatorna::f_2c(double ye, double yv, double mp) {
     ostringstream strstrm;
-    strstrm.str("\n\t\t  f_2c: nincs normalszint, integralas iranya: <--");
+    strstrm.str("\n\t\t  f_2c: normal depth not found, integrateing backwards: <--");
     logfile_write(strstrm.str(), 2);
 
     double ykrit = kritikus_szint(mp / ro);
 
     strstrm.str("");
-    strstrm << "\n\t\t\t y_krit=" << ykrit; //<<", yv_min="<<yv_min;
+    strstrm << "\n\t\t\t y_crit=" << ykrit;
 
-    if (yv < ykrit)
-    {
+    if (yv < ykrit) {
         yv = ykrit * 1.01;
         jac[1] = 0.0;
         num_eval_jac[1] = false;
         strstrm
-                << "\n\t\t\t o !!! Nem lehetseges a kritikus szint alatti kiaramlas";
-        strstrm << "\n\t\t\t          -> yv=1.01*ykrit=" << yv << " �s eval_jac[1]=0";
+                << "\n\t\t\t o !!! y(x=L) < y_crit, which is not possible.";
+        strstrm << "\n\t\t\t          -> setting y(L) = 1.01 * y_crit=" << yv << " and eval_jac[1]=0";
     }
     logfile_write(strstrm.str(), 2);
 
-    // Integralas
+    // Integrate backwards
     double f = ye - ode_megoldo(yv, -L / db, L, mp);
     jac[0] = 1.0;
     num_eval_jac[0] = false;
 
     strstrm.str("");
-    strstrm << "\n\t\t\t f = ye-ye_int = " << f;
+    strstrm << "\n\t\t\t f = y(0)-y(0)_integrated = " << f;
     logfile_write(strstrm.str(), 2);
 
     return f;
@@ -1452,8 +1316,7 @@ double Csatorna::f_2c(double ye, double yv, double mp)
  * @param mp t�meg�ram
  * @return �gegyenlet �rt�ke
  */
-double Csatorna::f_2aii(double ye, double yv, double mp)
-{
+double Csatorna::f_2aii(double ye, double yv, double mp) {
     //  Matlab k�d:
     //  eval_jac=[1 1 1];
     //  [x,y]=ode15s(@nyf_ode,[0,L],ye,options,Q);
@@ -1474,14 +1337,12 @@ double Csatorna::f_2aii(double ye, double yv, double mp)
 
     double f, ykrit = kritikus_szint(mp / ro);
 
-    if (ye < ykrit)
-    {
+    if (ye < ykrit) {
         vector<double> ynv = normal_szint(mp / ro);
         double yn;
         if (ynv.size() == 1)
             yn = ynv[0];
-        else
-        {
+        else {
             if (ynv[0] > ynv[1])
                 yn = ynv[1];
             else
@@ -1500,16 +1361,13 @@ double Csatorna::f_2aii(double ye, double yv, double mp)
         strstrm << "\n\t\t\t f = ye-yn = " << f;
 
         // build_res
-        if (write_res)
-        {
-            if (yv > yn)
-            {
+        if (write_res) {
+            if (yv > yn) {
                 //cout<<"\n\n"<<nev
                 //      <<": 2.a.ii. : vizugras folyadekszint szamitasa...\n";
                 double dx = -L / 100., x = L, y1 = yv, f_at_y;
 
-                while ((x > 0) && (y1 > ykrit))
-                {
+                while ((x > 0) && (y1 > ykrit)) {
                     xres.push_back(x);
                     yf.push_back((L - x) / L * (ze - zv) + zv);
                     yres.push_back(y1);
@@ -1525,9 +1383,7 @@ double Csatorna::f_2aii(double ye, double yv, double mp)
                 xres.push_back(0);
                 yf.push_back(ze);
                 yres.push_back(yn);
-            }
-            else
-            {
+            } else {
                 xres.push_back(0);
                 xres.push_back(L);
                 yf.push_back(ze);
@@ -1536,9 +1392,7 @@ double Csatorna::f_2aii(double ye, double yv, double mp)
                 yres.push_back(yn);
             }
         }
-    }
-    else
-    {
+    } else {
         f = yv - ode_megoldo(ye, L / db, 0., mp);
         strstrm.str("");
         strstrm << "\n\t\t\t f = yv-yv_int = " << f;
@@ -1554,8 +1408,7 @@ double Csatorna::f_2aii(double ye, double yv, double mp)
  * @param fv h�v� f�ggv�ny
  * @param msg �zenet
  */
-void Csatorna::warning(string fv, string msg)
-{
+void Csatorna::warning(string fv, string msg) {
     ostringstream strstrm;
     strstrm.str("");
     strstrm << "\n\n******** FIGYELMEZTETES *********";
@@ -1571,8 +1424,7 @@ void Csatorna::warning(string fv, string msg)
  * @param fv h�v� f�ggv�ny
  * @param msg �zenet
  */
-void Csatorna::error(string fv, string msg)
-{
+void Csatorna::error(string fv, string msg) {
     ostringstream strstrm;
     strstrm.str("");
     strstrm << "\n\n******** HIBA *********";
@@ -1585,8 +1437,7 @@ void Csatorna::error(string fv, string msg)
 }
 
 //--------------------------------------------------------------
-void Csatorna::Set_dprop(string mit, double mire)
-{
+void Csatorna::Set_dprop(string mit, double mire) {
     //    if (mit=="diameter")
     //      D=mire;
     //    else
@@ -1597,8 +1448,7 @@ void Csatorna::Set_dprop(string mit, double mire)
 }
 
 //--------------------------------------------------------------
-void Csatorna::SetLogFile(string fnev)
-{
+void Csatorna::SetLogFile(string fnev) {
     out_file = nev + ".out";
     ofstream outputFile;
     outputFile.open(out_file.c_str());

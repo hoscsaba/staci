@@ -7,6 +7,7 @@ using namespace std;
 #include <iomanip>
 #include <vector>
 #include <math.h>
+#include <string.h> 
 #include "KonstNyomas.h"
 #include "Cso.h"
 #include "Szivattyu.h"
@@ -32,11 +33,11 @@ data_io::data_io(const char *a_xml_fnev) {
     edge_type.push_back("pump");
     edge_type.push_back("valve");
     edge_type.push_back("pool");
-    edge_type.push_back("channel"); // t�glalap km.
-    edge_type.push_back("channel1"); // k�r km.
-    edge_type.push_back("channel2"); // tetsz�leges km.
-    edge_type.push_back("overflow"); // buk� m�t�rgy
-    edge_type.push_back("checkvalve"); // visszacsap� szelep
+    edge_type.push_back("channel"); // rectangle cross-section
+    edge_type.push_back("channel1"); // circle cross-section
+    edge_type.push_back("channel2"); // arbitrary cross-section
+    edge_type.push_back("overflow"); // overflow
+    edge_type.push_back("checkvalve"); // check valve
     edge_type_number = edge_type.size();
 
     for (int i = 0; i < edge_type_number; i++)

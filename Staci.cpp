@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <cmath>
+#include <string.h>
 #include "Staci.h"
 #include "StaciException.h"
 #include "data_io.h"
