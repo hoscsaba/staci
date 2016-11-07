@@ -105,6 +105,8 @@ void Vegakna::Set_dprop(string mit, double mire) {
         Hf = mire;
     else if (mit == "water_level")
         H = mire;
+    else if ((mit == "concentration") || (mit == "konc_atlag"))
+        konc_atlag = mire;
     else
         cout << endl
              << "HIBA! Vegakna::Set_dprop(mit), ismeretlen bemenet: mit="
@@ -125,6 +127,8 @@ double Vegakna::Get_dprop(string mit) {
         out = 0.0;
     else if (mit == "headloss_per_unit_length")
         out = 0.0;
+    else if ((mit == "concentration") || (mit == "konc_atlag"))
+        out = konc_atlag;
     else {
         cout << endl
              << "HIBA! Vegakna::Get_dprop(mit), ismeretlen bemenet: mit="
@@ -133,3 +137,5 @@ double Vegakna::Get_dprop(string mit) {
     }
     return out;
 }
+
+

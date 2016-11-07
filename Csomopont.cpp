@@ -88,15 +88,16 @@ void Csomopont::Ini(int mode, double value)
 //--------------------------------------------------------------
 void Csomopont::Set_dprop(string mit, double value)
 {
-    if (mit == "konc_be")
+    if ((mit == "konc_be") || (mit == "cl_be"))
         cl_be = value;
     if (mit == "demand")
         // m3/h-ban kell megadni, de belul kg/s-ban taroljuk
         fogy = value / 3600 * ro;
-    if (mit == "konc_atlag")
+    if ((mit == "konc_atlag")|| (mit == "concentration"))
         konc_atlag = value;
     if (mit == "tt")
         tt = value;
+
 }
 
 //--------------------------------------------------------------
@@ -112,7 +113,7 @@ double Csomopont::Get_dprop(string mit)
         outdata = cl_be;
     }
 
-    if (mit == "konc_atlag")
+    if ((mit == "konc_atlag") || (mit == "concentration"))
     {
         megvan = true;
         outdata = konc_atlag;

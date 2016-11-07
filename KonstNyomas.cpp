@@ -1,4 +1,5 @@
 using namespace std;
+
 #include <cmath>
 #include <vector>
 #include <iostream>
@@ -7,16 +8,15 @@ using namespace std;
 #include "KonstNyomas.h"
 
 KonstNyomas::KonstNyomas(
-    const string a_nev, 
-    const double a_Aref,
-    const string a_csp_nev, 
-    const double a_ro, 
-    const double a_p, 
-    const double a_mp, 
-    const double a_tt) :
+        const string a_nev,
+        const double a_Aref,
+        const string a_csp_nev,
+        const double a_ro,
+        const double a_p,
+        const double a_mp,
+        const double a_tt) :
 
-    Agelem(a_nev, a_Aref, a_mp, a_ro, a_tt)
-{
+        Agelem(a_nev, a_Aref, a_mp, a_ro, a_tt) {
     //Kotelezo adatok minden Agelemnel:
     tipus = "Konstans nyomas";
     csp_db = 1;
@@ -31,13 +31,11 @@ KonstNyomas::KonstNyomas(
 }
 
 //--------------------------------------------------------------
-KonstNyomas::~KonstNyomas()
-{
+KonstNyomas::~KonstNyomas() {
 }
 
 //--------------------------------------------------------------
-string KonstNyomas::Info()
-{
+string KonstNyomas::Info() {
     ostringstream strstrm;
     strstrm << Agelem::Info();
     strstrm << endl << "  kapcsolodas : " << cspv_nev << "(index:" << cspe_index << ")\n";
@@ -45,15 +43,13 @@ string KonstNyomas::Info()
 }
 
 //--------------------------------------------------------------
-double KonstNyomas::f(vector<double> x)
-{
+double KonstNyomas::f(vector<double> x) {
     double ere = x[0] - p / ro / g;
     return ere;
 }
 
 //--------------------------------------------------------------
-vector<double> KonstNyomas::df(vector<double> x)
-{
+vector<double> KonstNyomas::df(vector<double> x) {
     vector<double> ere;
     ere.push_back(1);
     ere.push_back(0);
@@ -64,8 +60,7 @@ vector<double> KonstNyomas::df(vector<double> x)
 }
 
 //--------------------------------------------------------------
-void KonstNyomas::Ini(int mode, double value)
-{
+void KonstNyomas::Ini(int mode, double value) {
     if (mode == 0)
         mp = 0.01;
     else
@@ -73,13 +68,12 @@ void KonstNyomas::Ini(int mode, double value)
 }
 
 //--------------------------------------------------------------
-void KonstNyomas::Set_dprop(string mit, double mire)
-{
-    //    if (mit=="diameter")
-    //      D=mire;
-    //    else
-    //      {
-    cout << endl << "HIBA! KonstNyomas::Set_dprop(mit), ismeretlen bemenet: mit="
-         << mit << endl << endl;
-    //      }
+void KonstNyomas::Set_dprop(string mit, double mire) {
+
+    if ((mit == "concentration") || (mit == "konc_atlag")) {
+        konc_atlag = mire;
+    } else {
+        cout << endl << "HIBA! KonstNyomas::Set_dprop(mit), ismeretlen bemenet: mit="
+             << mit << endl << endl;
+    }
 }

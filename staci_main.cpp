@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
 
 		feladat.copy_file(feladat.get_def_file(),feladat.new_def_file);
 		feladat.set_res_file(feladat.new_def_file);
-		feladat.save_mod_prop();
+		feladat.save_mod_prop(false);
 	}
 
 	// Minden elem listazasa
@@ -134,12 +134,12 @@ int main(int argc, char* argv[]) {
 		cout << endl << "element_ID  : " << feladat.element_ID;
 		cout << endl << "property_ID : " << feladat.property_ID;
 
-		feladat.set_do_save_file(false);
+		//feladat.set_do_save_file(false);
 		solve_hydraulics(feladat,timing.at(2),timing.at(3));
 
 		feladat.Compute_dxdmu();
 		feladat.Print_dxdmu();
-
+        feladat.Save_Sensitivity();
 	}
 
 	time_t stop;

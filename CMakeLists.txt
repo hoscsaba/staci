@@ -41,6 +41,6 @@ set(SOURCE_FILES
     VisszacsapoSzelep.cpp
     VisszacsapoSzelep.h
     xmlParser.cpp
-    xmlParser.h staci_calibrate.cpp.backup1.cpp)
+    xmlParser.h staci_calibrate.cpp.backup1.cpp staci_split_graph.cpp)
 
 add_executable(staci ${SOURCE_FILES})

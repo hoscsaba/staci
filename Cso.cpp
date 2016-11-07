@@ -220,9 +220,9 @@ double Cso::Get_dprop(string mit) {
         out = Aref;
     else if (mit == "lambda")
         out = lambda;
-    else if (mit == "diameter")
+    else if ((mit == "diameter") || (mit == "D"))
         out = D;
-    else if (mit == "L")
+    else if ((mit == "length") || (mit == "L"))
         out = L;
     else if (mit == "Rh")
         out = D / 2.;
@@ -238,6 +238,8 @@ double Cso::Get_dprop(string mit) {
         out = fabs(ComputeHeadloss() / ro / g / L);
     else if (mit == "mass_flow_rate")
         out = mp;
+    else if ((mit == "concentration") || (mit == "konc_atlag"))
+        out = konc_atlag;
     else {
         cout << endl << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit="
              << mit << endl << endl;
@@ -268,6 +270,8 @@ void Cso::Set_dprop(string mit, double mire) {
         D = mire;
         Aref = D * D * pi / 4;
         FolyTerf = Aref * L;
+    } else if ((mit == "concentration") || (mit == "konc_atlag")) {
+        konc_atlag = mire;
     } else {
         cout << endl << "HIBA! Cso::Set_dprop(mit), ismeretlen bemenet: mit="
              << mit << endl << endl;

@@ -32,7 +32,8 @@ public:
     void list_system();
     string list_results();
     void save_results(bool conv_reached);
-    void save_mod_prop();
+    void save_mod_prop(bool is_general_property);
+    void save_mod_prop_all_elements(string property_ID);
     bool solve_system();
     void solve_residence_time();
     void residence_time_step(string& max_ID, double& max_VAL, double& mean_VAL);
@@ -86,6 +87,7 @@ public:
     string new_def_file, element_ID, property_ID;
     double newValue;
 
+
     void list_all_elements();
 
     vector<vector<double> > SM_MassFlowRates; // Sensitivity Matrix
@@ -104,7 +106,7 @@ public:
     void Print_dxdmu();
     void Compute_dxdmu();
     void Compute_Sensitivity_Matrix(string parameter,int scale);
-
+    void Save_Sensitivity();
     void set_do_save_file(const bool save_it)
     {
         do_save_file = save_it;
@@ -113,6 +115,14 @@ public:
     double get_sum_of_consumption();
     double get_sum_of_pos_consumption();
     double get_sum_of_neg_consumption();
+
+    double GetMinPipeDiameter();
+    double GetMaxPipeDiameter();
+    double GetMinPipeLength();
+    double GetMaxPipeLength();
+    double GetSumPipeLength();
+    double GetMaxConsumption();
+
 
 private:
     bool van_ini;

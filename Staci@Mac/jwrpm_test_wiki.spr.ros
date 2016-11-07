@@ -1,0 +1,26 @@
+
+STACI v2.0
+ (c) BME Dept. of Hydrodynamic Systems
+ (c) C. Hos (csaba.hos@hds.bme.hu)
+ info: www.hds.bme.hu\staci
+
+ date: Mon Nov  7 11:48:48 2016
+
+ input file:jwrpm_test_wiki.spr
+
+ Number of nodes: 10
+ Number of edges: 15
+
+
+Automatic inicialization...
+	nodal pressures:	5 mwc 
+	edge mass flow rates:	100 kg/s ...
+
+Solving system...
+====================================
+
+ Number of nonzero Jacobian entries: 69 out of 625 (11.04%)
+
+ iter. # 6./100 e_mp=6.15e-15,  e_p=2.68e-04  relax.=1.00, relax.mul.=1.20
+
+ Overall fluid volume:3.76992 m3.  

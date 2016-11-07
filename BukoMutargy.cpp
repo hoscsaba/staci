@@ -47,11 +47,11 @@ string BukoMutargy::Info()
       strstrm<<" igen";
     else
       strstrm<<" nem";
-    strstrm<<"\n                fenékszint         : "<<Hf;
-    strstrm<<"\n                szélesség          : "<<width;
-    strstrm<<"\n                bukómagasság       : "<<overflow_height;
-    strstrm<<"\n                átbukási tényezõ   : "<<discharge_coeff;
-    strstrm<<"\n                szelep átf. tényezõ: "<<valve_coeff<<endl;
+    strstrm<<"\n                fen?kszint         : "<<Hf;
+    strstrm<<"\n                sz?less?g          : "<<width;
+    strstrm<<"\n                buk?magass?g       : "<<overflow_height;
+    strstrm<<"\n                ?tbuk?si t?nyez?   : "<<discharge_coeff;
+    strstrm<<"\n                szelep ?tf. t?nyez?: "<<valve_coeff<<endl;
     return strstrm.str();
   }
 
@@ -80,27 +80,27 @@ double BukoMutargy::f(vector<double> x)
 
         if (hve>overflow_height)
           {
-            // Normál irány, de nincs bukás
+            // Norm?l ir?ny, de nincs buk?s
             if (hvu>overflow_height)
               {
                 ere = (hvu+vu*vu/2/g) - (hve+ve*ve/2/g);
               }
             else
               {
-                // Normál irány, van bukás
+                // Norm?l ir?ny, van buk?s
                 double H=hve-overflow_height;
                 ere = mp/ro-width*H*discharge_coeff*sqrt(2*g*H);
               }
           }
         else
           {
-            // Ellentétes irány, bukás
+            // Ellent?tes ir?ny, buk?s
             if (hvu>overflow_height)
               {
                 double H=hvu-overflow_height;
                 ere = -mp/ro-width*H*discharge_coeff*sqrt(2*g*H);
               }
-            // beszoptuk, mindkét oldalon a bukási szint alatt vagyunk
+            // beszoptuk, mindk?t oldalon a buk?si szint alatt vagyunk
             else
               {
                 ere = mp/ro;
@@ -138,7 +138,7 @@ vector<double> BukoMutargy::df(vector<double> x)
     // Konstans tag:
     ere.push_back(0.0);
 
-    // Azért ellenõrizni kell a bukás lehetõségét:
+    // Az?rt ellen?rizni kell a buk?s lehet?s?g?t:
     double pe=x[0]*ro*g;
     double pv=x[1]*ro*g;
     double he=x[2];

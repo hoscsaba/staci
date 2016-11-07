@@ -221,11 +221,28 @@ void Szivattyu::Ini(int mode, double value) {
 
 //--------------------------------------------------------------
 void Szivattyu::Set_dprop(string mit, double mire) {
-    //    if (mit=="diameter")
-    //      D=mire;
-    //    else
-    //      {
-    cout << endl << "HIBA! Szivattyu::Set_dprop(mit), ismeretlen bemenet: mit="
-         << mit << endl << endl;
-    //      }
+    if ((mit == "concentration") || (mit == "konc_atlag")) {
+        konc_atlag = mire;
+    } else {
+        cout << endl << "HIBA! Szivattyu::Set_dprop(mit), ismeretlen bemenet: mit="
+             << mit << endl << endl;
+    }
+}
+
+//--------------------------------------------------------------
+double Szivattyu::Get_dprop(string mit) {
+
+    double out = 0.0;
+    if (mit == "Aref")
+        out = Aref;
+    else if (mit == "mass_flow_rate")
+        out = mp;
+    else if ((mit == "concentration") || (mit == "konc_atlag"))
+        out = konc_atlag;
+    else {
+        cout << endl << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit="
+             << mit << endl << endl;
+        out = 0.0;
+    }
+    return out;
 }

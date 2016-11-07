@@ -1,9 +1,10 @@
+
 STACI v2.0
  (c) BME Dept. of Hydrodynamic Systems
  (c) C. Hos (csaba.hos@hds.bme.hu)
  info: www.hds.bme.hu\staci
 
- date: Tue Apr 12 21:04:25 2016
+ date: Thu Nov  3 22:59:42 2016
 
  input file:FV_input_2012_11_06_1.spr
 
@@ -11,23 +12,6 @@ STACI v2.0
  Number of edges: 307
 
 
-Solving system...
-====================================
-
- Number of nonzero Jacobian entries: 1499 out of 295936 (0.506528%)
-
- iter. # 0./1000 e_mp=4.00e+03,  e_p=6.78e+02  relax.=0.50, relax.mul.=1.20
- iter. # 1./1000 e_mp=1.60e+03,  e_p=2.71e+02  relax.=0.60, relax.mul.=1.20
- iter. # 2./1000 e_mp=4.48e+02,  e_p=7.61e+01  relax.=0.72, relax.mul.=1.20
- iter. # 3./1000 e_mp=6.10e+01,  e_p=1.05e+01  relax.=0.86, relax.mul.=1.20
- iter. # 4./1000 e_mp=3.47e-13,  e_p=4.83e-01  relax.=1.00, relax.mul.=1.20
- iter. # 5./1000 e_mp=3.25e-13,  e_p=3.18e-01  relax.=1.00, relax.mul.=1.20
- iter. # 6./1000 e_mp=3.18e-13,  e_p=1.88e-01  relax.=1.00, relax.mul.=1.20
- iter. # 7./1000 e_mp=4.18e-13,  e_p=3.28e-02  relax.=1.00, relax.mul.=1.20
- iter. # 8./1000 e_mp=4.30e-13,  e_p=2.43e-03  relax.=1.00, relax.mul.=1.20
- iter. # 9./1000 e_mp=4.14e-13,  e_p=1.84e-05  relax.=1.00, relax.mul.=1.20
-
-ok
-
-Computing residence time...
-====================================
+Automatic inicialization...
+	nodal pressures:	5 mwc 
+	edge mass flow rates:	100 kg/s ...

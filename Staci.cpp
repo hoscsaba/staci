@@ -399,7 +399,7 @@ void Staci::m_set_dprop() {
 
 //--------------------------------------------------------------
 double Staci::get_sum_of_consumption() {
-    double sum=0.0;
+    double sum = 0.0;
     for (unsigned int i = 0; i < cspok.size(); i++) {
         sum += fabs(cspok.at(i)->Get_fogy());
     }
@@ -408,7 +408,7 @@ double Staci::get_sum_of_consumption() {
 
 //--------------------------------------------------------------
 double Staci::get_sum_of_pos_consumption() {
-    double sum=0.0, cons;
+    double sum = 0.0, cons;
     for (unsigned int i = 0; i < cspok.size(); i++) {
         cons = cspok.at(i)->Get_fogy();
         if (cons > 0.)
@@ -419,7 +419,7 @@ double Staci::get_sum_of_pos_consumption() {
 
 //--------------------------------------------------------------
 double Staci::get_sum_of_neg_consumption() {
-    double sum=0.0, cons;
+    double sum = 0.0, cons;
     for (unsigned int i = 0; i < cspok.size(); i++) {
         cons = cspok.at(i)->Get_fogy();
         if (cons < 0.)
@@ -854,9 +854,15 @@ void Staci::save_results(bool conv_reached) {
 }
 
 //--------------------------------------------------------------
-void Staci::save_mod_prop() {
+void Staci::save_mod_prop(bool is_general_property) {
     data_io datta_io(res_file.c_str());
-    datta_io.save_mod_prop(cspok, agelemek, element_ID, property_ID);
+    datta_io.save_mod_prop(cspok, agelemek, element_ID, property_ID, is_general_property);
+}
+
+//--------------------------------------------------------------
+void Staci::save_mod_prop_all_elements(string property_ID) {
+    data_io datta_io(res_file.c_str());
+    datta_io.save_mod_prop_all_elements(cspok, agelemek, property_ID);
 }
 
 //--------------------------------------------------------------
@@ -1097,10 +1103,6 @@ bool Staci::solve_system() {
             build_vectors(x, f, false);
         else {
             build_vectors_frozen_Jacobian(x, f);
-            //if (debug_level > 1) {
-            //cout << endl << "\t Using frozen Jacobian...";
-            //cin.get();
-            //}
         }
 
         compute_error(f, e_mp, e_p, e_mp_r, e_p_r, konv_ok);
@@ -1117,20 +1119,9 @@ bool Staci::solve_system() {
             cout << endl << endl
                  << "WARNING: Staci::solve_system() -> umfpack_solver did not provide a solution, switching back to nr_solver!!\n\n";
             nr_solver(x, f);
-        }
-
-            /*if ((e_mp != e_mp) || (e_p != e_p))
-            {
-                //cout << "\n !!! e_mp is NaN!";
-                iter = iter_max + 1;
-                comp_ok = false;
-                konv_ok = false;
-            }*/
-        else
+        } else
             iter++;
     }
-    //cout<<"\n\t\t number of iterations:"<<iter++<<", comp_ok="<<comp_ok;
-    //cin.get();
 
     if (debug_level == 1) {
         logfile_write(iter_info(x, f, iter, e_mp, e_p), 1);
@@ -2263,11 +2254,18 @@ void Staci::update_relax(double e_mp, double e_p, double &e_mp_r,
 
 //--------------------------------------------------------------
 void Staci::list_all_elements() {
+    stringstream str;
     for (unsigned int i = 0; i < agelemek.size(); i++)
-        cout << endl << agelemek.at(i)->Get_Tipus() << ";\t" << agelemek.at(i)->Get_nev() << ";";
+        str << agelemek.at(i)->Get_Tipus() << ";\t" << agelemek.at(i)->Get_nev() << endl;
     for (unsigned int i = 0; i < cspok.size(); i++)
-        cout << endl << "Csp;\t" << cspok.at(i)->Get_nev() << ";";
-    cout << endl;
+        str << "Node;\t" << cspok.at(i)->Get_nev() << endl;
+
+    cout << endl << endl << "Element list is in file element_list.txt." << endl << endl;
+
+    ofstream OutFile;
+    OutFile.open("element_list.txt");
+    OutFile << str.str();
+    OutFile.close();
 }
 
 //--------------------------------------------------------------
@@ -2424,23 +2422,56 @@ void Staci::Print_dfdmu() {
 }
 
 //--------------------------------------------------------------
+void Staci::Save_Sensitivity() {
+
+    /*! \todo Sensitivity is flushed to <concentration>
+       *
+       *  A <tag> must be created to be used for sensitivity information in the data file.
+       */
+
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+
+        element_ID = agelemek.at(i)->Get_nev();
+        property_ID = "concentration";
+        double sens = m_dxdmu[i];
+        //double orig = agelemek.at(i)->Get_mp();
+        agelemek.at(i)->Set_dprop("konc_atlag", fabs(sens));
+        save_mod_prop(true);
+    }
+
+    for (unsigned int i = 0; i < cspok.size(); i++) {
+        element_ID = cspok.at(i)->Get_nev();
+        property_ID = "concentration";
+        double sens = m_dxdmu[agelemek.size() + i];
+        //double orig = cspok.at(i)->Get_h();
+        cspok.at(i)->Set_dprop("konc_atlag", fabs(sens));
+        save_mod_prop(true);
+    }
+}
+
+//--------------------------------------------------------------
 void Staci::Print_dxdmu() {
 
     ostringstream strstrm;
     strstrm.str("");
     strstrm << scientific << setprecision(3) << showpos;
     strstrm << "Parameter: " << element_ID << ", " << property_ID;
+    strstrm << endl << "No., expl. , dx/dmu, x , fabs((dx/dmu)/x) ";
 
     for (unsigned int i = 0; i < agelemek.size(); i++)
-        strstrm << "\n" << i << ";(mp @ " << agelemek.at(i)->Get_nev() << "); " << m_dxdmu[i] << "; mp(kg/s)="
-                << agelemek.at(i)->Get_mp();
+        strstrm << "\n" << i << ";(mp @ " << agelemek.at(i)->Get_nev() << "); s = " << m_dxdmu[i] << "; mp(kg/s) = "
+                << agelemek.at(i)->Get_mp() << ", s/mp = " << fabs(m_dxdmu[i] / agelemek.at(i)->Get_mp());
 
     for (unsigned int i = 0; i < cspok.size(); i++)
         strstrm << "\n" << i << ";(p @ " << cspok.at(i)->Get_nev() << "); " << m_dxdmu[agelemek.size() + i]
-                << "; p(vom)=" << cspok.at(i)->Get_p();
+                << "; p(vom)=" << cspok.at(i)->Get_p() << ", s/p = "
+                << fabs(m_dxdmu[agelemek.size() + i] / cspok.at(i)->Get_h());
 
     ofstream OutFile;
-    OutFile.open("dxdmu.txt");
+    stringstream fname;
+    fname.str("");
+    fname << "dxdmu_" << element_ID << "_" << property_ID << ".txt";
+    OutFile.open(fname.str().c_str());
     OutFile << strstrm.str();
     OutFile.close();
 }
@@ -2537,7 +2568,7 @@ void Staci::rescale_vec(vector<double> &vec) {
 
 //--------------------------------------------------------------
 
-vector<double> Staci::col_abs_sum(vector<vector<double> > M) {
+vector<double> Staci::col_abs_sum(vector < vector<double> > M) {
     vector<double> out(M.at(0).size(), 0.);
     for (unsigned int j = 0; j < M.at(0).size(); j++) {
         double sum = 0.;
@@ -2549,7 +2580,7 @@ vector<double> Staci::col_abs_sum(vector<vector<double> > M) {
 }
 
 //--------------------------------------------------------------
-vector<double> Staci::row_abs_sum(vector<vector<double> > M) {
+vector<double> Staci::row_abs_sum(vector < vector<double> > M) {
     vector<double> out(M.size(), 0.);
     for (unsigned int i = 0; i < M.size(); i++) {
         double sum = 0.;
@@ -2873,4 +2904,71 @@ string Staci::convert_to_hr_min(double input_seconds) {
 
     str << days << " d, " << hours << " h, " << minutes << " m";
     return str.str();
+}
+
+double Staci::GetMinPipeDiameter() {
+    double D, Dmin = 1.e5;
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if (0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Cso")) {
+            D = agelemek.at(i)->Get_dprop("diameter");
+            if (D < Dmin)
+                Dmin = D;
+        }
+    }
+    return Dmin;
+}
+
+double Staci::GetMaxPipeDiameter() {
+    double D, Dmax = 0.;
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if (0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Cso")) {
+            D = agelemek.at(i)->Get_dprop("diameter");
+            if (D > Dmax)
+                Dmax = D;
+        }
+    }
+    return Dmax;
+}
+
+double Staci::GetMinPipeLength() {
+    double L, Lmin = 1.e5;
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if (0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Cso")) {
+            L = agelemek.at(i)->Get_dprop("length");
+            if (L < Lmin)
+                Lmin = L;
+        }
+    }
+    return Lmin;
+}
+
+double Staci::GetMaxPipeLength() {
+    double L, Lmax = 0.;
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if (0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Cso")) {
+            L = agelemek.at(i)->Get_dprop("length");
+            if (L > Lmax)
+                Lmax = L;
+        }
+    }
+    return Lmax;
+}
+
+double Staci::GetSumPipeLength() {
+    double Lsum = 0.;
+    for (unsigned int i = 0; i < agelemek.size(); i++) {
+        if (0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Cso"))
+            Lsum += agelemek.at(i)->Get_dprop("length");
+    }
+    return Lsum;
+}
+
+double Staci::GetMaxConsumption() {
+    double c, cmax = 0.;
+    for (unsigned int i = 0; i < cspok.size(); i++) {
+        c = cspok.at(i)->Get_fogy();
+        if (c > cmax)
+            cmax = c;
+    }
+    return cmax;
 }

@@ -88,7 +88,6 @@ Setting up LOWER_BOUND, UPPER_BOUND...
 	PIPE102 D=0.305, LB=0.1525, UB=0.61
 
 
-
 Spoiling active pipes....
 	Spoiling pipe PIPE3 D = 0.406 -> 0.203003 m
 	Spoiling pipe PIPE9 D = 0.406 -> 0.256404 m
@@ -99,60 +98,7 @@ Spoiling active pipes....
 	Spoiling pipe PIPE48 D = 0.305 -> 0.166849 m
 	Spoiling pipe PIPE60 D = 0.305 -> 0.359554 m
 	Spoiling pipe PIPE75 D = 0.305 -> 0.359685 m
-	Spoiling pipe PIPE102 D = 0.305 -> 0.437581 mStarting optimization...
+	Spoiling pipe PIPE102 D = 0.305 -> 0.437581 m
+Starting optimization...
 
- Objective evaluation #0	Error: 39.1984
- Objective evaluation #100	Error: 53.7949
- Objective evaluation #200	Error: 49.0572
- Objective evaluation #300	Error: 44.5419
- Objective evaluation #400	Error: 49.7791
- Objective evaluation #500	Error: 64.0866
- Objective evaluation #600	Error: 31.5917
- Objective evaluation #700	Error: 22.4069
- Objective evaluation #800	Error: 28.8065
- Objective evaluation #900	Error: 42.9631
- Objective evaluation #1000	Error: 27.3644
- Objective evaluation #1100	Error: 60.4261
- Objective evaluation #1200	Error: 22.9515
- Objective evaluation #1300	Error: 70.5378
- Objective evaluation #1400	Error: 28.8986
- Objective evaluation #1500	Error: 25.5501
- Objective evaluation #1600	Error: 46.4675
- Objective evaluation #1700	Error: 33.9827
- Objective evaluation #1800	Error: 30.0967
- Objective evaluation #1900	Error: 33.5799
- Objective evaluation #2000	Error: 21.305
- Objective evaluation #2100	Error: 36.0332
- Objective evaluation #2200	Error: 19.715
- Objective evaluation #2300	Error: 17.4102
- Objective evaluation #2400	Error: 22.8482
- Objective evaluation #2500	Error: 24.9445
- Objective evaluation #2600	Error: 19.2827
- Objective evaluation #2700	Error: 25.8813
- Objective evaluation #2800	Error: 20.165
- Objective evaluation #2900	Error: 17.8786
- Objective evaluation #3000	Error: 14.3857
- Objective evaluation #3100	Error: 47.0142
- Objective evaluation #3200	Error: 13.3456
- Objective evaluation #3300	Error: 40.1246
- Objective evaluation #3400	Error: 42.8478
- Objective evaluation #3500	Error: 26.2212
- Objective evaluation #3600	Error: 13.5806
- Objective evaluation #3700	Error: 44.4279
- Objective evaluation #3800	Error: 13.3914
- Objective evaluation #3900	Error: 12.5517
- Objective evaluation #4000	Error: 14.5904
- Objective evaluation #4100	Error: 18.2518
- Objective evaluation #4200	Error: 22.8649
- Objective evaluation #4300	Error: 22.6401
- Objective evaluation #4400	Error: 23.1663
- Objective evaluation #4500	Error: 19.2478
- Objective evaluation #4600	Error: 11.2332
- Objective evaluation #4700	Error: 22.1015
- Objective evaluation #4800	Error: 28.5632
- Objective evaluation #4900	Error: 17.4697
- Objective evaluation #5000	Error: 13.6056
-
-Optimization finished.
-Best solution objective is 12.8715
-
+ Objective evaluation #0	Error: 85.7305
