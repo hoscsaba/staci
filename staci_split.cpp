@@ -78,7 +78,6 @@ int main(int argc, char **argv) {
     f_ce = pow((double) n_comm, (double) n_n);
 
     // Load matrices
-    //LoadMatrices(p, "topology");
     LoadMatrices(p, weight_type);
 
     // Optimize
@@ -102,15 +101,15 @@ int main(int argc, char **argv) {
     ga.set(gaNscoreFrequency, 100);        // how often to record scores
     ga.set(gaNflushFrequency, 100);    // how often to dump scores to file
     ga.set(gaNselectScores,        // which scores should we track?
-     GAStatistics::Maximum | GAStatistics::Minimum | GAStatistics::Mean);
+       GAStatistics::Maximum | GAStatistics::Minimum | GAStatistics::Mean);
     ga.set(gaNscoreFilename, "bog.dat");
 
     ga.evolve();
+    cout << endl << "done." << endl;
 
     genome = ga.statistics().bestIndividual();
-    double best_obj = Objective(genome);
+    //double best_obj = Objective(genome);
 
-    cout << endl << "done." << endl;
     strstrm.str("");
     strstrm << endl << "BEST SOLUTION FOUND:" << endl;
 
@@ -119,7 +118,7 @@ int main(int argc, char **argv) {
     strstrm << endl;
 
     info = true;
-    best_obj = Objective(genome);
+    double best_obj = Objective(genome);
 
     strstrm << endl << "Some more info:";
     strstrm << endl << "\t datafile   : " << fname;
@@ -167,10 +166,14 @@ return((int)nMut);
 
 int QMutator(GAGenome & c, float prob_mut){
     GA1DArrayAlleleGenome<int> &child = (GA1DArrayAlleleGenome<int> &) c;
-    GA1DArrayAlleleGenome<int> c_child = (GA1DArrayAlleleGenome<int> &) c;
+    
+    // Copy of child
+    vector<int> copy_of_child(child.size());
+    for (unsigned int i=0; i<child.size(); i++)
+        copy_of_child.at(i)=child.gene(i);
 
-    bool mut_info = true;
-    info = true;
+    bool mut_info = false;
+    info = false;
     int mut_round=0;
     bool next_round=true;
     double obj_before=0., obj_after=1.;
@@ -180,7 +183,7 @@ int QMutator(GAGenome & c, float prob_mut){
 
     if (mut_info){
         cout<<endl<<endl<<"MUTATION:"<<endl<<endl<<"Initial gene:"<<flush;
-        cin.get();
+        // cin.get();
     }
     
     obj_before = Objective(child);
@@ -210,7 +213,6 @@ int QMutator(GAGenome & c, float prob_mut){
         if (mut_info)
             cout<<endl;
 
-        c_child = child;
         for(unsigned int i=0; i<n_n; i++){
             if (cut_idx.at(i)){
                 int other_node_community = child.gene(cut_pair.at(i));
@@ -222,33 +224,27 @@ int QMutator(GAGenome & c, float prob_mut){
                 cut_idx.at(i)=false;
                 cut_idx.at(cut_pair.at(i))=false;
 
-                c_child.gene(i,other_node_community);
+                child.gene(i,other_node_community);
                 nMut++;
             }
         }
         if (mut_info)
             cout<<endl;
 
-        obj_after = Objective(c_child);
-        if (mut_info){
-            cout<<endl<<"obj: "<<obj_before<<" -> "<<obj_after;
-            cout<<endl<<"child.size()="<<child.size()<<", c_child.size="<<c_child.size()<<flush;
-        }
-
+        obj_after = Objective(child);
+        
         if (obj_after>obj_before){
             next_round=true;
+            mut_round++;
+            obj_before=obj_after;
             for (unsigned int i=0; i<child.size(); i++)
-                child.gene(i,c_child.gene(i));
+                copy_of_child.at(i)=child.gene(i);
         }
         else{
             next_round=false;
-            if (mut_info)
-                cout<<endl<<endl<<"No improvement, finishing."<<endl;
+            for (unsigned int i=0; i<child.size(); i++)
+                child.gene(i,copy_of_child.at(i));
         }
-
-        mut_round++;
-        obj_before=obj_after;
-
     }
     info = false;
 
@@ -267,7 +263,7 @@ int QMutator(GAGenome & c, float prob_mut){
 
     if (mut_info){
         cout<<endl<<"Leaving QMutator()..."<<endl;
-        cin.get();
+        // cin.get();
     }
     return((int)nMut);
 }
@@ -461,9 +457,9 @@ string Load_Settings() {
     msg << "\t n_comm                 : " << n_comm << endl;
     msg << "\t weight_type            : " << weight_type;
     if ((weight_type=="topology") || (weight_type=="dp")){
-       msg<< " (ok)"<<endl;
-   }
-   else{
+     msg<< " (ok)"<<endl;
+ }
+ else{
     cout<<endl<<"!!!! UNKNOWN WEIGHT_TYPE!!!"<<endl<<"Exiting..."<<endl;
     exit(-1);
 }

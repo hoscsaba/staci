@@ -167,7 +167,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -307,7 +307,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -377,7 +377,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -447,7 +447,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -587,7 +587,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -797,7 +797,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -1147,7 +1147,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -1356,7 +1356,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<edge_spec>
 				<pool>
@@ -1416,7 +1416,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -1488,7 +1488,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -1560,7 +1560,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -1632,7 +1632,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -1704,7 +1704,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				5.00000e-01
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -1920,7 +1920,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				5.00000e-01
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -1992,7 +1992,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				5.00000e-01
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2136,7 +2136,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				5.00000e-01
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2340,7 +2340,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				5.00000e-01
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2484,7 +2484,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2556,7 +2556,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2628,7 +2628,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2700,7 +2700,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2772,7 +2772,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				0.00000e+00
+				1.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -3060,7 +3060,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				5.00000e-01
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -3132,7 +3132,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				5.00000e-01
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
