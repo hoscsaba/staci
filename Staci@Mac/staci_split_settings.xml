@@ -1,11 +1,11 @@
 <settings>
     <global_debug_level>1</global_debug_level>
-    <n_comm>4</n_comm>
-    <!-- <fname> jwrpm_test2.spr</fname> -->
-     <fname>VIZ-SOPTVR-T-81-input_mod.spr</fname>
-    <logfilename> staci_split.log</logfilename>
-    <popsize> 1000</popsize>
-    <ngen> 100000</ngen>
-    <pmut> 0.01</pmut>
+    <n_comm>2</n_comm>
+     <fname> jwrpm_test2.spr</fname> 
+     <weight_type>dp</weight_type>
+     <logfilename> staci_split.log</logfilename>
+    <popsize> 100</popsize>
+    <ngen> 100</ngen>
+    <pmut> 0.5</pmut>
     <pcross> 0.6</pcross>
 </settings>

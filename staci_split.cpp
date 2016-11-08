@@ -1,15 +1,10 @@
 #include <stdio.h>
-#include <ga/ga.h>
 #include <vector>
 #include "Staci.h"
-#include <iomanip>
-#include <boost/tokenizer.hpp>
-#include <numeric>
-#include <list>
 #include "xmlParser.h"
 #include <Eigen/Dense>
-#include <Eigen/Eigenvalues>
 
+#include <ga/ga.h>
 #include <ga/GASimpleGA.h>
 #include <ga/GAListGenome.h>
 
@@ -18,7 +13,6 @@ float Objective(GAGenome &);
 float Objective2(GAGenome &);
 
 using namespace std;
-using namespace boost;
 using namespace Eigen;
 
 #define cout STD_COUT
@@ -27,6 +21,7 @@ using namespace Eigen;
 string fname;
 int popsize, ngen;
 double pcross, pmut;
+string weight_type;
 
 Staci *wds;
 int n_n, n_p, n_comm;
@@ -49,6 +44,9 @@ void save_state();
 
 void logfile_write(string msg, int debug_level);
 
+int MyFlipMutator(GAGenome & c, float prob_mut);
+int QMutator(GAGenome & c, float prob_mut);
+
 string Load_Settings();
 
 int global_debug_level;
@@ -68,18 +66,20 @@ int main(int argc, char **argv) {
     fcount = 0;
 
     string msg = Load_Settings();
-    logfile_write(msg,0);
-
+    
     // Clear logfile
     ofstream ofs(logfilename.c_str(), std::ios::out | std::ios::trunc);
     ofs.close();
+
+    logfile_write(msg,0);
 
     // Load system
     LoadSystem(fname);
     f_ce = pow((double) n_comm, (double) n_n);
 
     // Load matrices
-    LoadMatrices(p, "uniform");
+    //LoadMatrices(p, "topology");
+    LoadMatrices(p, weight_type);
 
     // Optimize
     cout << endl << "RUNNING OPTMIZATION...";
@@ -90,7 +90,8 @@ int main(int argc, char **argv) {
         aset[i] = i;
     GAAlleleSet<int> alleles(n_comm, aset);
 
-    GA1DArrayAlleleGenome<int> genome(n_n - 1, alleles, Objective);
+    GA1DArrayAlleleGenome<int> genome(n_n, alleles, Objective);
+    genome.mutator(QMutator);
 
     GASteadyStateGA ga(genome);
 
@@ -101,7 +102,7 @@ int main(int argc, char **argv) {
     ga.set(gaNscoreFrequency, 100);        // how often to record scores
     ga.set(gaNflushFrequency, 100);    // how often to dump scores to file
     ga.set(gaNselectScores,        // which scores should we track?
-           GAStatistics::Maximum | GAStatistics::Minimum | GAStatistics::Mean);
+     GAStatistics::Maximum | GAStatistics::Minimum | GAStatistics::Mean);
     ga.set(gaNscoreFilename, "bog.dat");
 
     ga.evolve();
@@ -113,11 +114,11 @@ int main(int argc, char **argv) {
     strstrm.str("");
     strstrm << endl << "BEST SOLUTION FOUND:" << endl;
 
-    strstrm << "0 ";
-    for (unsigned int i = 0; i < n_n - 1; i++)
+    for (unsigned int i = 0; i < n_n; i++)
         strstrm << genome.gene(i) << " ";
     strstrm << endl;
 
+    info = true;
     best_obj = Objective(genome);
 
     strstrm << endl << "Some more info:";
@@ -125,23 +126,156 @@ int main(int argc, char **argv) {
     strstrm << endl << "\t # of nodes : " << n_n;
     strstrm << endl << "\t # of pipes : " << n_p;
     strstrm << endl << "\t D          : " << (wds->GetMinPipeDiameter()) << " ... " << (wds->GetMaxPipeDiameter())
-            << " m";
+    << " m";
     strstrm << endl << "\t L          : " << (wds->GetMinPipeLength()) << " ... " << (wds->GetMaxPipeLength()) << " m";
     strstrm << endl << "\t sum. L     : " << (wds->GetSumPipeLength()) << " m ";
     strstrm << endl << "\t max. cons. : " << (wds->GetMaxConsumption()) << " kg/s = "
-            << 3.6 * (wds->GetMaxConsumption())
-            << " m3/h" << endl;
+    << 3.6 * (wds->GetMaxConsumption())
+    << " m3/h" << endl;
 
-// Write Settings to logfile
     logfile_write(strstrm.str(), 0);
 
     return 0;
 }
 
+int 
+MyFlipMutator(GAGenome & c, float prob_mut)
+{
+    GA1DArrayAlleleGenome<int> &child = (GA1DArrayAlleleGenome<int> &) c;
+
+    register int n, i;
+    if(prob_mut <= 0.0) return(0);
+
+    float nMut = prob_mut * (float)(child.length());
+  if(nMut < 1.0){       // we have to do a flip test on each bit
+    nMut = 0;
+    for(i=child.length()-1; i>=0; i--){
+      if(GAFlipCoin(prob_mut)){
+        child.gene(i, child.alleleset().allele());
+        nMut++;
+    }
+}
+}
+  else{             // only flip the number of bits we need to flip
+    for(n=0; n<nMut; n++){
+      i = GARandomInt(0, child.length()-1); // the index of the bit to flip
+      child.gene(i, child.alleleset().allele());
+  }
+}
+return((int)nMut);
+}
+
+int QMutator(GAGenome & c, float prob_mut){
+    GA1DArrayAlleleGenome<int> &child = (GA1DArrayAlleleGenome<int> &) c;
+    GA1DArrayAlleleGenome<int> c_child = (GA1DArrayAlleleGenome<int> &) c;
+
+    bool mut_info = true;
+    info = true;
+    int mut_round=0;
+    bool next_round=true;
+    double obj_before=0., obj_after=1.;
+    int nMut = 0;
+
+    if(prob_mut <= 0.0) return(0);
+
+    if (mut_info){
+        cout<<endl<<endl<<"MUTATION:"<<endl<<endl<<"Initial gene:"<<flush;
+        cin.get();
+    }
+    
+    obj_before = Objective(child);
+    while (next_round && (mut_round<10)){
+        if (mut_info)
+            cout<<endl<<endl<<"ROUND "<<mut_round;
+
+        int n_c = 0;
+        vector<bool> cut_idx(n_n,false);
+        vector<int> cut_pair(n_n,0);
+        for (unsigned int i = 0; i < n_p; i++) {
+            int idx_n1 = wds->agelemek.at(pipe_idx.at(i))->Get_Cspe_Index();
+            int idx_n2 = wds->agelemek.at(pipe_idx.at(i))->Get_Cspv_Index();
+
+            if (child.gene(idx_n1) != child.gene(idx_n2)){
+                n_c++;
+                cut_idx.at(idx_n1)=true;
+                cut_idx.at(idx_n2)=true;
+                cut_pair.at(idx_n1)=idx_n2;
+                cut_pair.at(idx_n2)=idx_n1;
+                if (mut_info){
+                    cout<<endl<<"\tCut: "<<idx_n1 <<"("<<child.gene(idx_n1);
+                    cout<<") --x-- "<<idx_n2<<"("<<child.gene(idx_n2)<<")";
+                }
+            }
+        }
+        if (mut_info)
+            cout<<endl;
+
+        c_child = child;
+        for(unsigned int i=0; i<n_n; i++){
+            if (cut_idx.at(i)){
+                int other_node_community = child.gene(cut_pair.at(i));
+                if (mut_info){
+                    cout<<endl<<" --> idx="<<i<<", pair: "<<cut_pair.at(i)<<" with comm. "<<other_node_community;
+                }
+
+
+                cut_idx.at(i)=false;
+                cut_idx.at(cut_pair.at(i))=false;
+
+                c_child.gene(i,other_node_community);
+                nMut++;
+            }
+        }
+        if (mut_info)
+            cout<<endl;
+
+        obj_after = Objective(c_child);
+        if (mut_info){
+            cout<<endl<<"obj: "<<obj_before<<" -> "<<obj_after;
+            cout<<endl<<"child.size()="<<child.size()<<", c_child.size="<<c_child.size()<<flush;
+        }
+
+        if (obj_after>obj_before){
+            next_round=true;
+            for (unsigned int i=0; i<child.size(); i++)
+                child.gene(i,c_child.gene(i));
+        }
+        else{
+            next_round=false;
+            if (mut_info)
+                cout<<endl<<endl<<"No improvement, finishing."<<endl;
+        }
+
+        mut_round++;
+        obj_before=obj_after;
+
+    }
+    info = false;
+
+    // if no improvement was made, switch to "normal" mutation
+    if (mut_round==0){
+        nMut = 0;
+        for (int i=0; i<child.length(); i++){
+            if (GAFlipCoin(prob_mut)){
+                child.gene(i, child.alleleset().allele());
+                nMut++;
+            }
+        }
+        if (mut_info)
+            cout<<endl<<endl<<"Done with FlipCoin mutation, nMut="<<nMut<<endl;
+    }
+
+    if (mut_info){
+        cout<<endl<<"Leaving QMutator()..."<<endl;
+        cin.get();
+    }
+    return((int)nMut);
+}
+
+
 void save_state() {
     for (int i = 0; i < n_n; i++){
         wds->cspok.at(i)->Set_dprop("concentration", best.at(i));
-        // cout<<endl<<"node #"<<i<<": "<<wds->cspok.at(i)->Get_nev()<<", comm. #"<<best.at(i);
     }
 
     for (int i = 0; i < wds->agelemek.size(); i++) {
@@ -169,9 +303,9 @@ Objective(GAGenome &c) {
 
     // Extract genome to more convenient form
     vector<int> tmp(n_n);
-    tmp.at(0) = 0;
-    for (int i = 0; i < n_n - 1; i++)
-        tmp.at(i + 1) = genome.gene(i);
+    //tmp.at(0) = 0;
+    for (int i = 0; i < n_n; i++)
+        tmp.at(i) = genome.gene(i);
 
     // Compute number of cuts
     n_c = 0;
@@ -179,18 +313,11 @@ Objective(GAGenome &c) {
         int idx_n1 = wds->agelemek.at(pipe_idx.at(i))->Get_Cspe_Index();
         int idx_n2 = wds->agelemek.at(pipe_idx.at(i))->Get_Cspv_Index();
 
-        if (tmp.at(idx_n1) != tmp.at(idx_n2)) {
+        if (tmp.at(idx_n1) != tmp.at(idx_n2))
             n_c++;
-            /*if (info) {
-                cout << endl << "Name: " << wds->agelemek.at(i)->Get_nev();
-                cout << " node from: #" << idx_n1 << " comm. #" << tmp.at(idx_n1);
-                cout << " -------> node to: #" << idx_n2 << " comm. #" << tmp.at(idx_n2);
-                cout << " !! PIPE IS CUT !! -> n_c=" << n_c;
-            }*/
-        }
     }
 
-    // Modularity with weight W, p = abs(Apn.transpose()) * w
+        // Modularity with weight W, p = abs(Apn.transpose()) * w
     Qmod = 0.;
     double Qtmp;
     for (unsigned int m = 0; m < n_comm; m++) {
@@ -205,7 +332,7 @@ Objective(GAGenome &c) {
 
     double Q = 1 - ((double) n_c / (double) n_p) - Qmod;
 
-    if (Q > best_Q) {
+    if ((Q > best_Q) || (info)) {
         best = tmp;
         best_Q = Q;
 
@@ -214,20 +341,20 @@ Objective(GAGenome &c) {
         strstrm.str("");
         if (fcount < 1000)
             strstrm << endl << "fcount : " << fcount << " (" << ((double) fcount) / f_ce * 100.
-                    << " % of compl. enum.)";
+        << " % of compl. enum.)";
         if (fcount < 1e6)
             strstrm << endl << "fcount : " << ((double) fcount) / 1000. << "k (" << ((double) fcount) / f_ce * 100.
-                    << " % of compl. enum.)";
+        << " % of compl. enum.)";
         else
             strstrm << endl << "fcount : " << ((double) fcount) / 1000000. << "M (" << ((double) fcount) / f_ce * 100.
-                    << " % of compl. enum.)";
+        << " % of compl. enum.)";
         strstrm << endl << "n_c/np : " << ((double) n_c / (double) n_p) << " (=n_c/np with n_c = " << n_c << ", np = "
-                << n_p
-                << ")";
+        << n_p
+        << ")";
         strstrm << endl << "Qmod   : " << Qmod;
         strstrm << endl << "Q      : " << Q << endl << "----------------------------------------------------";
         logfile_write(strstrm.str(), 0);
-        
+
     }
 
     return (obj_offset + Q);
@@ -264,11 +391,19 @@ void LoadMatrices(VectorXd &p, string weight_type) {
         }
     }
 
-    // Now set the weight
-    // Node rank = topology
-    if (0 == strcmp(weight_type.c_str(), "uniform")) {
+    if (0 == strcmp(weight_type.c_str(), "topology")) {
         for (unsigned int i = 0; i < W.size(); i++)
             W(i) = 1;
+    }
+
+    if (0 == strcmp(weight_type.c_str(), "dp")) {
+        double dp;
+        for (unsigned int i = 0; i < W.size(); i++){
+            dp = wds->agelemek.at(pipe_idx.at(i))->Get_dprop("headloss");
+            W(i) = abs(dp);
+            cout<<endl<<wds->agelemek.at(pipe_idx.at(i))->Get_nev()<<" dp="<<dp;
+        }
+            // cin.get();
     }
 
     // Final computations
@@ -310,15 +445,9 @@ string Load_Settings() {
     XMLNode xMainNode = XMLNode::openFileHelper("staci_split_settings.xml", "settings");
     global_debug_level = atoi(xMainNode.getChildNode("global_debug_level").getText());
     n_comm = atoi(xMainNode.getChildNode("n_comm").getText());
+    weight_type = xMainNode.getChildNode("weight_type").getText();
     fname = xMainNode.getChildNode("fname").getText();
     logfilename = xMainNode.getChildNode("logfilename").getText();
-
-    //string fname = "jwrpm_test2.spr";
-    //string fname = "jwrpm_test_wiki.spr";
-    //string fname = "VIZ-SOPTVR-T-81-input_mod.spr";
-    //string fname = "BUK-AMEVAV-1-80-input_mod.spr";
-    //string fname = "LOV-SOPRKV-1-input_mod.spr";
-    //string fname = "VIZ-SOPTVR-E-input_mod.spr";
 
     popsize = atoi(xMainNode.getChildNode("popsize").getText());
     ngen = atoi(xMainNode.getChildNode("ngen").getText());
@@ -329,15 +458,23 @@ string Load_Settings() {
     msg.str("");
     msg << "Settings:" << endl << endl;
     msg << "\t global_debug_level     : " << global_debug_level << endl;
-    msg << "\t n_comm                 : " << n_comm << endl << endl;
-    msg << "\t fname                  : " << fname << endl;
-    msg << "\t logfilename            : " << logfilename << endl;
-    msg << "\t popsize : " << popsize << endl;
-    msg << "\t ngen    : " << ngen << endl;
-    msg << "\t pmut    : " << pmut << endl;
-    msg << "\t pcross  : " << pcross << endl << endl;
+    msg << "\t n_comm                 : " << n_comm << endl;
+    msg << "\t weight_type            : " << weight_type;
+    if ((weight_type=="topology") || (weight_type=="dp")){
+       msg<< " (ok)"<<endl;
+   }
+   else{
+    cout<<endl<<"!!!! UNKNOWN WEIGHT_TYPE!!!"<<endl<<"Exiting..."<<endl;
+    exit(-1);
+}
+msg << "\t fname                  : " << fname << endl;
+msg << "\t logfilename            : " << logfilename << endl<<endl;
+msg << "\t popsize : " << popsize << endl;
+msg << "\t ngen    : " << ngen << endl;
+msg << "\t pmut    : " << pmut << endl;
+msg << "\t pcross  : " << pcross << endl << endl;
 
-    return msg.str();
+return msg.str();
 }
 
 

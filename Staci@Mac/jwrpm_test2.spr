@@ -92,7 +92,7 @@
 			5.0
 		</p_init>
 		<fluid_volume>
-			7.86028e+00
+			7.91683e+00
 		</fluid_volume>
 		<start_date>
 			2007-01-01
@@ -155,10 +155,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.81000e+04
+				1.96200e+05
 			</pressure>
 			<head>
-				1.00000e+01
+				2.00000e+01
 			</head>
 			<endnode>
 				false
@@ -295,10 +295,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.80894e+04
+				1.96191e+05
 			</pressure>
 			<head>
-				9.99892e+00
+				1.99991e+01
 			</head>
 			<endnode>
 				false
@@ -365,10 +365,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.80894e+04
+				1.96191e+05
 			</pressure>
 			<head>
-				9.99892e+00
+				1.99991e+01
 			</head>
 			<endnode>
 				false
@@ -435,10 +435,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.80841e+04
+				1.96187e+05
 			</pressure>
 			<head>
-				9.99838e+00
+				1.99987e+01
 			</head>
 			<endnode>
 				false
@@ -505,10 +505,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.80513e+04
+				1.96164e+05
 			</pressure>
 			<head>
-				9.99504e+00
+				1.99963e+01
 			</head>
 			<endnode>
 				false
@@ -517,7 +517,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -575,10 +575,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.80512e+04
+				1.96164e+05
 			</pressure>
 			<head>
-				9.99502e+00
+				1.99963e+01
 			</head>
 			<endnode>
 				false
@@ -645,10 +645,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.80533e+04
+				1.96165e+05
 			</pressure>
 			<head>
-				9.99524e+00
+				1.99964e+01
 			</head>
 			<endnode>
 				false
@@ -657,7 +657,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -715,10 +715,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.80513e+04
+				1.96164e+05
 			</pressure>
 			<head>
-				9.99504e+00
+				1.99963e+01
 			</head>
 			<endnode>
 				false
@@ -727,7 +727,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -785,10 +785,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.80979e+04
+				3.92397e+05
 			</pressure>
 			<head>
-				9.99979e+00
+				3.99997e+01
 			</head>
 			<endnode>
 				false
@@ -855,10 +855,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.81000e+04
+				3.92400e+05
 			</pressure>
 			<head>
-				1.00000e+01
+				4.00000e+01
 			</head>
 			<endnode>
 				false
@@ -867,7 +867,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -925,10 +925,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.80978e+04
+				3.92397e+05
 			</pressure>
 			<head>
-				9.99977e+00
+				3.99997e+01
 			</head>
 			<endnode>
 				false
@@ -937,7 +937,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -995,10 +995,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.80980e+04
+				3.92397e+05
 			</pressure>
 			<head>
-				9.99979e+00
+				3.99997e+01
 			</head>
 			<endnode>
 				false
@@ -1007,7 +1007,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -1135,10 +1135,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.80896e+04
+				1.96191e+05
 			</pressure>
 			<head>
-				9.99894e+00
+				1.99991e+01
 			</head>
 			<endnode>
 				false
@@ -1205,10 +1205,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.80515e+04
+				1.96164e+05
 			</pressure>
 			<head>
-				9.99506e+00
+				1.99963e+01
 			</head>
 			<endnode>
 				false
@@ -1217,7 +1217,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -1275,10 +1275,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				9.80981e+04
+				3.92397e+05
 			</pressure>
 			<head>
-				9.99981e+00
+				3.99997e+01
 			</head>
 			<endnode>
 				false
@@ -1287,7 +1287,7 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<curve>
 				<id>
@@ -1338,13 +1338,13 @@
 				1.00000e+00
 			</aref>
 			<mass_flow_rate>
-				-1.93577e+00
+				-1.76841e+00
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-6.96877e+00
+				-6.36628e+00
 			</volume_flow_rate>
 			<velocity>
-				-1.93577e-03
+				-1.76841e-03
 			</velocity>
 			<headloss>
 				0.00000e+00
@@ -1361,7 +1361,7 @@
 			<edge_spec>
 				<pool>
 					<water_level>
-						10.0
+						20.0
 					</water_level>
 					<bottom_level>
 						0.0
@@ -1398,19 +1398,19 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				6.47251e-01
+				5.91629e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				2.33010e+00
+				2.12986e+00
 			</volume_flow_rate>
 			<velocity>
-				2.06026e-02
+				1.88321e-02
 			</velocity>
 			<headloss>
-				1.08172e-03
+				9.03791e-04
 			</headloss>
 			<head_loss_per_unit_length>
-				1.08172e-04
+				9.03791e-05
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
@@ -1470,19 +1470,19 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				6.47251e-01
+				5.91629e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				2.33010e+00
+				2.12986e+00
 			</volume_flow_rate>
 			<velocity>
-				2.06026e-02
+				1.88321e-02
 			</velocity>
 			<headloss>
-				1.08172e-03
+				9.03791e-04
 			</headloss>
 			<head_loss_per_unit_length>
-				1.08172e-04
+				9.03791e-05
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
@@ -1542,19 +1542,19 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				4.57286e-01
+				4.01155e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.64623e+00
+				1.44416e+00
 			</volume_flow_rate>
 			<velocity>
-				1.45558e-02
+				1.27691e-02
 			</velocity>
 			<headloss>
-				5.39939e-04
+				4.15521e-04
 			</headloss>
 			<head_loss_per_unit_length>
-				5.39939e-05
+				4.15521e-05
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
@@ -1614,19 +1614,19 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				4.57286e-01
+				4.01155e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.64623e+00
+				1.44416e+00
 			</volume_flow_rate>
 			<velocity>
-				1.45558e-02
+				1.27691e-02
 			</velocity>
 			<headloss>
-				5.39939e-04
+				4.15521e-04
 			</headloss>
 			<head_loss_per_unit_length>
-				5.39939e-05
+				4.15521e-05
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
@@ -1686,25 +1686,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				7.97617e-02
+				3.03190e-02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				2.87142e-01
+				1.09148e-01
 			</volume_flow_rate>
 			<velocity>
-				2.53889e-03
+				9.65081e-04
 			</velocity>
 			<headloss>
-				1.64270e-05
+				2.37355e-06
 			</headloss>
 			<head_loss_per_unit_length>
-				1.64270e-06
+				2.37355e-07
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				5.00000e-01
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -1758,25 +1758,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				2.78844e-01
+				2.27366e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.00384e+00
+				8.18516e-01
 			</volume_flow_rate>
 			<velocity>
-				8.87585e-03
+				7.23726e-03
 			</velocity>
 			<headloss>
-				2.00766e-04
+				1.33481e-04
 			</headloss>
 			<head_loss_per_unit_length>
-				2.00766e-05
+				1.33481e-05
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -1830,25 +1830,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				2.78305e-01
+				2.17383e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.00190e+00
+				7.82579e-01
 			</volume_flow_rate>
 			<velocity>
-				8.85870e-03
+				6.91950e-03
 			</velocity>
 			<headloss>
-				1.99991e-04
+				1.22017e-04
 			</headloss>
 			<head_loss_per_unit_length>
-				1.99991e-05
+				1.22017e-05
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -1902,25 +1902,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				8.16219e-02
+				7.32050e-02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				2.93839e-01
+				2.63538e-01
 			</volume_flow_rate>
 			<velocity>
-				2.59810e-03
+				2.33018e-03
 			</velocity>
 			<headloss>
-				1.72022e-05
+				1.38373e-05
 			</headloss>
 			<head_loss_per_unit_length>
-				1.72022e-06
+				1.38373e-06
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				5.00000e-01
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -1974,25 +1974,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				-2.84680e-01
+				-3.46417e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-1.02485e+00
+				-1.24710e+00
 			</volume_flow_rate>
 			<velocity>
-				-9.06163e-03
+				-1.10268e-02
 			</velocity>
 			<headloss>
-				2.09259e-04
+				3.09862e-04
 			</headloss>
 			<head_loss_per_unit_length>
-				2.09259e-05
+				3.09862e-05
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				5.00000e-01
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2046,25 +2046,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				-8.44607e-02
+				-1.27518e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-3.04058e-01
+				-4.59066e-01
 			</volume_flow_rate>
 			<velocity>
-				-2.68846e-03
+				-4.05902e-03
 			</velocity>
 			<headloss>
-				1.84195e-05
+				4.19869e-05
 			</headloss>
 			<head_loss_per_unit_length>
-				1.84195e-06
+				4.19869e-06
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2118,25 +2118,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				8.26114e-02
+				9.27540e-02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				2.97401e-01
+				3.33915e-01
 			</volume_flow_rate>
 			<velocity>
-				2.62960e-03
+				2.95245e-03
 			</velocity>
 			<headloss>
-				1.76217e-05
+				2.22144e-05
 			</headloss>
 			<head_loss_per_unit_length>
-				1.76217e-06
+				2.22144e-06
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				5.00000e-01
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2190,25 +2190,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				2.84137e-01
+				3.35183e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.02289e+00
+				1.20666e+00
 			</volume_flow_rate>
 			<velocity>
-				9.04434e-03
+				1.06692e-02
 			</velocity>
 			<headloss>
-				2.08461e-04
+				2.90090e-04
 			</headloss>
 			<head_loss_per_unit_length>
-				2.08461e-05
+				2.90090e-05
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2262,13 +2262,13 @@
 				1.00000e+00
 			</aref>
 			<mass_flow_rate>
-				-8.42010e-01
+				-1.00937e+00
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-3.03123e+00
+				-3.63372e+00
 			</volume_flow_rate>
 			<velocity>
-				-8.42010e-04
+				-1.00937e-03
 			</velocity>
 			<headloss>
 				0.00000e+00
@@ -2280,12 +2280,12 @@
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pool>
 					<water_level>
-						10.0
+						40.0
 					</water_level>
 					<bottom_level>
 						0.0
@@ -2322,25 +2322,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				1.10243e+00
+				9.35077e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				3.96877e+00
+				3.36628e+00
 			</volume_flow_rate>
 			<velocity>
-				3.50915e-02
+				2.97644e-02
 			</velocity>
 			<headloss>
-				3.13816e-03
+				2.25769e-03
 			</headloss>
 			<head_loss_per_unit_length>
-				3.13816e-04
+				2.25769e-04
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				5.00000e-01
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2394,30 +2394,30 @@
 				3.14160e-04
 			</aref>
 			<mass_flow_rate>
-				4.33063e-03
+				8.80171e-02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.55903e-02
+				3.16861e-01
 			</volume_flow_rate>
 			<velocity>
-				1.37848e-02
+				2.80166e-01
 			</velocity>
 			<headloss>
-				4.84252e-03
+				2.00034e+01
 			</headloss>
 			<head_loss_per_unit_length>
-				4.84252e-04
+				2.00034e-01
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
 					<length>
-						10.0
+						100.0
 					</length>
 					<diameter>
 						0.02
@@ -2466,19 +2466,19 @@
 				3.14160e-04
 			</aref>
 			<mass_flow_rate>
-				4.34555e-03
+				8.80172e-02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.56440e-02
+				3.16862e-01
 			</volume_flow_rate>
 			<velocity>
-				1.38323e-02
+				2.80167e-01
 			</velocity>
 			<headloss>
-				4.87594e-03
+				2.00034e+01
 			</headloss>
 			<head_loss_per_unit_length>
-				4.87594e-04
+				2.00034e-01
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
@@ -2489,7 +2489,7 @@
 			<edge_spec>
 				<pipe>
 					<length>
-						10.0
+						100.0
 					</length>
 					<diameter>
 						0.02
@@ -2538,19 +2538,19 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				6.41266e-01
+				5.85152e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				2.30856e+00
+				2.10655e+00
 			</volume_flow_rate>
 			<velocity>
-				2.04121e-02
+				1.86259e-02
 			</velocity>
 			<headloss>
-				1.06181e-03
+				8.84111e-04
 			</headloss>
 			<head_loss_per_unit_length>
-				1.06181e-04
+				8.84111e-05
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
@@ -2610,19 +2610,19 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				-8.78128e-02
+				-8.73036e-02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-3.16126e-01
+				-3.14293e-01
 			</volume_flow_rate>
 			<velocity>
-				-2.79516e-03
+				-2.77895e-03
 			</velocity>
 			<headloss>
-				1.99106e-05
+				1.96804e-05
 			</headloss>
 			<head_loss_per_unit_length>
-				1.99106e-06
+				1.96804e-06
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
@@ -2682,19 +2682,19 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				-4.65641e-01
+				-4.10545e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-1.67631e+00
+				-1.47796e+00
 			</volume_flow_rate>
 			<velocity>
-				-1.48218e-02
+				-1.30680e-02
 			</velocity>
 			<headloss>
-				5.59850e-04
+				4.35202e-04
 			</headloss>
 			<head_loss_per_unit_length>
-				5.59850e-05
+				4.35202e-05
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
@@ -2754,19 +2754,19 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				-8.78128e-02
+				-8.73036e-02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-3.16126e-01
+				-3.14293e-01
 			</volume_flow_rate>
 			<velocity>
-				-2.79516e-03
+				-2.77895e-03
 			</velocity>
 			<headloss>
-				1.99106e-05
+				1.96804e-05
 			</headloss>
 			<head_loss_per_unit_length>
-				1.99106e-06
+				1.96804e-06
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
@@ -2826,25 +2826,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				-7.86958e-02
+				-8.07311e-02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-2.83305e-01
+				-2.90632e-01
 			</volume_flow_rate>
 			<velocity>
-				-2.50496e-03
+				-2.56974e-03
 			</velocity>
 			<headloss>
-				1.59909e-05
+				1.68287e-05
 			</headloss>
 			<head_loss_per_unit_length>
-				1.59909e-06
+				1.68287e-06
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2898,25 +2898,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				2.67509e-01
+				2.12550e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				9.63031e-01
+				7.65181e-01
 			</volume_flow_rate>
 			<velocity>
-				8.51504e-03
+				6.76567e-03
 			</velocity>
 			<headloss>
-				1.84776e-04
+				1.16652e-04
 			</headloss>
 			<head_loss_per_unit_length>
-				1.84776e-05
+				1.16652e-05
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -2970,25 +2970,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				-7.67643e-02
+				-4.55826e-02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-2.76351e-01
+				-1.64097e-01
 			</volume_flow_rate>
 			<velocity>
-				-2.44348e-03
+				-1.45094e-03
 			</velocity>
 			<headloss>
-				1.52155e-05
+				5.36498e-06
 			</headloss>
 			<head_loss_per_unit_length>
-				1.52155e-06
+				5.36498e-07
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -3042,25 +3042,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				-1.12049e-01
+				-8.62366e-02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-4.03375e-01
+				-3.10452e-01
 			</volume_flow_rate>
 			<velocity>
-				-3.56661e-03
+				-2.74499e-03
 			</velocity>
 			<headloss>
-				3.24177e-05
+				1.92023e-05
 			</headloss>
 			<head_loss_per_unit_length>
-				3.24177e-06
+				1.92023e-06
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				5.00000e-01
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -3114,25 +3114,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				-8.00546e-02
+				-1.12132e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-2.88196e-01
+				-4.03674e-01
 			</volume_flow_rate>
 			<velocity>
-				-2.54821e-03
+				-3.56925e-03
 			</velocity>
 			<headloss>
-				1.65479e-05
+				3.24657e-05
 			</headloss>
 			<head_loss_per_unit_length>
-				1.65479e-06
+				3.24657e-06
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				5.00000e-01
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -3186,25 +3186,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				2.73192e-01
+				3.27767e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				9.83492e-01
+				1.17996e+00
 			</volume_flow_rate>
 			<velocity>
-				8.69596e-03
+				1.04331e-02
 			</velocity>
 			<headloss>
-				1.92711e-04
+				2.77397e-04
 			</headloss>
 			<head_loss_per_unit_length>
-				1.92711e-05
+				2.77397e-05
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -3258,25 +3258,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				-1.15036e-01
+				-1.45523e-01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-4.14131e-01
+				-5.23881e-01
 			</volume_flow_rate>
 			<velocity>
-				-3.66171e-03
+				-4.63211e-03
 			</velocity>
 			<headloss>
-				3.41696e-05
+				5.46801e-05
 			</headloss>
 			<head_loss_per_unit_length>
-				3.41696e-06
+				5.46801e-06
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
@@ -3330,25 +3330,25 @@
 				3.14160e-02
 			</aref>
 			<mass_flow_rate>
-				-7.81014e-02
+				-7.01134e-02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-2.81165e-01
+				-2.52408e-01
 			</volume_flow_rate>
 			<velocity>
-				-2.48604e-03
+				-2.23177e-03
 			</velocity>
 			<headloss>
-				1.57502e-05
+				1.26932e-05
 			</headloss>
 			<head_loss_per_unit_length>
-				1.57502e-06
+				1.26932e-06
 			</head_loss_per_unit_length>
 			<travel_time>
 				0.00000e+00
 			</travel_time>
 			<concentration>
-				1.00000e+00
+				0.00000e+00
 			</concentration>
 			<edge_spec>
 				<pipe>
