@@ -2,8 +2,8 @@
 <project version="4">
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" buildAllGenerated="true">
     <generated>
-      <config projectName="new_staci" targetName="new_staci" />
       <config projectName="staci" targetName="staci" />
+      <config projectName="new_staci" targetName="new_staci" />
     </generated>
   </component>
   <component name="CMakeSettings">
@@ -13,69 +13,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f72ed067-d179-4092-9461-72fee8098102" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Staci@Mac/staci_split_settings.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Staci@Mac/subdir_staci_split.mk" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/staci_split.cpp" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Staci@Mac/.ros" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/Staci@Mac/xmlParser.d" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/new_staci.sublime-project" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/new_staci.sublime-workspace" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/staci_calibrate.cpp.backup1.cpp" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/logfile.log" afterPath="$PROJECT_DIR$/Staci@Mac/makefile_staci_split.mk" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Agelem.o" afterPath="$PROJECT_DIR$/Staci@Mac/Agelem.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/AnyOption.o" afterPath="$PROJECT_DIR$/Staci@Mac/AnyOption.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/BukoMutargy.o" afterPath="$PROJECT_DIR$/Staci@Mac/BukoMutargy.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Csatorna.o" afterPath="$PROJECT_DIR$/Staci@Mac/Csatorna.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Cso.o" afterPath="$PROJECT_DIR$/Staci@Mac/Cso.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Csomopont.o" afterPath="$PROJECT_DIR$/Staci@Mac/Csomopont.o" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/JelleggorbesFojtas.o" afterPath="$PROJECT_DIR$/Staci@Mac/JelleggorbesFojtas.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/KonstNyomas.o" afterPath="$PROJECT_DIR$/Staci@Mac/KonstNyomas.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Staci.o" afterPath="$PROJECT_DIR$/Staci@Mac/Staci.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Szivattyu.o" afterPath="$PROJECT_DIR$/Staci@Mac/Szivattyu.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/Vegakna.o" afterPath="$PROJECT_DIR$/Staci@Mac/Vegakna.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/VisszacsapoSzelep.o" afterPath="$PROJECT_DIR$/Staci@Mac/VisszacsapoSzelep.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/data_io.o" afterPath="$PROJECT_DIR$/Staci@Mac/data_io.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/lubksb.o" afterPath="$PROJECT_DIR$/Staci@Mac/lubksb.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/ludcmp.o" afterPath="$PROJECT_DIR$/Staci@Mac/ludcmp.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/new_staci" afterPath="$PROJECT_DIR$/Staci@Mac/new_staci" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.o" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_main.o" afterPath="$PROJECT_DIR$/Staci@Mac/staci_main.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/xmlParser.o" afterPath="$PROJECT_DIR$/Staci@Mac/xmlParser.o" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/staci.iml" afterPath="$PROJECT_DIR$/.idea/staci.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_split" afterPath="$PROJECT_DIR$/Staci@Mac/staci_split" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_split.o" afterPath="$PROJECT_DIR$/Staci@Mac/staci_split.o" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/BukoMutargy.cpp" afterPath="$PROJECT_DIR$/BukoMutargy.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Csatorna.cpp" afterPath="$PROJECT_DIR$/Csatorna.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Cso.cpp" afterPath="$PROJECT_DIR$/Cso.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Csomopont.cpp" afterPath="$PROJECT_DIR$/Csomopont.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/JelleggorbesFojtas.cpp" afterPath="$PROJECT_DIR$/JelleggorbesFojtas.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KonstNyomas.cpp" afterPath="$PROJECT_DIR$/KonstNyomas.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci.cpp" afterPath="$PROJECT_DIR$/Staci.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci.h" afterPath="$PROJECT_DIR$/Staci.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/FV_input_2012_11_06_1.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/FV_input_2012_11_06_1.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/best.dat" afterPath="$PROJECT_DIR$/Staci@Mac/best.dat" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/bests.log" afterPath="$PROJECT_DIR$/Staci@Mac/bests.log" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/KonstNyomas.h" afterPath="$PROJECT_DIR$/KonstNyomas.h" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/BUK-AMEVAV-1-80-input_mod.spr" afterPath="$PROJECT_DIR$/Staci@Mac/BUK-AMEVAV-1-80-input_mod.spr" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/BUK-AMEVAV-1-80-input_mod.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/BUK-AMEVAV-1-80-input_mod.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/VIZ-SOPTVR-E-input_mod.spr" afterPath="$PROJECT_DIR$/Staci@Mac/VIZ-SOPTVR-E-input_mod.spr" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/VIZ-SOPTVR-E-input_mod.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/VIZ-SOPTVR-E-input_mod.spr.ros" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/bog.dat" afterPath="$PROJECT_DIR$/Staci@Mac/bog.dat" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/makefile_calibrate.mk" afterPath="$PROJECT_DIR$/Staci@Mac/makefile_calibrate.mk" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/makefile_staci.mk" afterPath="$PROJECT_DIR$/Staci@Mac/makefile_staci.mk" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/proba1.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/proba1.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/res_time_test.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/res_time_test.spr.ros" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/res_time_test.spr.rps" afterPath="$PROJECT_DIR$/Staci@Mac/res_time_test.spr.rps" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/sensitivity_MassFlowRates.dat" afterPath="$PROJECT_DIR$/Staci@Mac/sensitivity_MassFlowRates.dat" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/sensitivity_Pressures.dat" afterPath="$PROJECT_DIR$/Staci@Mac/sensitivity_Pressures.dat" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.d" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.d" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.log" afterPath="$PROJECT_DIR$/Staci@Mac/staci_calibrate.log" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/subdir_calibrate.mk" afterPath="$PROJECT_DIR$/Staci@Mac/subdir_calibrate.mk" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Szivattyu.cpp" afterPath="$PROJECT_DIR$/Szivattyu.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Szivattyu.h" afterPath="$PROJECT_DIR$/Szivattyu.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Vegakna.cpp" afterPath="$PROJECT_DIR$/Vegakna.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_io.cpp" afterPath="$PROJECT_DIR$/data_io.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data_io.h" afterPath="$PROJECT_DIR$/data_io.h" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/staci_main.cpp" afterPath="$PROJECT_DIR$/staci_main.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tests/CHANNEL4.out" afterPath="$PROJECT_DIR$/tests/CHANNEL4.out" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/jwrpm_test2.spr" afterPath="$PROJECT_DIR$/Staci@Mac/jwrpm_test2.spr" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/jwrpm_test2.spr.ros" afterPath="$PROJECT_DIR$/Staci@Mac/jwrpm_test2.spr.ros" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/makefile_staci_split.mk" afterPath="$PROJECT_DIR$/Staci@Mac/makefile_staci_split.mk" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_split.d" afterPath="$PROJECT_DIR$/Staci@Mac/staci_split.d" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_split.log" afterPath="$PROJECT_DIR$/Staci@Mac/staci_split.log" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Staci@Mac/staci_split_settings.xml" afterPath="$PROJECT_DIR$/Staci@Mac/staci_split_settings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/staci_split.cpp" afterPath="$PROJECT_DIR$/staci_split.cpp" />
     </list>
     <ignored path="staci.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -95,41 +50,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Staci.cpp" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Staci.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="389">
-              <caret line="862" column="38" lean-forward="false" selection-start-line="862" selection-start-column="12" selection-end-line="862" selection-end-column="38" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="staci_split.cpp" pinned="false" current-in-tab="false">
+      <file leaf-file-name="staci_split.cpp" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/staci_split.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="495">
-              <caret line="167" column="53" lean-forward="false" selection-start-line="167" selection-start-column="53" selection-end-line="167" selection-end-column="53" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="data_io.cpp" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/data_io.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="453">
-              <caret line="860" column="32" lean-forward="false" selection-start-line="860" selection-start-column="32" selection-end-line="860" selection-end-column="32" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="staci_split_settings.xml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Staci@Mac/staci_split_settings.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="27" lean-forward="false" selection-start-line="3" selection-start-column="27" selection-end-line="3" selection-end-column="27" />
+            <state relative-caret-position="6540">
+              <caret line="436" column="21" lean-forward="true" selection-start-line="436" selection-start-column="21" selection-end-line="436" selection-end-column="21" />
               <folding />
             </state>
           </provider>
@@ -493,6 +418,7 @@
       <workItem from="1477434445664" duration="21000" />
       <workItem from="1478185701434" duration="33445000" />
       <workItem from="1478344935317" duration="30433000" />
+      <workItem from="1478696246657" duration="62000" />
     </task>
     <task id="LOCAL-00001" summary="Fixed issue with residential time computation.">
       <created>1460530738994</created>
@@ -505,7 +431,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="208359000" />
+    <option name="totallyTimeSpent" value="208421000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -517,14 +443,13 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1680" height="978" extended-state="0" />
+    <frame x="0" y="23" width="1680" height="978" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24231465" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3295711" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.46726862" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32946634" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.21639542" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" x="660" y="69" width="360" height="886" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -536,6 +461,7 @@
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.46726862" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
     </layout>
@@ -785,7 +711,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-683">
           <caret line="24" column="12" lean-forward="false" selection-start-line="24" selection-start-column="8" selection-end-line="24" selection-end-column="12" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -793,7 +718,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2685">
           <caret line="179" column="36" lean-forward="false" selection-start-line="179" selection-start-column="4" selection-end-line="179" selection-end-column="36" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -801,7 +725,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -809,7 +732,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="154">
           <caret line="224" column="44" lean-forward="false" selection-start-line="224" selection-start-column="44" selection-end-line="224" selection-end-column="44" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -817,7 +739,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
           <caret line="16" column="39" lean-forward="false" selection-start-line="16" selection-start-column="39" selection-end-line="16" selection-end-column="39" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -825,7 +746,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="273">
           <caret line="53" column="18" lean-forward="false" selection-start-line="53" selection-start-column="18" selection-end-line="53" selection-end-column="18" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -833,23 +753,14 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="801">
           <caret line="1062" column="0" lean-forward="true" selection-start-line="965" selection-start-column="0" selection-end-line="1062" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logfile.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/logfile.log" />
     <entry file="file://$PROJECT_DIR$/AnyTownBuildDatafiles.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1065">
           <caret line="19" column="17" lean-forward="false" selection-start-line="19" selection-start-column="17" selection-end-line="19" selection-end-column="17" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -857,7 +768,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="24" selection-end-column="11" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -873,7 +783,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="292">
           <caret line="35" column="56" lean-forward="false" selection-start-line="35" selection-start-column="56" selection-end-line="35" selection-end-column="56" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -889,24 +798,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Staci.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="389">
-          <caret line="862" column="38" lean-forward="false" selection-start-line="862" selection-start-column="12" selection-end-line="862" selection-end-column="38" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/staci_split.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="495">
-          <caret line="167" column="53" lean-forward="false" selection-start-line="167" selection-start-column="53" selection-end-line="167" selection-end-column="53" />
+        <state relative-caret-position="12930">
+          <caret line="862" column="38" lean-forward="false" selection-start-line="862" selection-start-column="38" selection-end-line="862" selection-end-column="38" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/data_io.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="453">
-          <caret line="860" column="32" lean-forward="false" selection-start-line="860" selection-start-column="32" selection-end-line="860" selection-end-column="32" />
+        <state relative-caret-position="12420">
+          <caret line="857" column="30" lean-forward="true" selection-start-line="857" selection-start-column="30" selection-end-line="857" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/staci_split.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6540">
+          <caret line="436" column="21" lean-forward="true" selection-start-line="436" selection-start-column="21" selection-end-line="436" selection-end-column="21" />
           <folding />
         </state>
       </provider>

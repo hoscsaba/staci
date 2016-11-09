@@ -142,6 +142,8 @@ double JelleggorbesFojtas::Get_dprop(string mit) {
         out = headloss;
     else if ((mit == "concentration") || (mit == "konc_atlag"))
         out = konc_atlag;
+    else if ((mit == "length") || (mit == "L"))
+        out = 0.5;
     else {
         cout << endl << "HIBA! Jelleggorbes::Get_dprop(mit), ismeretlen bemenet: mit="
              << mit << endl << endl;

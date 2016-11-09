@@ -3,232 +3,153 @@ Settings:
 	 global_debug_level     : 1
 	 n_comm                 : 2
 	 weight_type            : dp (ok)
-	 fname                  : VIZ-SOPTVR-E-input_mod.spr
+	 fname                  : BUK-AMEVAV-1-80-input_mod.spr
 	 logfilename            : staci_split.log
 
 	 popsize : 50
 	 ngen    : 100000
-	 pmut    : 0.5
+	 pmut    : 0.05
 	 pcross  : 0.6
 
 
-fcount : 1 (5.42666e-164 % of compl. enum.)
-fcount : 0.001k (5.42666e-164 % of compl. enum.)
-n_c/np : 0.526733 (=n_c/np with n_c = 266, np = 505)
-Qmod   : 0.504753
-Q      : -0.0314858
+fcount : 1 (1.2513e-145 % of compl. enum.)
+fcount : 0.001k (1.2513e-145 % of compl. enum.)
+n_c/np : 0.00408163 (=n_c/np with n_c = 2, np = 490)
+Qmod   : 0.972653
+Q      : 0.0232657
 ----------------------------------------------------
-fcount : 2 (1.08533e-163 % of compl. enum.)
-fcount : 0.002k (1.08533e-163 % of compl. enum.)
-n_c/np : 0.50297 (=n_c/np with n_c = 254, np = 505)
-Qmod   : 0.511476
-Q      : -0.0144462
+fcount : 54 (6.75703e-144 % of compl. enum.)
+fcount : 0.054k (6.75703e-144 % of compl. enum.)
+n_c/np : 0.00612245 (=n_c/np with n_c = 3, np = 490)
+Qmod   : 0.956753
+Q      : 0.0371242
 ----------------------------------------------------
-fcount : 5 (2.71333e-163 % of compl. enum.)
-fcount : 0.005k (2.71333e-163 % of compl. enum.)
-n_c/np : 0.485149 (=n_c/np with n_c = 245, np = 505)
-Qmod   : 0.502398
-Q      : 0.0124533
+fcount : 111 (1.38895e-143 % of compl. enum.)
+fcount : 0.111k (1.38895e-143 % of compl. enum.)
+n_c/np : 0.0265306 (=n_c/np with n_c = 13, np = 490)
+Qmod   : 0.903809
+Q      : 0.0696605
 ----------------------------------------------------
-fcount : 11 (5.96932e-163 % of compl. enum.)
-fcount : 0.011k (5.96932e-163 % of compl. enum.)
-n_c/np : 0.471287 (=n_c/np with n_c = 238, np = 505)
-Qmod   : 0.500382
-Q      : 0.0283306
+fcount : 120 (1.50156e-143 % of compl. enum.)
+fcount : 0.12k (1.50156e-143 % of compl. enum.)
+n_c/np : 0.077551 (=n_c/np with n_c = 38, np = 490)
+Qmod   : 0.832637
+Q      : 0.0898118
 ----------------------------------------------------
-fcount : 13 (7.05465e-163 % of compl. enum.)
-fcount : 0.013k (7.05465e-163 % of compl. enum.)
-n_c/np : 0.457426 (=n_c/np with n_c = 231, np = 505)
-Qmod   : 0.502254
-Q      : 0.0403198
+fcount : 134 (1.67674e-143 % of compl. enum.)
+fcount : 0.134k (1.67674e-143 % of compl. enum.)
+n_c/np : 0.0122449 (=n_c/np with n_c = 6, np = 490)
+Qmod   : 0.89065
+Q      : 0.0971051
 ----------------------------------------------------
-fcount : 23 (1.24813e-162 % of compl. enum.)
-fcount : 0.023k (1.24813e-162 % of compl. enum.)
-n_c/np : 0.457426 (=n_c/np with n_c = 231, np = 505)
-Qmod   : 0.501692
-Q      : 0.0408822
+fcount : 141 (1.76434e-143 % of compl. enum.)
+fcount : 0.141k (1.76434e-143 % of compl. enum.)
+n_c/np : 0.0183673 (=n_c/np with n_c = 9, np = 490)
+Qmod   : 0.741988
+Q      : 0.239645
 ----------------------------------------------------
-fcount : 52 (2.82186e-162 % of compl. enum.)
-fcount : 0.052k (2.82186e-162 % of compl. enum.)
-n_c/np : 0.225743 (=n_c/np with n_c = 114, np = 505)
-Qmod   : 0.589953
-Q      : 0.184305
+fcount : 168 (2.10219e-143 % of compl. enum.)
+fcount : 0.168k (2.10219e-143 % of compl. enum.)
+n_c/np : 0.0102041 (=n_c/np with n_c = 5, np = 490)
+Qmod   : 0.746864
+Q      : 0.242931
 ----------------------------------------------------
-fcount : 53 (2.87613e-162 % of compl. enum.)
-fcount : 0.053k (2.87613e-162 % of compl. enum.)
-n_c/np : 0.213861 (=n_c/np with n_c = 108, np = 505)
-Qmod   : 0.502303
-Q      : 0.283835
+fcount : 169 (2.1147e-143 % of compl. enum.)
+fcount : 0.169k (2.1147e-143 % of compl. enum.)
+n_c/np : 0.00612245 (=n_c/np with n_c = 3, np = 490)
+Qmod   : 0.746864
+Q      : 0.247013
 ----------------------------------------------------
-fcount : 54 (2.93039e-162 % of compl. enum.)
-fcount : 0.054k (2.93039e-162 % of compl. enum.)
-n_c/np : 0.20198 (=n_c/np with n_c = 102, np = 505)
-Qmod   : 0.501391
-Q      : 0.296629
+fcount : 178 (2.22732e-143 % of compl. enum.)
+fcount : 0.178k (2.22732e-143 % of compl. enum.)
+n_c/np : 0.044898 (=n_c/np with n_c = 22, np = 490)
+Qmod   : 0.629333
+Q      : 0.325769
 ----------------------------------------------------
-fcount : 75 (4.06999e-162 % of compl. enum.)
-fcount : 0.075k (4.06999e-162 % of compl. enum.)
-n_c/np : 0.176238 (=n_c/np with n_c = 89, np = 505)
-Qmod   : 0.500187
-Q      : 0.323576
+fcount : 221 (2.76538e-143 % of compl. enum.)
+fcount : 0.221k (2.76538e-143 % of compl. enum.)
+n_c/np : 0.0306122 (=n_c/np with n_c = 15, np = 490)
+Qmod   : 0.540531
+Q      : 0.428857
 ----------------------------------------------------
-fcount : 137 (7.43452e-162 % of compl. enum.)
-fcount : 0.137k (7.43452e-162 % of compl. enum.)
-n_c/np : 0.172277 (=n_c/np with n_c = 87, np = 505)
-Qmod   : 0.503018
-Q      : 0.324705
+fcount : 222 (2.77789e-143 % of compl. enum.)
+fcount : 0.222k (2.77789e-143 % of compl. enum.)
+n_c/np : 0.0346939 (=n_c/np with n_c = 17, np = 490)
+Qmod   : 0.511196
+Q      : 0.45411
 ----------------------------------------------------
-fcount : 192 (1.04192e-161 % of compl. enum.)
-fcount : 0.192k (1.04192e-161 % of compl. enum.)
-n_c/np : 0.166337 (=n_c/np with n_c = 84, np = 505)
-Qmod   : 0.500006
-Q      : 0.333657
+fcount : 223 (2.7904e-143 % of compl. enum.)
+fcount : 0.223k (2.7904e-143 % of compl. enum.)
+n_c/np : 0.0204082 (=n_c/np with n_c = 10, np = 490)
+Qmod   : 0.515499
+Q      : 0.464092
 ----------------------------------------------------
-fcount : 408 (2.21408e-161 % of compl. enum.)
-fcount : 0.408k (2.21408e-161 % of compl. enum.)
-n_c/np : 0.164356 (=n_c/np with n_c = 83, np = 505)
-Qmod   : 0.501256
-Q      : 0.334388
+fcount : 502 (6.28154e-143 % of compl. enum.)
+fcount : 0.502k (6.28154e-143 % of compl. enum.)
+n_c/np : 0.0244898 (=n_c/np with n_c = 12, np = 490)
+Qmod   : 0.511295
+Q      : 0.464216
 ----------------------------------------------------
-fcount : 922 (5.00338e-161 % of compl. enum.)
-fcount : 0.922k (5.00338e-161 % of compl. enum.)
-n_c/np : 0.146535 (=n_c/np with n_c = 74, np = 505)
-Qmod   : 0.506354
-Q      : 0.347112
+fcount : 506 (6.33159e-143 % of compl. enum.)
+fcount : 0.506k (6.33159e-143 % of compl. enum.)
+n_c/np : 0.0265306 (=n_c/np with n_c = 13, np = 490)
+Qmod   : 0.508691
+Q      : 0.464779
 ----------------------------------------------------
-fcount : 923 (5.0088e-161 % of compl. enum.)
-fcount : 0.923k (5.0088e-161 % of compl. enum.)
-n_c/np : 0.148515 (=n_c/np with n_c = 75, np = 505)
-Qmod   : 0.500422
-Q      : 0.351063
+fcount : 578 (7.23253e-143 % of compl. enum.)
+fcount : 0.578k (7.23253e-143 % of compl. enum.)
+n_c/np : 0.0163265 (=n_c/np with n_c = 8, np = 490)
+Qmod   : 0.506018
+Q      : 0.477656
 ----------------------------------------------------
-fcount : 3.442k (1.86786e-160 % of compl. enum.)
-n_c/np : 0.146535 (=n_c/np with n_c = 74, np = 505)
-Qmod   : 0.501577
-Q      : 0.351889
+fcount : 943 (1.17998e-142 % of compl. enum.)
+fcount : 0.943k (1.17998e-142 % of compl. enum.)
+n_c/np : 0.0204082 (=n_c/np with n_c = 10, np = 490)
+Qmod   : 0.501477
+Q      : 0.478114
 ----------------------------------------------------
-fcount : 3.594k (1.95034e-160 % of compl. enum.)
-n_c/np : 0.144554 (=n_c/np with n_c = 73, np = 505)
-Qmod   : 0.500306
-Q      : 0.355139
+fcount : 1.086k (1.35891e-142 % of compl. enum.)
+n_c/np : 0.0163265 (=n_c/np with n_c = 8, np = 490)
+Qmod   : 0.503922
+Q      : 0.479752
 ----------------------------------------------------
-fcount : 4.253k (2.30796e-160 % of compl. enum.)
-n_c/np : 0.138614 (=n_c/np with n_c = 70, np = 505)
-Qmod   : 0.50037
-Q      : 0.361016
+fcount : 1.087k (1.36017e-142 % of compl. enum.)
+n_c/np : 0.0163265 (=n_c/np with n_c = 8, np = 490)
+Qmod   : 0.502516
+Q      : 0.481158
 ----------------------------------------------------
-fcount : 5.252k (2.85008e-160 % of compl. enum.)
-n_c/np : 0.134653 (=n_c/np with n_c = 68, np = 505)
-Qmod   : 0.502278
-Q      : 0.363069
+fcount : 1.088k (1.36142e-142 % of compl. enum.)
+n_c/np : 0.0102041 (=n_c/np with n_c = 5, np = 490)
+Qmod   : 0.504088
+Q      : 0.485708
 ----------------------------------------------------
-fcount : 6.068k (3.2929e-160 % of compl. enum.)
-n_c/np : 0.132673 (=n_c/np with n_c = 67, np = 505)
-Qmod   : 0.503191
-Q      : 0.364136
+fcount : 1.735k (2.17101e-142 % of compl. enum.)
+n_c/np : 0.0122449 (=n_c/np with n_c = 6, np = 490)
+Qmod   : 0.500405
+Q      : 0.48735
 ----------------------------------------------------
-fcount : 6.216k (3.37321e-160 % of compl. enum.)
-n_c/np : 0.134653 (=n_c/np with n_c = 68, np = 505)
-Qmod   : 0.5004
-Q      : 0.364946
+fcount : 2.024k (2.53264e-142 % of compl. enum.)
+n_c/np : 0.0122449 (=n_c/np with n_c = 6, np = 490)
+Qmod   : 0.500055
+Q      : 0.4877
 ----------------------------------------------------
-fcount : 6.377k (3.46058e-160 % of compl. enum.)
-n_c/np : 0.134653 (=n_c/np with n_c = 68, np = 505)
-Qmod   : 0.500336
-Q      : 0.365011
+fcount : 2.209k (2.76413e-142 % of compl. enum.)
+n_c/np : 0.00816327 (=n_c/np with n_c = 4, np = 490)
+Qmod   : 0.502991
+Q      : 0.488846
 ----------------------------------------------------
-fcount : 6.554k (3.55663e-160 % of compl. enum.)
-n_c/np : 0.126733 (=n_c/np with n_c = 64, np = 505)
-Qmod   : 0.503132
-Q      : 0.370136
+fcount : 2.21k (2.76538e-142 % of compl. enum.)
+n_c/np : 0.00612245 (=n_c/np with n_c = 3, np = 490)
+Qmod   : 0.500941
+Q      : 0.492936
 ----------------------------------------------------
-fcount : 6.691k (3.63098e-160 % of compl. enum.)
-n_c/np : 0.124752 (=n_c/np with n_c = 63, np = 505)
-Qmod   : 0.50342
-Q      : 0.371827
+fcount : 2.211k (2.76663e-142 % of compl. enum.)
+n_c/np : 0.00204082 (=n_c/np with n_c = 1, np = 490)
+Qmod   : 0.500939
+Q      : 0.49702
 ----------------------------------------------------
-fcount : 6.728k (3.65105e-160 % of compl. enum.)
-n_c/np : 0.122772 (=n_c/np with n_c = 62, np = 505)
-Qmod   : 0.502747
-Q      : 0.37448
-----------------------------------------------------
-fcount : 7.798k (4.23171e-160 % of compl. enum.)
-n_c/np : 0.120792 (=n_c/np with n_c = 61, np = 505)
-Qmod   : 0.50038
-Q      : 0.378828
-----------------------------------------------------
-fcount : 9.755k (5.2937e-160 % of compl. enum.)
-n_c/np : 0.118812 (=n_c/np with n_c = 60, np = 505)
-Qmod   : 0.500146
-Q      : 0.381042
-----------------------------------------------------
-fcount : 11.369k (6.16957e-160 % of compl. enum.)
-n_c/np : 0.114851 (=n_c/np with n_c = 58, np = 505)
-Qmod   : 0.501649
-Q      : 0.3835
-----------------------------------------------------
-fcount : 11.877k (6.44524e-160 % of compl. enum.)
-n_c/np : 0.114851 (=n_c/np with n_c = 58, np = 505)
-Qmod   : 0.501611
-Q      : 0.383537
-----------------------------------------------------
-fcount : 12.183k (6.6113e-160 % of compl. enum.)
-n_c/np : 0.114851 (=n_c/np with n_c = 58, np = 505)
-Qmod   : 0.500984
-Q      : 0.384164
-----------------------------------------------------
-fcount : 13.056k (7.08504e-160 % of compl. enum.)
-n_c/np : 0.112871 (=n_c/np with n_c = 57, np = 505)
-Qmod   : 0.500156
-Q      : 0.386972
-----------------------------------------------------
-fcount : 13.208k (7.16753e-160 % of compl. enum.)
-n_c/np : 0.112871 (=n_c/np with n_c = 57, np = 505)
-Qmod   : 0.500012
-Q      : 0.387117
-----------------------------------------------------
-fcount : 14.113k (7.65864e-160 % of compl. enum.)
-n_c/np : 0.112871 (=n_c/np with n_c = 57, np = 505)
-Qmod   : 0.500001
-Q      : 0.387128
-----------------------------------------------------
-fcount : 15.055k (8.16983e-160 % of compl. enum.)
-n_c/np : 0.112871 (=n_c/np with n_c = 57, np = 505)
-Qmod   : 0.5
-Q      : 0.387129
-----------------------------------------------------
-fcount : 15.211k (8.25449e-160 % of compl. enum.)
-n_c/np : 0.112871 (=n_c/np with n_c = 57, np = 505)
-Qmod   : 0.5
-Q      : 0.387129
-----------------------------------------------------
-fcount : 16.188k (8.78467e-160 % of compl. enum.)
-n_c/np : 0.112871 (=n_c/np with n_c = 57, np = 505)
-Qmod   : 0.5
-Q      : 0.387129
-----------------------------------------------------
-fcount : 16.568k (8.99089e-160 % of compl. enum.)
-n_c/np : 0.112871 (=n_c/np with n_c = 57, np = 505)
-Qmod   : 0.5
-Q      : 0.387129
-----------------------------------------------------
-fcount : 23.208k (1.25942e-159 % of compl. enum.)
-n_c/np : 0.112871 (=n_c/np with n_c = 57, np = 505)
-Qmod   : 0.5
-Q      : 0.387129
-----------------------------------------------------
-fcount : 38.266k (2.07656e-159 % of compl. enum.)
-n_c/np : 0.112871 (=n_c/np with n_c = 57, np = 505)
-Qmod   : 0.5
-Q      : 0.387129
-----------------------------------------------------
-fcount : 75.539k (4.09924e-159 % of compl. enum.)
-n_c/np : 0.112871 (=n_c/np with n_c = 57, np = 505)
-Qmod   : 0.5
-Q      : 0.387129
-----------------------------------------------------
-fcount : 311.801k (1.69204e-158 % of compl. enum.)
-n_c/np : 0.112871 (=n_c/np with n_c = 57, np = 505)
-Qmod   : 0.5
-Q      : 0.387129
+fcount : 2.212k (2.76788e-142 % of compl. enum.)
+n_c/np : 0.00204082 (=n_c/np with n_c = 1, np = 490)
+Qmod   : 0.50001
+Q      : 0.497949
 ----------------------------------------------------

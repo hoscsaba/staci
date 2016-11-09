@@ -23,4 +23,8 @@ public:
     {
         return "KonstNyomas";
     }
+    string Get_Tipus()
+    {
+        return "KonstNyomas";
+    }
 };

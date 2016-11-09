@@ -88,7 +88,7 @@ CPP_DEPS += \
 %.o: ../%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -I/usr/local/include -I /usr/local/include/eigen3 -O2 -g -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@"  "$<"
+	g++ -I/usr/local/include -I/usr/local/include/eigen3 -O2 -g -Wall -c -fmessage-length=0 -pedantic -ansi -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@"  "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -96,7 +96,7 @@ CPP_DEPS += \
 all: staci_calibrate
 
 staci_calibrate: $(OBJS) $(USER_OBJS)
-	g++ -o staci_split $(OBJS) $(USER_OBJS) -L/usr/local/lib -L/usr/lib -lga -lm -lumfpack
+	g++ -o staci_split $(OBJS) $(USER_OBJS) -L/usr/local/lib -L/usr/lib -L/usr/local/lib -ligraph -lga -lm -lumfpack
 
 clean:
 	-rm $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) staci_split

@@ -2,11 +2,13 @@
     <global_debug_level>1</global_debug_level>
     <n_comm>2</n_comm>
      <!-- <fname> jwrpm_test2.spr</fname>  -->
-     <fname> VIZ-SOPTVR-E-input_mod.spr</fname> 
+     <!-- <fname> VIZ-SOPTVR-E-input_mod2.spr</fname>  -->
+     <fname> BUK-AMEVAV-1-80-input_mod.spr</fname> 
+     <!-- <weight_type>topology</weight_type> -->
      <weight_type>dp</weight_type>
      <logfilename> staci_split.log</logfilename>
     <popsize> 50</popsize>
     <ngen> 100000</ngen>
-    <pmut> 0.5</pmut>
+    <pmut> 0.05</pmut>
     <pcross> 0.6</pcross>
 </settings>
