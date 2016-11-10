@@ -1,7 +1,7 @@
-
 #ifndef AGELEM_H
 #define AGELEM_H
 #include <iostream>
+#include <vector>
 using namespace std;
 
 class Agelem

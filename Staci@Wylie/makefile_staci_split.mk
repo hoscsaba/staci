@@ -96,7 +96,7 @@ CPP_DEPS += \
 all: staci_calibrate
 
 staci_calibrate: $(OBJS) $(USER_OBJS)
-	g++ -o staci_split $(OBJS) $(USER_OBJS) -L/usr/local/lib -L/usr/lib -lga -lm -lumfpack
+	g++ -o staci_split $(OBJS) $(USER_OBJS) -L/usr/local/lib -L/usr/lib -ligraph -lga -lm -lumfpack
 
 clean:
 	-rm $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) staci_split

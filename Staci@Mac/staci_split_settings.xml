@@ -1,6 +1,6 @@
 <settings>
     <global_debug_level>1</global_debug_level>
-    <n_comm>2</n_comm>
+    <n_comm>4</n_comm>
      <!-- <fname> jwrpm_test2.spr</fname>  -->
      <!-- <fname> VIZ-SOPTVR-E-input_mod2.spr</fname>  -->
      <fname> BUK-AMEVAV-1-80-input_mod.spr</fname> 
