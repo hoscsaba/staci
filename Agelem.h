@@ -63,7 +63,7 @@ public:
     {
         return 0.0;
     }
-    /// Get double property, Cso es Csatorna akarja elulirja
+    /// Get double property, Cso es Csatorna akarja felulirja
     double Get_Aref()
     {
         return Aref;

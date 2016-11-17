@@ -108,7 +108,7 @@ string Szivattyu::Info() {
 //! Pump branch equation
 /*!
 The function evaluates the curve fit by the constructor \sa Szivattyu()
-\param x vector<double> 
+\param x vector<double>
 \param x(0)=pstart/ro/g
 \param x(1)=pend/ro/g
 \param x(2)=zstart
@@ -173,22 +173,6 @@ vector<double> Szivattyu::df(vector<double> x) {
         for (int i = 1; i < fokszam; i++) der += p[i] * i * pow(mp / ro, i - 1);
     der /= -ro;
 
-    // Csunya megoldas: numerikus derivalt kiszamitasa
-    //    double mp_old=mp;
-    //    double f0=f(x);
-    //    double dmp;
-    //    if (abs(mp)>0.01)
-    //  dmp=mp*0.01;
-    //    else
-    //  dmp=0.0001;
-    //
-    //    mp+=dmp;
-    //    double f1=f(x);
-    //    mp=mp_old;
-    //
-    //    double der_num = (f1-f0)/dmp;
-
-
     //--------------------------------
     // HCs. 2014.07.30.
     // EZ FONTOS, NEGATIV MEREDEKSEGU SZIV: KARAKTERISZTIKA ESETEN
@@ -199,11 +183,7 @@ vector<double> Szivattyu::df(vector<double> x) {
 
     ere.push_back(der);
 
-    //cout<<endl<<"mp="<<mp<<" kg/s, der="<<der<<", der_num="<<der_num;
-
     ere.push_back(0.0);
-
-    //cout<< "--> der="<<der;
 
     return ere;
 }
@@ -239,8 +219,12 @@ double Szivattyu::Get_dprop(string mit) {
         out = mp;
     else if ((mit == "concentration") || (mit == "konc_atlag"))
         out = konc_atlag;
+    else if (mit == "headloss")
+        out = abs(PumpCharCurve(mp / ro));
+    else if (mit == "headloss_per_unit_length")
+        out = abs(PumpCharCurve(mp / ro));
     else {
-        cout << endl << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit="
+        cout << endl << "HIBA! Szivattyu::Get_dprop(mit), ismeretlen bemenet: mit="
              << mit << endl << endl;
         out = 0.0;
     }

@@ -628,6 +628,7 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
                 Node_edges.getChildNode("edge", i).getChildNode("travel_time").addText(os.str().c_str());
 
                 aref = agelemek.at(i)->Get_Aref();
+                // cout<<endl<<"--> "<<agelemek.at(i)->Get_nev()<<" aref="<<aref; cin.get();
                 Node_edges.getChildNode("edge", i).getChildNode("aref").deleteText();
                 os.str("");
                 os << scientific << setprecision(5) << aref;

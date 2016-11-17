@@ -1,14 +1,17 @@
 <settings>
     <global_debug_level>1</global_debug_level>
-    <n_comm>4</n_comm>
-     <!-- <fname> jwrpm_test2.spr</fname>  -->
-     <!-- <fname> VIZ-SOPTVR-E-input_mod2.spr</fname>  -->
-     <fname> BUK-AMEVAV-1-80-input_mod.spr</fname> 
-     <!-- <weight_type>topology</weight_type> -->
-     <weight_type>dp</weight_type>
-     <logfilename> staci_split.log</logfilename>
+    <n_comm>1</n_comm>
+    <fname> jwrpm_test2.spr</fname> 
+    <!-- <fname> VIZ-SOPTVR-E-input_mod2.spr</fname>  -->
+    <!-- <fname> BUK-AMEVAV-1-80-input_mod.spr</fname>  -->
+    <!-- <weight_type>topology</weight_type> -->
+    <!-- <obj_type>modularity</obj_type> -->
+    <!-- <weight_type>dp</weight_type> -->
+    <obj_type>A-optimality</obj_type>
+    <weight_type>friction_coeff</weight_type>
+    <logfilename> staci_split.log</logfilename>
     <popsize> 50</popsize>
-    <ngen> 100000</ngen>
+    <ngen> 20000</ngen>
     <pmut> 0.05</pmut>
     <pcross> 0.6</pcross>
 </settings>

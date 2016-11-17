@@ -14,10 +14,10 @@ using namespace std;
 #include "Agelem.h"
 
 Cso::Cso(const string a_nev, const string a_cspe_nev, const string a_cspv_nev,
-         const double a_ro, const double a_L, const double a_D,
-         const double a_erdesseg, const double a_cl_k, const double a_cl_w,
-         const double a_mp)
-    : Agelem(a_nev, a_D * a_D * pi / 4, a_mp, a_ro) {
+ const double a_ro, const double a_L, const double a_D,
+ const double a_erdesseg, const double a_cl_k, const double a_cl_w,
+ const double a_mp)
+: Agelem(a_nev, a_D * a_D * pi / 4., a_mp, a_ro) {
   // Kotelezo adatok minden Agelemnel:
   tipus = "Cso";
   csp_db = 2;
@@ -48,10 +48,10 @@ void Cso::Set_friction_model(string a_fric_type) {
       friction_model_type = 1;
     else {
       cout << endl
-           << "HIBA! Cso::ComputeHeadloss, ismeretlen surlodasi modell (DW|HW) "
-              ": "
-           << a_fric_type << endl
-           << endl;
+      << "HIBA! Cso::ComputeHeadloss, ismeretlen surlodasi modell (DW|HW) "
+      ": "
+      << a_fric_type << endl
+      << endl;
     }
   }
 }
@@ -64,14 +64,14 @@ string Cso::Info() {
   ostringstream strstrm;
   strstrm << Agelem::Info();
   strstrm << "\n  kapcsolodas : " << cspe_nev << "(index:" << cspe_index
-          << ") --> " << cspv_nev << "(index:" << cspv_index << ")\n";
+  << ") --> " << cspv_nev << "(index:" << cspv_index << ")\n";
   strstrm << "       adatok : L=" << L << "[m], D=" << D
-          << "[m], erdesseg=" << erdesseg << "[mm], lambda=" << lambda << "[-]";
+  << "[m], erdesseg=" << erdesseg << "[mm], lambda=" << lambda << "[-]";
   strstrm << endl
-          << "                klor lebomlasi allando         : cl_k=" << cl_k;
+  << "                klor lebomlasi allando         : cl_k=" << cl_k;
   strstrm << endl
-          << "                klor lebomlasi allando a falnal: cl_w=" << cl_w
-          << endl;
+  << "                klor lebomlasi allando a falnal: cl_w=" << cl_w
+  << endl;
 
   return strstrm.str();
 }
@@ -105,7 +105,7 @@ vector<double> Cso::df(vector<double> x) {
   ere.push_back(-ro * g * (hv - he));
 
   for (unsigned int i = 0; i < ere.size(); i++) ere.at(i) /= ro * g;
-  return ere;
+    return ere;
 }
 
 //--------------------------------------------------------------
@@ -152,19 +152,19 @@ double Cso::surlodas() {
         unsigned int i = 0;
         while ((hiba > 1e-6) && (i < 10)) {
           ize = -2.0 *
-                log10(erdesseg / 1000 / D / 3.71 + 2.51 / Re / sqrt(lambda));
+          log10(erdesseg / 1000 / D / 3.71 + 2.51 / Re / sqrt(lambda));
           lambda_uj = 1 / ize / ize;
           hiba = fabs((lambda - lambda_uj) / lambda);
           lambda = lambda_uj;
         }
         if (i > 8)
           cout << endl
-               << endl
-               << "WARNING: " << nev << endl
-               << "\t\t pipe " << nev
-               << " friction factor coefficient iteration #" << i;
+        << endl
+        << "WARNING: " << nev << endl
+        << "\t\t pipe " << nev
+        << " friction factor coefficient iteration #" << i;
       } else
-        lambda = 0.02;
+      lambda = 0.02;
     }
   }
 
@@ -182,23 +182,23 @@ double Cso::surlodas() {
 
         if (C_factor < 10.) {
           cout << endl
-               << "\tWARNING: "
-               << " pipe " << nev
-               << " friction factor is set to Hazen-Williams but the friction "
-                  "factor is too small (C_HW="
-               << C_factor << ").";
+          << "\tWARNING: "
+          << " pipe " << nev
+          << " friction factor is set to Hazen-Williams but the friction "
+          "factor is too small (C_HW="
+          << C_factor << ").";
           cout << " -> OVERRIDING by C_HW=10.";
           C_factor = 10.;
           erdesseg = 10.;
         }
 
         dp = L / pow(C_factor, 1.85) / pow(D, 4.87) * 7.88 / pow(0.85, 1.85) *
-             pow(fabs(v * Aref), 0.85) * (v * Aref) * ro * g;
+        pow(fabs(v * Aref), 0.85) * (v * Aref) * ro * g;
 
         lambda = fabs(dp / (L / D * ro / 2 * v * fabs(v)));
 
       } else
-        lambda = 0.02;
+      lambda = 0.02;
     }
   }
 
@@ -249,8 +249,9 @@ double Cso::Get_dprop(string mit) {
     out = konc_atlag;
   else {
     cout << endl
-         << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit=" << mit << endl
-         << endl;
+    << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit=" << mit << endl
+    << endl;
+    cout<<endl<<"Name of pipe: "<<nev<<endl;
     out = 0.0;
   }
   return out;
@@ -262,25 +263,29 @@ double Cso::Get_dfdmu(string mit) {
   if (mit == "diameter")
     out = -5. * surlodas() * L / pow(D, 6) * 8 / ro / pow(pi, 2) * mp *
           abs(mp);  // Pa/m
-  else if (mit == "friction_coeff") {
+          else if (mit == "friction_coeff") {
     // equation: f(friction_coeff) = 0 = pv - pe + tag1 + ComputeHeadloss();
-    double old_erdesseg = erdesseg;
-    double f0 = ComputeHeadloss();
-    double delta_erdesseg = erdesseg * 0.01;
-    erdesseg += erdesseg + delta_erdesseg;
-    double f1 = ComputeHeadloss();
-    double deriv = (f1 - f0) / delta_erdesseg;
-    // cout << endl
+            // out = -L / pow(D, 5) * 8 / ro / pow(pi, 2) * mp *
+          // abs(mp);  // Pa/m
+            double old_erdesseg = erdesseg;
+            double f0 = ComputeHeadloss();
+            double delta_erdesseg = erdesseg * 0.1;
+            erdesseg += delta_erdesseg;
+            double f1 = ComputeHeadloss();
+            out = (f1 - f0) / delta_erdesseg;
+            erdesseg = old_erdesseg;
+    // cout << endl<<" out ="<<out<<", deriv = "<<deriv;
     //      << "Get_dfdmu -> f0=" << f0 << ", f1=" << f1
     //      << ", (f1-f0)/(Delta)=" << deriv;
     // cin.get();
-    out = deriv;
-  } else {
-    cout << endl
-         << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit=" << mit << endl
-         << endl;
-    out = 0.0;
-  }
+    // out = deriv;
+          } else {
+            cout << endl
+            << "HIBA! Cso::Get_dfdmu(mit), ismeretlen bemenet: mit=" << mit << endl
+            << endl;
+            cout<<endl<<"Name of pipe: "<<nev<<endl;
+            out = 0.0;
+          }
   return out / ro / g;  // Itt osztom vissza ro*g-vel
 }
 
@@ -294,8 +299,8 @@ void Cso::Set_dprop(string mit, double mire) {
     konc_atlag = mire;
   } else {
     cout << endl
-         << "HIBA! Cso::Set_dprop(mit), ismeretlen bemenet: mit=" << mit << endl
-         << endl;
+    << "HIBA! Cso::Set_dprop(mit), ismeretlen bemenet: mit=" << mit << endl
+    << endl;
   }
 }
 
@@ -324,5 +329,5 @@ double Cso::ComputeHeadlossDerivative() {
   double der;
   der = surlodas() * L / pow(D, 5) * 8 / ro / pow(pi, 2) * 2 *
         abs(mp);  // Pa/(kg/s)
-  return der;
-}
+        return der;
+      }
