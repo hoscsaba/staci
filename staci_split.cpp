@@ -191,11 +191,11 @@ void Save_Membership(GAGenome & c) {
     int node_count = 0;
     for (int i = 0; i < n_comm; i++) {
         fprintf(pFile, "#%d; ", i);
-        strstrm<<endl<<"comm. #"<<i<<": ";
+        strstrm << endl << "comm. #" << i << ": ";
         for (int j = 0 ; j < n_n; j++) {
             if (genome.gene(j) == i) {
                 fprintf (pFile, "%s; ", wds->cspok.at(j)->Get_nev().c_str());
-                strstrm<<wds->cspok.at(j)->Get_nev().c_str()<<" ";
+                strstrm << wds->cspok.at(j)->Get_nev().c_str() << " ";
                 node_count++;
             }
         }
@@ -506,8 +506,10 @@ void D_Optimize() {
     genome.mutator(Mutator);
 
     GASteadyStateGA ga(genome);
-    if (obj_type == "A-optimality")
+    if (obj_type == "A-optimality") {
         ga.minimize();
+        best_Q = +100.;
+    }
 
     ga.set(gaNpopulationSize, popsize);
     ga.set(gaNpCrossover, pcross);
@@ -951,6 +953,7 @@ float D_Objective(GAGenome & c) {
                 Q = 0.;
                 for (unsigned int i = 0; i < n_comm; i++)
                     Q += sqrt(Cov(i, i));
+                // Q = sqrt(Cov.trace());
                 Q /= n_comm;
                 if (obj_info) {
                     cout << endl << endl << "jac.transpose() * jac" << endl << jac.transpose() * jac;
@@ -1009,7 +1012,12 @@ float D_Objective(GAGenome & c) {
         cin.get();
 
 
-    if ((Q > best_Q) || (info)) {
+    bool add_info = false;
+    if ((obj_type == "D-optimality") && (Q > best_Q))
+        add_info = true;
+    if ((obj_type == "A-optimality") && (Q < best_Q))
+        add_info = true;
+    if ((add_info) || (info)) {
         best = tmp;
         best_Q = Q;
 
@@ -1143,7 +1151,7 @@ void LoadMatrices(MatrixXd & A, VectorXd & W, VectorXd & p, string weight_type) 
     }
 
     if (0 == strcmp(weight_type.c_str(), "dp")) {
-        double dp, dp_max = -1., weight_min = 0.0001;
+        double dp, dp_max = -1., weight_min = 1.e-5;
         for (unsigned int i = 0; i < W.size(); i++) {
             // dp = wds->agelemek.at(pipe_idx.at(i))->Get_dprop("mass_flow_rate");
             dp = wds->agelemek.at(pipe_idx.at(i))->Get_dprop("headloss");
@@ -1161,6 +1169,54 @@ void LoadMatrices(MatrixXd & A, VectorXd & W, VectorXd & p, string weight_type) 
         }
     }
 
+    if (0 == strcmp(weight_type.c_str(), "sensitivity")) {
+        // Add total sensitivities
+        bool is_edge_prop;
+
+        if (weight_type_mod == "friction_coeff") {
+            is_edge_prop = true;
+            PerformSensitivityAnalysis(true /*is_edge_prop*/, "friction_coeff", "sensitivity_matrix_friction_coeff.csv");
+        }
+        else if (weight_type_mod == "diameter") {
+            is_edge_prop = true;
+            PerformSensitivityAnalysis(true/*is_edge_prop*/, "diameter", "sensitivity_matrix_diameter.csv");
+        }
+        else if (weight_type_mod == "demand") {
+            is_edge_prop = false;
+            PerformSensitivityAnalysis(false /*is_edge_prop*/, "demand", "sensitivity_matrix_demand.csv");
+        }
+        else {
+            cout << endl << endl << "ERROR: illegal weight_type: >" << weight_type << "<" << endl;
+            exit(-1);
+        }
+        vector<double> node_weights;
+        int n_nodes = wds->cspok.size();
+        for (int i = 0 ; i < n_nodes; i++) {
+            double tmp = 0.;
+            for (int j = 0 ; j < SM_PR.size(); j++) {
+                tmp += SM_PR.at(j).at(i) * SM_PR.at(j).at(i);
+            }
+            node_weights.push_back(sqrt(tmp));
+        }
+        for (unsigned int i = 0; i < W.size(); i++) {
+            int idx_n1 = wds->agelemek.at(i)->Get_Cspe_Index();
+            int idx_n2 = wds->agelemek.at(i)->Get_Cspv_Index();
+            double w1, w2;
+            if (idx_n1 < 0)
+                w1 = 0;
+            else
+                w1 = node_weights.at(idx_n1);
+            if (idx_n2 < 0)
+                w2 = 0;
+            else
+                w2 = node_weights.at(idx_n2);
+            W(i) = (w1 + w2) / 2.;
+            // cout << endl << wds->agelemek.at(i)->Get_nev() << ": ";
+            // cout << "idx_n1:" << idx_n1 << ", w1=" << w1 << " ---> ";
+            // cout << "idx_n2:" << idx_n2 << ", w2=" << w2;
+        }
+    }
+    // cin.get();
     // Final computations
     p = abs_Apn.transpose() * W;
     sumW = W.sum();
@@ -1238,7 +1294,7 @@ void Load_Settings() {
 
     bool is_weight_ok = false;
     if (obj_type == "modularity") {
-        if ( (weight_type == "topology") || (weight_type == "dp") ) {
+        if ( (weight_type == "topology") || (weight_type == "dp") || (weight_type == "sensitivity")) {
             // msg << " (ok)" << endl;
             is_weight_ok = true;
         }
