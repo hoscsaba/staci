@@ -19,7 +19,9 @@ Csomopont::Csomopont(const string a_nev,
 {
     // A fogyasztas m3/h-ban erkezik...
     ro = a_ro;
-    fogy = a_fogy / 3600 * ro;
+
+    fogy = a_fogy / 3600. * ro;
+
     h = a_h;
     p_head = 1 * ro * 9.81;
     // azonosito
@@ -31,13 +33,7 @@ Csomopont::Csomopont(const string a_nev,
     p_head = pressure;
 
     konc_atlag = 0.0;
-    tt = a_tt*3600.; // travel time, órában jön, de s-ban fogunk számolni
-
-
-    // if (a_nev=="NODE_3998554"){
-    //     cout<<"\n\n "<<a_nev<<": tt="<<tt<<"\n\n";
-    //     cin.get();
-    // }
+    tt = a_tt * 3600.; // travel time, órában jön, de s-ban fogunk számolni
 }
 
 //--------------------------------------------------------------
@@ -46,29 +42,29 @@ Csomopont::~Csomopont()
 }
 
 //--------------------------------------------------------------
-string Csomopont::Info()
+string Csomopont::Info(bool check_if_lonely)
 {
     ostringstream strstrm;
-    strstrm << "\n Csomopont neve: " << nev;
-    strstrm << "\n       magassag: " << h << " m";
-    strstrm << "\n           head: " << p_head << " m (=p[Pa]/ro/g)";
-    strstrm << "\n       pressure: " << p_head *ro * 9.81 << " Pa";
-    strstrm << "\n        suruseg: " << ro << " kg/m3";
-    strstrm << "\n        elvetel: " << fogy << " kg/s = " << fogy * 3600 / ro << " m3/h";
-    strstrm << "\n         vizkor: " << tt << " s = " << tt/ 60. << " min";
-    strstrm << "\n    erkezo agak: ";
+    strstrm << "\n       Node name: " << nev;
+    strstrm << "\n          height: " << h << " m";
+    strstrm << "\n            head: " << p_head << " m (=p[Pa]/ro/g)";
+    strstrm << "\n        pressure: " << p_head *ro * 9.81 << " Pa";
+    strstrm << "\n         desnity: " << ro << " kg/m3";
+    strstrm << "\n     consumption: " << fogy << " kg/s = " << fogy * 3600 / ro << " m3/h";
+    strstrm << "\n    age of fluid: " << tt << " s = " << tt / 60. << " min";
+    strstrm << "\n  incoming edges: ";
     for (vector<int>::iterator it = ag_be.begin(); it != ag_be.end(); it++)
         strstrm << *it << " ";
-    strstrm << "\n    indulo agak: ";
+    strstrm << "\n  outgoing edges: ";
     for (vector<int>::iterator it = ag_ki.begin(); it != ag_ki.end(); it++)
         strstrm << *it << " ";
     strstrm << endl;
-    strstrm << "   beadagolt klor: " << cl_be << " gr/m3\n";
+    strstrm << " chlorine injected: " << cl_be << " gr/m3\n";
 
-    if ((ag_be.size() + ag_ki.size()) == 0)
+    if (check_if_lonely && ((ag_be.size() + ag_ki.size()) == 0))
     {
         strstrm << "\n!!! PANIC !!! Lonely node: " << nev
-        << " !!!\n";
+                << " !!!\n";
         cout << strstrm.str();
         exit(-1);
     }
@@ -93,7 +89,7 @@ void Csomopont::Set_dprop(string mit, double value)
     if (mit == "demand")
         // m3/h-ban kell megadni, de belul kg/s-ban taroljuk
         fogy = value / 3600 * ro;
-    if ((mit == "konc_atlag")|| (mit == "concentration"))
+    if ((mit == "konc_atlag") || (mit == "concentration"))
         konc_atlag = value;
     if (mit == "tt")
         tt = value;
@@ -123,13 +119,13 @@ double Csomopont::Get_dprop(string mit)
     {
         megvan = true;
         // kg/s-ban taroljuk, de m3/h-ban adjuk vissza
-        outdata = fogy*3600/ro;
+        outdata = fogy * 3600 / ro;
     }
 
     if (mit == "head")
     {
         megvan = true;
-        outdata = p_head/ro/9.81;
+        outdata = p_head / ro / 9.81;
     }
     if (mit == "pressure")
     {
@@ -147,6 +143,12 @@ double Csomopont::Get_dprop(string mit)
     {
         megvan = true;
         outdata = tt;
+    }
+
+    if (mit == "height")
+    {
+        megvan = true;
+        outdata = h;
     }
 
     if (!megvan)

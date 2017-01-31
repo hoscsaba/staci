@@ -57,10 +57,10 @@ private:
 	/// Eredm�nyeloszl�sok kisz�m�t�sa
 	void build_res();
 
-	/// Ki kell-e __numerikusan__ sz�m�tani a Jacobi elemeit: [df_dye, df_dyv, df_dQ]	
+	/// Ki kell-e __numerikusan__ sz�m�tani a Jacobi elemeit: [df_dye, df_dyv, df_dQ]
 	vector<bool> num_eval_jac;
 
-	/// A Jacobi elemei: [df_dye, df_dyv, df_dQ]	
+	/// A Jacobi elemei: [df_dye, df_dyv, df_dQ]
 	vector<double> jac;
 
 	/// Norm�lszint sz�m�t�sa
@@ -70,13 +70,19 @@ private:
 	double kritikus_szint(const double Q);
 
 	/// Kritikus �s norm�lszint sz�m�t�s�n�l maxim�lis iter�ci�sz�m
-	const static unsigned int iter_max=1000;
+	const static unsigned int iter_max = 1000;
+
+	// double f_simple(vector<double>);
+	// double f_full(vector<double>);
 
 	double f_telt(const double ye, const double yv, const double mp);
 	double f_0(const double ye, const double yv, const double mp);
 	double f_1(const double ye, const double yv, const double mp);
+	double f_1_old(const double ye, const double yv, const double mp);
 	double f_2c(const double ye, const double yv, const double mp);
+	double f_2c_old(const double ye, const double yv, const double mp);
 	double f_2aii(const double ye, const double yv, const double mp);
+	double f_2ai(const double ye, const double yv, const double mp);
 
 	/// Z�rtszelv�ny� cs�h�z (@see f_0) kell
 	double D_fake;
@@ -89,7 +95,13 @@ private:
 
 	void which_case(const double ye, const double yv);
 
-double (Csatorna::*pt2fun)(double, double, double);    
+	double (Csatorna::*pt2fun)(double, double, double);
+
+	bool is_simplified;
+	bool is_switched;
+	double vmean;
+	double y_crit;
+	vector<double> y_normal;
 
 public:
 	/// Konstruktor t�glalap km. eset�n
@@ -101,10 +113,10 @@ public:
 
 	/// Konstruktor k�r km. eset�n
 	Csatorna(const string nev, const string a_cspe_nev,
-			const string a_cspv_nev, const double a_ro, const double Aref, const double L,
-			const double ze, const double zv, const double surl,
-			const int int_steps, const int debugl, const double dia,
-			const double a_cl_k, const double a_cl_w, const bool is_reversed, const double a_mp);
+	         const string a_cspv_nev, const double a_ro, const double Aref, const double L,
+	         const double ze, const double zv, const double surl,
+	         const int int_steps, const int debugl, const double dia,
+	         const double a_cl_k, const double a_cl_w, const bool is_reversed, const double a_mp);
 
 	/// Konstruktor user-defined km. eset�n
 	//	Csatorna(const string a_nev, const string a_cspe_nev,
@@ -126,6 +138,7 @@ public:
 
 	/// �gegyenlet derv�ltja
 	vector<double> df(vector<double>);
+	// vector<double> df_simple(vector<double>);
 
 	/// Inicializ�ci�
 	void Ini(int mode, double value);
@@ -158,7 +171,7 @@ public:
 	double Get_dprop(string mit);
 
 	/// Folyadekterfogat az elemben
-	void Set_FolyTerf();
+	double Get_FolyTerf();
 
 	/// Hibauzenet
 	void error(string fv, string msg);
@@ -173,11 +186,18 @@ public:
 	void Set_dprop(string mit, double mire);
 
 	/// Overriding Agelem::SetLogFile()
-	void virtual SetLogFile(string fnev);
+	// void virtual SetLogFile();
 
 	double virtual Get_v()
-    {
-        build_res();
-        return mp / ro / Aref;
-    }
+	{
+		if (!res_ready)
+			build_res();
+		return vmean;
+	}
+
+	bool Get_res_ready() {
+		return res_ready;
+	}
+
+
 };

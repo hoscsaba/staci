@@ -1,0 +1,830 @@
+
+
+ evaluating f (#0)
+-----------------------------------------
+  Data: pe=+5.000000e+00m, he=+0.000000e+00m, pv=+5.000000e+00m, hv=+0.000000e+00m, mp=+1.000000e+02
+        ye=+4.000000e+00m, ye+ze=+5.000000e+00m, yv=+5.000000e+00, yv+zv=+5.000000e+00m
+
+
+	      f  = -7.597013e-05
+	 df/dye  = +1.000000e+00
+	 df/dyv  = -1.000000e+00
+	 df/dmp  = -1.519403e-06
+
+	CHANNEL10: switching back from simplified model to proper model.
+
+
+
+ evaluating f (#1)
+-----------------------------------------
+  Data: pe=+5.000000e+00m, he=+0.000000e+00m, pv=+5.000000e+00m, hv=+0.000000e+00m, mp=+1.000000e+02
+        ye=+4.000000e+00m, ye+ze=+5.000000e+00m, yv=+5.000000e+00, yv+zv=+5.000000e+00m
+
+	 teltszelveny: ye=4m > D and yv=5m >D (D=1.5m)
+
+
+	      f  = -7.597013e-05
+	 df/dye  = +1.000000e+00
+	 df/dyv  = -1.000000e+00
+	 df/dmp  = -1.519403e-06
+
+ evaluating f (#2)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+1.316807e+05
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499998e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=131681kg/s >0, yn nincs
+		(0 db normalszint, yc=1.5m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499998e+00 m
+			 y_crit=1.5
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.515 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+1.3168e+05 kg/s)
+			 => solution: x=+0.0000e+00 y=+1.0061e+02
+			 f = y(0)-y(0)_integrated = -100.111
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499998e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=131549kg/s >0, yn nincs
+		(0 db normalszint, yc=1.5m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499998e+00 m
+			 y_crit=1.5
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.515 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+1.3155e+05 kg/s)
+			 => solution: x=+0.0000e+00 y=+1.0041e+02
+			 f = y(0)-y(0)_integrated = -99.9106
+
+
+	      f  = -1.001107e+02
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -1.519519e-03
+
+ evaluating f (#3)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+1.250924e+05
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499998e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=125092kg/s >0, yn nincs
+		(0 db normalszint, yc=1.5m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499998e+00 m
+			 y_crit=1.5
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.515 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+1.2509e+05 kg/s)
+			 => solution: x=+0.0000e+00 y=+9.0845e+01
+			 f = y(0)-y(0)_integrated = -90.3452
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499998e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=124967kg/s >0, yn nincs
+		(0 db normalszint, yc=1.5m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499998e+00 m
+			 y_crit=1.5
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.515 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+1.2497e+05 kg/s)
+			 => solution: x=+0.0000e+00 y=+9.0665e+01
+			 f = y(0)-y(0)_integrated = -90.1646
+
+
+	      f  = -9.034521e+01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -1.443494e-03
+
+ evaluating f (#4)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+1.175818e+05
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499997e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=117582kg/s >0, yn nincs
+		(0 db normalszint, yc=1.5m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499997e+00 m
+			 y_crit=1.5
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.515 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+1.1758e+05 kg/s)
+			 => solution: x=+0.0000e+00 y=+8.0324e+01
+			 f = y(0)-y(0)_integrated = -79.824
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499997e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=117464kg/s >0, yn nincs
+		(0 db normalszint, yc=1.5m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499997e+00 m
+			 y_crit=1.5
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.515 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+1.1746e+05 kg/s)
+			 => solution: x=+0.0000e+00 y=+8.0164e+01
+			 f = y(0)-y(0)_integrated = -79.6644
+
+
+	      f  = -7.982398e+01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -1.356827e-03
+
+ evaluating f (#5)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+1.091101e+05
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499997e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=109110kg/s >0, yn nincs
+		(0 db normalszint, yc=1.5m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499997e+00 m
+			 y_crit=1.5
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.515 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+1.0911e+05 kg/s)
+			 => solution: x=+0.0000e+00 y=+6.9238e+01
+			 f = y(0)-y(0)_integrated = -68.7379
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499997e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=109001kg/s >0, yn nincs
+		(0 db normalszint, yc=1.5m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499997e+00 m
+			 y_crit=1.5
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.515 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+1.0900e+05 kg/s)
+			 => solution: x=+0.0000e+00 y=+6.9101e+01
+			 f = y(0)-y(0)_integrated = -68.6005
+
+
+	      f  = -6.873788e+01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -1.259068e-03
+
+ evaluating f (#6)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+9.967622e+04
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499995e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=99676.2kg/s >0, yn nincs
+		(0 db normalszint, yc=1.5m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499995e+00 m
+			 y_crit=1.5
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.515 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+9.9676e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+5.7868e+01
+			 f = y(0)-y(0)_integrated = -57.3678
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499995e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=99576.5kg/s >0, yn nincs
+		(0 db normalszint, yc=1.5m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499995e+00 m
+			 y_crit=1.5
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51499 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+9.9577e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+5.7753e+01
+			 f = y(0)-y(0)_integrated = -57.2531
+
+
+	      f  = -5.736778e+01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -1.150207e-03
+
+ evaluating f (#7)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+8.933392e+04
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499992e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=89333.9kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49999m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499992e+00 m
+			 y_crit=1.49999
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51499 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+8.9334e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+4.6584e+01
+			 f = y(0)-y(0)_integrated = -46.0835
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499992e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=89244.6kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49999m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499992e+00 m
+			 y_crit=1.49999
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51499 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+8.9245e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+4.6491e+01
+			 f = y(0)-y(0)_integrated = -45.9914
+
+
+	      f  = -4.608350e+01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -1.030862e-03
+
+ evaluating f (#8)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+7.821018e+04
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499987e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=78210.2kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49999m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499987e+00 m
+			 y_crit=1.49999
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51499 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+7.8210e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+3.5825e+01
+			 f = y(0)-y(0)_integrated = -35.325
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499987e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=78132kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49999m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499987e+00 m
+			 y_crit=1.49999
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51499 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+7.8132e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+3.5754e+01
+			 f = y(0)-y(0)_integrated = -35.2544
+
+
+	      f  = -3.532500e+01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -9.025011e-04
+
+ evaluating f (#9)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+6.652267e+04
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499975e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=66522.7kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49998m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499975e+00 m
+			 y_crit=1.49998
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51497 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+6.6523e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+2.6060e+01
+			 f = y(0)-y(0)_integrated = -25.5603
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499975e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=66456.1kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49997m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499975e+00 m
+			 y_crit=1.49997
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51497 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5150e+00 (mp=+6.6456e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+2.6009e+01
+			 f = y(0)-y(0)_integrated = -25.5092
+
+
+	      f  = -2.556026e+01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -7.676349e-04
+
+ evaluating f (#10)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+5.459160e+04
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499945e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=54591.6kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49995m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499945e+00 m
+			 y_crit=1.49995
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51494 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5149e+00 (mp=+5.4592e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+1.7719e+01
+			 f = y(0)-y(0)_integrated = -17.2187
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499945e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=54537kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49994m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499945e+00 m
+			 y_crit=1.49994
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51494 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5149e+00 (mp=+5.4537e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+1.7684e+01
+			 f = y(0)-y(0)_integrated = -17.1843
+
+
+	      f  = -1.721869e+01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -6.299598e-04
+
+ evaluating f (#11)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+4.283891e+04
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499855e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=42838.9kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49985m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499855e+00 m
+			 y_crit=1.49985
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51485 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5149e+00 (mp=+4.2839e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+1.1109e+01
+			 f = y(0)-y(0)_integrated = -10.6086
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499854e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=42796.1kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49985m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499854e+00 m
+			 y_crit=1.49985
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51485 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5149e+00 (mp=+4.2796e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+1.1087e+01
+			 f = y(0)-y(0)_integrated = -10.5874
+
+
+	      f  = -1.060857e+01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -4.943501e-04
+
+ evaluating f (#12)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+3.176622e+04
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499520e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=31766.2kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49952m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499520e+00 m
+			 y_crit=1.49952
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51452 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5145e+00 (mp=+3.1766e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+6.3396e+00
+			 f = y(0)-y(0)_integrated = -5.8396
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.499518e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=31734.5kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49952m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.499518e+00 m
+			 y_crit=1.49952
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51451 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5145e+00 (mp=+3.1734e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+6.3280e+00
+			 f = y(0)-y(0)_integrated = -5.82796
+
+
+	      f  = -5.839602e+00
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -3.666251e-04
+
+ evaluating f (#13)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+2.190402e+04
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.497876e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=21904kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49788m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.497876e+00 m
+			 y_crit=1.49788
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51286 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5129e+00 (mp=+2.1904e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+3.2825e+00
+			 f = y(0)-y(0)_integrated = -2.78247
+
+		Normalszint(ek): Nincs
+
+		Kritikus szint: yc = +1.497868e+00 m
+
+	 case 2.c.:  ye=0.5m >0, mp=21882.1kg/s >0, yn nincs
+		(0 db normalszint, yc=1.49787m)
+		  f_2c: normal depth not found, integrateing backwards: <--
+
+		Kritikus szint: yc = +1.497868e+00 m
+			 y_crit=1.49787
+			 o !!! y(x=L) < y_crit, which is not possible.
+			          -> setting y(L) = 1.01 * y_crit=1.51285 and eval_jac[1]=0
+
+			Solving open-surface DE in channel CHANNEL10 ...
+ x=+1.0000e+02 y=+1.5128e+00 (mp=+2.1882e+04 kg/s)
+			 => solution: x=+0.0000e+00 y=+3.2769e+00
+			 f = y(0)-y(0)_integrated = -2.77692
+
+
+	      f  = -2.782469e+00
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -2.531528e-04
+
+ evaluating f (#14)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+1.373742e+04
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): yn1 = +1.298546e+00 m yn2 = +1.407272e+00 m
+
+		Kritikus szint: yc = +1.486281e+00 m
+
+	 case 2.b.iii.:  ye=0.5m >0, mp=13737.4kg/s >0, yn2<yc
+		(2 db normalszint: yn1=1.29855m < yn2=1.40727m < yc=1.48628m
+		  f_2aii: yn<ykrit, integralas iranya: -->
+
+		Kritikus szint: yc = +1.486281e+00 m
+
+		Normalszint(ek): yn1 = +1.298546e+00 m yn2 = +1.407272e+00 m
+			 o !!! ye=0.5 < ykrit=1.48628,  jac[1]=0
+			 f = ye-yn = -0.798546
+
+		Normalszint(ek): yn1 = +1.296573e+00 m yn2 = +1.407272e+00 m
+
+		Kritikus szint: yc = +1.486226e+00 m
+
+	 case 2.b.iii.:  ye=0.5m >0, mp=13723.7kg/s >0, yn2<yc
+		(2 db normalszint: yn1=1.29657m < yn2=1.40727m < yc=1.48623m
+		  f_2aii: yn<ykrit, integralas iranya: -->
+
+		Kritikus szint: yc = +1.486226e+00 m
+
+		Normalszint(ek): yn1 = +1.296573e+00 m yn2 = +1.407272e+00 m
+			 o !!! ye=0.5 < ykrit=1.48623,  jac[1]=0
+			 f = ye-yn = -0.796573
+
+
+	      f  = -7.985459e-01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -1.436016e-04
+
+ evaluating f (#15)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+8.779321e+03
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): yn1 = +8.957952e-01 m
+
+		Kritikus szint: yc = +1.422965e+00 m
+
+	 case 2.a.ii.:  ye=0.5 m >0, mp=8779.32 kg/s >0, yn<yc
+		(1 db normalszint: yn=0.895795 m < yc=1.42296 m)
+		  f_2aii: yn<ykrit, integralas iranya: -->
+
+		Kritikus szint: yc = +1.422965e+00 m
+
+		Normalszint(ek): yn1 = +8.957952e-01 m
+			 o !!! ye=0.5 < ykrit=1.42296,  jac[1]=0
+			 f = ye-yn = -0.395795
+
+		Normalszint(ek): yn1 = +8.952120e-01 m
+
+		Kritikus szint: yc = +1.422690e+00 m
+
+	 case 2.a.ii.:  ye=0.5 m >0, mp=8770.54 kg/s >0, yn<yc
+		(1 db normalszint: yn=0.895212 m < yc=1.42269 m)
+		  f_2aii: yn<ykrit, integralas iranya: -->
+
+		Kritikus szint: yc = +1.422690e+00 m
+
+		Normalszint(ek): yn1 = +8.952120e-01 m
+			 o !!! ye=0.5 < ykrit=1.42269,  jac[1]=0
+			 f = ye-yn = -0.395212
+
+
+	      f  = -3.957952e-01
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -6.642780e-05
+
+ evaluating f (#16)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+2.821045e+03
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): yn1 = +4.715650e-01 m
+
+		Kritikus szint: yc = +8.701329e-01 m
+
+	 case 2.a.ii.:  ye=0.5 m >0, mp=2821.04 kg/s >0, yn<yc
+		(1 db normalszint: yn=0.471565 m < yc=0.870133 m)
+		  f_2aii: yn<ykrit, integralas iranya: -->
+
+		Kritikus szint: yc = +8.701329e-01 m
+
+		Normalszint(ek): yn1 = +4.715650e-01 m
+			 o !!! ye=0.5 < ykrit=0.870133,  jac[1]=0
+			 f = ye-yn = 0.028435
+
+		Normalszint(ek): yn1 = +4.713196e-01 m
+
+		Kritikus szint: yc = +8.696780e-01 m
+
+	 case 2.a.ii.:  ye=0.5 m >0, mp=2818.22 kg/s >0, yn<yc
+		(1 db normalszint: yn=0.47132 m < yc=0.869678 m)
+		  f_2aii: yn<ykrit, integralas iranya: -->
+
+		Kritikus szint: yc = +8.696780e-01 m
+
+		Normalszint(ek): yn1 = +4.713196e-01 m
+			 o !!! ye=0.5 < ykrit=0.869678,  jac[1]=0
+			 f = ye-yn = 0.0286804
+
+
+	      f  = +2.843497e-02
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -8.699590e-05
+
+ evaluating f (#17)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+3.147899e+03
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): yn1 = +4.993848e-01 m
+
+		Kritikus szint: yc = +9.213512e-01 m
+
+	 case 2.a.ii.:  ye=0.5 m >0, mp=3147.9 kg/s >0, yn<yc
+		(1 db normalszint: yn=0.499385 m < yc=0.921351 m)
+		  f_2aii: yn<ykrit, integralas iranya: -->
+
+		Kritikus szint: yc = +9.213512e-01 m
+
+		Normalszint(ek): yn1 = +4.993848e-01 m
+			 o !!! ye=0.5 < ykrit=0.921351,  jac[1]=0
+			 f = ye-yn = 0.000615238
+
+		Normalszint(ek): yn1 = +4.991223e-01 m
+
+		Kritikus szint: yc = +9.208714e-01 m
+
+	 case 2.a.ii.:  ye=0.5 m >0, mp=3144.75 kg/s >0, yn<yc
+		(1 db normalszint: yn=0.499122 m < yc=0.920871 m)
+		  f_2aii: yn<ykrit, integralas iranya: -->
+
+		Kritikus szint: yc = +9.208714e-01 m
+
+		Normalszint(ek): yn1 = +4.991223e-01 m
+			 o !!! ye=0.5 < ykrit=0.920871,  jac[1]=0
+			 f = ye-yn = 0.000877707
+
+
+	      f  = +6.152381e-04
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -8.337893e-05
+
+ evaluating f (#18)
+-----------------------------------------
+  Data: pe=+1.500000e+00m, he=+0.000000e+00m, pv=+1.300000e+00m, hv=+0.000000e+00m, mp=+3.155278e+03
+        ye=+5.000000e-01m, ye+ze=+1.500000e+00m, yv=+1.300000e+00, yv+zv=+1.300000e+00m
+
+		Normalszint(ek): yn1 = +4.999996e-01 m
+
+		Kritikus szint: yc = +9.224747e-01 m
+
+	 case 2.a.ii.:  ye=0.5 m >0, mp=3155.28 kg/s >0, yn<yc
+		(1 db normalszint: yn=0.5 m < yc=0.922475 m)
+		  f_2aii: yn<ykrit, integralas iranya: -->
+
+		Kritikus szint: yc = +9.224747e-01 m
+
+		Normalszint(ek): yn1 = +4.999996e-01 m
+			 o !!! ye=0.5 < ykrit=0.922475,  jac[1]=0
+			 f = ye-yn = 3.89047e-07
+
+		Normalszint(ek): yn1 = +4.997368e-01 m
+
+		Kritikus szint: yc = +9.219945e-01 m
+
+	 case 2.a.ii.:  ye=0.5 m >0, mp=3152.12 kg/s >0, yn<yc
+		(1 db normalszint: yn=0.499737 m < yc=0.921994 m)
+		  f_2aii: yn<ykrit, integralas iranya: -->
+
+		Kritikus szint: yc = +9.219945e-01 m
+
+		Normalszint(ek): yn1 = +4.997368e-01 m
+			 o !!! ye=0.5 < ykrit=0.921994,  jac[1]=0
+			 f = ye-yn = 0.000263239
+
+
+	      f  = +3.890466e-07
+	 df/dye  = +1.000000e+00
+	 df/dyv  = +0.000000e+00
+	 df/dmp  = -8.330491e-05
+		  f_2aii: yn<ykrit, integralas iranya: -->
+
+		Kritikus szint: yc = +9.224754e-01 m
+
+		Normalszint(ek): yn1 = +5.000000e-01 m
+			 o !!! ye=0.5 < ykrit=0.922475,  jac[1]=0
+			 f = ye-yn = 5.34323e-10
+
+Building solution vectors...
+---------------------------------
+	 ye+ze = 1.5m, ye=0.5m
+	 yv+zv = 1.3m, yv=1.3m
+	 mp    = 3155.28kg/s
+	 case  : 2.a.ii.
+	 length of solution vectors : 23
+
+ Solution vectors:
+
+	  i    x      	   yf     	  yf+D   	   y   	     p (mwc) 	  yf+p    	   v    	     A
+	  0	1.000e+02	0.000e+00	1.500e+00	1.300e+00	1.300e+00	1.300e+00	1.939e+00	1.627e+00
+	  1	9.900e+01	1.000e-02	1.510e+00	1.298e+00	1.288e+00	1.298e+00	1.942e+00	1.625e+00
+	  2	9.800e+01	2.000e-02	1.520e+00	1.295e+00	1.275e+00	1.295e+00	1.946e+00	1.622e+00
+	  3	9.700e+01	3.000e-02	1.530e+00	1.292e+00	1.262e+00	1.292e+00	1.949e+00	1.619e+00
+	  4	9.600e+01	4.000e-02	1.540e+00	1.289e+00	1.249e+00	1.289e+00	1.953e+00	1.616e+00
+	  5	9.500e+01	5.000e-02	1.550e+00	1.286e+00	1.236e+00	1.286e+00	1.957e+00	1.612e+00
+	  6	9.400e+01	6.000e-02	1.560e+00	1.282e+00	1.222e+00	1.282e+00	1.962e+00	1.608e+00
+	  7	9.300e+01	7.000e-02	1.570e+00	1.278e+00	1.208e+00	1.278e+00	1.967e+00	1.604e+00
+	  8	9.200e+01	8.000e-02	1.580e+00	1.274e+00	1.194e+00	1.274e+00	1.973e+00	1.600e+00
+	  9	9.100e+01	9.000e-02	1.590e+00	1.269e+00	1.179e+00	1.269e+00	1.979e+00	1.595e+00
+	  10	9.000e+01	1.000e-01	1.600e+00	1.264e+00	1.164e+00	1.264e+00	1.986e+00	1.589e+00
+	  11	8.900e+01	1.100e-01	1.610e+00	1.259e+00	1.149e+00	1.259e+00	1.993e+00	1.583e+00
+	  12	8.800e+01	1.200e-01	1.620e+00	1.252e+00	1.132e+00	1.252e+00	2.002e+00	1.576e+00
+	  13	8.700e+01	1.300e-01	1.630e+00	1.246e+00	1.116e+00	1.246e+00	2.012e+00	1.569e+00
+	  14	8.600e+01	1.400e-01	1.640e+00	1.238e+00	1.098e+00	1.238e+00	2.023e+00	1.560e+00
+	  15	8.500e+01	1.500e-01	1.650e+00	1.229e+00	1.079e+00	1.229e+00	2.036e+00	1.550e+00
+	  16	8.400e+01	1.600e-01	1.660e+00	1.219e+00	1.059e+00	1.219e+00	2.052e+00	1.538e+00
+	  17	8.300e+01	1.700e-01	1.670e+00	1.207e+00	1.037e+00	1.207e+00	2.071e+00	1.524e+00
+	  18	8.200e+01	1.800e-01	1.680e+00	1.192e+00	1.012e+00	1.192e+00	2.096e+00	1.505e+00
+	  19	8.100e+01	1.900e-01	1.690e+00	1.171e+00	9.813e-01	1.171e+00	2.131e+00	1.480e+00
+	  20	8.000e+01	2.000e-01	1.700e+00	1.139e+00	9.388e-01	1.139e+00	2.192e+00	1.439e+00
+	  21	7.900e+01	2.100e-01	1.710e+00	7.100e-01	5.000e-01	7.100e-01	3.831e+00	8.236e-01
+	  22	0.000e+00	1.000e+00	2.500e+00	1.500e+00	5.000e-01	1.500e+00	1.786e+00	1.767e+00

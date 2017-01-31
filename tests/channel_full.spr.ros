@@ -1,0 +1,52 @@
+
+======================================
+ STACI v.2.0
+ (c) BME Dept. of Hydrodynamic Systems
+ (c) C. Hos (cshos@hds.bme.hu)
+ info: www.hds.bme.hu\staci
+======================================
+
+ date: Tue Dec  6 23:57:58 2016
+
+ input file: channel_full.spr
+
+
+ Automatic inicialization...
+	nodal pressures:	5 mwc 
+	edge mass flow rates:	100 kg/s ...
+
+Solving system...
+====================================
+
+ iter. # 0./1000 e_mp=2.00e+02,  e_p=6.21e+00  relax.=1.00, relax.mul.=2.00
+ iter. # 1./1000 e_mp=0.00e+00,  e_p=7.88e-01  relax.=1.00, relax.mul.=2.00
+ iter. # 2./1000 e_mp=0.00e+00,  e_p=4.09e-01  relax.=1.00, relax.mul.=2.00
+ iter. # 3./1000 e_mp=0.00e+00,  e_p=8.87e-02  relax.=1.00, relax.mul.=2.00
+ iter. # 4./1000 e_mp=0.00e+00,  e_p=6.12e-03  relax.=1.00, relax.mul.=2.00
+ iter. # 5./1000 e_mp=0.00e+00,  e_p=1.63e-05  relax.=1.00, relax.mul.=2.00
+
+OK
+
+Computing residence time...
+====================================
+
+	 step #3 max. res. time: 0 d, 0 h, 0 m (), mean: 0 d, 0 h, 0 m
+
+Statistics:
+======================
+	 # of nodes : 3
+	 # of pipes : 2
+
+	 diameter     : min : 0.20m (ID: CHANNEL10)  max : 0.20m (ID: CHANNEL10)
+	 length       : min : 100.00m (ID: CHANNEL10)  max : 100.00m (ID: CHANNEL10)
+	 sum. length  : 100.00 m 
+	 pipe volume  : 3.14 m^3 
+	 fluid volume : 3.14 m^3 (100.00% of pipe volume)
+
+	 max. inflow          : -0.00 m3/h (ID: NODE8)  
+	 max. consumption     : 0.00 m3/h (ID: NODE8)  
+	 sum of inflow        : 0.00 m3/h
+	 sum of consumption   : 0.00 m3/h
+	 consumption - inflow : 0.00 m3/h
+
+ 	 number of nonzero Jacobian entries: 11 out of 25 (44.00%)

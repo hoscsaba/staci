@@ -38,7 +38,7 @@ protected:
     double tt_start;
     /// vizkor a vegen
     double tt_end;
-    
+
 
 public:
     void logfile_write(string msg, int msg_debug_level);
@@ -206,15 +206,14 @@ public:
     {
         cdt = a_cdt;
     }
-    void virtual SetLogFile(string fnev)
-    {
-        out_file = fnev;
-    }
+    void SetLogFile();
+    
     void Set_Aref(double a_Aref)
     {
         Aref = a_Aref;
         //cout << endl << "Agelem " << nev << ": referencia keresztmetszet beallitasa: " << a_Aref << "-> Aref=" << Aref << endl;
-
     }
+    bool force_more_iter;
+    bool update_diameter;
 };
 #endif

@@ -7,7 +7,7 @@ using namespace std;
 #include <iomanip>
 #include <vector>
 #include <math.h>
-#include <string.h> 
+#include <string.h>
 #include "KonstNyomas.h"
 #include "Cso.h"
 #include "Szivattyu.h"
@@ -66,12 +66,12 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
     ag_db = Node_edges.nChildNode("edge");
     if (debug)
         cout << endl << "Adatfajl: " << xml_fnev << endl << "\tcsomopontok szama: "
-    << csp_db << endl << "\tagak szama:        " << ag_db;
+             << csp_db << endl << "\tagak szama:        " << ag_db;
 
     // Csomopontok reszletes kiolvasasa...
     if (debug)
         cout << endl << endl << "A csomopontok alapadatai reszletesen: " << endl
-    << "-----------------------------------------" << endl;
+             << "-----------------------------------------" << endl;
 
     string id, is_endnode;
     double height, demand, cl_be, pressure, ro, tt;
@@ -84,35 +84,39 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
             id = Node_nodes.getChildNode("node", i).getChildNode("id").getText();
 
             height = string_to_double(Node_nodes.getChildNode("node", i).getChildNode("height").getText(), id,
-              "<height>", 0.0);
+                                      "<height>", 0.0);
 
             demand = string_to_double(Node_nodes.getChildNode("node", i).getChildNode("demand").getText(), id,
-              "<demand>", 0.0);
+                                      "<demand>", 0.0);
 
             cl_be = string_to_double(Node_nodes.getChildNode("node", i).getChildNode("cl_input").getText(), id,
-             "<cl_input>", 0.0);
+                                     "<cl_input>", 0.0);
 
             pressure = string_to_double(Node_nodes.getChildNode("node", i).getChildNode("pressure").getText(), id,
-                "<pressure>", 0.0);
+                                        "<pressure>", 0.0);
 
             ro = string_to_double(Node_nodes.getChildNode("node", i).getChildNode("density").getText(), id,
-              "<pressure>", 0.0);
+                                  "<pressure>", 0.0);
 
             tt = string_to_double(Node_nodes.getChildNode("node", i).getChildNode("travel_time").getText(), id,
-              "<travel_time>", 0.0);
+                                  "<travel_time>", 0.0);
 
             cspok.push_back(new Csomopont(id, height, demand, cl_be, pressure, ro, tt));
-//            if (debug)
-//                cout << cspok.at(j)->Info();
+
+            if (debug)
+                cout << cspok.at(j)->Info(false);
             j++;
         }
     }
-    csp_db = j--;
+    // csp_db = j--;
+
+    if (debug)
+        cin.get();
 
     // Agak reszletes kiolvasasa...
     if (debug)
         cout << endl << endl << "Az agak: " << endl
-    << "-----------------------------------------" << endl;
+             << "-----------------------------------------" << endl;
     // Eloszor csak az info kedveert megszamoljuk a elemszamot
     int db;
     bool megvan;
@@ -123,7 +127,7 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
             db = 0;
             for (int j = 0; j < edge_type_number; j++) {
                 db = Node_edges.getChildNode("edge", i).getChildNode("edge_spec", 0).nChildNode(
-                    edge_type.at(j).c_str());
+                         edge_type.at(j).c_str());
                 if (db == 1) {
                     edge_type_occur.at(j) += 1;
                     megvan = true;
@@ -140,7 +144,7 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
 
     if (debug)
         cout << endl << endl << "Az agak reszletesen:" << endl
-    << "-----------------------------------------" << endl;
+             << "-----------------------------------------" << endl;
     string node_from, node_to;
     double density, patlag = 0, pmax = 0, aref, mass_flow_rate, travel_time;
     int darab = 0;
@@ -176,270 +180,270 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
         travel_time = atof(Node_edges.getChildNode("edge", i).getChildNode("travel_time").getText());
         if (debug)
             cout << endl << (i + 1) << ". edge: " << id << ", node_from=" << node_from
-        << ", node_to=" << node_to << ", density=" << density << ", aref="
-        << aref;
+                 << ", node_to=" << node_to << ", density=" << density << ", aref="
+                 << aref;
 
         for (int j = 0; j < edge_type_number; j++) {
             db = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode(edge_type.at(j).c_str());
             if (db == 1) {
                 XMLNode elem = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                    edge_type.at(j).c_str());
+                                   edge_type.at(j).c_str());
                 switch (j) {
-                    case 0: //press = Konst_Nyomas
-                    {
-                        double pres = atof(elem.getChildNode("pressure").getText());
-                        if (debug)
-                            cout << ", pressure=" << pres << "Pa, szumma_patlag=" << patlag
-                        / 1000 / 9.81 << "vom";
-                        patlag += pres;
-                        if (pres > pmax)
-                            pmax = pres;
-                        darab++;
-                        agelemek.push_back(
-                            new KonstNyomas(id, aref, node_from, density, pres, mass_flow_rate, travel_time));
-                        if (debug)
-                            cout << " OK";
-                        break;
+                case 0: //press = Konst_Nyomas
+                {
+                    double pres = atof(elem.getChildNode("pressure").getText());
+                    if (debug)
+                        cout << ", pressure=" << pres << "Pa, szumma_patlag=" << patlag
+                             / 1000 / 9.81 << "vom";
+                    patlag += pres;
+                    if (pres > pmax)
+                        pmax = pres;
+                    darab++;
+                    agelemek.push_back(
+                        new KonstNyomas(id, aref, node_from, density, pres, mass_flow_rate, travel_time));
+                    if (debug)
+                        cout << " OK";
+                    break;
+                }
+
+                case 1: //pipe = Cso
+                {
+                    double L = atof(elem.getChildNode("length").getText());
+                    double D = atof(elem.getChildNode("diameter").getText());
+                    double erdesseg = atof(elem.getChildNode("roughness").getText());
+                    double cl_k = atof(elem.getChildNode("cl_k").getText());
+                    double cl_w = atof(elem.getChildNode("cl_w").getText());
+                    //double b=atof(elem.getChildNode("distr_consumption").getText());
+                    if (debug)
+                        cout << ", length=" << L << "m, diameter=" << D
+                             << "m, roughness=" << erdesseg << "mm";
+                    agelemek.push_back(
+                        new Cso(id, node_from, node_to, density, L, D, erdesseg, cl_k, cl_w, mass_flow_rate));
+                    if (debug)
+                        cout << " OK";
+                    break;
+                }
+
+                case 2: // pump = Szivattyu
+                {
+                    int jgpsz = elem.getChildNode("curve").getChildNode("points").nChildNode("point_x");
+                    vector<double> Q(jgpsz), H(jgpsz);
+                    curve_reader(id, elem.getChildNode("curve"), Q, H);
+                    agelemek.push_back(new Szivattyu(id, node_from, node_to, density, aref, Q, H, mass_flow_rate));
+                    if (debug)
+                        cout << " OK";
+                    break;
+                }
+
+                case 3: // Valve = JelleggorbesFojtas
+                {
+                    double allas = atof(elem.getChildNode("position").getText());
+
+                    if (debug)
+                        cout << ", actual setting=" << allas;
+                    int jgpsz = elem.getChildNode("curve").getChildNode("points").nChildNode("point_x");
+                    vector<double> e(jgpsz), zeta(jgpsz);
+                    curve_reader(id, elem.getChildNode("curve"), e, zeta);
+                    if (aref < 1e-5) {
+                        double Aref_min = 3.1416e-04; // 2cm-es cso belvilaga
+                        aref = Aref_min;
+                        cout << "Warning! element " << id << " Aref=" << aref << ", overwriting with " << Aref_min
+                             << endl;
                     }
+                    if (allas > e.at(e.size() - 1))
+                        cout << "Warning! element " << id << " actual setting=" << allas << " > e(end) "
+                             << e.at(e.size() - 1) << endl;
+                    if (allas < e.at(0))
+                        cout << "Warning! element " << id << " actual setting=" << allas << " < e(0) " << e.at(0)
+                             << endl;
 
-                    case 1: //pipe = Cso
-                    {
-                        double L = atof(elem.getChildNode("length").getText());
-                        double D = atof(elem.getChildNode("diameter").getText());
-                        double erdesseg = atof(elem.getChildNode("roughness").getText());
-                        double cl_k = atof(elem.getChildNode("cl_k").getText());
-                        double cl_w = atof(elem.getChildNode("cl_w").getText());
-                        //double b=atof(elem.getChildNode("distr_consumption").getText());
-                        if (debug)
-                            cout << ", length=" << L << "m, diameter=" << D
-                        << "m, roughness=" << erdesseg << "mm";
-                        agelemek.push_back(
-                            new Cso(id, node_from, node_to, density, L, D, erdesseg, cl_k, cl_w, mass_flow_rate));
-                        if (debug)
-                            cout << " OK";
-                        break;
+                    agelemek.push_back(new JelleggorbesFojtas(id, node_from, node_to, density, aref, e, zeta, allas,
+                                       mass_flow_rate));
+                    if (debug)
+                        cout << " OK";
+                    break;
+                }
+
+                case 4: //pool = Vegakna
+                {
+                    double Hb = atof(elem.getChildNode("bottom_level").getText());
+                    double Hw = atof(elem.getChildNode("water_level").getText());
+                    patlag += Hw + Hb;
+                    if ((Hw + Hb) > pmax)
+                        pmax = Hw + Hb;
+                    darab++;
+                    if (debug)
+                        cout << ", bottom_level=" << Hb << "m" << ", water_level=" << Hw
+                             << "m, szumma_patlag=" << patlag;
+
+                    agelemek.push_back(
+                        new Vegakna(id, node_from, density, aref, Hb, Hw, mass_flow_rate, travel_time));
+                    if (debug)
+                        cout << " OK";
+                    break;
+                }
+
+                //              case 5: //channel0 = T�glalap km. csatorna
+                //              {
+                //                  double L = atof(elem.getChildNode("length").getText());
+                //                  double ze = atof(elem.getChildNode("start_height").getText());
+                //                  double zv = atof(elem.getChildNode("end_height").getText());
+                //                  //      double inc   = atof(elem.getChildNode("inclination").getText())/100;
+                //                  double erdesseg=atof(elem.getChildNode("roughness").getText());
+                //                  int int_steps= atoi(elem.getChildNode("integral_steps").getText());
+                //                  int debugl = atoi(elem.getChildNode("debug_level").getText());
+                //                  double cl_k=atof(elem.getChildNode("cl_k").getText());
+                //                  double cl_w=atof(elem.getChildNode("cl_w").getText());
+                //                  if (debug)
+                //                      cout<<", length="<<L<<"m"<<", start_height="<<ze
+                //                              <<"m, end_height="<<zv<<"m, roughness="
+                //                              <<erdesseg <<", integral_steps="<<int_steps
+                //                              <<", debug_level=" <<debug;
+                //                  double width = atof(elem.getChildNode("width").getText());
+                //                  double Hmax = atof(elem.getChildNode("max_height").getText());
+                //
+                //                  if (debug)
+                //                      cout<<endl<<"\t\t teglalap geometria: B="<<width
+                //                              <<"m, Hmax="<<Hmax;
+                //                  agelemek.push_back(new Csatorna(id,node_from,node_to,aref,L,ze,zv,erdesseg,int_steps,debugl,width,Hmax,cl_k,cl_w));
+                //                  break;
+                //              }
+
+                case 6: // kor rm.
+                {
+                    double L = atof(elem.getChildNode("length").getText());
+                    double ze = atof(elem.getChildNode("start_height").getText());
+                    double zv = atof(elem.getChildNode("end_height").getText());
+                    bool is_reversed = false;
+                    if (ze < zv) {
+                        cout
+                                << "\n\n\tNegativ lejtes -> CSOMOPONT CSERE!!!\n\t elem neve: "
+                                << id;
+                        cout << "\n\t elotte: node_from:" << node_from
+                             << ", node_to:" << node_to << ", ze=" << ze << ", zv="
+                             << zv;
+
+                        string s_tmp = node_from;
+                        node_from = node_to;
+                        node_to = s_tmp;
+
+                        double d_tmp = ze;
+                        ze = zv;
+                        zv = d_tmp;
+                        cout << "\n\t utana : node_from:" << node_from
+                             << ", node_to:" << node_to << ", ze=" << ze << ", zv="
+                             << zv;
+                        is_reversed = true;
                     }
+                    double erdesseg = atof(elem.getChildNode("roughness").getText());
+                    int int_steps = atoi(elem.getChildNode("integral_steps").getText());
+                    int debugl = atoi(elem.getChildNode("debug_level").getText());
+                    double cl_k = atof(elem.getChildNode("cl_k").getText());
+                    double cl_w = atof(elem.getChildNode("cl_w").getText());
+                    if (debug)
+                        cout << ", length=" << L << "m" << ", start_height=" << ze
+                             << "m, end_height=" << zv << "m, roughness="
+                             << erdesseg << ", integral_steps=" << int_steps
+                             << ", debug_level=" << debug;
+                    double dia = atof(elem.getChildNode("diameter").getText());
 
-                    case 2: // pump = Szivattyu
-                    {
-                        int jgpsz = elem.getChildNode("curve").getChildNode("points").nChildNode("point_x");
-                        vector<double> Q(jgpsz), H(jgpsz);
-                        curve_reader(id, elem.getChildNode("curve"), Q, H);
-                        agelemek.push_back(new Szivattyu(id, node_from, node_to, density, aref, Q, H, mass_flow_rate));
-                        if (debug)
-                            cout << " OK";
-                        break;
+                    if (debug)
+                        cout << endl << "\t\t kor geometria: D=" << dia;
+                    agelemek.push_back(
+                        new Csatorna(id, node_from, node_to, density, dia * dia * M_PI / 4., L, ze, zv,
+                                     erdesseg, int_steps, debugl, dia, cl_k, cl_w, is_reversed,
+                                     mass_flow_rate));
+                    break;
+                }
+
+                //              case 7: // Felhasznalo altal definialt tipus
+                //              {
+                //                  double L = atof(elem.getChildNode("length").getText());
+                //                  double ze = atof(elem.getChildNode("start_height").getText());
+                //                  double zv = atof(elem.getChildNode("end_height").getText());
+                //                  //                        double inc   = atof(elem.getChildNode("inclination").getText())/100;
+                //                  double erdesseg=atof(elem.getChildNode("roughness").getText());
+                //                  int int_steps= atoi(elem.getChildNode("integral_steps").getText());
+                //                  int debugl = atoi(elem.getChildNode("debug_level").getText());
+                //                  double cl_k=atof(elem.getChildNode("cl_k").getText());
+                //                  double cl_w=atof(elem.getChildNode("cl_w").getText());
+                //                  if (debug)
+                //                      cout<<", length="<<L<<"m"<<", start_height="<<ze
+                //                              <<"m, end_height="<<zv<<"m, roughness="
+                //                              <<erdesseg <<", integral_steps="<<int_steps
+                //                              <<", debug_level=" <<debug;
+                //                  int jgpszb, jgpsza, jgpszk;
+                //                  for (int cdb=0; cdb<elem.nChildNode("curve"); cdb++) {
+                //                      if (elem.getChildNode("curve",cdb).getChildNode("id").getText()=="curve_b")
+                //                          jgpszb=elem.getChildNode("curve").getChildNode("points").nChildNode("point_x");
+                //                      if (elem.getChildNode("curve",cdb).getChildNode("id").getText()=="curve_a")
+                //                          jgpsza=elem.getChildNode("curve").getChildNode("points").nChildNode("point_x");
+                //                      if (elem.getChildNode("curve",cdb).getChildNode("id").getText()=="curve_k")
+                //                          jgpszk=elem.getChildNode("curve").getChildNode("points").nChildNode("point_x");
+                //                  }
+                //                  vector<double> yb(jgpszb), b(jgpszb), ya(jgpsza), a(jgpsza),
+                //                          yk(jgpszk), k(jgpszk);
+                //
+                //                  for (int cdb=0; cdb<elem.nChildNode("curve"); cdb++) {
+                //                      if (elem.getChildNode("curve",cdb).getChildNode("id").getText()=="curve_b")
+                //                          curve_reader(id, elem.getChildNode("curve"), yb, b);
+                //                      if (elem.getChildNode("curve",cdb).getChildNode("id").getText()=="curve_a")
+                //                          curve_reader(id, elem.getChildNode("curve"), ya, a);
+                //                      if (elem.getChildNode("curve",cdb).getChildNode("id").getText()=="curve_k")
+                //                          curve_reader(id, elem.getChildNode("curve"), yk, k);
+                //                  }
+                //                  agelemek.push_back(new Csatorna(id,node_from,node_to,aref,L,ze,zv,erdesseg,int_steps,debugl,yb,b,ya,a,yk,k,cl_k,cl_w));
+                //                  break;
+                //              }
+
+                case 8: // Buko mutargy
+                {
+                    string iso = elem.getChildNode("is_opened").getText();
+                    double bh = atof(elem.getChildNode("bottom_height").getText());
+                    bool is_opened = false;
+                    if (iso == "true")
+                        is_opened = true;
+                    double wi = atof(elem.getChildNode("width").getText());
+                    double oh = atof(elem.getChildNode("overflow_height").getText());
+                    double dc = atof(elem.getChildNode("discharge_coeff").getText());
+                    double vc = atof(elem.getChildNode("valve_coeff").getText());
+                    if (debug)
+                        cout << endl << "is_opened:" << iso << ", width=" << wi
+                             << ", overflow_height=" << oh
+                             << ", discharge_coeff=" << dc << ", valve_coeff="
+                             << vc;
+                    agelemek.push_back(
+                        new BukoMutargy(id, node_from, node_to, density, aref, bh, is_opened, wi, oh, dc, vc,
+                                        mass_flow_rate));
+                    if (debug)
+                        cout << "  OK";
+                    break;
+                }
+                case 9: // visszacsap� szelep
+                {
+                    double lce = atof(elem.getChildNode("loss_coeff_f").getText()) / 1e5;
+                    double lcv = atof(elem.getChildNode("loss_coeff_b").getText()) / 1e5;
+                    if (debug) {
+                        cout << endl << "loss_coeff_f(orward):" << lce;
+                        cout << endl << "loss_coeff_b(ack):" << lcv;
                     }
-
-                    case 3: // Valve = JelleggorbesFojtas
-                    {
-                        double allas = atof(elem.getChildNode("position").getText());
-
-                        if (debug)
-                            cout << ", actual setting=" << allas;
-                        int jgpsz = elem.getChildNode("curve").getChildNode("points").nChildNode("point_x");
-                        vector<double> e(jgpsz), zeta(jgpsz);
-                        curve_reader(id, elem.getChildNode("curve"), e, zeta);
-                        if (aref < 1e-5) {
-                            double Aref_min = 3.1416e-04; // 2cm-es cso belvilaga
-                            aref = Aref_min;
-                            cout << "Warning! element " << id << " Aref=" << aref << ", overwriting with " << Aref_min
-                            << endl;
-                        }
-                        if (allas > e.at(e.size() - 1))
-                            cout << "Warning! element " << id << " actual setting=" << allas << " > e(end) "
-                        << e.at(e.size() - 1) << endl;
-                        if (allas < e.at(0))
-                            cout << "Warning! element " << id << " actual setting=" << allas << " < e(0) " << e.at(0)
-                        << endl;
-
-                        agelemek.push_back(new JelleggorbesFojtas(id, node_from, node_to, density, aref, e, zeta, allas,
-                          mass_flow_rate));
-                        if (debug)
-                            cout << " OK";
-                        break;
-                    }
-
-                    case 4: //pool = Vegakna
-                    {
-                        double Hb = atof(elem.getChildNode("bottom_level").getText());
-                        double Hw = atof(elem.getChildNode("water_level").getText());
-                        patlag += Hw + Hb;
-                        if ((Hw + Hb) > pmax)
-                            pmax = Hw + Hb;
-                        darab++;
-                        if (debug)
-                            cout << ", bottom_level=" << Hb << "m" << ", water_level=" << Hw
-                        << "m, szumma_patlag=" << patlag;
-
-                        agelemek.push_back(
-                            new Vegakna(id, node_from, density, aref, Hb, Hw, mass_flow_rate, travel_time));
-                        if (debug)
-                            cout << " OK";
-                        break;
-                    }
-
-                        //              case 5: //channel0 = T�glalap km. csatorna
-                        //              {
-                        //                  double L = atof(elem.getChildNode("length").getText());
-                        //                  double ze = atof(elem.getChildNode("start_height").getText());
-                        //                  double zv = atof(elem.getChildNode("end_height").getText());
-                        //                  //      double inc   = atof(elem.getChildNode("inclination").getText())/100;
-                        //                  double erdesseg=atof(elem.getChildNode("roughness").getText());
-                        //                  int int_steps= atoi(elem.getChildNode("integral_steps").getText());
-                        //                  int debugl = atoi(elem.getChildNode("debug_level").getText());
-                        //                  double cl_k=atof(elem.getChildNode("cl_k").getText());
-                        //                  double cl_w=atof(elem.getChildNode("cl_w").getText());
-                        //                  if (debug)
-                        //                      cout<<", length="<<L<<"m"<<", start_height="<<ze
-                        //                              <<"m, end_height="<<zv<<"m, roughness="
-                        //                              <<erdesseg <<", integral_steps="<<int_steps
-                        //                              <<", debug_level=" <<debug;
-                        //                  double width = atof(elem.getChildNode("width").getText());
-                        //                  double Hmax = atof(elem.getChildNode("max_height").getText());
-                        //
-                        //                  if (debug)
-                        //                      cout<<endl<<"\t\t teglalap geometria: B="<<width
-                        //                              <<"m, Hmax="<<Hmax;
-                        //                  agelemek.push_back(new Csatorna(id,node_from,node_to,aref,L,ze,zv,erdesseg,int_steps,debugl,width,Hmax,cl_k,cl_w));
-                        //                  break;
-                        //              }
-
-                    case 6: // kor rm.
-                    {
-                        double L = atof(elem.getChildNode("length").getText());
-                        double ze = atof(elem.getChildNode("start_height").getText());
-                        double zv = atof(elem.getChildNode("end_height").getText());
-                        bool is_reversed = false;
-                        if (ze < zv) {
-                            cout
-                            << "\n\n\tNegativ lejtes -> CSOMOPONT CSERE!!!\n\t elem neve: "
-                            << id;
-                            cout << "\n\t elotte: node_from:" << node_from
-                            << ", node_to:" << node_to << ", ze=" << ze << ", zv="
-                            << zv;
-
-                            string s_tmp = node_from;
-                            node_from = node_to;
-                            node_to = s_tmp;
-
-                            double d_tmp = ze;
-                            ze = zv;
-                            zv = d_tmp;
-                            cout << "\n\t utana : node_from:" << node_from
-                            << ", node_to:" << node_to << ", ze=" << ze << ", zv="
-                            << zv;
-                            is_reversed = true;
-                        }
-                        double erdesseg = atof(elem.getChildNode("roughness").getText());
-                        int int_steps = atoi(elem.getChildNode("integral_steps").getText());
-                        int debugl = atoi(elem.getChildNode("debug_level").getText());
-                        double cl_k = atof(elem.getChildNode("cl_k").getText());
-                        double cl_w = atof(elem.getChildNode("cl_w").getText());
-                        if (debug)
-                            cout << ", length=" << L << "m" << ", start_height=" << ze
-                        << "m, end_height=" << zv << "m, roughness="
-                        << erdesseg << ", integral_steps=" << int_steps
-                        << ", debug_level=" << debug;
-                        double dia = atof(elem.getChildNode("diameter").getText());
-
-                        if (debug)
-                            cout << endl << "\t\t kor geometria: D=" << dia;
-                        agelemek.push_back(
-                            new Csatorna(id, node_from, node_to, density, dia * dia * M_PI / 4., L, ze, zv,
-                             erdesseg, int_steps, debugl, dia, cl_k, cl_w, is_reversed,
-                             mass_flow_rate));
-                        break;
-                    }
-
-                        //              case 7: // Felhasznalo altal definialt tipus
-                        //              {
-                        //                  double L = atof(elem.getChildNode("length").getText());
-                        //                  double ze = atof(elem.getChildNode("start_height").getText());
-                        //                  double zv = atof(elem.getChildNode("end_height").getText());
-                        //                  //                        double inc   = atof(elem.getChildNode("inclination").getText())/100;
-                        //                  double erdesseg=atof(elem.getChildNode("roughness").getText());
-                        //                  int int_steps= atoi(elem.getChildNode("integral_steps").getText());
-                        //                  int debugl = atoi(elem.getChildNode("debug_level").getText());
-                        //                  double cl_k=atof(elem.getChildNode("cl_k").getText());
-                        //                  double cl_w=atof(elem.getChildNode("cl_w").getText());
-                        //                  if (debug)
-                        //                      cout<<", length="<<L<<"m"<<", start_height="<<ze
-                        //                              <<"m, end_height="<<zv<<"m, roughness="
-                        //                              <<erdesseg <<", integral_steps="<<int_steps
-                        //                              <<", debug_level=" <<debug;
-                        //                  int jgpszb, jgpsza, jgpszk;
-                        //                  for (int cdb=0; cdb<elem.nChildNode("curve"); cdb++) {
-                        //                      if (elem.getChildNode("curve",cdb).getChildNode("id").getText()=="curve_b")
-                        //                          jgpszb=elem.getChildNode("curve").getChildNode("points").nChildNode("point_x");
-                        //                      if (elem.getChildNode("curve",cdb).getChildNode("id").getText()=="curve_a")
-                        //                          jgpsza=elem.getChildNode("curve").getChildNode("points").nChildNode("point_x");
-                        //                      if (elem.getChildNode("curve",cdb).getChildNode("id").getText()=="curve_k")
-                        //                          jgpszk=elem.getChildNode("curve").getChildNode("points").nChildNode("point_x");
-                        //                  }
-                        //                  vector<double> yb(jgpszb), b(jgpszb), ya(jgpsza), a(jgpsza),
-                        //                          yk(jgpszk), k(jgpszk);
-                        //
-                        //                  for (int cdb=0; cdb<elem.nChildNode("curve"); cdb++) {
-                        //                      if (elem.getChildNode("curve",cdb).getChildNode("id").getText()=="curve_b")
-                        //                          curve_reader(id, elem.getChildNode("curve"), yb, b);
-                        //                      if (elem.getChildNode("curve",cdb).getChildNode("id").getText()=="curve_a")
-                        //                          curve_reader(id, elem.getChildNode("curve"), ya, a);
-                        //                      if (elem.getChildNode("curve",cdb).getChildNode("id").getText()=="curve_k")
-                        //                          curve_reader(id, elem.getChildNode("curve"), yk, k);
-                        //                  }
-                        //                  agelemek.push_back(new Csatorna(id,node_from,node_to,aref,L,ze,zv,erdesseg,int_steps,debugl,yb,b,ya,a,yk,k,cl_k,cl_w));
-                        //                  break;
-                        //              }
-
-                    case 8: // Buko mutargy
-                    {
-                        string iso = elem.getChildNode("is_opened").getText();
-                        double bh = atof(elem.getChildNode("bottom_height").getText());
-                        bool is_opened = false;
-                        if (iso == "true")
-                            is_opened = true;
-                        double wi = atof(elem.getChildNode("width").getText());
-                        double oh = atof(elem.getChildNode("overflow_height").getText());
-                        double dc = atof(elem.getChildNode("discharge_coeff").getText());
-                        double vc = atof(elem.getChildNode("valve_coeff").getText());
-                        if (debug)
-                            cout << endl << "is_opened:" << iso << ", width=" << wi
-                        << ", overflow_height=" << oh
-                        << ", discharge_coeff=" << dc << ", valve_coeff="
-                        << vc;
-                        agelemek.push_back(
-                            new BukoMutargy(id, node_from, node_to, density, aref, bh, is_opened, wi, oh, dc, vc,
-                                mass_flow_rate));
-                        if (debug)
-                            cout << "  OK";
-                        break;
-                    }
-                    case 9: // visszacsap� szelep
-                    {
-                        double lce = atof(elem.getChildNode("loss_coeff_f").getText()) / 1e5;
-                        double lcv = atof(elem.getChildNode("loss_coeff_b").getText()) / 1e5;
-                        if (debug) {
-                            cout << endl << "loss_coeff_f(orward):" << lce;
-                            cout << endl << "loss_coeff_b(ack):" << lcv;
-                        }
-                        agelemek.push_back(
-                            new VisszacsapoSzelep(id, node_from, node_to, density, aref, lce, lcv, mass_flow_rate));
-                        if (debug)
-                            cout << "  OK";
-                        break;
-                    }
-                    default: {
-                        cout << endl << endl
-                        << "xml adatfajl feldolgozasa: HIBA!!! Sz@r van, nem talalok ilyen tipusu agelemet => "
-                        << i << ". edge, id:" << id << endl;
-                    }
+                    agelemek.push_back(
+                        new VisszacsapoSzelep(id, node_from, node_to, density, aref, lce, lcv, mass_flow_rate));
+                    if (debug)
+                        cout << "  OK";
+                    break;
+                }
+                default: {
+                    cout << endl << endl
+                         << "xml adatfajl feldolgozasa: HIBA!!! Sz@r van, nem talalok ilyen tipusu agelemet => "
+                         << i << ". edge, id:" << id << endl;
+                }
                 }
             }
         }
-/*        printf("\n Size of agelemek is %lu, last one added is %s.",agelemek.size(),agelemek.at(agelemek.size()-1)->Get_nev().c_str());
-        cout<<agelemek.at(agelemek.size()-1)->Info();
-        cin.get();*/
+        /*        printf("\n Size of agelemek is %lu, last one added is %s.",agelemek.size(),agelemek.at(agelemek.size()-1)->Get_nev().c_str());
+                cout<<agelemek.at(agelemek.size()-1)->Info();
+                cin.get();*/
     }
     if (debug) {
         cout << endl << endl << endl << "Number of edge types:";
@@ -454,7 +458,7 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
 
 //--------------------------------------------------------------------------------
 void data_io::curve_reader(const string id, const XMLNode elem,
-   vector<double> &px, vector<double> &py) {
+                           vector<double> &px, vector<double> &py) {
 
     string curve_id = elem.getChildNode("id").getText();
     string x_val = elem.getChildNode("x_val").getText();
@@ -468,7 +472,7 @@ void data_io::curve_reader(const string id, const XMLNode elem,
 
     if (debug)
         cout << endl << "\t curve_id: " << curve_id << "  x_jgsz=" << xjgpsz
-    << ", y_jgpsz=" << yjgpsz;
+             << ", y_jgpsz=" << yjgpsz;
 
     if (xjgpsz == yjgpsz) {
         if (debug)
@@ -487,23 +491,24 @@ void data_io::curve_reader(const string id, const XMLNode elem,
             py.at(i) = y;
             if (debug)
                 cout << "\t\t " << x_val << "[" << x_dim << "]=" << x << "  " << y_val << "["
-            << y_dim << "]=" << y << endl;
+                     << y_dim << "]=" << y << endl;
         }
     } else
-    cout << endl << "xml adatfajl feldolgozasa: HIBA! jgpsz_x=" << xjgpsz
-    << " <-> jgpsz_y=" << yjgpsz << endl << "Atugrom a(z) " << id
-    << " elemet..." << endl << endl;
+        cout << endl << "xml adatfajl feldolgozasa: HIBA! jgpsz_x=" << xjgpsz
+             << " <-> jgpsz_y=" << yjgpsz << endl << "Atugrom a(z) " << id
+             << " elemet..." << endl << endl;
 
 }
 
 //--------------------------------------------------------------------------------
 void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
-   vector<Agelem *> agelemek, bool conv_reached) {
+                           vector<Agelem *> agelemek, bool conv_reached, int staci_debug_level) {
 
 
     XMLNode xMainNode = XMLNode::openFileHelper(xml_fnev, "staci");
 
-    cout << endl << endl << "Output file name:" << xml_fnev << ", saving results...";
+    if (staci_debug_level > 0)
+        cout << endl << endl << "Output file name:" << xml_fnev << ", saving results...";
 
     XMLNode Node_settings = xMainNode.getChildNode("settings");
     XMLNode Node_nodes = xMainNode.getChildNode("nodes");
@@ -527,7 +532,8 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
         os << scientific << setprecision(5) << FolyMenny;
         Node_settings.getChildNode("fluid_volume").addText(os.str().c_str());
     } else
-    Node_settings.getChildNode("solution_exists").addText("false");
+        Node_settings.getChildNode("solution_exists").addText("true");//!!!!!!!!!
+        // Node_settings.getChildNode("solution_exists").addText("false");
 
     // Csomopontok es agak szamanak es nevenek kiolvasasa...
     csp_db = Node_nodes.nChildNode("node");
@@ -638,9 +644,9 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
                 megvan = true;
                 if (debug)
                     cout << " \t=> mass_flow_rate=" << mp
-                << " kg/s, volume_flow_rate=" << q
-                << " m^3/s, velocity=" << v << " m/s"
-                << " m/s, head_loss=" << dh << " m";
+                         << " kg/s, volume_flow_rate=" << q
+                         << " m^3/s, velocity=" << v << " m/s"
+                         << " m/s, head_loss=" << dh << " m";
 
                 // Jelleggorbes fojtas - interpolalt dzeta ertek
                 if (agelemek.at(j)->Get_Tipus() == "Jelleggorbes fojtas") {
@@ -648,7 +654,7 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
 
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("valve") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                            "valve").getChildNode("adzeta");
+                                       "valve").getChildNode("adzeta");
 
                     akt_node.deleteText();
                     ostringstream os;
@@ -663,7 +669,7 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
                     XMLNode akt_node;
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel1") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                            "channel1");
+                                       "channel1");
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("pipe") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode("pipe");
 
@@ -679,7 +685,7 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
                     XMLNode akt_node;
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel1") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                            "channel1");
+                                       "channel1");
 
                     Node_edges.getChildNode("edge", i).getChildNode("node_from").deleteText();
                     Node_edges.getChildNode("edge", i).getChildNode("node_from").addText(
@@ -697,13 +703,13 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode("channel");
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel0") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                            "channel0");
+                                       "channel0");
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel1") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                            "channel1");
+                                       "channel1");
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel2") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                            "channel2");
+                                       "channel2");
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("pipe") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode("pipe");
 
@@ -719,13 +725,13 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode("channel");
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel0") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                            "channel0");
+                                       "channel0");
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel1") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                            "channel1");
+                                       "channel1");
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel2") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                            "channel2");
+                                       "channel2");
 
                     akt_node.getChildNode("start_height").deleteText();
                     ostringstream os;
@@ -752,13 +758,13 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode("channel");
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel0") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                            "channel0");
+                                       "channel0");
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel1") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                            "channel1");
+                                       "channel1");
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel2") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                            "channel2");
+                                       "channel2");
 
 
                     for (int nn = 0; nn < akt_node.nChildNode("curve"); nn++) {
@@ -777,8 +783,8 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
 
                             for (unsigned int pdb = 0; pdb < xf.size(); pdb++)
                                 os << "<point_x>" << xf.at(pdb)
-                            << "</point_x><point_y>" << yf.at(pdb)
-                            << "</point_y>";
+                                   << "</point_x><point_y>" << yf.at(pdb)
+                                   << "</point_y>";
                             if (debug)
                                 cout << endl << " \t\t fenek kesz";
                         }
@@ -789,8 +795,8 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
                             vector<double> y = agelemek.at(j)->Get_res("y");
                             for (unsigned int pdb = 0; pdb < x.size(); pdb++)
                                 os << "<point_x>" << x.at(pdb)
-                            << "</point_x><point_y>" << y.at(pdb)
-                            << "</point_y>";
+                                   << "</point_x><point_y>" << y.at(pdb)
+                                   << "</point_y>";
                             if (debug)
                                 cout << endl << " \t\t vizfelszin kesz";
                         }
@@ -801,8 +807,8 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
                             vector<double> y = agelemek.at(j)->Get_res("p");
                             for (unsigned int pdb = 0; pdb < x.size(); pdb++)
                                 os << "<point_x>" << x.at(pdb)
-                            << "</point_x><point_y>" << y.at(pdb)
-                            << "</point_y>";
+                                   << "</point_x><point_y>" << y.at(pdb)
+                                   << "</point_y>";
                             if (debug)
                                 cout << endl << " \t\t vizfelszin kesz";
                         }
@@ -813,8 +819,8 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
                             vector<double> v = agelemek.at(j)->Get_res("v");
                             for (unsigned int pdb = 0; pdb < x.size(); pdb++)
                                 os << "<point_x>" << x.at(pdb)
-                            << "</point_x><point_y>" << v.at(pdb)
-                            << "</point_y>";
+                                   << "</point_x><point_y>" << v.at(pdb)
+                                   << "</point_y>";
                             if (debug)
                                 cout << endl << " \t\t sebesseg kesz";
                         }
@@ -827,11 +833,13 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
             cout << "nincs meg, atugrom...";
     }
     xMainNode.writeToFile(xml_fnev);
-    cout << "  ok.\n\n";
+
+    if (staci_debug_level > 0)
+        cout << "  ok.\n\n";
 }
 
 //--------------------------------------------------------------------------------
-void data_io::save_mod_prop_all_elements(vector<Csomopont*> cspok, vector<Agelem*> agelemek, string pID){
+void data_io::save_mod_prop_all_elements(vector<Csomopont*> cspok, vector<Agelem*> agelemek, string pID) {
 
     debug = false;
 
@@ -846,11 +854,11 @@ void data_io::save_mod_prop_all_elements(vector<Csomopont*> cspok, vector<Agelem
         ostringstream os;
         os << scientific << setprecision(5) << agelemek.at(i)->Get_dprop(pID);
         akt_node.getChildNode(pID.c_str()).addText(os.str().c_str());
-        
-    } 
+
+    }
 
     // The cspok structure keeps track only the non-end nodes.
-    int i=0;
+    int i = 0;
     double val;
     for (unsigned int j = 0; j < Node_nodes.nChildNode("node"); j++) {
         XMLNode akt_node = Node_nodes.getChildNode("node", j);
@@ -861,21 +869,21 @@ void data_io::save_mod_prop_all_elements(vector<Csomopont*> cspok, vector<Agelem
             i++;
         }
         else
-            val=0.0;
+            val = 0.0;
 
         akt_node.getChildNode(pID.c_str()).deleteText();
         ostringstream os;
         os << scientific << setprecision(5) << val;
-        akt_node.getChildNode(pID.c_str()).addText(os.str().c_str()); 
+        akt_node.getChildNode(pID.c_str()).addText(os.str().c_str());
 
-    }         
+    }
 
     xMainNode.writeToFile(xml_fnev);
 }
 
 //--------------------------------------------------------------------------------
 void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek, string eID, string pID,
-    bool is_property_general) {
+                            bool is_property_general) {
 
     debug = false;
 
@@ -883,7 +891,7 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
 
     if (debug)
         cout << endl << "Kimeneti fajl neve:" << xml_fnev << ", modositott adatok mentese... (eID:" << eID << ", pID="
-    << pID << ")";
+             << pID << ")";
 
     XMLNode Node_settings = xMainNode.getChildNode("settings");
     XMLNode Node_nodes = xMainNode.getChildNode("nodes");
@@ -891,7 +899,7 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
 
     if (debug)
         cout << endl << endl << "cpp_xml_debug=" << Node_settings.getChildNode("cpp_xml_debug").getText()
-    << " => adatfajl irasa kozbeni debug bekapcsolasa..." << endl;
+             << " => adatfajl irasa kozbeni debug bekapcsolasa..." << endl;
 
     // Csomopontok es agak szamanak es nevenek kiolvasasa...
     csp_db = Node_nodes.nChildNode("node");
@@ -917,8 +925,8 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
                 megvan = true;
                 if (debug) {
                     cout << endl << "\tFOUND! xml id : " << id << ",  eID : " << eID << ", agelemek.at(" << j
-                    << ")->Get_nev() : "
-                    << agelemek.at(j)->Get_nev();
+                         << ")->Get_nev() : "
+                         << agelemek.at(j)->Get_nev();
                     cout << endl << "\tpID : " << pID;
                     cout << endl << "\tval : " << agelemek.at(j)->Get_dprop(pID);
                     cout << endl << "\ttip : " << agelemek.at(j)->Get_Tipus();
@@ -938,7 +946,7 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
 
                         if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("pipe") > 0)
                             akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                                "pipe");
+                                           "pipe");
 
                         akt_node.getChildNode(pID.c_str()).deleteText();
                         ostringstream os;
@@ -952,7 +960,7 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
 
                         if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("pool") > 0)
                             akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                                "pool");
+                                           "pool");
 
                         akt_node.getChildNode(pID.c_str()).deleteText();
                         ostringstream os;
@@ -966,7 +974,7 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
 
                         if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("valve") > 0)
                             akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                                "valve");
+                                           "valve");
 
                         akt_node.getChildNode(pID.c_str()).deleteText();
                         ostringstream os;
@@ -1014,7 +1022,7 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
                 akt_node.getChildNode(pID.c_str()).deleteText();
                 ostringstream os;
                 os << scientific << setprecision(5) << cspok.at(j)->Get_dprop(pID);
-                newval=cspok.at(j)->Get_dprop(pID);
+                newval = cspok.at(j)->Get_dprop(pID);
                 akt_node.getChildNode(pID.c_str()).addText(os.str().c_str());
                 break;
             }
@@ -1028,7 +1036,7 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
     } else {
         xMainNode.writeToFile(xml_fnev);
         if (debug) {
-            cout << "\n modified element saved to data file: "<<pID<<" = "<<newval<<"\n\n";
+            cout << "\n modified element saved to data file: " << pID << " = " << newval << "\n\n";
             //cin.get();
         }
     }
@@ -1045,15 +1053,15 @@ void data_io::load_ini_values(vector<Csomopont *> &cspok, vector<Agelem *> &agel
 
     if (debug)
         cout << endl
-    << "cpp_xml_debug= true => inicializacios fajl olvasasa kozbeni debug bekapcsolasa..."
-    << endl;
+             << "cpp_xml_debug= true => inicializacios fajl olvasasa kozbeni debug bekapcsolasa..."
+             << endl;
 
     // Csomopontok es agak szamanak es nevenek kiolvasasa...
     csp_db = Node_nodes.nChildNode("node");
     ag_db = Node_edges.nChildNode("edge");
     if (debug)
         cout << endl << "Ini fajl: " << xml_fnev << endl << "\tcsomopontok szama: "
-    << csp_db << endl << "\tagak szama:        " << ag_db << endl;
+             << csp_db << endl << "\tagak szama:        " << ag_db << endl;
 
     string id;
     double pressure;
@@ -1065,7 +1073,7 @@ void data_io::load_ini_values(vector<Csomopont *> &cspok, vector<Agelem *> &agel
                 cspok.at(j)->Ini(1, pressure);
                 if (debug)
                     cout << endl << "\t id: " << id << " =>  p=" << (pressure * 1000 * 9.81)
-                << "Pa = " << pressure << "vom";
+                         << "Pa = " << pressure << "vom";
             }
         }
     }
@@ -1078,7 +1086,7 @@ void data_io::load_ini_values(vector<Csomopont *> &cspok, vector<Agelem *> &agel
                 mass_flow_rate = atof(Node_edges.getChildNode("edge", i).getChildNode("mass_flow_rate").getText());
                 if (debug)
                     cout << endl << "\t id: " << id << " => mp=" << mass_flow_rate
-                << " kg/s";
+                         << " kg/s";
                 agelemek.at(j)->Ini(1, mass_flow_rate);
             }
         }
@@ -1087,7 +1095,7 @@ void data_io::load_ini_values(vector<Csomopont *> &cspok, vector<Agelem *> &agel
 
 //--------------------------------------------------------------------------------
 void data_io::save_transport(int mode, vector<Csomopont *> cspok,
- vector<Agelem *> agelemek) {
+                             vector<Agelem *> agelemek) {
     XMLNode xMainNode = XMLNode::openFileHelper(xml_fnev, "staci");
 
     XMLNode Node_settings = xMainNode.getChildNode("settings");
@@ -1096,7 +1104,7 @@ void data_io::save_transport(int mode, vector<Csomopont *> cspok,
 
     if (debug)
         cout << endl << endl << "cpp_xml_debug=" << Node_settings.getChildNode("cpp_xml_debug").getText()
-    << " => adatfajl irasa kozbeni debug bekapcsolasa..." << endl;
+             << " => adatfajl irasa kozbeni debug bekapcsolasa..." << endl;
 
     // Csomopontok es agak szamanak es nevenek kiolvasasa...
     csp_db = Node_nodes.nChildNode("node");
@@ -1186,11 +1194,11 @@ string data_io::read_setting(string which) {
             out=thisnode.getText();
         else
             out="";*/
-            out = xMainNode.getChildNode("settings").getChildNode(which.c_str()).getText();
+        out = xMainNode.getChildNode("settings").getChildNode(which.c_str()).getText();
         //if (debug) cout<<endl<<"\t"<<which<<" => "<<out;
         return out;
     } else
-    return "nincs ilyen node!";
+        return "nincs ilyen node!";
 }
 
 //--------------------------------------------------------------------------------
@@ -1201,15 +1209,15 @@ data_io::string_to_double(const string &s, const string &elem_name, const string
     if (s.empty()) {
         cout << endl << endl << "Error! Element: " << elem_name << ", tag: " << tag_name << " is empty." << endl;
         cout << endl << "  Returning default value of " << def_value << " but you should check the input file." << endl
-        << endl;
+             << endl;
         cin.get();
         return def_value;
     } else {
         if (!(i >> x)) {
             cout << endl << endl << "Error! Element: " << elem_name << ", tag: " << tag_name << " - non-numeric value: "
-            << s << endl;
+                 << s << endl;
             cout << endl << "  Returning default value of " << def_value << " but you should check the input file."
-            << endl << endl;
+                 << endl << endl;
             cin.get();
             return def_value;
         } else {

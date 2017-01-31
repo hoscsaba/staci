@@ -105,7 +105,7 @@ public:
     void Print_dfdmu();
     void Print_dxdmu();
     void Compute_dxdmu();
-    void Compute_Sensitivity_Matrix(string parameter,int scale);
+    void Compute_Sensitivity_Matrix(string parameter, int scale);
     void Save_Sensitivity();
     void set_do_save_file(const bool save_it)
     {
@@ -116,12 +116,19 @@ public:
     double get_sum_of_pos_consumption();
     double get_sum_of_neg_consumption();
 
-    double GetMinPipeDiameter();
-    double GetMaxPipeDiameter();
-    double GetMinPipeLength();
-    double GetMaxPipeLength();
+    double GetMinPipeDiameter(int &idx);
+    double GetMaxPipeDiameter(int &idx);
+    double GetMinPipeLength(int &idx);
+    double GetMaxPipeLength(int &idx);
     double GetSumPipeLength();
-    double GetMaxConsumption();
+    double GetSumPipeVolume();
+    double GetMinConsumption(int &idx);
+    double GetMaxConsumption(int &idx);
+    double GetMinGeoHeight(int &idx);
+    double GetMaxGeoHeight(int &idx);
+
+
+    void Statistics();
 
 
 private:
@@ -165,7 +172,7 @@ private:
     int m_nnz;  /*!< Number of nonzero entries of the Jacobian. */
 
     void Compute_dfdmu();
-    
+
 
     // UMFPACK
     /* nemnulla elemek */
@@ -184,5 +191,5 @@ private:
     vector<double> row_abs_sum(vector<vector<double> > M);
     vector<double> col_abs_sum(vector<vector<double> > M);
     void rescale_vec(vector<double>& vec);
-
+    void print_worst_iter(const Vec_DP x, const Vec_DP f, const int a_debug_level);
 };

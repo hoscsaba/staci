@@ -42,7 +42,7 @@ public:
     /// Destruktor
     ~Csomopont();
     // Info
-    string Info();
+    string Info(bool check_if_lonely);
     /// Nyomas beallitasa
     void Set_p(double x)
     {

@@ -34,6 +34,8 @@ Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const
     if (fabs(a_ro) < 1.0e-3)
         error("Agelem constructor", "Density (ro) is zero up to machine precision!");
 
+    force_more_iter = false;
+    update_diameter = false;
 
 }
 
@@ -206,4 +208,12 @@ void Agelem::logfile_write(string msg, int msg_debug_level) {
         outfile << msg;
         outfile.close();
     }
+}
+
+void Agelem::SetLogFile()
+{
+    out_file = nev + ".out";
+    ofstream outputFile;
+    outputFile.open(out_file.c_str());
+    outputFile.close();
 };

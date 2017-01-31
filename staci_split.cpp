@@ -68,7 +68,8 @@ void D_Optimize();
 
 void Load_Settings();
 
-void Save_Membership();
+void Save_Membership(GAGenome & c);
+void Save_Membership2();
 
 double GetAbsMaxCoeff(vector< vector<double> > M);
 
@@ -186,9 +187,10 @@ void Save_Membership(GAGenome & c) {
     FILE * pFile;
 
     pFile = fopen ("membership.txt", "w");
-    fprintf(pFile, "n_comm  : %d\n", n_comm);
+    fprintf(pFile, "n_comm  : %d :\n", n_comm);
     fprintf(pFile, "n_nodes : %d\n", n_n);
     int node_count = 0;
+    vector<int> n_nonempty(n_comm, 0);
     for (int i = 0; i < n_comm; i++) {
         fprintf(pFile, "#%d; ", i);
         strstrm << endl << "comm. #" << i << ": ";
@@ -197,10 +199,17 @@ void Save_Membership(GAGenome & c) {
                 fprintf (pFile, "%s; ", wds->cspok.at(j)->Get_nev().c_str());
                 strstrm << wds->cspok.at(j)->Get_nev().c_str() << " ";
                 node_count++;
+                n_nonempty.at(i) = 1;
             }
         }
         fprintf (pFile, "\n");
     }
+    int sum_nonempty = 0;
+    for (unsigned int i = 0; i < n_comm; i++)
+        sum_nonempty += n_nonempty.at(i);
+
+    fprintf(pFile, "non empty comm: %d\n", sum_nonempty);
+    fprintf(pFile, "    empty comm: %d\n", n_c - sum_nonempty);
 
     fclose (pFile);
 
@@ -211,6 +220,51 @@ void Save_Membership(GAGenome & c) {
     logfile_write(strstrm.str(), 0);
 
 }
+
+void Save_Membership2() {
+    // GA1DArrayAlleleGenome<int> &genome = (GA1DArrayAlleleGenome<int> &) c;
+
+    stringstream strstrm;
+    strstrm.str("");
+    strstrm << endl << "Saving membership to membership.txt...";
+
+    FILE * pFile;
+
+    pFile = fopen ("membership.txt", "w");
+    fprintf(pFile, "n_comm  : %d :\n", n_comm);
+    fprintf(pFile, "n_nodes : %d\n", n_n);
+    int node_count = 0;
+    vector<int> n_nonempty(n_comm, 0);
+    for (int i = 0; i < n_comm; i++) {
+        fprintf(pFile, "#%d; ", i);
+        strstrm << endl << "comm. #" << i << ": ";
+        for (int j = 0 ; j < n_n; j++) {
+            if (best.at(j) == i) {
+                fprintf (pFile, "%s; ", wds->cspok.at(j)->Get_nev().c_str());
+                strstrm << wds->cspok.at(j)->Get_nev().c_str() << " ";
+                node_count++;
+                n_nonempty.at(i) = 1;
+            }
+        }
+        fprintf (pFile, "\n");
+    }
+    int sum_nonempty = 0;
+    for (unsigned int i = 0; i < n_comm; i++)
+        sum_nonempty += n_nonempty.at(i);
+
+    fprintf(pFile, "non empty comm: %d\n", sum_nonempty);
+    fprintf(pFile, "    empty comm: %d\n", n_c - sum_nonempty);
+
+    fclose (pFile);
+
+    if (n_n != node_count)
+        strstrm << " \n\n???? ERROR n_n=" << n_n << " ?= node_count=" << node_count << " WRF????\n\n";
+    else
+        strstrm << " done.\n";
+    logfile_write(strstrm.str(), 0);
+
+}
+
 
 double GetAbsMaxCoeff(vector< vector<double> > M) {
     double maxval = -1.;
@@ -409,19 +463,19 @@ void Q_Optimize() {
     ga.evolve();
     cout << endl << "done." << endl;
 
-    genome = ga.statistics().bestIndividual();
+    // genome = ga.statistics().bestIndividual();
     //double best_obj = Objective(genome);
 
-    strstrm.str("");
-    strstrm << endl << "BEST SOLUTION FOUND:" << endl;
+    // strstrm.str("");
+    // strstrm << endl << "BEST SOLUTION FOUND:" << endl;
 
-    for (unsigned int i = 0; i < n_n; i++)
-        strstrm << genome.gene(i) << " ";
-    strstrm << endl;
-    logfile_write(strstrm.str(), 0);
+    // for (unsigned int i = 0; i < n_n; i++)
+        // strstrm << genome.gene(i) << " ";
+    // strstrm << endl;
+    // logfile_write(strstrm.str(), 0);
 
-    info = true;
-    double best_obj = Objective(genome);
+    // info = true;
+    // double best_obj = Objective(genome);
 
     strstrm << endl << "Some more info:";
     strstrm << endl << "\t datafile   : " << fname;
@@ -437,7 +491,8 @@ void Q_Optimize() {
 
     logfile_write(strstrm.str(), 0);
 
-    Save_Membership(genome);
+    // Save_Membership(genome);
+    Save_Membership2();
 
 
     // Add total sensitivities
@@ -474,7 +529,7 @@ void Q_Optimize() {
         }
         s.val = sqrt(tmp);
         s.ID = wds->cspok.at(i)->Get_nev().c_str();
-        s.comm = genome.gene(i);
+        s.comm = best.at(i);//genome.gene(i);
         v_nodes.push_back(s);
     }
 
@@ -519,19 +574,21 @@ void D_Optimize() {
     ga.set(gaNflushFrequency, 100);
     ga.set(gaNselectScores, GAStatistics::Maximum | GAStatistics::Minimum | GAStatistics::Mean);
     ga.set(gaNscoreFilename, "bog.dat");
+    // ga.elitism();
 
     ga.evolve();
     cout << endl << "done." << endl;
 
-    genome = ga.statistics().bestIndividual();
+    // genome = ga.statistics().bestIndividual();
 
-    strstrm.str("");
-    strstrm << endl << "BEST SOLUTION FOUND:" << endl;
+    // strstrm.str("");
+    // strstrm << endl << "BEST SOLUTION FOUND:" << endl;
 
 
     vector<int> best_sorted;
     for (unsigned int i = 0; i < n_comm; i++)
-        best_sorted.push_back(genome.gene(i));
+        best_sorted.push_back(best.at(i));
+        // best_sorted.push_back(genome.gene(i));
     sort(best_sorted.begin(), best_sorted.begin() + best_sorted.size());
 
     for (unsigned int i = 0; i < n_comm; i++)
@@ -539,8 +596,9 @@ void D_Optimize() {
     // strstrm << "\tNode #" << genome.gene(i) << " is " << wds->cspok.at(genome.gene(i))->Get_nev() << endl;
     logfile_write(strstrm.str(), 0);
 
-    info = true;
-    double best_obj = Objective(genome);
+    // info = true;
+    // GA1DArrayAlleleGenome<int> tmp = (GA1DArrayAlleleGenome<int> &) c;
+    // double best_obj = Objective(genome);
 
     strstrm.str("");
     strstrm << endl << "Some more info:";
@@ -1053,9 +1111,18 @@ float Q_Objective(GAGenome & c) {
 
     // Extract genome to more convenient form
     vector<int> tmp(n_n);
-    //tmp.at(0) = 0;
-    for (int i = 0; i < n_n; i++)
+    vector<int> empty_comm(n_comm, 0);
+    for (int i = 0; i < n_n; i++) {
         tmp.at(i) = genome.gene(i);
+        for (int j = 0; j < n_comm; j++) {
+            if (j == tmp.at(i))
+                empty_comm.at(j) = 1;
+        }
+    }
+
+    int sum_nonempty = 0;
+    for (int j = 0; j < n_comm; j++)
+        sum_nonempty += empty_comm.at(j);
 
     // Compute number of cuts
     n_c = 0;
@@ -1094,19 +1161,20 @@ float Q_Objective(GAGenome & c) {
             strstrm << best.at(i) << " ";
 
         if (fcount < 1000)
-            strstrm << endl << "fcount : " << fcount << " (" << ((double) fcount) / f_ce * 100.
+            strstrm << endl << "fcount  : " << fcount << " (" << ((double) fcount) / f_ce * 100.
                     << " % of compl. enum.)";
         if (fcount < 1e6)
-            strstrm << endl << "fcount : " << ((double) fcount) / 1000. << "k (" << ((double) fcount) / f_ce * 100.
+            strstrm << endl << "fcount  : " << ((double) fcount) / 1000. << "k (" << ((double) fcount) / f_ce * 100.
                     << " % of compl. enum.)";
         else
-            strstrm << endl << "fcount : " << ((double) fcount) / 1000000. << "M (" << ((double) fcount) / f_ce * 100.
+            strstrm << endl << "fcount  : " << ((double) fcount) / 1000000. << "M (" << ((double) fcount) / f_ce * 100.
                     << " % of compl. enum.)";
-        strstrm << endl << "n_c/np : " << ((double) n_c / (double) n_p) << " (=n_c/np with n_c = " << n_c << ", np = "
+        strstrm << endl << "n_c/np  : " << ((double) n_c / (double) n_p) << " (=n_c/np with n_c = " << n_c << ", np = "
                 << n_p
                 << ")";
-        strstrm << endl << "Qmod   : " << Qmod;
-        strstrm << endl << "Q      : " << Q << endl << "----------------------------------------------------";
+        strstrm << endl << "empty c.: " << n_comm-sum_nonempty;
+        strstrm << endl << "Qmod    : " << Qmod;
+        strstrm << endl << "Q       : " << Q << endl << "----------------------------------------------------";
         logfile_write(strstrm.str(), 0);
 
     }

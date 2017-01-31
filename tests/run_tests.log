@@ -1,0 +1,4 @@
+
+*********** TEST 6: channel.spr, yn>yc (case 2.a.i) ************ 
+
+ ==> expected: 3155.29, got: 3155.28, error: 0.000316928 %	OK.
