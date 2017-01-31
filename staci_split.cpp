@@ -105,7 +105,8 @@ struct val_and_ID {
     bool operator<=(const val_and_ID& rhs) { return val <= rhs.val; }
 };
 
-bool comparison_function1(const val_and_ID& lhs, const val_and_ID& rhs ) { return lhs.val > rhs.val; }
+// Note that Staci.ccp already has a "comparison_function1()"
+bool comparison_function11(const val_and_ID& lhs, const val_and_ID& rhs ) { return lhs.val > rhs.val; }
 
 struct val_and_ID_and_comm {
     double val;
@@ -137,6 +138,8 @@ int main(int argc, char **argv) {
     // Load system
     LoadSystem(fname);
 
+    // cout << endl << "LoadSystem() ready." << endl;
+
     // Sensitivity matrix
     if ((obj_type == "A-optimality") || (obj_type == "D-optimality")) {
         if (weight_type == "friction_coeff") {
@@ -159,6 +162,7 @@ int main(int argc, char **argv) {
         SM.push_back(tmp);
         tmp.clear();
     }
+
 
     double maxSM = GetAbsMaxCoeff(SM);
     for (int i = 0; i < SM.size(); i++)
@@ -278,14 +282,15 @@ double GetAbsMaxCoeff(vector< vector<double> > M) {
 }
 
 void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
-    wds->Compute_Sensitivity_Matrix(par, 0);
 
-    int debug = false;
+    int debug = true;
 
     if (debug) {
         cout << endl << "Entering PerformSensitivityAnalysis()..." << flush;
         cin.get();
     }
+
+    wds->Compute_Sensitivity_Matrix(par, 0);
 
     SM_MFR = wds->SM_MassFlowRates;
     SM_PR  = wds->SM_Pressures;
@@ -361,24 +366,37 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
     vector<val_and_ID> v_nodes;
     val_and_ID s;
 
+    cout << "\n n_edges = " << n_edges << ", n_nodes=" << n_nodes << ", sum: " << (n_edges + n_nodes);
+    cout << "\n SM_MFR = " << SM_MFR.size() << " x " << SM_MFR.at(0).size();
+    cout << "\n SM_PR  = " << SM_PR.size() << " x " << SM_PR.at(0).size();
+    cin.get();
+
     if (is_edge_prop) {
         for (int i = 0 ; i < n_edges; i++) {
             double tmp = 0.;
-            for (int j = 0 ; j < n_edges; j++)
+            for (int j = 0 ; j < n_edges; j++) {
+                // cout << "\n\t " << i << "/" << j;
                 tmp += SM_MFR.at(j).at(i) * SM_MFR.at(j).at(i);
+            }
             s.val =  sqrt(tmp);
             s.ID = wds->agelemek.at(i)->Get_nev().c_str();
             v_edges.push_back(s);
         }
+        cout << "\n is_edge_prop, finished n_edges.";
+        cin.get();
+
         for (int i = 0 ; i < n_nodes; i++) {
             double tmp = 0.;
             for (int j = 0 ; j < n_edges; j++) {
+                // cout << "\n\t " << i << "/" << j;
                 tmp += SM_PR.at(j).at(i) * SM_PR.at(j).at(i);
             }
             s.val = sqrt(tmp);
             s.ID = wds->cspok.at(i)->Get_nev().c_str();
             v_nodes.push_back(s);
         }
+        cout << "\n is_edge_prop, finished n_nodes.";
+        cin.get();
     }
     else {
         for (int i = 0 ; i < n_edges; i++) {
@@ -406,8 +424,11 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
     // for (int i = 0; i < n_nodes; i++)
     //     fprintf(pFile, "\n %10s: %7.5e", v_nodes.at(i).ID.c_str(), v_nodes.at(i).val);
 
-    sort(v_edges.begin(), v_edges.end(), comparison_function1);
-    sort(v_nodes.begin(), v_nodes.end(), comparison_function1);
+    sort(v_edges.begin(), v_edges.end(), comparison_function11);
+    sort(v_nodes.begin(), v_nodes.end(), comparison_function11);
+
+    cout << endl << "Hi! 3" << endl;
+    cin.get();
 
     fprintf (pFile, "\nColumn-wise L2 norm of sensitivities, after sorting:");
     for (int i = 0; i < n_edges; i++)
@@ -470,23 +491,23 @@ void Q_Optimize() {
     // strstrm << endl << "BEST SOLUTION FOUND:" << endl;
 
     // for (unsigned int i = 0; i < n_n; i++)
-        // strstrm << genome.gene(i) << " ";
+    // strstrm << genome.gene(i) << " ";
     // strstrm << endl;
     // logfile_write(strstrm.str(), 0);
 
     // info = true;
     // double best_obj = Objective(genome);
-
+    int idx;
     strstrm << endl << "Some more info:";
     strstrm << endl << "\t datafile   : " << fname;
     strstrm << endl << "\t # of nodes : " << n_n;
     strstrm << endl << "\t # of pipes : " << n_p;
-    strstrm << endl << "\t D          : " << (wds->GetMinPipeDiameter()) << " ... " << (wds->GetMaxPipeDiameter())
+    strstrm << endl << "\t D          : " << (wds->GetMinPipeDiameter(idx)) << " ... " << (wds->GetMaxPipeDiameter(idx))
             << " m";
-    strstrm << endl << "\t L          : " << (wds->GetMinPipeLength()) << " ... " << (wds->GetMaxPipeLength()) << " m";
+    strstrm << endl << "\t L          : " << (wds->GetMinPipeLength(idx)) << " ... " << (wds->GetMaxPipeLength(idx)) << " m";
     strstrm << endl << "\t sum. L     : " << (wds->GetSumPipeLength()) << " m ";
-    strstrm << endl << "\t max. cons. : " << (wds->GetMaxConsumption()) << " kg/s = "
-            << 3.6 * (wds->GetMaxConsumption())
+    strstrm << endl << "\t max. cons. : " << (wds->GetMaxConsumption(idx)) << " kg/s = "
+            << 3.6 * (wds->GetMaxConsumption(idx))
             << " m3/h" << endl;
 
     logfile_write(strstrm.str(), 0);
@@ -588,7 +609,7 @@ void D_Optimize() {
     vector<int> best_sorted;
     for (unsigned int i = 0; i < n_comm; i++)
         best_sorted.push_back(best.at(i));
-        // best_sorted.push_back(genome.gene(i));
+    // best_sorted.push_back(genome.gene(i));
     sort(best_sorted.begin(), best_sorted.begin() + best_sorted.size());
 
     for (unsigned int i = 0; i < n_comm; i++)
@@ -601,14 +622,15 @@ void D_Optimize() {
     // double best_obj = Objective(genome);
 
     strstrm.str("");
+    int idx;
     strstrm << endl << "Some more info:";
     strstrm << endl << "\t datafile   : " << fname;
     strstrm << endl << "\t # of nodes : " << n_n;
     strstrm << endl << "\t # of pipes : " << n_p;
-    strstrm << endl << "\t D          : " << (wds->GetMinPipeDiameter()) << " ... " << (wds->GetMaxPipeDiameter()) << " m";
-    strstrm << endl << "\t L          : " << (wds->GetMinPipeLength()) << " ... " << (wds->GetMaxPipeLength()) << " m";
+    strstrm << endl << "\t D          : " << (wds->GetMinPipeDiameter(idx)) << " ... " << (wds->GetMaxPipeDiameter(idx)) << " m";
+    strstrm << endl << "\t L          : " << (wds->GetMinPipeLength(idx)) << " ... " << (wds->GetMaxPipeLength(idx)) << " m";
     strstrm << endl << "\t sum. L     : " << (wds->GetSumPipeLength()) << " m ";
-    strstrm << endl << "\t max. cons. : " << (wds->GetMaxConsumption()) << " kg/s = " << 3.6 * (wds->GetMaxConsumption()) << " m3/h" << endl;
+    strstrm << endl << "\t max. cons. : " << (wds->GetMaxConsumption(idx)) << " kg/s = " << 3.6 * (wds->GetMaxConsumption(idx)) << " m3/h" << endl;
 
     logfile_write(strstrm.str(), 0);
 
@@ -1172,7 +1194,7 @@ float Q_Objective(GAGenome & c) {
         strstrm << endl << "n_c/np  : " << ((double) n_c / (double) n_p) << " (=n_c/np with n_c = " << n_c << ", np = "
                 << n_p
                 << ")";
-        strstrm << endl << "empty c.: " << n_comm-sum_nonempty;
+        strstrm << endl << "empty c.: " << n_comm - sum_nonempty;
         strstrm << endl << "Qmod    : " << Qmod;
         strstrm << endl << "Q       : " << Q << endl << "----------------------------------------------------";
         logfile_write(strstrm.str(), 0);
@@ -1201,6 +1223,9 @@ void LoadMatrices(MatrixXd & A, VectorXd & W, VectorXd & p, string weight_type) 
         abs_Apn(j, idx_n1)++;
         abs_Apn(j, idx_n2)++;
     }
+
+    cout << endl << " LoadMatrices 1 " << endl;
+    cin.get();
 
     A = Apn.transpose() * Apn;
     for (unsigned i = 0; i < n_n; i++) {
@@ -1237,6 +1262,10 @@ void LoadMatrices(MatrixXd & A, VectorXd & W, VectorXd & p, string weight_type) 
         }
     }
 
+
+    cout << endl << " LoadMatrices 2 " << endl;
+    cin.get();
+
     if (0 == strcmp(weight_type.c_str(), "sensitivity")) {
         // Add total sensitivities
         bool is_edge_prop;
@@ -1244,6 +1273,8 @@ void LoadMatrices(MatrixXd & A, VectorXd & W, VectorXd & p, string weight_type) 
         if (weight_type_mod == "friction_coeff") {
             is_edge_prop = true;
             PerformSensitivityAnalysis(true /*is_edge_prop*/, "friction_coeff", "sensitivity_matrix_friction_coeff.csv");
+            cout << endl << " LoadMatrices 3 " << endl;
+            cin.get();
         }
         else if (weight_type_mod == "diameter") {
             is_edge_prop = true;
@@ -1288,6 +1319,10 @@ void LoadMatrices(MatrixXd & A, VectorXd & W, VectorXd & p, string weight_type) 
     // Final computations
     p = abs_Apn.transpose() * W;
     sumW = W.sum();
+
+
+    cout << endl << " LoadMatrices exit " << endl;
+    cin.get();
 
 }
 

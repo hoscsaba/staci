@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 #include "StaciException.h"
 #include "data_io.h"
 
@@ -1209,7 +1210,7 @@ bool Staci::solve_system() {
     if ((e_mp < 0.001) && (e_p < 0.001)) {
       m_ss.str("");
       m_ss << endl << "e_mp=" << e_mp << ", e_p=" << e_p << " --> Updating pipe diameters.";
-      logfile_write(m_ss.str(),1);
+      logfile_write(m_ss.str(), 1);
       for (unsigned int i = 0; i < agelemek.size(); i++) {
         agelemek.at(i)->update_diameter = true;
         if (agelemek.at(i)->force_more_iter)
