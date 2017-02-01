@@ -1448,7 +1448,7 @@ void Load_Settings() {
     if (!is_weight_ok) {
         if (obj_type == "modularity") {
             cout << endl << "ERROR in Load_Settings() unknown weight_type >" << weight_type << "<";
-            cout << endl << "obj_type = " << obj_type << " -> possible weigths: topology, dp";
+            cout << endl << "obj_type = " << obj_type << " -> possible weigths: topology, dp, sensitivity";
             cout << endl << "Exiting..." << endl;
             exit(-1);
         }
