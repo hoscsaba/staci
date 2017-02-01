@@ -5,7 +5,6 @@
 #include "xmlParser.h"
 #include <Eigen/Dense>
 #include <algorithm>
-// #include </usr/inlude/eigen3/Dense>
 #include <ga/ga.h>
 #include <ga/GASimpleGA.h>
 #include <ga/GAListGenome.h>
@@ -97,23 +96,23 @@ vector< vector<double> > SM;
 vector< vector<double> > SM_MFR ;
 vector< vector<double> > SM_PR ;
 
-struct val_and_ID {
-    double val;
-    string ID;
-    // bool operator>(const val_and_ID& rhs)const { return val > rhs.val; }
-    // bool operator>=(const val_and_ID& rhs) const { return val >= rhs.val; }
-    // bool operator<(const val_and_ID& rhs) const { return val < rhs.val; }
-    // bool operator<=(const val_and_ID& rhs)const { return val <= rhs.val; }
-    // val_and_ID(double k, string s) : val(k), ID(s) {}
-    // val_and_ID() : val(0.), ID("a") {}
-};
+// struct val_and_ID {
+//     double val;
+//     string ID;
+//     // bool operator>(const val_and_ID& rhs)const { return val > rhs.val; }
+//     // bool operator>=(const val_and_ID& rhs) const { return val >= rhs.val; }
+//     // bool operator<(const val_and_ID& rhs) const { return val < rhs.val; }
+//     // bool operator<=(const val_and_ID& rhs)const { return val <= rhs.val; }
+//     // val_and_ID(double k, string s) : val(k), ID(s) {}
+//     // val_and_ID() : val(0.), ID("a") {}
+// };
 
-// Note that Staci.ccp already has a "comparison_function1()"
-bool comparison_function_val_and_ID(
-    const val_and_ID &lhs,
-    const val_and_ID &rhs ) {
-    return lhs.val > rhs.val;
-}
+// // Note that Staci.ccp already has a "comparison_function1()"
+// bool comparison_function_val_and_ID(
+//     const val_and_ID &lhs,
+//     const val_and_ID &rhs ) {
+//     return lhs.val > rhs.val;
+// }
 
 struct val_and_ID_and_comm {
     double val;
