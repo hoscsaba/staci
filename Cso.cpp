@@ -252,7 +252,7 @@ double Cso::Get_dprop(string mit) {
          << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit=" << mit << endl
          << endl;
     cout << endl << "Name of pipe: " << nev << endl;
-    exit(-1);
+    cin.get();
   }
   return out;
 }

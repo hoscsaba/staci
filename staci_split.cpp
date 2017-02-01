@@ -100,12 +100,12 @@ vector< vector<double> > SM_PR ;
 struct val_and_ID {
     double val;
     string ID;
-    bool operator>(const val_and_ID& rhs)const { return val > rhs.val; }
-    bool operator>=(const val_and_ID& rhs) const { return val >= rhs.val; }
-    bool operator<(const val_and_ID& rhs) const { return val < rhs.val; }
-    bool operator<=(const val_and_ID& rhs)const { return val <= rhs.val; }
-    val_and_ID(double k, string s) : val(k), ID(s) {}
-    val_and_ID() : val(0.), ID("a") {}
+    // bool operator>(const val_and_ID& rhs)const { return val > rhs.val; }
+    // bool operator>=(const val_and_ID& rhs) const { return val >= rhs.val; }
+    // bool operator<(const val_and_ID& rhs) const { return val < rhs.val; }
+    // bool operator<=(const val_and_ID& rhs)const { return val <= rhs.val; }
+    // val_and_ID(double k, string s) : val(k), ID(s) {}
+    // val_and_ID() : val(0.), ID("a") {}
 };
 
 // Note that Staci.ccp already has a "comparison_function1()"
@@ -422,8 +422,6 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
     // Add total sensitivities
     vector<val_and_ID> v_edges;
     vector<val_and_ID> v_nodes;
-    v_edges.reserve(n_edges);
-    v_edges.reserve(n_nodes);
 
     // cout << "\n n_edges = " << n_edges << ", n_nodes=" << n_nodes << ", sum: " << (n_edges + n_nodes);
     // cout << "\n size of SM_MFR : " << SM_MFR.size() << " x " << SM_MFR.at(0).size();
@@ -434,16 +432,18 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
             double tmp = 0.;
             for (int j = 0 ; j < n_edges; j++)
                 tmp += SM_MFR.at(j).at(i) * SM_MFR.at(j).at(i);
-            val_and_ID s(sqrt(tmp), wds->agelemek.at(i)->Get_nev().c_str());
-            v_edges.push_back(s);
+            v_edges.push_back(val_and_ID());
+            v_edges[i].val = sqrt(tmp);
+            v_edges[i].ID = wds->agelemek.at(i)->Get_nev();
         }
 
         for (int i = 0 ; i < n_nodes; i++) {
             double tmp = 0.;
             for (int j = 0 ; j < n_edges; j++)
                 tmp += SM_PR.at(j).at(i) * SM_PR.at(j).at(i);
-            val_and_ID s(sqrt(tmp), wds->cspok.at(i)->Get_nev().c_str());
-            v_nodes.push_back(s);
+            v_nodes.push_back(val_and_ID());
+            v_nodes[i].val = sqrt(tmp);
+            v_nodes[i].ID = wds->cspok.at(i)->Get_nev();
         }
     }
     else {
@@ -451,15 +451,17 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
             double tmp = 0.;
             for (int j = 0 ; j < n_nodes; j++)
                 tmp += SM_MFR.at(j).at(i) * SM_MFR.at(j).at(i) ;
-            val_and_ID s(sqrt(tmp), wds->agelemek.at(i)->Get_nev().c_str());
-            v_edges.push_back(s);
+            v_edges.push_back(val_and_ID());
+            v_edges[i].val = sqrt(tmp);
+            v_edges[i].ID = wds->agelemek.at(i)->Get_nev();
         }
         for (int i = 0 ; i < n_nodes; i++) {
             double tmp = 0.;
             for (int j = 0 ; j < n_nodes; j++)
                 tmp += SM_PR.at(j).at(i) * SM_PR.at(j).at(i) ;
-            val_and_ID s(sqrt(tmp), wds->cspok.at(i)->Get_nev().c_str());
-            v_nodes.push_back(s);
+            v_nodes.push_back(val_and_ID());
+            v_nodes[i].val = sqrt(tmp);
+            v_nodes[i].ID = wds->cspok.at(i)->Get_nev();
         }
     }
 

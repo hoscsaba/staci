@@ -125,7 +125,7 @@ double VisszacsapoSzelep::Get_dprop(string mit) {
          << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit=" << mit << endl
          << endl;
     cout << endl << "Name of VisszacsapoSzelep: " << nev << endl;
-    exit(-1);
+    cin.get();
     // }
     return out;
 }
