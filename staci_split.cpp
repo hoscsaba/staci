@@ -420,30 +420,33 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
     }
 
     // Add total sensitivities
-    vector<val_and_ID> v_edges;
-    vector<val_and_ID> v_nodes;
+    vector<val_and_ID> v_edges(n_edges);
+    vector<val_and_ID> v_nodes(n_nodes);
 
-    // cout << "\n n_edges = " << n_edges << ", n_nodes=" << n_nodes << ", sum: " << (n_edges + n_nodes);
-    // cout << "\n size of SM_MFR : " << SM_MFR.size() << " x " << SM_MFR.at(0).size();
-    // cout << "\n size of SM_PR  : " << SM_PR.size() << " x " << SM_PR.at(0).size();
+    cout << "\n n_edges = " << n_edges << ", n_nodes=" << n_nodes << ", sum: " << (n_edges + n_nodes);
+    cout << "\n size of SM_MFR : " << SM_MFR.size() << " x " << SM_MFR.at(0).size();
+    cout << "\n size of SM_PR  : " << SM_PR.size() << " x " << SM_PR.at(0).size();
+    cin.get();
 
     if (is_edge_prop) {
         for (int i = 0 ; i < n_edges; i++) {
             double tmp = 0.;
             for (int j = 0 ; j < n_edges; j++)
                 tmp += SM_MFR.at(j).at(i) * SM_MFR.at(j).at(i);
-            v_edges.push_back(val_and_ID());
-            v_edges[i].val = sqrt(tmp);
-            v_edges[i].ID = wds->agelemek.at(i)->Get_nev();
+            val_and_ID tmp2;
+            tmp2.val =  sqrt(tmp);
+            tmp2.ID =  wds->agelemek.at(i)->Get_nev();
+            v_edges.at(i) = tmp2;
         }
 
         for (int i = 0 ; i < n_nodes; i++) {
             double tmp = 0.;
             for (int j = 0 ; j < n_edges; j++)
                 tmp += SM_PR.at(j).at(i) * SM_PR.at(j).at(i);
-            v_nodes.push_back(val_and_ID());
-            v_nodes[i].val = sqrt(tmp);
-            v_nodes[i].ID = wds->cspok.at(i)->Get_nev();
+            val_and_ID tmp2;
+            tmp2.val =  sqrt(tmp);
+            tmp2.ID =  wds->cspok.at(i)->Get_nev();
+            v_nodes.at(i) = tmp2;
         }
     }
     else {
@@ -451,25 +454,27 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
             double tmp = 0.;
             for (int j = 0 ; j < n_nodes; j++)
                 tmp += SM_MFR.at(j).at(i) * SM_MFR.at(j).at(i) ;
-            v_edges.push_back(val_and_ID());
-            v_edges[i].val = sqrt(tmp);
-            v_edges[i].ID = wds->agelemek.at(i)->Get_nev();
+            val_and_ID tmp2;
+            tmp2.val =  sqrt(tmp);
+            tmp2.ID =  wds->agelemek.at(i)->Get_nev();
+            v_edges.at(i) = tmp2;
         }
         for (int i = 0 ; i < n_nodes; i++) {
             double tmp = 0.;
             for (int j = 0 ; j < n_nodes; j++)
                 tmp += SM_PR.at(j).at(i) * SM_PR.at(j).at(i) ;
-            v_nodes.push_back(val_and_ID());
-            v_nodes[i].val = sqrt(tmp);
-            v_nodes[i].ID = wds->cspok.at(i)->Get_nev();
+            val_and_ID tmp2;
+            tmp2.val =  sqrt(tmp);
+            tmp2.ID =  wds->cspok.at(i)->Get_nev();
+            v_nodes.at(i) = tmp2;
         }
     }
 
-    // for (int k = 0 ; k < v_edges.size(); k++)
-    //     cout << "\n ID = " << v_edges.at(k).ID << ", val=" <<  v_edges.at(k).val;
-    // for (int k = 0 ; k < v_nodes.size(); k++)
-    //     cout << "\n ID = " << v_nodes.at(k).ID << ", val=" <<  v_nodes.at(k).val;
-    // cin.get();
+    for (int k = 0 ; k < v_edges.size(); k++)
+        cout << "\n ID = " << v_edges.at(k).ID << ", val=" <<  v_edges.at(k).val;
+    for (int k = 0 ; k < v_nodes.size(); k++)
+        cout << "\n ID = " << v_nodes.at(k).ID << ", val=" <<  v_nodes.at(k).val;
+    cin.get();
 
     // fprintf (pFile, "\nColumn-wise sum of absolute values:");
     // for (int i = 0; i < n_edges; i++)
@@ -478,8 +483,8 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
     // for (int i = 0; i < n_nodes; i++)
     //     fprintf(pFile, "\n %10s: %7.5e", v_nodes.at(i).ID.c_str(), v_nodes.at(i).val);
 
-    sort(v_edges.begin(), v_edges.end(), comparison_function_val_and_ID);
-    sort(v_nodes.begin(), v_nodes.end(), comparison_function_val_and_ID);
+    // sort(v_edges.begin(), v_edges.end(), comparison_function_val_and_ID);
+    // sort(v_nodes.begin(), v_nodes.end(), comparison_function_val_and_ID);
 
     fprintf (pFile, "\nColumn-wise L2 norm of sensitivities, after sorting:");
     for (int i = 0; i < n_edges; i++)
