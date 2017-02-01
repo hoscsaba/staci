@@ -1,9 +1,3 @@
-//! The pipe class.
-/*!
-Fully filled pipe only!
-*/
-
-using namespace std;
 
 #include "Cso.h"
 #include <cmath>
@@ -13,11 +7,13 @@ using namespace std;
 #include <vector>
 #include "Agelem.h"
 
+using namespace std;
+
 Cso::Cso(const string a_nev, const string a_cspe_nev, const string a_cspv_nev,
          const double a_ro, const double a_L, const double a_D,
          const double a_erdesseg, const double a_cl_k, const double a_cl_w,
          const double a_mp)
-  : Agelem(a_nev, a_D * a_D * pi / 4., a_mp, a_ro) {
+  : Agelem(a_nev, a_D * a_D * M_PI / 4., a_mp, a_ro) {
   // Kotelezo adatok minden Agelemnel:
   tipus = "Cso";
   csp_db = 2;
@@ -30,7 +26,7 @@ Cso::Cso(const string a_nev, const string a_cspe_nev, const string a_cspv_nev,
   f_count = 0;
   cl_k = a_cl_k;
   cl_w = a_cl_w;
-  FolyTerf = D * D * pi / 4 * L;
+  FolyTerf = D * D * M_PI / 4. * L;
   lambda = 0.02;
 }
 
@@ -88,6 +84,10 @@ double Cso::f(vector<double> x) {
   ere = pv - pe + tag1 + ComputeHeadloss();
   f_count++;
   lambda = surlodas();
+
+  // cout << endl << nev << ": tag1 = " << tag1 << ", Aref=" << Aref;
+  // cout << endl << "pe=" << pe << ", pv=" << pv << ", he=" << he << ", hv=" << hv << ", f=" << ere;
+  // cin.get();
 
   return ere / ro / g;
 }
@@ -222,7 +222,7 @@ double Cso::surlodas() {
 
 //--------------------------------------------------------------
 double Cso::Get_dprop(string mit) {
-  double out = 0.0;
+  double out;
   if (mit == "Aref")
     out = Aref;
   else if (mit == "lambda")
@@ -252,7 +252,7 @@ double Cso::Get_dprop(string mit) {
          << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit=" << mit << endl
          << endl;
     cout << endl << "Name of pipe: " << nev << endl;
-    out = 0.0;
+    exit(-1);
   }
   return out;
 }
@@ -274,10 +274,12 @@ double Cso::Get_dfdmu(string mit) {
     double f1 = ComputeHeadloss();
     out = (f1 - f0) / delta_erdesseg;
     erdesseg = old_erdesseg;
-    // cout << endl<<" out ="<<out<<", deriv = "<<deriv;
+
+    // cout << endl << " out =" << out
     //      << "Get_dfdmu -> f0=" << f0 << ", f1=" << f1
-    //      << ", (f1-f0)/(Delta)=" << deriv;
+    //      << ", (f1-f0)/(Delta)=" << out;
     // cin.get();
+
     // out = deriv;
   } else {
     cout << endl
@@ -293,7 +295,7 @@ double Cso::Get_dfdmu(string mit) {
 void Cso::Set_dprop(string mit, double mire) {
   if (mit == "diameter") {
     D = mire;
-    Aref = D * D * pi / 4;
+    Aref = D * D * M_PI / 4.;
     FolyTerf = Aref * L;
   } else if ((mit == "concentration") || (mit == "konc_atlag")) {
     konc_atlag = mire;

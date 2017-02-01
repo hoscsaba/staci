@@ -4,7 +4,8 @@
 #include "Staci.h"
 #include "xmlParser.h"
 #include <Eigen/Dense>
-
+#include <algorithm>
+// #include </usr/inlude/eigen3/Dense>
 #include <ga/ga.h>
 #include <ga/GASimpleGA.h>
 #include <ga/GAListGenome.h>
@@ -99,14 +100,20 @@ vector< vector<double> > SM_PR ;
 struct val_and_ID {
     double val;
     string ID;
-    bool operator>(const val_and_ID& rhs) { return val > rhs.val; }
-    bool operator>=(const val_and_ID& rhs) { return val >= rhs.val; }
-    bool operator<(const val_and_ID& rhs) { return val < rhs.val; }
-    bool operator<=(const val_and_ID& rhs) { return val <= rhs.val; }
+    bool operator>(const val_and_ID& rhs)const { return val > rhs.val; }
+    bool operator>=(const val_and_ID& rhs) const { return val >= rhs.val; }
+    bool operator<(const val_and_ID& rhs) const { return val < rhs.val; }
+    bool operator<=(const val_and_ID& rhs)const { return val <= rhs.val; }
+    val_and_ID(double k, string s) : val(k), ID(s) {}
+    val_and_ID() : val(0.), ID("a") {}
 };
 
 // Note that Staci.ccp already has a "comparison_function1()"
-bool comparison_function11(const val_and_ID& lhs, const val_and_ID& rhs ) { return lhs.val > rhs.val; }
+bool comparison_function_val_and_ID(
+    const val_and_ID &lhs,
+    const val_and_ID &rhs ) {
+    return lhs.val > rhs.val;
+}
 
 struct val_and_ID_and_comm {
     double val;
@@ -283,7 +290,7 @@ double GetAbsMaxCoeff(vector< vector<double> > M) {
 
 void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
 
-    int debug = true;
+    int debug = false;
 
     if (debug) {
         cout << endl << "Entering PerformSensitivityAnalysis()..." << flush;
@@ -296,16 +303,45 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
     SM_PR  = wds->SM_Pressures;
     int n_edges = wds->agelemek.size();
     int n_nodes = wds->cspok.size();
-    // cout << endl << "SM_PR:";
-    // for (unsigned int i = 0; i < SM_PR.size(); i++) {
-    //     cout << endl;
-    //     for (unsigned int j = 0; j < SM_PR.at(i).size(); j++) {
-    //         printf("%+5.3e ", SM_PR.at(i).at(j));
-    //     }
-    // }
 
+    if (debug) {
+        cout << endl << "SM_MFR (before rescaling):";
+        for (unsigned int i = 0; i < SM_MFR.size(); i++) {
+            cout << endl;
+            for (unsigned int j = 0; j < SM_MFR.at(i).size(); j++) {
+                printf("%+5.3e ", SM_MFR.at(i).at(j));
+            }
+        }
+
+        cout << endl << "SM_PR (before rescaling):";
+        for (unsigned int i = 0; i < SM_PR.size(); i++) {
+            cout << endl;
+            for (unsigned int j = 0; j < SM_PR.at(i).size(); j++) {
+                printf("%+5.3e ", SM_PR.at(i).at(j));
+            }
+        }
+    }
+
+    double TINY_NUM = 1.e-5;
     double max_SM_MFR = GetAbsMaxCoeff(SM_MFR);
+    if (max_SM_MFR < TINY_NUM) {
+        stringstream strstrm;
+        strstrm.str("");
+        strstrm << endl << "WARNING! max(abs(SM_MFR))=" << max_SM_MFR;
+        strstrm << ", ovewriting with " << TINY_NUM << endl;
+        logfile_write(strstrm.str(), 0);
+        max_SM_MFR = TINY_NUM;
+    }
+
     double max_SM_PR  = GetAbsMaxCoeff(SM_PR);
+    if (max_SM_PR < TINY_NUM) {
+        stringstream strstrm;
+        strstrm.str("");
+        strstrm << endl << "WARNING! max(abs(SM_PR))=" << max_SM_PR;
+        strstrm << ", ovewriting with " << TINY_NUM << endl;
+        logfile_write(strstrm.str(), 0);
+        max_SM_PR = TINY_NUM;
+    }
 
     if (is_edge_prop) {
         for (int i = 0 ; i < n_edges; i++) {
@@ -325,6 +361,26 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
         }
     }
 
+    if (debug) {
+        cout << endl << "SM_MFR (after rescaling):";
+        for (unsigned int i = 0; i < SM_MFR.size(); i++) {
+            cout << endl;
+            for (unsigned int j = 0; j < SM_MFR.at(i).size(); j++) {
+                printf("%+5.3e ", SM_MFR.at(i).at(j));
+            }
+        }
+
+        cout << endl << "SM_PR (after rescaling):";
+        for (unsigned int i = 0; i < SM_PR.size(); i++) {
+            cout << endl;
+            for (unsigned int j = 0; j < SM_PR.at(i).size(); j++) {
+                printf("%+5.3e ", SM_PR.at(i).at(j));
+            }
+        }
+        cin.get();
+    }
+
+
     FILE * pFile;
 
     pFile = fopen (fname.c_str(), "w");
@@ -333,6 +389,8 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
     fprintf(pFile, "n_nodes : %d\n", n_nodes);
     fprintf(pFile, "n_cols  : %d ( = n_edges + n_nodes )\n", n_edges + n_nodes);
     fprintf(pFile, "n_rows  : %d ( = n_edges )\n", n_edges);
+    fprintf(pFile, "Note that these are scaled sensitivities:");
+    fprintf(pFile, " max_SM_MFR = %5.3e, max_SM_PR = %5.3e\n\n", max_SM_MFR, max_SM_PR);
     fprintf(pFile, "column names; ");
     for (int j = 0 ; j < n_edges; j++)
         fprintf (pFile, "%s; ", wds->agelemek.at(j)->Get_nev().c_str());
@@ -364,58 +422,52 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
     // Add total sensitivities
     vector<val_and_ID> v_edges;
     vector<val_and_ID> v_nodes;
-    val_and_ID s;
+    v_edges.reserve(n_edges);
+    v_edges.reserve(n_nodes);
 
-    cout << "\n n_edges = " << n_edges << ", n_nodes=" << n_nodes << ", sum: " << (n_edges + n_nodes);
-    cout << "\n SM_MFR = " << SM_MFR.size() << " x " << SM_MFR.at(0).size();
-    cout << "\n SM_PR  = " << SM_PR.size() << " x " << SM_PR.at(0).size();
-    cin.get();
+    // cout << "\n n_edges = " << n_edges << ", n_nodes=" << n_nodes << ", sum: " << (n_edges + n_nodes);
+    // cout << "\n size of SM_MFR : " << SM_MFR.size() << " x " << SM_MFR.at(0).size();
+    // cout << "\n size of SM_PR  : " << SM_PR.size() << " x " << SM_PR.at(0).size();
 
     if (is_edge_prop) {
         for (int i = 0 ; i < n_edges; i++) {
             double tmp = 0.;
-            for (int j = 0 ; j < n_edges; j++) {
-                // cout << "\n\t " << i << "/" << j;
+            for (int j = 0 ; j < n_edges; j++)
                 tmp += SM_MFR.at(j).at(i) * SM_MFR.at(j).at(i);
-            }
-            s.val =  sqrt(tmp);
-            s.ID = wds->agelemek.at(i)->Get_nev().c_str();
+            val_and_ID s(sqrt(tmp), wds->agelemek.at(i)->Get_nev().c_str());
             v_edges.push_back(s);
         }
-        cout << "\n is_edge_prop, finished n_edges.";
-        cin.get();
 
         for (int i = 0 ; i < n_nodes; i++) {
             double tmp = 0.;
-            for (int j = 0 ; j < n_edges; j++) {
-                // cout << "\n\t " << i << "/" << j;
+            for (int j = 0 ; j < n_edges; j++)
                 tmp += SM_PR.at(j).at(i) * SM_PR.at(j).at(i);
-            }
-            s.val = sqrt(tmp);
-            s.ID = wds->cspok.at(i)->Get_nev().c_str();
+            val_and_ID s(sqrt(tmp), wds->cspok.at(i)->Get_nev().c_str());
             v_nodes.push_back(s);
         }
-        cout << "\n is_edge_prop, finished n_nodes.";
-        cin.get();
     }
     else {
         for (int i = 0 ; i < n_edges; i++) {
             double tmp = 0.;
             for (int j = 0 ; j < n_nodes; j++)
                 tmp += SM_MFR.at(j).at(i) * SM_MFR.at(j).at(i) ;
-            s.val =  sqrt(tmp);
-            s.ID = wds->agelemek.at(i)->Get_nev().c_str();
+            val_and_ID s(sqrt(tmp), wds->agelemek.at(i)->Get_nev().c_str());
             v_edges.push_back(s);
         }
         for (int i = 0 ; i < n_nodes; i++) {
             double tmp = 0.;
             for (int j = 0 ; j < n_nodes; j++)
                 tmp += SM_PR.at(j).at(i) * SM_PR.at(j).at(i) ;
-            s.val = sqrt(tmp);
-            s.ID = wds->cspok.at(i)->Get_nev().c_str();
+            val_and_ID s(sqrt(tmp), wds->cspok.at(i)->Get_nev().c_str());
             v_nodes.push_back(s);
         }
     }
+
+    // for (int k = 0 ; k < v_edges.size(); k++)
+    //     cout << "\n ID = " << v_edges.at(k).ID << ", val=" <<  v_edges.at(k).val;
+    // for (int k = 0 ; k < v_nodes.size(); k++)
+    //     cout << "\n ID = " << v_nodes.at(k).ID << ", val=" <<  v_nodes.at(k).val;
+    // cin.get();
 
     // fprintf (pFile, "\nColumn-wise sum of absolute values:");
     // for (int i = 0; i < n_edges; i++)
@@ -424,11 +476,8 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
     // for (int i = 0; i < n_nodes; i++)
     //     fprintf(pFile, "\n %10s: %7.5e", v_nodes.at(i).ID.c_str(), v_nodes.at(i).val);
 
-    sort(v_edges.begin(), v_edges.end(), comparison_function11);
-    sort(v_nodes.begin(), v_nodes.end(), comparison_function11);
-
-    cout << endl << "Hi! 3" << endl;
-    cin.get();
+    sort(v_edges.begin(), v_edges.end(), comparison_function_val_and_ID);
+    sort(v_nodes.begin(), v_nodes.end(), comparison_function_val_and_ID);
 
     fprintf (pFile, "\nColumn-wise L2 norm of sensitivities, after sorting:");
     for (int i = 0; i < n_edges; i++)
@@ -1224,9 +1273,6 @@ void LoadMatrices(MatrixXd & A, VectorXd & W, VectorXd & p, string weight_type) 
         abs_Apn(j, idx_n2)++;
     }
 
-    cout << endl << " LoadMatrices 1 " << endl;
-    cin.get();
-
     A = Apn.transpose() * Apn;
     for (unsigned i = 0; i < n_n; i++) {
         A(i, i) = 0;
@@ -1262,10 +1308,6 @@ void LoadMatrices(MatrixXd & A, VectorXd & W, VectorXd & p, string weight_type) 
         }
     }
 
-
-    cout << endl << " LoadMatrices 2 " << endl;
-    cin.get();
-
     if (0 == strcmp(weight_type.c_str(), "sensitivity")) {
         // Add total sensitivities
         bool is_edge_prop;
@@ -1273,8 +1315,6 @@ void LoadMatrices(MatrixXd & A, VectorXd & W, VectorXd & p, string weight_type) 
         if (weight_type_mod == "friction_coeff") {
             is_edge_prop = true;
             PerformSensitivityAnalysis(true /*is_edge_prop*/, "friction_coeff", "sensitivity_matrix_friction_coeff.csv");
-            cout << endl << " LoadMatrices 3 " << endl;
-            cin.get();
         }
         else if (weight_type_mod == "diameter") {
             is_edge_prop = true;
@@ -1320,14 +1360,9 @@ void LoadMatrices(MatrixXd & A, VectorXd & W, VectorXd & p, string weight_type) 
     p = abs_Apn.transpose() * W;
     sumW = W.sum();
 
-
-    cout << endl << " LoadMatrices exit " << endl;
-    cin.get();
-
 }
 
 void LoadSystem(string fname) {
-
 
     wds = new Staci(fname.c_str());
     wds->build_system();

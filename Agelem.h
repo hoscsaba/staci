@@ -14,9 +14,9 @@ protected:
     /// Referencia keresztmetszet, [m2], a sebesseg kiszamitasahoz hasznaljuk
     double Aref;
     /// Pi
-    static const double pi = 3.1416;
+    const double pi = 3.1416;
     /// g
-    static const double g = 9.81;
+    const double g = 9.81;
     /// Az agelem neve
     string nev;
     /// Az agelem tipusa, pl. Cso, Csatorna, stb.
@@ -59,10 +59,10 @@ public:
     /// Inicializacio, mode=0 -> automatikus, mode=1 -> value beirasa
     virtual void Ini(int mode, double value) = 0;
     /// Get double property, Cso es Csatorna akarja elulirja
-    virtual double Get_dprop(string mit)
-    {
-        return 0.0;
-    }
+    virtual double Get_dprop(string mit) = 0;
+    // {
+    // return 12.53;
+    // }
     /// Get double property, Cso es Csatorna akarja felulirja
     double Get_Aref()
     {
@@ -207,11 +207,12 @@ public:
         cdt = a_cdt;
     }
     void SetLogFile();
-    
+
     void Set_Aref(double a_Aref)
     {
         Aref = a_Aref;
-        //cout << endl << "Agelem " << nev << ": referencia keresztmetszet beallitasa: " << a_Aref << "-> Aref=" << Aref << endl;
+        // cout << endl << "Agelem " << nev << ": referencia keresztmetszet beallitasa: " << a_Aref << "-> Aref=" << Aref << endl;
+        // cin.get();
     }
     bool force_more_iter;
     bool update_diameter;

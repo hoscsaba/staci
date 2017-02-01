@@ -52,8 +52,11 @@ void Staci::SetInitialParameters() {
   m_nnz = 0; /*!< Number of nonzero entries of the Jacobian. */
   // az adatfile olvasasa
   if (mode >= 0) {
+
     data_io datta_io(def_file.c_str());
+
     datta_io.load_system(cspok, agelemek);
+
 
     // beallitasok
     // cout<<endl<<endl<<"Beallitasok:";
@@ -114,7 +117,7 @@ void Staci::SetInitialParameters() {
   m_ss << endl << " STACI v.2.0";
   m_ss << endl << " (c) BME Dept. of Hydrodynamic Systems";
   m_ss << endl << " (c) C. Hos (cshos@hds.bme.hu)";
-  m_ss << endl << " info: www.hds.bme.hu\\staci";
+  m_ss << endl << " info: www.hds.bme.hu\\staci_web";
   m_ss << endl << "======================================" << endl;
   time_t ido = time(0);
   m_ss << endl << " date: " << ctime(&ido);
@@ -607,16 +610,10 @@ void Staci::set_dprop(string in_element_ID, string in_property_ID,
 //--------------------------------------------------------------
 void Staci::build_system() {
   ostringstream msg1;
-  // msg1 << endl
-  //      << " Number of nodes   : "
-  //      << cspok.size();
-  // msg1 << endl
-  //      << " Number of edges   : " << agelemek.size()
-  //      << endl;
-  // msg1 << endl
-  //      << " Sum of consumption: " << get_sum_of_consumption() << " m3/h"
-  //      << endl;
-  // logfile_write(msg1.str(), 1);
+
+  // for (int i = 0; i < agelemek.size(); i++)
+  //   agelemek.at(i)->Info();
+  // cin.get();
 
   bool stop = false;
 
@@ -1207,17 +1204,8 @@ bool Staci::solve_system() {
 
     comp_ok = umfpack_solver(x, f);
 
-    if ((e_mp < 0.001) && (e_p < 0.001)) {
-      m_ss.str("");
-      m_ss << endl << "e_mp=" << e_mp << ", e_p=" << e_p << " --> Updating pipe diameters.";
-      logfile_write(m_ss.str(), 1);
-      for (unsigned int i = 0; i < agelemek.size(); i++) {
-        agelemek.at(i)->update_diameter = true;
-        if (agelemek.at(i)->force_more_iter)
-          konv_ok = false;
-      }
-      // cin.get();
-    }
+    if ((e_mp < e_mp_max) && (e_p < e_p_max))
+      konv_ok = true;
 
     m_ss.str("");
     for (unsigned int i = 0; i < agelemek.size(); i++)

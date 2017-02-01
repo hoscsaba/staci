@@ -88,7 +88,7 @@ CPP_DEPS += \
 %.o: ../%.cpp
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C++ Compiler'
-	g++ -I/usr/local/include -I/usr/local/include/eigen3 -O2 -g -Wall -c -fmessage-length=0 -pedantic -ansi -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@"  "$<"
+	g++ -I/usr/local/include -I/usr/include/eigen3 -O2 -g -Wall -c -fmessage-length=0 -pedantic -ansi -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@"  "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

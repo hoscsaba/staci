@@ -8,15 +8,15 @@ using namespace std;
 #include "KonstNyomas.h"
 
 KonstNyomas::KonstNyomas(
-        const string a_nev,
-        const double a_Aref,
-        const string a_csp_nev,
-        const double a_ro,
-        const double a_p,
-        const double a_mp,
-        const double a_tt) :
+    const string a_nev,
+    const double a_Aref,
+    const string a_csp_nev,
+    const double a_ro,
+    const double a_p,
+    const double a_mp,
+    const double a_tt) :
 
-        Agelem(a_nev, a_Aref, a_mp, a_ro, a_tt) {
+    Agelem(a_nev, a_Aref, a_mp, a_ro, a_tt) {
     //Kotelezo adatok minden Agelemnel:
     tipus = "Konstans nyomas";
     csp_db = 1;
@@ -38,7 +38,7 @@ KonstNyomas::~KonstNyomas() {
 string KonstNyomas::Info() {
     ostringstream strstrm;
     strstrm << Agelem::Info();
-    strstrm << endl << "  kapcsolodas : " << cspv_nev << "(index:" << cspe_index << ")\n";
+    strstrm << endl << "  kapcsolodas : " << cspe_nev << "(index:" << cspe_index << ")\n";
     return strstrm.str();
 }
 
@@ -76,4 +76,22 @@ void KonstNyomas::Set_dprop(string mit, double mire) {
         cout << endl << "HIBA! KonstNyomas::Set_dprop(mit), ismeretlen bemenet: mit="
              << mit << endl << endl;
     }
+}
+
+double KonstNyomas::Get_dprop(string mit) {
+    double out = 0.0;
+    if (mit == "headloss")
+        out = 0.;
+    else if (mit == "headloss_per_unit_length")
+        out = 0.;
+    else if ((mit == "concentration") || (mit == "konc_atlag"))
+        out = konc_atlag;
+    else {
+        cout << endl
+             << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit=" << mit << endl
+             << endl;
+        cout << endl << "Name of KonstNyomas: " << nev << endl;
+        exit(-1);
+    }
+    return out;
 }

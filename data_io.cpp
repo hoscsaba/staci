@@ -114,9 +114,9 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
         cin.get();
 
     // Agak reszletes kiolvasasa...
-    if (debug)
-        cout << endl << endl << "Az agak: " << endl
-             << "-----------------------------------------" << endl;
+    // if (debug)
+    //     cout << endl << endl << "Az agak: " << endl
+    //          << "-----------------------------------------" << endl;
     // Eloszor csak az info kedveert megszamoljuk a elemszamot
     int db;
     bool megvan;
@@ -153,10 +153,18 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
         /*cout<<endl<<" id:"<<id;
         cin.get();
         */
-        aref = atof(Node_edges.getChildNode("edge", i).getChildNode("aref").getText());
-        if (aref < 1e-3 * 1e-3) {
+        // Laci vicceskedett, vesszovel irta be, igy lecsereljuk pontra.
+        // Fasza, 5 oram ment el ezzel.
+        string s = Node_edges.getChildNode("edge", i).getChildNode("aref").getText();
+
+        replace( s.begin(), s.end(), ',', '.');
+        aref = atof(s.c_str());
+
+        if (aref < 1.e-3 * 1.e-3) {
             printf("\nWARNING!!! Reference area of %s is %g, overriding with 1. m^2.", id.c_str(), aref);
+            cout << endl << "String in xml file: " << s;
             aref = 1.;
+            cin.get();
         }
         /*cout<<endl<<" aref:"<<aref;
         cin.get();
@@ -533,7 +541,7 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
         Node_settings.getChildNode("fluid_volume").addText(os.str().c_str());
     } else
         Node_settings.getChildNode("solution_exists").addText("true");//!!!!!!!!!
-        // Node_settings.getChildNode("solution_exists").addText("false");
+    // Node_settings.getChildNode("solution_exists").addText("false");
 
     // Csomopontok es agak szamanak es nevenek kiolvasasa...
     csp_db = Node_nodes.nChildNode("node");

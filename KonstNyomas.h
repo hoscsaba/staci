@@ -27,4 +27,5 @@ public:
     {
         return "KonstNyomas";
     }
+    double Get_dprop(string mit);
 };

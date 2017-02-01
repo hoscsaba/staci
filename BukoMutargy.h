@@ -1,8 +1,8 @@
 #include "Agelem.h"
 
-class BukoMutargy:public Agelem
-  {
-  private:
+class BukoMutargy: public Agelem
+{
+private:
     /// Fenékszint
     double Hf;
     /// Nyitva van?
@@ -15,8 +15,8 @@ class BukoMutargy:public Agelem
     double discharge_coeff;
     /// Szelep ellenállástényezõ
     double valve_coeff;
-    
-  public:
+
+public:
     /// Konstruktor
     BukoMutargy(const string nev, const string a_cspe_nev, const string a_cspv_nev, const double a_ro, const double Aref,
                 const double Hf, const bool is_opened, const double width, const double overflow_height,
@@ -36,6 +36,5 @@ class BukoMutargy:public Agelem
         return "BukoMutargy";
     }
     void Set_dprop(string mit, double mire);
-  };
-
-
+    double Get_dprop(string mit);
+};

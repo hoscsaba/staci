@@ -7,8 +7,8 @@ private:
 
 public:
 	VisszacsapoSzelep(const string nev, const string cspenev,
-			const string cspvnev, const double a_ro, const double Aref, const double veszt_e,
-			const double veszt_v, const double a_mp);
+	                  const string cspvnev, const double a_ro, const double Aref, const double veszt_e,
+	                  const double veszt_v, const double a_mp);
 	~VisszacsapoSzelep();
 	string Info();
 	double f(vector<double>);
@@ -18,4 +18,5 @@ public:
 	string GetType() {
 		return "VisszacsapoSzelep";
 	}
+	double Get_dprop(string mit);
 };

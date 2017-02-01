@@ -113,3 +113,19 @@ void VisszacsapoSzelep::Set_dprop(string mit, double mire)
          << mit << endl << endl;
     //      }
 }
+
+double VisszacsapoSzelep::Get_dprop(string mit) {
+    double out = 0.0;
+    // if (mit == "Aref")
+    //   out = Aref;
+    // else if (mit == "lambda")
+    //   out = lambda;
+    // else {
+    cout << endl
+         << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit=" << mit << endl
+         << endl;
+    cout << endl << "Name of VisszacsapoSzelep: " << nev << endl;
+    exit(-1);
+    // }
+    return out;
+}
