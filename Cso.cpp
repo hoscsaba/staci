@@ -226,7 +226,7 @@ double Cso::surlodas() {
 
 //--------------------------------------------------------------
 double Cso::Get_dprop(string mit) {
-  double out;
+  double out = 0.0;
   if (mit == "Aref")
     out = Aref;
   else if (mit == "lambda")
