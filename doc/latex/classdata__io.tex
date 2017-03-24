@@ -3,28 +3,39 @@
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{classdata__io_ab2af4a1c42da224e002c9221f7117129}{}\label{classdata__io_ab2af4a1c42da224e002c9221f7117129} 
+\mbox{\Hypertarget{classdata__io_ab2af4a1c42da224e002c9221f7117129}\label{classdata__io_ab2af4a1c42da224e002c9221f7117129}} 
 \hyperlink{classdata__io_ab2af4a1c42da224e002c9221f7117129}{data\+\_\+io} (const char $\ast$xml\+\_\+fnev)
 \begin{DoxyCompactList}\small\item\em Konstruktor. \end{DoxyCompactList}\item 
-\hypertarget{classdata__io_a6b94381a36f297a3c3014fd593035581}{}\label{classdata__io_a6b94381a36f297a3c3014fd593035581} 
+\mbox{\Hypertarget{classdata__io_a6b94381a36f297a3c3014fd593035581}\label{classdata__io_a6b94381a36f297a3c3014fd593035581}} 
 void {\bfseries load\+\_\+system} (vector$<$ \hyperlink{class_csomopont}{Csomopont} $\ast$$>$ \&cspok, vector$<$ \hyperlink{class_agelem}{Agelem} $\ast$$>$ \&agelemek)
 \item 
-\hypertarget{classdata__io_a3941963428eab44f1c3c05f3647c9193}{}\label{classdata__io_a3941963428eab44f1c3c05f3647c9193} 
+\mbox{\Hypertarget{classdata__io_a3941963428eab44f1c3c05f3647c9193}\label{classdata__io_a3941963428eab44f1c3c05f3647c9193}} 
 void {\bfseries load\+\_\+ini\+\_\+values} (vector$<$ \hyperlink{class_csomopont}{Csomopont} $\ast$$>$ \&cspok, vector$<$ \hyperlink{class_agelem}{Agelem} $\ast$$>$ \&agelemek)
 \item 
-\hypertarget{classdata__io_a694062a0c53097863dfaa8306573ff0c}{}\label{classdata__io_a694062a0c53097863dfaa8306573ff0c} 
-void {\bfseries save\+\_\+results} (double Foly\+Menny, vector$<$ \hyperlink{class_csomopont}{Csomopont} $\ast$$>$ cspok, vector$<$ \hyperlink{class_agelem}{Agelem} $\ast$$>$ agelemek, bool conv\+\_\+reached)
+void \hyperlink{classdata__io_aa0fa92e0eea74827c4c085364fc39185}{save\+\_\+results} (double Foly\+Menny, vector$<$ \hyperlink{class_csomopont}{Csomopont} $\ast$$>$ cspok, vector$<$ \hyperlink{class_agelem}{Agelem} $\ast$$>$ agelemek, bool conv\+\_\+reached, int staci\+\_\+debug\+\_\+level)
 \item 
-\hypertarget{classdata__io_ae269760bfd397b8fba4012e3ed2d5333}{}\label{classdata__io_ae269760bfd397b8fba4012e3ed2d5333} 
-void {\bfseries save\+\_\+mod\+\_\+prop} (vector$<$ \hyperlink{class_csomopont}{Csomopont} $\ast$$>$ cspok, vector$<$ \hyperlink{class_agelem}{Agelem} $\ast$$>$ agelemek, string e\+ID, string p\+ID)
+\mbox{\Hypertarget{classdata__io_aaec948d78d5b7ae7a59503ec2814ad90}\label{classdata__io_aaec948d78d5b7ae7a59503ec2814ad90}} 
+void {\bfseries save\+\_\+mod\+\_\+prop} (vector$<$ \hyperlink{class_csomopont}{Csomopont} $\ast$$>$ cspok, vector$<$ \hyperlink{class_agelem}{Agelem} $\ast$$>$ agelemek, string e\+ID, string p\+ID, bool is\+\_\+property\+\_\+general)
 \item 
-\hypertarget{classdata__io_a15627ef79b47a8afeb33f01fa15457fd}{}\label{classdata__io_a15627ef79b47a8afeb33f01fa15457fd} 
+\mbox{\Hypertarget{classdata__io_a899e9242802f92b269d45e2c4f33b29d}\label{classdata__io_a899e9242802f92b269d45e2c4f33b29d}} 
+void {\bfseries save\+\_\+mod\+\_\+prop\+\_\+all\+\_\+elements} (vector$<$ \hyperlink{class_csomopont}{Csomopont} $\ast$$>$ cspok, vector$<$ \hyperlink{class_agelem}{Agelem} $\ast$$>$ agelemek, string p\+ID)
+\item 
+\mbox{\Hypertarget{classdata__io_a15627ef79b47a8afeb33f01fa15457fd}\label{classdata__io_a15627ef79b47a8afeb33f01fa15457fd}} 
 void {\bfseries save\+\_\+transport} (int mode, vector$<$ \hyperlink{class_csomopont}{Csomopont} $\ast$$>$ cspok, vector$<$ \hyperlink{class_agelem}{Agelem} $\ast$$>$ agelemek)
 \item 
-\hypertarget{classdata__io_a2bef52b6a28b450a5887c0483ff1e4a7}{}\label{classdata__io_a2bef52b6a28b450a5887c0483ff1e4a7} 
+\mbox{\Hypertarget{classdata__io_a2bef52b6a28b450a5887c0483ff1e4a7}\label{classdata__io_a2bef52b6a28b450a5887c0483ff1e4a7}} 
 string {\bfseries read\+\_\+setting} (string which)
 \end{DoxyCompactItemize}
 
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classdata__io_aa0fa92e0eea74827c4c085364fc39185}\label{classdata__io_aa0fa92e0eea74827c4c085364fc39185}} 
+\index{data\+\_\+io@{data\+\_\+io}!save\+\_\+results@{save\+\_\+results}}
+\index{save\+\_\+results@{save\+\_\+results}!data\+\_\+io@{data\+\_\+io}}
+\subsubsection{\texorpdfstring{save\+\_\+results()}{save\_results()}}
+{\footnotesize\ttfamily void data\+\_\+io\+::save\+\_\+results (\begin{DoxyParamCaption}\item[{double}]{Foly\+Menny,  }\item[{vector$<$ \hyperlink{class_csomopont}{Csomopont} $\ast$$>$}]{cspok,  }\item[{vector$<$ \hyperlink{class_agelem}{Agelem} $\ast$$>$}]{agelemek,  }\item[{bool}]{conv\+\_\+reached,  }\item[{int}]{staci\+\_\+debug\+\_\+level }\end{DoxyParamCaption})}
+
+!!!!!!!! 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 

@@ -9,228 +9,231 @@ Inheritance diagram for Agelem\+:\begin{figure}[H]
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_agelem_a9dd12f555cf1927a743f2672a1545c61}{}\label{class_agelem_a9dd12f555cf1927a743f2672a1545c61} 
+\mbox{\Hypertarget{class_agelem_a9dd12f555cf1927a743f2672a1545c61}\label{class_agelem_a9dd12f555cf1927a743f2672a1545c61}} 
 void {\bfseries logfile\+\_\+write} (string msg, int msg\+\_\+debug\+\_\+level)
 \item 
-\hypertarget{class_agelem_a72fb0a2a58cfbcbcce00aa09ba40d8a0}{}\label{class_agelem_a72fb0a2a58cfbcbcce00aa09ba40d8a0} 
+\mbox{\Hypertarget{class_agelem_a72fb0a2a58cfbcbcce00aa09ba40d8a0}\label{class_agelem_a72fb0a2a58cfbcbcce00aa09ba40d8a0}} 
 \hyperlink{class_agelem_a72fb0a2a58cfbcbcce00aa09ba40d8a0}{Agelem} (const string \hyperlink{class_agelem_abe92b7e3912367d5d1caf6b277ca0b7d}{nev}, const double \hyperlink{class_agelem_a3f8668febc2958fd539997d537552f17}{Aref}, const double \hyperlink{class_agelem_a1377d80d8511cc4adacccba31d28282d}{mp}, const double \hyperlink{class_agelem_a520072191e53f368a04ca80b8b583a3f}{ro})
 \begin{DoxyCompactList}\small\item\em Konstruktor. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_ad8c13af2ccc41f2b68a693518c1e850e}{}\label{class_agelem_ad8c13af2ccc41f2b68a693518c1e850e} 
+\mbox{\Hypertarget{class_agelem_ad8c13af2ccc41f2b68a693518c1e850e}\label{class_agelem_ad8c13af2ccc41f2b68a693518c1e850e}} 
 \hyperlink{class_agelem_ad8c13af2ccc41f2b68a693518c1e850e}{Agelem} (const string \hyperlink{class_agelem_abe92b7e3912367d5d1caf6b277ca0b7d}{nev}, const double \hyperlink{class_agelem_a3f8668febc2958fd539997d537552f17}{Aref}, const double \hyperlink{class_agelem_a1377d80d8511cc4adacccba31d28282d}{mp}, const double \hyperlink{class_agelem_a520072191e53f368a04ca80b8b583a3f}{ro}, const double tt)
 \begin{DoxyCompactList}\small\item\em Konstruktor with travel time. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a62ea4415f524e75918a2dde15e8bd560}{}\label{class_agelem_a62ea4415f524e75918a2dde15e8bd560} 
+\mbox{\Hypertarget{class_agelem_a62ea4415f524e75918a2dde15e8bd560}\label{class_agelem_a62ea4415f524e75918a2dde15e8bd560}} 
 virtual \hyperlink{class_agelem_a62ea4415f524e75918a2dde15e8bd560}{$\sim$\+Agelem} ()
 \begin{DoxyCompactList}\small\item\em Destruktor. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a2e6c4688cdbdf17c6d3bde0c6c08ff49}{}\label{class_agelem_a2e6c4688cdbdf17c6d3bde0c6c08ff49} 
-virtual string \hyperlink{class_agelem_a2e6c4688cdbdf17c6d3bde0c6c08ff49}{Info} ()
-\begin{DoxyCompactList}\small\item\em Informacio. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_aa440ca95f0c0d27092f048f0c95cd998}{}\label{class_agelem_aa440ca95f0c0d27092f048f0c95cd998} 
+\mbox{\Hypertarget{class_agelem_aa440ca95f0c0d27092f048f0c95cd998}\label{class_agelem_aa440ca95f0c0d27092f048f0c95cd998}} 
 virtual void \hyperlink{class_agelem_aa440ca95f0c0d27092f048f0c95cd998}{add\+\_\+csp} (const int \hyperlink{class_agelem_a9639c0a7a0165b644d62033e24eb6d24}{cspe\+\_\+index}, const int cspv\+\_\+index)
 \begin{DoxyCompactList}\small\item\em \hyperlink{class_csomopont}{Csomopont} beallitasa. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_aa1d93be52ddae11df003c4e35c47084b}{}\label{class_agelem_aa1d93be52ddae11df003c4e35c47084b} 
+\mbox{\Hypertarget{class_agelem_aa1d93be52ddae11df003c4e35c47084b}\label{class_agelem_aa1d93be52ddae11df003c4e35c47084b}} 
 virtual double \hyperlink{class_agelem_aa1d93be52ddae11df003c4e35c47084b}{f} (vector$<$ double $>$)=0
 \begin{DoxyCompactList}\small\item\em Az agegyenlet erteke, nullara rendezve, v.\+o.\+m.-\/ben. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a7934ea6320bdc37526ed3daa108ce1ed}{}\label{class_agelem_a7934ea6320bdc37526ed3daa108ce1ed} 
+\mbox{\Hypertarget{class_agelem_a7934ea6320bdc37526ed3daa108ce1ed}\label{class_agelem_a7934ea6320bdc37526ed3daa108ce1ed}} 
 virtual vector$<$ double $>$ \hyperlink{class_agelem_a7934ea6320bdc37526ed3daa108ce1ed}{df} (vector$<$ double $>$)=0
 \begin{DoxyCompactList}\small\item\em Jacobi\+: df/dhe, df/dhv, df/dmp, konstans tag. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a844171faf01143770bbd894b1a48e72f}{}\label{class_agelem_a844171faf01143770bbd894b1a48e72f} 
+\mbox{\Hypertarget{class_agelem_a844171faf01143770bbd894b1a48e72f}\label{class_agelem_a844171faf01143770bbd894b1a48e72f}} 
 virtual void \hyperlink{class_agelem_a844171faf01143770bbd894b1a48e72f}{Ini} (int mode, double value)=0
 \begin{DoxyCompactList}\small\item\em Inicializacio, mode=0 -\/$>$ automatikus, mode=1 -\/$>$ value beirasa. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_ab808a928d9ebef901155b6b985370eb5}{}\label{class_agelem_ab808a928d9ebef901155b6b985370eb5} 
-virtual double \hyperlink{class_agelem_ab808a928d9ebef901155b6b985370eb5}{Get\+\_\+dprop} (string mit)
+\mbox{\Hypertarget{class_agelem_abc0d957800007cf6f8dcef940d7b136b}\label{class_agelem_abc0d957800007cf6f8dcef940d7b136b}} 
+virtual double \hyperlink{class_agelem_abc0d957800007cf6f8dcef940d7b136b}{Get\+\_\+dprop} (string mit)=0
 \begin{DoxyCompactList}\small\item\em Get double property, \hyperlink{class_cso}{Cso} es \hyperlink{class_csatorna}{Csatorna} akarja elulirja. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a47b441de19cf771363bf25e3f65fc228}{}\label{class_agelem_a47b441de19cf771363bf25e3f65fc228} 
+\mbox{\Hypertarget{class_agelem_a2e6c4688cdbdf17c6d3bde0c6c08ff49}\label{class_agelem_a2e6c4688cdbdf17c6d3bde0c6c08ff49}} 
+virtual string \hyperlink{class_agelem_a2e6c4688cdbdf17c6d3bde0c6c08ff49}{Info} ()
+\begin{DoxyCompactList}\small\item\em Informacio. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_agelem_a47b441de19cf771363bf25e3f65fc228}\label{class_agelem_a47b441de19cf771363bf25e3f65fc228}} 
 double \hyperlink{class_agelem_a47b441de19cf771363bf25e3f65fc228}{Get\+\_\+\+Aref} ()
-\begin{DoxyCompactList}\small\item\em Get double property, \hyperlink{class_cso}{Cso} es \hyperlink{class_csatorna}{Csatorna} akarja elulirja. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a47c5952bbfa4ca32910f361ee47f6ae8}{}\label{class_agelem_a47c5952bbfa4ca32910f361ee47f6ae8} 
+\begin{DoxyCompactList}\small\item\em Get double property, \hyperlink{class_cso}{Cso} es \hyperlink{class_csatorna}{Csatorna} akarja felulirja. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_agelem_a47c5952bbfa4ca32910f361ee47f6ae8}\label{class_agelem_a47c5952bbfa4ca32910f361ee47f6ae8}} 
 virtual double \hyperlink{class_agelem_a47c5952bbfa4ca32910f361ee47f6ae8}{Get\+\_\+dfdmu} (string mit)
 \begin{DoxyCompactList}\small\item\em Get equation derivative w.\+r.\+t. parameter. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_aa830fcc840b21486fdecd40712f3373e}{}\label{class_agelem_aa830fcc840b21486fdecd40712f3373e} 
+\mbox{\Hypertarget{class_agelem_aa830fcc840b21486fdecd40712f3373e}\label{class_agelem_aa830fcc840b21486fdecd40712f3373e}} 
 virtual void {\bfseries Set\+\_\+dprop} (string mit, double mire)
 \item 
-\hypertarget{class_agelem_a1285244f5e03d7db2092a2e5c14df288}{}\label{class_agelem_a1285244f5e03d7db2092a2e5c14df288} 
+\mbox{\Hypertarget{class_agelem_a1285244f5e03d7db2092a2e5c14df288}\label{class_agelem_a1285244f5e03d7db2092a2e5c14df288}} 
 virtual void {\bfseries Set\+\_\+friction\+\_\+model} (string friction\+\_\+model)
 \item 
-\hypertarget{class_agelem_ab1bd05d137565c3a964e31598f8e2e71}{}\label{class_agelem_ab1bd05d137565c3a964e31598f8e2e71} 
+\mbox{\Hypertarget{class_agelem_ab1bd05d137565c3a964e31598f8e2e71}\label{class_agelem_ab1bd05d137565c3a964e31598f8e2e71}} 
 double \hyperlink{class_agelem_ab1bd05d137565c3a964e31598f8e2e71}{Get\+\_\+mp} ()
 \begin{DoxyCompactList}\small\item\em Tomegaram visszaadasa. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a7d72a3740ccae5c739eaa3c7b2697c2c}{}\label{class_agelem_a7d72a3740ccae5c739eaa3c7b2697c2c} 
+\mbox{\Hypertarget{class_agelem_a7d72a3740ccae5c739eaa3c7b2697c2c}\label{class_agelem_a7d72a3740ccae5c739eaa3c7b2697c2c}} 
 void \hyperlink{class_agelem_a7d72a3740ccae5c739eaa3c7b2697c2c}{Set\+\_\+mp} (double x)
 \begin{DoxyCompactList}\small\item\em Tomegaram beallitasa. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a26d71146bf7bb2cde89ac5bfde045e59}{}\label{class_agelem_a26d71146bf7bb2cde89ac5bfde045e59} 
+\mbox{\Hypertarget{class_agelem_a26d71146bf7bb2cde89ac5bfde045e59}\label{class_agelem_a26d71146bf7bb2cde89ac5bfde045e59}} 
 double \hyperlink{class_agelem_a26d71146bf7bb2cde89ac5bfde045e59}{Get\+\_\+Q} ()
 \begin{DoxyCompactList}\small\item\em Terfogataram visszaadasa. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a22269a8213c70e027d70e0f0b90c3df1}{}\label{class_agelem_a22269a8213c70e027d70e0f0b90c3df1} 
+\mbox{\Hypertarget{class_agelem_a22269a8213c70e027d70e0f0b90c3df1}\label{class_agelem_a22269a8213c70e027d70e0f0b90c3df1}} 
 virtual double \hyperlink{class_agelem_a22269a8213c70e027d70e0f0b90c3df1}{Get\+\_\+v} ()
 \begin{DoxyCompactList}\small\item\em Sebesseg visszaadasa. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_add61d5256125eeeddf90ae8c978254ec}{}\label{class_agelem_add61d5256125eeeddf90ae8c978254ec} 
+\mbox{\Hypertarget{class_agelem_add61d5256125eeeddf90ae8c978254ec}\label{class_agelem_add61d5256125eeeddf90ae8c978254ec}} 
 string \hyperlink{class_agelem_add61d5256125eeeddf90ae8c978254ec}{Get\+\_\+nev} ()
 \begin{DoxyCompactList}\small\item\em Nev visszaadasa. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a31c5720dbcba557194725666e205b9be}{}\label{class_agelem_a31c5720dbcba557194725666e205b9be} 
+\mbox{\Hypertarget{class_agelem_a31c5720dbcba557194725666e205b9be}\label{class_agelem_a31c5720dbcba557194725666e205b9be}} 
 string \hyperlink{class_agelem_a31c5720dbcba557194725666e205b9be}{Get\+\_\+\+Tipus} ()
 \begin{DoxyCompactList}\small\item\em Tipus visszaadasa. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_ac219eab8c53d72881134fad2c99deb04}{}\label{class_agelem_ac219eab8c53d72881134fad2c99deb04} 
+\mbox{\Hypertarget{class_agelem_ac219eab8c53d72881134fad2c99deb04}\label{class_agelem_ac219eab8c53d72881134fad2c99deb04}} 
 string \hyperlink{class_agelem_ac219eab8c53d72881134fad2c99deb04}{Get\+\_\+\+Cspe\+\_\+\+Nev} ()
 \begin{DoxyCompactList}\small\item\em cspe\+\_\+nev visszaadasa \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a2f940c9274a2a66cf9ccc9e78d00cf42}{}\label{class_agelem_a2f940c9274a2a66cf9ccc9e78d00cf42} 
+\mbox{\Hypertarget{class_agelem_a2f940c9274a2a66cf9ccc9e78d00cf42}\label{class_agelem_a2f940c9274a2a66cf9ccc9e78d00cf42}} 
 string \hyperlink{class_agelem_a2f940c9274a2a66cf9ccc9e78d00cf42}{Get\+\_\+\+Cspv\+\_\+\+Nev} ()
 \begin{DoxyCompactList}\small\item\em cspv\+\_\+nev visszaadasa \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a04dd7ea38bc9409b454da7bba81d9ac5}{}\label{class_agelem_a04dd7ea38bc9409b454da7bba81d9ac5} 
+\mbox{\Hypertarget{class_agelem_a04dd7ea38bc9409b454da7bba81d9ac5}\label{class_agelem_a04dd7ea38bc9409b454da7bba81d9ac5}} 
 int \hyperlink{class_agelem_a04dd7ea38bc9409b454da7bba81d9ac5}{Get\+\_\+\+Cspe\+\_\+\+Index} ()
 \begin{DoxyCompactList}\small\item\em cspe\+\_\+index visszaadasa \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a3a3728e971c8bc8e86657a2d578f2387}{}\label{class_agelem_a3a3728e971c8bc8e86657a2d578f2387} 
+\mbox{\Hypertarget{class_agelem_a3a3728e971c8bc8e86657a2d578f2387}\label{class_agelem_a3a3728e971c8bc8e86657a2d578f2387}} 
 int \hyperlink{class_agelem_a3a3728e971c8bc8e86657a2d578f2387}{Get\+\_\+\+Cspv\+\_\+\+Index} ()
 \begin{DoxyCompactList}\small\item\em cspv\+\_\+nev visszaadasa \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_ac22e9baaf66552cc60c1d5aa4f17c2ce}{}\label{class_agelem_ac22e9baaf66552cc60c1d5aa4f17c2ce} 
+\mbox{\Hypertarget{class_agelem_ac22e9baaf66552cc60c1d5aa4f17c2ce}\label{class_agelem_ac22e9baaf66552cc60c1d5aa4f17c2ce}} 
 int \hyperlink{class_agelem_ac22e9baaf66552cc60c1d5aa4f17c2ce}{Get\+\_\+\+Csp\+\_\+db} ()
 \begin{DoxyCompactList}\small\item\em csp darabszam visszaadasa \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_ae7811ac45d172913eb4caaf2312295eb}{}\label{class_agelem_ae7811ac45d172913eb4caaf2312295eb} 
+\mbox{\Hypertarget{class_agelem_ae7811ac45d172913eb4caaf2312295eb}\label{class_agelem_ae7811ac45d172913eb4caaf2312295eb}} 
 double \hyperlink{class_agelem_ae7811ac45d172913eb4caaf2312295eb}{Get\+\_\+tt\+\_\+start} ()
 \begin{DoxyCompactList}\small\item\em vizkor a cso elejen \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a65596050a3f47d1afdd3fd24a30fe43d}{}\label{class_agelem_a65596050a3f47d1afdd3fd24a30fe43d} 
+\mbox{\Hypertarget{class_agelem_a65596050a3f47d1afdd3fd24a30fe43d}\label{class_agelem_a65596050a3f47d1afdd3fd24a30fe43d}} 
 double \hyperlink{class_agelem_a65596050a3f47d1afdd3fd24a30fe43d}{Get\+\_\+tt\+\_\+end} ()
 \begin{DoxyCompactList}\small\item\em vizkor a cso vegen \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a6aaa45a656c9e78522ecd11f250640aa}{}\label{class_agelem_a6aaa45a656c9e78522ecd11f250640aa} 
+\mbox{\Hypertarget{class_agelem_a6aaa45a656c9e78522ecd11f250640aa}\label{class_agelem_a6aaa45a656c9e78522ecd11f250640aa}} 
 void \hyperlink{class_agelem_a6aaa45a656c9e78522ecd11f250640aa}{Set\+\_\+tt\+\_\+start} (double tmp)
 \begin{DoxyCompactList}\small\item\em vizkor a cso elejen -\/ beallitas \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a9ff9bdd8cfd642c697cde656576315a6}{}\label{class_agelem_a9ff9bdd8cfd642c697cde656576315a6} 
+\mbox{\Hypertarget{class_agelem_a9ff9bdd8cfd642c697cde656576315a6}\label{class_agelem_a9ff9bdd8cfd642c697cde656576315a6}} 
 void \hyperlink{class_agelem_a9ff9bdd8cfd642c697cde656576315a6}{Set\+\_\+tt\+\_\+end} (double tmp)
 \begin{DoxyCompactList}\small\item\em vizkor a cso vegen -\/ beallitas \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a0b858ef17c27b14b60c29404be67e486}{}\label{class_agelem_a0b858ef17c27b14b60c29404be67e486} 
+\mbox{\Hypertarget{class_agelem_a0b858ef17c27b14b60c29404be67e486}\label{class_agelem_a0b858ef17c27b14b60c29404be67e486}} 
 virtual double {\bfseries Get\+\_\+\+Foly\+Terf} ()
 \item 
-\hypertarget{class_agelem_a52bbebe64a09fb4e96e870cd7dfc5fc7}{}\label{class_agelem_a52bbebe64a09fb4e96e870cd7dfc5fc7} 
+\mbox{\Hypertarget{class_agelem_a52bbebe64a09fb4e96e870cd7dfc5fc7}\label{class_agelem_a52bbebe64a09fb4e96e870cd7dfc5fc7}} 
 virtual void {\bfseries Set\+\_\+\+Foly\+Terf} ()
 \item 
-\hypertarget{class_agelem_ac79eb4da65122b22558f66b8e4e8231b}{}\label{class_agelem_ac79eb4da65122b22558f66b8e4e8231b} 
+\mbox{\Hypertarget{class_agelem_ac79eb4da65122b22558f66b8e4e8231b}\label{class_agelem_ac79eb4da65122b22558f66b8e4e8231b}} 
 virtual void {\bfseries build\+\_\+res} ()
 \item 
-\hypertarget{class_agelem_a0b648fe896fb1c2abdbb30023ddb3f5d}{}\label{class_agelem_a0b648fe896fb1c2abdbb30023ddb3f5d} 
+\mbox{\Hypertarget{class_agelem_a0b648fe896fb1c2abdbb30023ddb3f5d}\label{class_agelem_a0b648fe896fb1c2abdbb30023ddb3f5d}} 
 virtual string {\bfseries Get\+Type} ()=0
 \item 
-\hypertarget{class_agelem_ad31d35680f3bb4941f4a68d6f208a2d7}{}\label{class_agelem_ad31d35680f3bb4941f4a68d6f208a2d7} 
+\mbox{\Hypertarget{class_agelem_ad31d35680f3bb4941f4a68d6f208a2d7}\label{class_agelem_ad31d35680f3bb4941f4a68d6f208a2d7}} 
 virtual vector$<$ double $>$ \hyperlink{class_agelem_ad31d35680f3bb4941f4a68d6f208a2d7}{Get\+\_\+res} (string which)
 \begin{DoxyCompactList}\small\item\em Eredmenyvektor visszaadasa (csak \hyperlink{class_csatorna}{Csatorna} eseten) \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a2bf7db59960759d324cbef9632ca7df8}{}\label{class_agelem_a2bf7db59960759d324cbef9632ca7df8} 
+\mbox{\Hypertarget{class_agelem_a2bf7db59960759d324cbef9632ca7df8}\label{class_agelem_a2bf7db59960759d324cbef9632ca7df8}} 
 vector$<$ double $>$ \hyperlink{class_agelem_a2bf7db59960759d324cbef9632ca7df8}{interp} (vector$<$ double $>$ x, vector$<$ double $>$ y, vector$<$ double $>$ xg)
 \begin{DoxyCompactList}\small\item\em Matlab-\/szeru linearis interpolacio. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a126c41d23c78c6d5a81feafd6829e236}{}\label{class_agelem_a126c41d23c78c6d5a81feafd6829e236} 
+\mbox{\Hypertarget{class_agelem_a126c41d23c78c6d5a81feafd6829e236}\label{class_agelem_a126c41d23c78c6d5a81feafd6829e236}} 
 double \hyperlink{class_agelem_a126c41d23c78c6d5a81feafd6829e236}{mean} (vector$<$ double $>$ x)
 \begin{DoxyCompactList}\small\item\em Atlag szamitasa. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a144892d0f79ad876bcdb3fe70e282edf}{}\label{class_agelem_a144892d0f79ad876bcdb3fe70e282edf} 
+\mbox{\Hypertarget{class_agelem_a144892d0f79ad876bcdb3fe70e282edf}\label{class_agelem_a144892d0f79ad876bcdb3fe70e282edf}} 
 void \hyperlink{class_agelem_a144892d0f79ad876bcdb3fe70e282edf}{set\+\_\+up\+\_\+grid} (double a\+\_\+konc, vector$<$ double $>$ a\+\_\+vel, double a\+\_\+cL)
 \begin{DoxyCompactList}\small\item\em Vizminoseghez numerikus halo. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a1500c8131aaa82f6150193a8cf13050b}{}\label{class_agelem_a1500c8131aaa82f6150193a8cf13050b} 
+\mbox{\Hypertarget{class_agelem_a1500c8131aaa82f6150193a8cf13050b}\label{class_agelem_a1500c8131aaa82f6150193a8cf13050b}} 
 string \hyperlink{class_agelem_a1500c8131aaa82f6150193a8cf13050b}{show\+\_\+grid} (double \hyperlink{class_agelem_a0cdf382c62ac004b8a120319be0cea84}{ido})
 \begin{DoxyCompactList}\small\item\em Vizminoseghez numerikus halo kiirasa. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a9c448326eb07e271b4e2dc8a9dd2a0d9}{}\label{class_agelem_a9c448326eb07e271b4e2dc8a9dd2a0d9} 
+\mbox{\Hypertarget{class_agelem_a9c448326eb07e271b4e2dc8a9dd2a0d9}\label{class_agelem_a9c448326eb07e271b4e2dc8a9dd2a0d9}} 
 double \hyperlink{class_agelem_a9c448326eb07e271b4e2dc8a9dd2a0d9}{Get\+\_\+head\+\_\+loss} ()
 \begin{DoxyCompactList}\small\item\em Hozz�f�r�s nyom�ses�shez. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a3ff5a59abe058d7b4b6812962e291fc1}{}\label{class_agelem_a3ff5a59abe058d7b4b6812962e291fc1} 
+\mbox{\Hypertarget{class_agelem_a3ff5a59abe058d7b4b6812962e291fc1}\label{class_agelem_a3ff5a59abe058d7b4b6812962e291fc1}} 
 void \hyperlink{class_agelem_a3ff5a59abe058d7b4b6812962e291fc1}{Set\+\_\+head\+\_\+loss} (double a\+\_\+head\+\_\+loss)
 \begin{DoxyCompactList}\small\item\em Nyom�ses�s �r�sa. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a9d3b5645c32c2d07b163e1270138a2b2}{}\label{class_agelem_a9d3b5645c32c2d07b163e1270138a2b2} 
+\mbox{\Hypertarget{class_agelem_a9d3b5645c32c2d07b163e1270138a2b2}\label{class_agelem_a9d3b5645c32c2d07b163e1270138a2b2}} 
 double {\bfseries Get\+\_\+ro} ()
 \item 
-\hypertarget{class_agelem_a045cfd41234f268b8f923a452df080c5}{}\label{class_agelem_a045cfd41234f268b8f923a452df080c5} 
+\mbox{\Hypertarget{class_agelem_a045cfd41234f268b8f923a452df080c5}\label{class_agelem_a045cfd41234f268b8f923a452df080c5}} 
 void {\bfseries Set\+\_\+cdt} (double a\+\_\+cdt)
 \item 
-\hypertarget{class_agelem_a4d4a42d36256dd6c55a548934269f33c}{}\label{class_agelem_a4d4a42d36256dd6c55a548934269f33c} 
-virtual void {\bfseries Set\+Log\+File} (string fnev)
+\mbox{\Hypertarget{class_agelem_aa10cee71481c553a0003c547ac3058dd}\label{class_agelem_aa10cee71481c553a0003c547ac3058dd}} 
+void {\bfseries Set\+Log\+File} ()
 \item 
-\hypertarget{class_agelem_ab0d58b657fe3300b4e10b70898cf5119}{}\label{class_agelem_ab0d58b657fe3300b4e10b70898cf5119} 
+\mbox{\Hypertarget{class_agelem_ab0d58b657fe3300b4e10b70898cf5119}\label{class_agelem_ab0d58b657fe3300b4e10b70898cf5119}} 
 void {\bfseries Set\+\_\+\+Aref} (double a\+\_\+\+Aref)
 \end{DoxyCompactItemize}
 \subsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_agelem_ae31b4979900d8e4c254c4405b04df2a0}{}\label{class_agelem_ae31b4979900d8e4c254c4405b04df2a0} 
+\mbox{\Hypertarget{class_agelem_ae31b4979900d8e4c254c4405b04df2a0}\label{class_agelem_ae31b4979900d8e4c254c4405b04df2a0}} 
 vector$<$ double $>$ \hyperlink{class_agelem_ae31b4979900d8e4c254c4405b04df2a0}{konc}
 \begin{DoxyCompactList}\small\item\em Vizminoseghez koncentracio-\/ es sebessegeloszlas. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_ae067f6cce2ca3f7d8c03c363d1ac6879}{}\label{class_agelem_ae067f6cce2ca3f7d8c03c363d1ac6879} 
+\mbox{\Hypertarget{class_agelem_ae067f6cce2ca3f7d8c03c363d1ac6879}\label{class_agelem_ae067f6cce2ca3f7d8c03c363d1ac6879}} 
 vector$<$ double $>$ {\bfseries vel}
 \item 
-\hypertarget{class_agelem_a23aaf89345c6b3c6ad6d90fc26b01b54}{}\label{class_agelem_a23aaf89345c6b3c6ad6d90fc26b01b54} 
+\mbox{\Hypertarget{class_agelem_a23aaf89345c6b3c6ad6d90fc26b01b54}\label{class_agelem_a23aaf89345c6b3c6ad6d90fc26b01b54}} 
 double \hyperlink{class_agelem_a23aaf89345c6b3c6ad6d90fc26b01b54}{konc\+\_\+atlag}
 \begin{DoxyCompactList}\small\item\em Atlagos koncentracio. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a0cdf382c62ac004b8a120319be0cea84}{}\label{class_agelem_a0cdf382c62ac004b8a120319be0cea84} 
+\mbox{\Hypertarget{class_agelem_a0cdf382c62ac004b8a120319be0cea84}\label{class_agelem_a0cdf382c62ac004b8a120319be0cea84}} 
 double \hyperlink{class_agelem_a0cdf382c62ac004b8a120319be0cea84}{ido}
 \begin{DoxyCompactList}\small\item\em Vizminoseg szamitashoz belso ido nyilvantartasa. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_ab72f11ac2c7182de3a5c21943e9350a0}{}\label{class_agelem_ab72f11ac2c7182de3a5c21943e9350a0} 
+\mbox{\Hypertarget{class_agelem_ab72f11ac2c7182de3a5c21943e9350a0}\label{class_agelem_ab72f11ac2c7182de3a5c21943e9350a0}} 
 double \hyperlink{class_agelem_ab72f11ac2c7182de3a5c21943e9350a0}{cL}
 \begin{DoxyCompactList}\small\item\em Hossz, \hyperlink{class_csatorna}{Csatorna} es \hyperlink{class_cso}{Cso} eseten maga a hossz, az osszes tobbi elemnel 1\mbox{[}m\mbox{]}. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a164f2afad3ab19d298c73a865e82aa0b}{}\label{class_agelem_a164f2afad3ab19d298c73a865e82aa0b} 
+\mbox{\Hypertarget{class_agelem_a164f2afad3ab19d298c73a865e82aa0b}\label{class_agelem_a164f2afad3ab19d298c73a865e82aa0b}} 
 double \hyperlink{class_agelem_a164f2afad3ab19d298c73a865e82aa0b}{cT}
 \begin{DoxyCompactList}\small\item\em Az agelem vegigjarasahoz szukseges ido es idolepes. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_ab2e1162f1ae624444515fb09bcfa5e8e}{}\label{class_agelem_ab2e1162f1ae624444515fb09bcfa5e8e} 
+\mbox{\Hypertarget{class_agelem_ab2e1162f1ae624444515fb09bcfa5e8e}\label{class_agelem_ab2e1162f1ae624444515fb09bcfa5e8e}} 
 double {\bfseries cdt}
+\item 
+\mbox{\Hypertarget{class_agelem_a2c9f1a19641baa978f764abfb0352e33}\label{class_agelem_a2c9f1a19641baa978f764abfb0352e33}} 
+bool {\bfseries force\+\_\+more\+\_\+iter}
+\item 
+\mbox{\Hypertarget{class_agelem_a53ddaf1d1015bc6544c492123180cd60}\label{class_agelem_a53ddaf1d1015bc6544c492123180cd60}} 
+bool {\bfseries update\+\_\+diameter}
 \end{DoxyCompactItemize}
 \subsection*{Protected Member Functions}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_agelem_acf0a31790483a62b9b1f46a2bd73b59a}{}\label{class_agelem_acf0a31790483a62b9b1f46a2bd73b59a} 
+\mbox{\Hypertarget{class_agelem_acf0a31790483a62b9b1f46a2bd73b59a}\label{class_agelem_acf0a31790483a62b9b1f46a2bd73b59a}} 
 void \hyperlink{class_agelem_acf0a31790483a62b9b1f46a2bd73b59a}{error} (string fv, string msg)
 \begin{DoxyCompactList}\small\item\em Standard error message. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsection*{Protected Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hypertarget{class_agelem_a1377d80d8511cc4adacccba31d28282d}{}\label{class_agelem_a1377d80d8511cc4adacccba31d28282d} 
+\mbox{\Hypertarget{class_agelem_a1377d80d8511cc4adacccba31d28282d}\label{class_agelem_a1377d80d8511cc4adacccba31d28282d}} 
 double \hyperlink{class_agelem_a1377d80d8511cc4adacccba31d28282d}{mp}
 \begin{DoxyCompactList}\small\item\em Tomegaram, \mbox{[}kg/s\mbox{]}. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a520072191e53f368a04ca80b8b583a3f}{}\label{class_agelem_a520072191e53f368a04ca80b8b583a3f} 
+\mbox{\Hypertarget{class_agelem_a520072191e53f368a04ca80b8b583a3f}\label{class_agelem_a520072191e53f368a04ca80b8b583a3f}} 
 double \hyperlink{class_agelem_a520072191e53f368a04ca80b8b583a3f}{ro}
 \begin{DoxyCompactList}\small\item\em Suruseg, \mbox{[}kg/m3\mbox{]}. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a3f8668febc2958fd539997d537552f17}{}\label{class_agelem_a3f8668febc2958fd539997d537552f17} 
+\mbox{\Hypertarget{class_agelem_a3f8668febc2958fd539997d537552f17}\label{class_agelem_a3f8668febc2958fd539997d537552f17}} 
 double \hyperlink{class_agelem_a3f8668febc2958fd539997d537552f17}{Aref}
 \begin{DoxyCompactList}\small\item\em Referencia keresztmetszet, \mbox{[}m2\mbox{]}, a sebesseg kiszamitasahoz hasznaljuk. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_abe92b7e3912367d5d1caf6b277ca0b7d}{}\label{class_agelem_abe92b7e3912367d5d1caf6b277ca0b7d} 
+\mbox{\Hypertarget{class_agelem_a994d67cc2ee3be36159a774681625134}\label{class_agelem_a994d67cc2ee3be36159a774681625134}} 
+const double \hyperlink{class_agelem_a994d67cc2ee3be36159a774681625134}{pi} = 3.\+1416
+\begin{DoxyCompactList}\small\item\em Pi. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_agelem_ab382ba1135a9aae3a5fd817f5746be43}\label{class_agelem_ab382ba1135a9aae3a5fd817f5746be43}} 
+const double \hyperlink{class_agelem_ab382ba1135a9aae3a5fd817f5746be43}{g} = 9.\+81
+\begin{DoxyCompactList}\small\item\em g \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{class_agelem_abe92b7e3912367d5d1caf6b277ca0b7d}\label{class_agelem_abe92b7e3912367d5d1caf6b277ca0b7d}} 
 string \hyperlink{class_agelem_abe92b7e3912367d5d1caf6b277ca0b7d}{nev}
 \begin{DoxyCompactList}\small\item\em Az agelem neve. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a6e1c3128174609a0dd8fbee09c0d9162}{}\label{class_agelem_a6e1c3128174609a0dd8fbee09c0d9162} 
+\mbox{\Hypertarget{class_agelem_a6e1c3128174609a0dd8fbee09c0d9162}\label{class_agelem_a6e1c3128174609a0dd8fbee09c0d9162}} 
 string \hyperlink{class_agelem_a6e1c3128174609a0dd8fbee09c0d9162}{tipus}
 \begin{DoxyCompactList}\small\item\em Az agelem tipusa, pl. \hyperlink{class_cso}{Cso}, \hyperlink{class_csatorna}{Csatorna}, stb. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a9639c0a7a0165b644d62033e24eb6d24}{}\label{class_agelem_a9639c0a7a0165b644d62033e24eb6d24} 
+\mbox{\Hypertarget{class_agelem_a9639c0a7a0165b644d62033e24eb6d24}\label{class_agelem_a9639c0a7a0165b644d62033e24eb6d24}} 
 int \hyperlink{class_agelem_a9639c0a7a0165b644d62033e24eb6d24}{cspe\+\_\+index}
 \begin{DoxyCompactList}\small\item\em Az elejen es vegen levo csompont indexe. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a58103d621323b8cc243fa8e7e3afd15d}{}\label{class_agelem_a58103d621323b8cc243fa8e7e3afd15d} 
+\mbox{\Hypertarget{class_agelem_a58103d621323b8cc243fa8e7e3afd15d}\label{class_agelem_a58103d621323b8cc243fa8e7e3afd15d}} 
 int {\bfseries cspv\+\_\+index}
 \item 
-\hypertarget{class_agelem_aba3d9c5d2eed320e7a0531e99188a73a}{}\label{class_agelem_aba3d9c5d2eed320e7a0531e99188a73a} 
+\mbox{\Hypertarget{class_agelem_aba3d9c5d2eed320e7a0531e99188a73a}\label{class_agelem_aba3d9c5d2eed320e7a0531e99188a73a}} 
 string \hyperlink{class_agelem_aba3d9c5d2eed320e7a0531e99188a73a}{cspe\+\_\+nev}
 \begin{DoxyCompactList}\small\item\em Az elejen es vegen levo csompont neve. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_ac637696905966c41ddc21c708c653991}{}\label{class_agelem_ac637696905966c41ddc21c708c653991} 
+\mbox{\Hypertarget{class_agelem_ac637696905966c41ddc21c708c653991}\label{class_agelem_ac637696905966c41ddc21c708c653991}} 
 string {\bfseries cspv\+\_\+nev}
 \item 
-\hypertarget{class_agelem_a2cf9ad5c8991d7bfc41754126a1a82f6}{}\label{class_agelem_a2cf9ad5c8991d7bfc41754126a1a82f6} 
+\mbox{\Hypertarget{class_agelem_a2cf9ad5c8991d7bfc41754126a1a82f6}\label{class_agelem_a2cf9ad5c8991d7bfc41754126a1a82f6}} 
 int {\bfseries csp\+\_\+db}
 \item 
-\hypertarget{class_agelem_ab235bccddd3f04b9f4e991ee8f3dd8ff}{}\label{class_agelem_ab235bccddd3f04b9f4e991ee8f3dd8ff} 
+\mbox{\Hypertarget{class_agelem_ab235bccddd3f04b9f4e991ee8f3dd8ff}\label{class_agelem_ab235bccddd3f04b9f4e991ee8f3dd8ff}} 
 double \hyperlink{class_agelem_ab235bccddd3f04b9f4e991ee8f3dd8ff}{Foly\+Terf}
 \begin{DoxyCompactList}\small\item\em Folyadekterfogat. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a723a132d3fc5ce069b16f22d169d9772}{}\label{class_agelem_a723a132d3fc5ce069b16f22d169d9772} 
+\mbox{\Hypertarget{class_agelem_a723a132d3fc5ce069b16f22d169d9772}\label{class_agelem_a723a132d3fc5ce069b16f22d169d9772}} 
 double \hyperlink{class_agelem_a723a132d3fc5ce069b16f22d169d9772}{head\+\_\+loss}
 \begin{DoxyCompactList}\small\item\em Nyomaseses. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_a79b5d0684f173c6cbd98530583352211}{}\label{class_agelem_a79b5d0684f173c6cbd98530583352211} 
+\mbox{\Hypertarget{class_agelem_a79b5d0684f173c6cbd98530583352211}\label{class_agelem_a79b5d0684f173c6cbd98530583352211}} 
 string {\bfseries out\+\_\+file}
 \item 
-\hypertarget{class_agelem_a18e84a58b3a1f45465e27e1afdf2f2a1}{}\label{class_agelem_a18e84a58b3a1f45465e27e1afdf2f2a1} 
+\mbox{\Hypertarget{class_agelem_a18e84a58b3a1f45465e27e1afdf2f2a1}\label{class_agelem_a18e84a58b3a1f45465e27e1afdf2f2a1}} 
 int {\bfseries debug\+\_\+level}
 \item 
-\hypertarget{class_agelem_a09ea41e75493961eb2b1d755c74e95f6}{}\label{class_agelem_a09ea41e75493961eb2b1d755c74e95f6} 
+\mbox{\Hypertarget{class_agelem_a09ea41e75493961eb2b1d755c74e95f6}\label{class_agelem_a09ea41e75493961eb2b1d755c74e95f6}} 
 double \hyperlink{class_agelem_a09ea41e75493961eb2b1d755c74e95f6}{tt\+\_\+start}
 \begin{DoxyCompactList}\small\item\em vizkor az elejen \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_af07d516eda5f43a676f9f417436e0d9c}{}\label{class_agelem_af07d516eda5f43a676f9f417436e0d9c} 
+\mbox{\Hypertarget{class_agelem_af07d516eda5f43a676f9f417436e0d9c}\label{class_agelem_af07d516eda5f43a676f9f417436e0d9c}} 
 double \hyperlink{class_agelem_af07d516eda5f43a676f9f417436e0d9c}{tt\+\_\+end}
 \begin{DoxyCompactList}\small\item\em vizkor a vegen \end{DoxyCompactList}\end{DoxyCompactItemize}
-\subsection*{Static Protected Attributes}
-\begin{DoxyCompactItemize}
-\item 
-\hypertarget{class_agelem_a994d67cc2ee3be36159a774681625134}{}\label{class_agelem_a994d67cc2ee3be36159a774681625134} 
-static const double \hyperlink{class_agelem_a994d67cc2ee3be36159a774681625134}{pi} = 3.\+1416
-\begin{DoxyCompactList}\small\item\em Pi. \end{DoxyCompactList}\item 
-\hypertarget{class_agelem_ab382ba1135a9aae3a5fd817f5746be43}{}\label{class_agelem_ab382ba1135a9aae3a5fd817f5746be43} 
-static const double \hyperlink{class_agelem_ab382ba1135a9aae3a5fd817f5746be43}{g} = 9.\+81
-\begin{DoxyCompactList}\small\item\em g \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}

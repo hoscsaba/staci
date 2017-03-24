@@ -37,7 +37,8 @@ string VisszacsapoSzelep::Info()
 {
     ostringstream strstrm;
     strstrm << Agelem::Info();
-    strstrm << "  kapcsolodas : " << cspv_nev << "(index:" << cspv_index << ")\n";
+    strstrm << "\n     tipusa : " << tipus;
+    strstrm << "\nkapcsolodas : " << cspv_nev << "(index:" << cspv_index << ")\n";
     strstrm << "\n\t átfolyási tényezõ folyásirányban : " << dzeta_e;
     strstrm << "\n\t átfolyási tényezõ zárás iráynyban: " << dzeta_v << "\n";
     return strstrm.str();

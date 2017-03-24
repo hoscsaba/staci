@@ -1,19 +1,17 @@
-
-#include "Cso.h"
 #include <cmath>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 #include "Agelem.h"
+#include "Cso.h"
 
 using namespace std;
 
 Cso::Cso(const string a_nev, const string a_cspe_nev, const string a_cspv_nev,
          const double a_ro, const double a_L, const double a_D,
          const double a_erdesseg, const double a_cl_k, const double a_cl_w,
-         const double a_mp)
-  : Agelem(a_nev, a_D * a_D * M_PI / 4., a_mp, a_ro) {
+         const double a_mp) : Agelem(a_nev, a_D * a_D * M_PI / 4., a_mp, a_ro) {
   // Kotelezo adatok minden Agelemnel:
   tipus = "Cso";
   csp_db = 2;
@@ -59,6 +57,7 @@ Cso::~Cso() {}
 string Cso::Info() {
   ostringstream strstrm;
   strstrm << Agelem::Info();
+  strstrm << "\n       tipusa : " << tipus;
   strstrm << "\n  kapcsolodas : " << cspe_nev << "(index:" << cspe_index
           << ") --> " << cspv_nev << "(index:" << cspv_index << ")\n";
   strstrm << "       adatok : L=" << L << "[m], D=" << D
@@ -132,12 +131,12 @@ For any of these models, if parameter erdesseg is negative, it is assumed that
 lambda=-erdesseg
 */
 double Cso::surlodas() {
-  double v_min = 0.1;
+  double v_min = 0.01;
   double v = mp / ro / (D * D * pi / 4);
   if (fabs(v) < v_min) v = v_min;
   double nu = 1e-6;
   double lambda_min = 0.001;
-  double lambda_max = 1.0;
+  double lambda_max = 10.0;
   double dp;
 
   if (friction_model_type == 0)  // Darcy-Wiesenbach
@@ -179,8 +178,9 @@ double Cso::surlodas() {
         /*double C_factor=100;*/
         // double Rh = D / 4; // A/K=(D^2*pi/4)/(D*pi)=D/4
         double C_factor = erdesseg;
+        double C_MIN = 1.;
 
-        if (C_factor < 10.) {
+        if (C_factor < C_MIN) {
           cout << endl
                << "\tWARNING: "
                << " pipe " << nev
@@ -188,8 +188,8 @@ double Cso::surlodas() {
                "factor is too small (C_HW="
                << C_factor << ").";
           cout << " -> OVERRIDING by C_HW=10.";
-          C_factor = 10.;
-          erdesseg = 10.;
+          C_factor = C_MIN;
+          erdesseg = C_MIN;
         }
 
         dp = L / pow(C_factor, 1.85) / pow(D, 4.87) * 7.88 / pow(0.85, 1.85) *
@@ -206,15 +206,19 @@ double Cso::surlodas() {
   //    cin.get();
 
   if (fabs(lambda) < lambda_min) {
-    // cout<<endl<<"\t WARNING: "<<nev<<": v="<<v<<"m/s,
-    // lambda="<<lambda<<"<"<<lambda_min<<", overriding by "<<lambda_min;
+    cout << endl << "\t WARNING: " << nev << ": v=" << v << "m/s, ";
+    cout << "erdesseg=" << erdesseg;
+    cout << "lambda=" << lambda << "<" << lambda_min << ", overriding by " << lambda_min;
     lambda = lambda_min;
+    // cin.get();
   }
 
   if (fabs(lambda) > lambda_max) {
-    // cout<<endl<<"\t WARNING: "<<nev<<": v="<<v<<"m/s,
-    // lambda="<<lambda<<">"<<lambda_max<<", overriding by "<<lambda_max;
+    cout << endl << "\t WARNING: " << nev << ": v=" << v << "m/s, ";
+    cout << "erdesseg=" << erdesseg;
+    cout << " lambda=" << lambda << ">" << lambda_max << ", overriding by " << lambda_max;
     lambda = lambda_max;
+    // cin.get();
   }
 
   return lambda;
@@ -237,7 +241,7 @@ double Cso::Get_dprop(string mit) {
     out = cl_k;
   else if (mit == "cl_w")
     out = cl_w;
-  else if (mit == "erdesseg")
+  else if ((mit == "erdesseg") || (mit == "friction_coeff"))
     out = erdesseg;
   else if (mit == "headloss")
     out = fabs(ComputeHeadloss() / ro / g);
@@ -269,7 +273,7 @@ double Cso::Get_dfdmu(string mit) {
     // abs(mp);  // Pa/m
     double old_erdesseg = erdesseg;
     double f0 = ComputeHeadloss();
-    double delta_erdesseg = erdesseg * 0.1;
+    double delta_erdesseg = erdesseg * 0.01;
     erdesseg += delta_erdesseg;
     double f1 = ComputeHeadloss();
     out = (f1 - f0) / delta_erdesseg;
@@ -299,6 +303,9 @@ void Cso::Set_dprop(string mit, double mire) {
     FolyTerf = Aref * L;
   } else if ((mit == "concentration") || (mit == "konc_atlag")) {
     konc_atlag = mire;
+  }
+  else if ((mit == "erdesseg") || (mit == "friction_coeff")) {
+    erdesseg = mire;
   } else {
     cout << endl
          << "HIBA! Cso::Set_dprop(mit), ismeretlen bemenet: mit=" << mit << endl

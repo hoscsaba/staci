@@ -40,6 +40,7 @@ protected:
     double tt_end;
 
 
+
 public:
     void logfile_write(string msg, int msg_debug_level);
     /// Konstruktor
@@ -48,8 +49,7 @@ public:
     Agelem(const string nev, const double Aref, const double mp, const double ro, const double tt);
     /// Destruktor
     virtual ~Agelem();
-    /// Informacio
-    virtual string Info();
+
     /// Csomopont beallitasa
     virtual void add_csp(const int cspe_index, const int cspv_index);
     /// Az agegyenlet erteke, nullara rendezve, v.o.m.-ben
@@ -60,9 +60,8 @@ public:
     virtual void Ini(int mode, double value) = 0;
     /// Get double property, Cso es Csatorna akarja elulirja
     virtual double Get_dprop(string mit) = 0;
-    // {
-    // return 12.53;
-    // }
+    /// Informacio
+    virtual string Info();
     /// Get double property, Cso es Csatorna akarja felulirja
     double Get_Aref()
     {

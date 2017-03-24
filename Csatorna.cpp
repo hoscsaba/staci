@@ -128,6 +128,7 @@ string Csatorna::Info() {
 	ostringstream strstrm;
 	strstrm << Agelem::Info();
 	cout << setprecision(3);
+	strstrm << endl << "       tipusa : " << tipus;
 	strstrm << endl << "  kapcsolodas : " << cspe_nev << "(index:" << cspe_index
 	        << ") ==> " << cspv_nev << "(index:" << cspv_index << ")";
 	strstrm << endl << "       adatok : hossz [m]         : " << L;

@@ -1,11 +1,11 @@
-using namespace std;
-
 #include <iomanip>
 #include <string>
 #include <vector>
 #include "Agelem.h"
 #include "Szivattyu.h"
 #include "nr.h"
+
+using namespace std;
 
 Szivattyu::Szivattyu(const string a_nev, const string a_cspe_nev,
                      const string a_cspv_nev, const double a_ro, const double Aref, vector<double> a_q,
@@ -88,6 +88,7 @@ Szivattyu::~Szivattyu() {}
 string Szivattyu::Info() {
     ostringstream strstrm;
     strstrm << Agelem::Info();
+    strstrm << endl << "       tipusa : " << tipus;
     strstrm << endl << "  kapcsolodas : " << cspe_nev << "(index:" << cspe_index << ") --> " << cspv_nev << "(index:"
             << cspv_index << ")\n";
     cout << setprecision(3);
@@ -102,6 +103,7 @@ string Szivattyu::Info() {
     strstrm << scientific << setprecision(3);
     for (unsigned int i = 0; i < p.size(); i++) strstrm << "p[" << i << "]=" << p.at(i) << "  ";
     strstrm << "\n";
+    cin.get();
     return strstrm.str();
 }
 

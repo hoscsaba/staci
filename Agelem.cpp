@@ -73,7 +73,7 @@ Agelem::~Agelem() {
 string Agelem::Info() {
     ostringstream strstrm;
     strstrm << "\n Agelem neve  : " << nev;
-    strstrm << "\n        tipusa: " << tipus;
+    // strstrm << "\n        tipusa: " << tipus;
     strstrm << "\n        ro    : " << ro << " [kg/m^3]";
     strstrm << "\n        Aref  : " << Aref << " [m^2]";
     strstrm << "\n        mp    : " << mp / ro * 3600 << " [m3/h]";

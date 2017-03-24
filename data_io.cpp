@@ -146,7 +146,8 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
         cout << endl << endl << "Az agak reszletesen:" << endl
              << "-----------------------------------------" << endl;
     string node_from, node_to;
-    double density, patlag = 0, pmax = 0, aref, mass_flow_rate, travel_time;
+    double density, aref, mass_flow_rate, travel_time;
+    // double patlag = 0, pmax = 0;
     int darab = 0;
     for (int i = 0; i < ag_db; i++) {
         id = Node_edges.getChildNode("edge", i).getChildNode("id").getText();
@@ -201,11 +202,11 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                 {
                     double pres = atof(elem.getChildNode("pressure").getText());
                     if (debug)
-                        cout << ", pressure=" << pres << "Pa, szumma_patlag=" << patlag
-                             / 1000 / 9.81 << "vom";
-                    patlag += pres;
-                    if (pres > pmax)
-                        pmax = pres;
+                        cout << ", pressure=" << pres << "Pa";//, szumma_patlag=" << patlag
+                    // / 1000 / 9.81 << "vom";
+                    // patlag += pres;
+                    // if (pres > pmax)
+                    // pmax = pres;
                     darab++;
                     agelemek.push_back(
                         new KonstNyomas(id, aref, node_from, density, pres, mass_flow_rate, travel_time));
@@ -276,13 +277,13 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                 {
                     double Hb = atof(elem.getChildNode("bottom_level").getText());
                     double Hw = atof(elem.getChildNode("water_level").getText());
-                    patlag += Hw + Hb;
-                    if ((Hw + Hb) > pmax)
-                        pmax = Hw + Hb;
+                    // patlag += Hw + Hb;
+                    // if ((Hw + Hb) > pmax)
+                    // pmax = Hw + Hb;
                     darab++;
                     if (debug)
                         cout << ", bottom_level=" << Hb << "m" << ", water_level=" << Hw
-                             << "m, szumma_patlag=" << patlag;
+                             << "m";//, szumma_patlag=" << patlag;
 
                     agelemek.push_back(
                         new Vegakna(id, node_from, density, aref, Hb, Hw, mass_flow_rate, travel_time));
@@ -449,10 +450,10 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                 }
             }
         }
-        /*        printf("\n Size of agelemek is %lu, last one added is %s.",agelemek.size(),agelemek.at(agelemek.size()-1)->Get_nev().c_str());
-                cout<<agelemek.at(agelemek.size()-1)->Info();
-                cin.get();*/
+        if (debug)
+            cout << agelemek.at(i)->Info();
     }
+
     if (debug) {
         cout << endl << endl << endl << "Number of edge types:";
         cout << endl << "\tnode:\t" << csp_db;
@@ -460,8 +461,8 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
             cout << endl << "\t" << edge_type.at(j) << ":\t" << edge_type_occur.at(j);
     }
 
-    //patlag = patlag / darab;
-
+    if (debug)
+        cin.get();
 }
 
 //--------------------------------------------------------------------------------
@@ -479,7 +480,7 @@ void data_io::curve_reader(const string id, const XMLNode elem,
     string tmp;
 
     if (debug)
-        cout << endl << "\t curve_id: " << curve_id << "  x_jgsz=" << xjgpsz
+        cout << endl << "\t datta_io::curvereader() -> curve_id: " << curve_id << "  x_jgsz=" << xjgpsz
              << ", y_jgpsz=" << yjgpsz;
 
     if (xjgpsz == yjgpsz) {

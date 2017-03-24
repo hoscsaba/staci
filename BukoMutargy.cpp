@@ -40,6 +40,7 @@ string BukoMutargy::Info()
 {
   ostringstream strstrm;
   strstrm << Agelem::Info();
+  strstrm << endl << "       tipusa : " << tipus;
   strstrm << endl << "  kapcsolodas : " << cspe_nev << "(index:" << cspe_index
           << ") ==> " << cspv_nev << "(index:" << cspv_index << ")";
   strstrm << "       adatok : nyitva a szelep?   : ";

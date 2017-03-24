@@ -3,7 +3,10 @@
 #include <sstream>
 #include "Staci.h"
 #include "xmlParser.h"
-#include <Eigen/Dense>
+// Linux
+// #include </usr/include/eigen3/Eigen/Dense>
+// Mac
+#include "/usr/local/Cellar/eigen/3.3.3/include/eigen3/Eigen/Dense"
 #include <algorithm>
 #include <ga/ga.h>
 #include <ga/GASimpleGA.h>
@@ -93,8 +96,8 @@ void copy_to_best(const igraph_vector_t *v);
 void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname);
 
 vector< vector<double> > SM;
-vector< vector<double> > SM_MFR ;
-vector< vector<double> > SM_PR ;
+vector< vector<double> > SM_MFR;
+vector< vector<double> > SM_PR;
 
 // struct val_and_ID {
 //     double val;
@@ -651,24 +654,26 @@ void D_Optimize() {
 
     // genome = ga.statistics().bestIndividual();
 
-    // strstrm.str("");
+    strstrm.str("");
     // strstrm << endl << "BEST SOLUTION FOUND:" << endl;
 
-
     vector<int> best_sorted;
-    for (unsigned int i = 0; i < n_comm; i++)
-        best_sorted.push_back(best.at(i));
+    // for (unsigned int i = 0; i < n_comm; i++)
+    // best_sorted.push_back(best.at(i));
     // best_sorted.push_back(genome.gene(i));
     sort(best_sorted.begin(), best_sorted.begin() + best_sorted.size());
 
-    for (unsigned int i = 0; i < n_comm; i++)
-        strstrm << "\t" << wds->cspok.at(best_sorted.at(i))->Get_nev();
-    // strstrm << "\tNode #" << genome.gene(i) << " is " << wds->cspok.at(genome.gene(i))->Get_nev() << endl;
+    // strstrm << endl << endl;
+    // for (unsigned int i = 0; i < n_comm; i++) {
+    // strstrm << "\t" << best.at(i) << endl;
+    // strstrm << "\t" << wds->cspok.at(best.at(i))->Get_nev();
+// }
+// strstrm << "\tNode #" << genome.gene(i) << " is " << wds->cspok.at(genome.gene(i))->Get_nev() << endl;
     logfile_write(strstrm.str(), 0);
 
-    // info = true;
-    // GA1DArrayAlleleGenome<int> tmp = (GA1DArrayAlleleGenome<int> &) c;
-    // double best_obj = Objective(genome);
+// info = true;
+// GA1DArrayAlleleGenome<int> tmp = (GA1DArrayAlleleGenome<int> &) c;
+// double best_obj = Objective(genome);
 
     strstrm.str("");
     int idx;
@@ -1054,28 +1059,42 @@ float D_Objective(GAGenome & c) {
     }
 
     // vector< vector<double> > SM_tr(SM.at(0).size(),SM.size());
-    MatrixXd jac(SM.size(), n_comm);
+    MatrixXd jacT(SM.size(), n_comm);
     for (int i = 0; i < n_comm; i++) {
         int col = genome.gene(i);
         for (int j = 0; j < SM.size(); j++) {
-            jac(j, i) = SM.at(j).at(col);
+            jacT(j, i) = SM.at(j).at(col);
         }
     }
-    if (obj_info) {
-        cout << endl << "jac:" << endl;
-        cout << endl << jac;
+    MatrixXd jac = jacT.transpose();
 
-        cout << endl << "jac.transpose()*jac:" << endl;
-        cout << endl << jac.transpose()*jac;
-    }
+    int m = jac.rows();
+    int n = jac.cols();
+
+    // if (m > n) {
+    //     if (obj_info) {
+    //         cout << endl << "jac.transpose()*jac:" << endl;
+    //         cout << endl << jac.transpose()*jac;
+    //     }
+    // }
+    // else {
+    //     cout << endl << "jac*jac.transpose():" << endl;
+    //     cout << endl << jac*jac.transpose();
+    // }
+
 
     double Q;
     if (obj_type == "A-optimality") {
         double TINY_NUM = 1.e-8;
         if (!is_same_gene) {
             // MINIMIZE tr(Cov)
-            MatrixXd Cov(n_comm, n_comm);
-            MatrixXd Cur = jac.transpose() * jac;
+            // MatrixXd Cov(n_comm, n_comm);
+            MatrixXd Cur, Cov;
+            if (m > n)
+                Cur = jac.transpose() * jac;
+            else
+                Cur = jac * jac.transpose();
+
             if (Cur.determinant() > TINY_NUM) {
                 Cov = Cur.inverse();
 
@@ -1111,7 +1130,15 @@ float D_Objective(GAGenome & c) {
     else if (obj_type == "D-optimality") {
         // MINIMIZE det(Cov) = MAXIMIZE det(Cov^-1)
         if (!is_same_gene) {
-            Q = (jac.transpose() * jac).determinant();
+            // MatrixXd Cur, Cov;
+            if (m > n)
+                // Cur = jac.transpose() * jac;
+                Q = (jac.transpose() * jac).determinant();
+            else
+                // Cur = jac * jac.transpose();
+                Q = (jac * jac.transpose()).determinant();
+
+            // Q = (jac.transpose() * jac).determinant();
             Q = pow(Q, 1. / 2. / (double)n_comm);
         }
         else
@@ -1153,9 +1180,12 @@ float D_Objective(GAGenome & c) {
         //save_state();
 
         strstrm.str("");
-        strstrm << endl << "Gene   : ";
+        strstrm << endl << "best : ";
         for (int i = 0; i < n_comm; i++)
             strstrm << best.at(i) << " ";
+        strstrm << " = ";
+        for (int i = 0; i < n_comm; i++)
+            strstrm << wds->cspok.at(best.at(i))->Get_nev() << " ";
 
         if (fcount < 1000)
             strstrm << endl << "fcount : " << fcount << " (" << ((double) fcount) / f_ce * 100. << " % of compl. enum.)";
@@ -1465,10 +1495,6 @@ void Load_Settings() {
             exit(-1);
         }
     }
-
-
-
-
 
     msg << "\t fname                  : " << fname << endl;
     msg << "\t logfilename            : " << logfilename << endl << endl;

@@ -10,7 +10,7 @@ using namespace std;
 
 Vegakna::Vegakna(const string a_nev, const string a_csp_nev, const double a_ro, const double Aref,
                  const double a_Hf, const double a_H, const double a_mp, const double a_tt) :
-        Agelem(a_nev, Aref, a_mp, a_ro, a_tt) {
+    Agelem(a_nev, Aref, a_mp, a_ro, a_tt) {
     //Kotelezo adatok minden Agelemnel:
     tipus = "Vegakna";
     csp_db = 1;
@@ -33,6 +33,7 @@ Vegakna::~Vegakna() {
 string Vegakna::Info() {
     ostringstream strstrm;
     strstrm << Agelem::Info();
+    strstrm << "\n             tipusa : " << tipus;
     strstrm << "\n        kapcsolodas : " << cspe_nev << "(index:" << cspe_index
             << ")\n";
     strstrm << "        adatok : fenek magassag [m] : " << Hf << endl;

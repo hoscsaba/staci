@@ -57,7 +57,6 @@ void Staci::SetInitialParameters() {
 
     datta_io.load_system(cspok, agelemek);
 
-
     // beallitasok
     // cout<<endl<<endl<<"Beallitasok:";
     debug_level = atoi(datta_io.read_setting("debug_level").c_str());
@@ -206,7 +205,7 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
   opt->addUsage(" ");
   opt->addUsage("\t check for islands: ");
   opt->addUsage(
-    "\t\t -e  (--export_to_connectivity_check) <halofile_regi>.spr");
+    "\t\t -x  (--export_to_connectivity_check) <halofile_regi>.spr");
 
   opt->addUsage(" ");
   opt->addUsage(" ");
@@ -612,7 +611,7 @@ void Staci::build_system() {
   ostringstream msg1;
 
   // for (int i = 0; i < agelemek.size(); i++)
-  //   agelemek.at(i)->Info();
+  // agelemek.at(i)->Info();
   // cin.get();
 
   bool stop = false;
@@ -2585,7 +2584,17 @@ void Staci::Print_dxdmu() {
 }
 
 //--------------------------------------------------------------
+/**
+       * Builds sensitivity matrix
+       * @param <string> parameter : "diameter" | "friction_coeff" | "demand"
+       * @param <int> scale : if set to 1, the matrix is rescaled with the largest element
+       * @return <->
+       *
+       * access results with wds->SM_MassFlowRates and/or wds->SM_Pressures
+       *
+       */
 void Staci::Compute_Sensitivity_Matrix(string parameter, int scale) {
+
   property_ID = parameter;
   int is_edge_prop = -1;  // 0->edge prop, 1-> node prop
 
