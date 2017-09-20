@@ -1,3 +1,11 @@
+/**
+* @file Staci.h
+* @brief Header file of Staci class
+* @author Csaba Hos
+* @date 09/20/2017
+*/
+
+
 #include <vector>
 #include "AnyOption.h"
 #include "Csomopont.h"
@@ -38,6 +46,7 @@ public:
     void save_mod_prop_all_elements(string property_ID);
     bool solve_system();
     void solve_residence_time();
+    void compute_demand_sensitivity();
     void residence_time_step(string& max_ID, double& max_VAL, double& mean_VAL);
     bool solve_system_old();
     void set_up_transport();
@@ -111,7 +120,7 @@ public:
     double SM_ss_con_MassFlowRates; // abs sum of the  whole SM with condition
     double SM_ss_con_Pressures; // abs sum of the  whole SM with condition
     double SM_arp_MassFlowRates; // average relative perturbation that cause 10% change
-    double SM_arp_Pressures; 
+    double SM_arp_Pressures;
 
     //void Print_Jacobian(Mat_DP jac);
     //void Print_Jacobian(vector<vector<double> > jac);
@@ -149,15 +158,12 @@ public:
     double GetMinPressure(int &idx);
 
     void Statistics();
-    void Add_edge(const int a, const int b){ // WR: collecting edge vector
-      edge.push_back(a);
-      edge.push_back(b);
+    void Add_edge(const int a, const int b) { // WR: collecting edge vector
+        edge.push_back(a);
+        edge.push_back(b);
     }
-    vector<int> Get_edge(){
+    vector<int> Get_edge() {
         return edge;
-    }
-    void Set_do_print(const bool b){ // WR: Turning on/off header printing
-        do_print = b;
     }
     void ProgressBar(int i, int n);// WR Progress bar for long calcs, n: no. of steps, i: current step
     void Avr_absmax_stddev(vector<double> x, double &a, double &m, double &s);// WR Calculates average, max, standard deviation of a vector x
@@ -233,5 +239,7 @@ private:
     void print_worst_iter(const Vec_DP x, const Vec_DP f, const int a_debug_level);
 
     vector<int> edge;
-    bool do_print; // do_print controls the header and other stuff printing
+
+    void Save_Sensitivity_Matrix(string fname);
+    double GetAbsMaxCoeff(vector< vector<double> > M);
 };

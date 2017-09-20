@@ -38,7 +38,8 @@ protected:
     double tt_start;
     /// vizkor a vegen
     double tt_end;
-
+    /// custom data
+    double user1, user2;
 
 
 public:
@@ -215,5 +216,21 @@ public:
     }
     bool force_more_iter;
     bool update_diameter;
+    /// Setter for user1
+    void Set_user1(double val) {
+        user1 = val;
+    }
+    /// Getter for user2
+    void Set_user2(double val) {
+        user2 = val;
+    }
+    /// Setter for user1
+    double Get_user1() {
+        return user1;
+    }
+    /// Setter for user2
+    double Get_user2() {
+        return user2;
+    }
 };
 #endif

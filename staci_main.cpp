@@ -177,24 +177,19 @@ int main(int argc, char* argv[]) {
 	return 0;
 }
 
+/**
+* Solve hydraulics, compute residence time, demand sensitivity and save the results
+* @author Csaba Hos
+* @param Staci&  pointer to the Staci object
+* @param double& time needed for computation
+* @param double& time needed for saving the results
+* @date 2/28/2009 */
+
 void solve_hydraulics(Staci&  feladat, double& time2, double& time3) {
 
 	clock_t startTime, endTime;
 
 	feladat.ini();
-//	feladat.list_system();
-
-	// if (feladat.Get_debug_level()==-1)
-	// {
-	// 	cout<<"\n============================================================";
-	// 	cout<<"\ndebug_level = -1   -->";
-	// 	cout<<"\n\nExporting node names to <nodelist.txt>...";
-	// 	cout<<"\nExporting connected nodes to <connected_nodes.txt>...";
-	// 	feladat.export_connected_nodes();
-	// 	cout<<" done.\n\nUse script connected_nodes.py to find isolated islands.";
-	// 	cout<<"\n============================================================\n\n";
-	// }
-
 	startTime = clock();
 	bool konv_ok = feladat.solve_system();
 	endTime = clock();
@@ -230,10 +225,8 @@ void solve_hydraulics(Staci&  feladat, double& time2, double& time3) {
 		outfile.close();
 		feladat.logfile_write("\n\nOK", 0);
 		feladat.solve_residence_time();
+		feladat.compute_demand_sensitivity();
 	}
-	// !!!!!!!!!!!!
-	feladat.solve_residence_time();
-	// !!!!!!!!!!!!
 	startTime = clock();
 	feladat.set_res_file(feladat.get_def_file());
 	feladat.save_results(konv_ok);

@@ -510,7 +510,7 @@ void data_io::curve_reader(const string id, const XMLNode elem,
 }
 
 //--------------------------------------------------------------------------------
-void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
+void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of_demand, vector<Csomopont *> cspok,
                            vector<Agelem *> agelemek, bool conv_reached, int staci_debug_level) {
 
 
@@ -534,15 +534,26 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
              << " => adatfajl irasa kozbeni debug bekapcsolasa..." << endl;*/
 
     Node_settings.getChildNode("solution_exists").deleteText();
-    Node_settings.getChildNode("fluid_volume").deleteText();
+
+    ostringstream os;
     if (conv_reached) {
         Node_settings.getChildNode("solution_exists").addText("true");
-        ostringstream os;
+        Node_settings.getChildNode("fluid_volume").deleteText();
+        os.str("");
         os << scientific << setprecision(5) << FolyMenny;
         Node_settings.getChildNode("fluid_volume").addText(os.str().c_str());
     } else
-        Node_settings.getChildNode("solution_exists").addText("true");//!!!!!!!!!
-    // Node_settings.getChildNode("solution_exists").addText("false");
+        Node_settings.getChildNode("solution_exists").addText("false");
+
+    Node_settings.getChildNode("sum_of_inflow").deleteText();
+    os.str("");
+    os << scientific << setprecision(5) << sum_of_inflow;
+    Node_settings.getChildNode("sum_of_inflow").addText(os.str().c_str());
+
+    Node_settings.getChildNode("sum_of_demand").deleteText();
+    os.str("");
+    os << scientific << setprecision(5) << sum_of_demand;
+    Node_settings.getChildNode("sum_of_demand").addText(os.str().c_str());
 
     // Csomopontok es agak szamanak es nevenek kiolvasasa...
     csp_db = Node_nodes.nChildNode("node");
@@ -581,6 +592,18 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
                     os << scientific << setprecision(5) << p / 3600.;
                     Node_nodes.getChildNode("node", i).getChildNode("travel_time").addText(os.str().c_str());
 
+                    Node_nodes.getChildNode("node", i).getChildNode("user1").deleteText();
+                    p = cspok.at(j)->Get_user1();
+                    os.str("");
+                    os << scientific << setprecision(5) << p;
+                    Node_nodes.getChildNode("node", i).getChildNode("user1").addText(os.str().c_str());
+
+                    Node_nodes.getChildNode("node", i).getChildNode("user2").deleteText();
+                    p = cspok.at(j)->Get_user2();
+                    os.str("");
+                    os << scientific << setprecision(5) << p;
+                    Node_nodes.getChildNode("node", i).getChildNode("user2").addText(os.str().c_str());
+
                     //cout<<endl<<cspok.at(j)->Get_nev()<<" tt="<<p;
                     //cin.get();
                 }
@@ -597,7 +620,7 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
         cout << endl << endl << "Csomopontok eredmenyeinek kiirasa kesz." << endl;
     }
 
-    double mp, q, v, dh, dhpL, tt, aref;
+    double mp, q, v, dh, dhpL, tt, aref, user1, user2;
     for (int i = 0; i < ag_db; i++) {
         id = Node_edges.getChildNode("edge", i).getChildNode("id").getText();
         megvan = false;
@@ -648,6 +671,18 @@ void data_io::save_results(double FolyMenny, vector<Csomopont *> cspok,
                 os.str("");
                 os << scientific << setprecision(5) << aref;
                 Node_edges.getChildNode("edge", i).getChildNode("aref").addText(os.str().c_str());
+
+                user1 = agelemek.at(i)->Get_user1();
+                Node_edges.getChildNode("edge", i).getChildNode("user1").deleteText();
+                os.str("");
+                os << scientific << setprecision(5) << user1;
+                Node_edges.getChildNode("edge", i).getChildNode("user1").addText(os.str().c_str());
+
+                user2 = agelemek.at(i)->Get_user2();
+                Node_edges.getChildNode("edge", i).getChildNode("user2").deleteText();
+                os.str("");
+                os << scientific << setprecision(5) << user2;
+                Node_edges.getChildNode("edge", i).getChildNode("user2").addText(os.str().c_str());
 
 
                 megvan = true;

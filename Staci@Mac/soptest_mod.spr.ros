@@ -1,0 +1,78 @@
+
+======================================
+ STACI v.2.0
+ (c) BME Dept. of Hydrodynamic Systems
+ (c) C. Hos (cshos@hds.bme.hu)
+ info: www.hds.bme.hu\staci_web
+======================================
+
+ date: Wed Sep 20 15:52:29 2017
+
+ input file: soptest_mod.spr
+
+
+ Automatic inicialization...
+	nodal pressures:	5 mwc 
+	edge mass flow rates:	100 kg/s ...
+
+Solving system...
+====================================
+
+ iter. # 0./100 e_mp=6.71e+02,  e_p=1.00e+06  relax.=0.00, relax.mul.=1.20 (0)
+ iter. # 1./100 e_mp=6.64e+02,  e_p=9.90e+05  relax.=0.01, relax.mul.=1.20 (0)
+ iter. # 2./100 e_mp=6.56e+02,  e_p=9.78e+05  relax.=0.01, relax.mul.=1.20 (0)
+ iter. # 3./100 e_mp=6.47e+02,  e_p=9.64e+05  relax.=0.01, relax.mul.=1.20 (0)
+ iter. # 4./100 e_mp=6.36e+02,  e_p=9.48e+05  relax.=0.02, relax.mul.=1.20 (0)
+ iter. # 5./100 e_mp=6.22e+02,  e_p=9.29e+05  relax.=0.02, relax.mul.=1.20 (0)
+ iter. # 6./100 e_mp=6.07e+02,  e_p=9.06e+05  relax.=0.02, relax.mul.=1.20 (0)
+ iter. # 7./100 e_mp=5.89e+02,  e_p=8.80e+05  relax.=0.03, relax.mul.=1.20 (0)
+ iter. # 8./100 e_mp=5.68e+02,  e_p=8.49e+05  relax.=0.04, relax.mul.=1.20 (0)
+ iter. # 9./100 e_mp=5.43e+02,  e_p=8.14e+05  relax.=0.04, relax.mul.=1.20 (0)
+ iter. # 10./100 e_mp=5.15e+02,  e_p=7.74e+05  relax.=0.05, relax.mul.=1.20 (0)
+ iter. # 11./100 e_mp=4.83e+02,  e_p=7.28e+05  relax.=0.06, relax.mul.=1.20 (0)
+ iter. # 12./100 e_mp=4.47e+02,  e_p=6.77e+05  relax.=0.07, relax.mul.=1.20 (0)
+ iter. # 13./100 e_mp=4.08e+02,  e_p=6.20e+05  relax.=0.09, relax.mul.=1.20 (0)
+ iter. # 14./100 e_mp=3.64e+02,  e_p=5.58e+05  relax.=0.11, relax.mul.=1.20 (0)
+ iter. # 15./100 e_mp=3.17e+02,  e_p=4.91e+05  relax.=0.13, relax.mul.=1.20 (0)
+ iter. # 16./100 e_mp=2.68e+02,  e_p=4.21e+05  relax.=0.15, relax.mul.=1.20 (0)
+ iter. # 17./100 e_mp=2.19e+02,  e_p=3.49e+05  relax.=0.18, relax.mul.=1.20 (0)
+ iter. # 18./100 e_mp=1.70e+02,  e_p=2.76e+05  relax.=0.22, relax.mul.=1.20 (0)
+ iter. # 19./100 e_mp=1.25e+02,  e_p=2.07e+05  relax.=0.27, relax.mul.=1.20 (0)
+ iter. # 20./100 e_mp=8.50e+01,  e_p=1.45e+05  relax.=0.32, relax.mul.=1.20 (0)
+ iter. # 21./100 e_mp=5.24e+01,  e_p=9.16e+04  relax.=0.38, relax.mul.=1.20 (0)
+ iter. # 22./100 e_mp=2.83e+01,  e_p=5.07e+04  relax.=0.46, relax.mul.=1.20 (0)
+ iter. # 23./100 e_mp=1.27e+01,  e_p=2.33e+04  relax.=0.55, relax.mul.=1.20 (0)
+ iter. # 24./100 e_mp=4.28e+00,  e_p=8.01e+03  relax.=0.66, relax.mul.=1.20 (0)
+ iter. # 25./100 e_mp=8.77e-01,  e_p=1.67e+03  relax.=0.79, relax.mul.=1.20 (0)
+ iter. # 26./100 e_mp=4.04e-02,  e_p=7.83e+01  relax.=0.95, relax.mul.=1.20 (0)
+ iter. # 27./100 e_mp=1.05e-15,  e_p=1.34e-02  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 28./100 e_mp=9.12e-16,  e_p=1.25e-03  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 29./100 e_mp=5.27e-16,  e_p=2.43e-04  relax.=1.00, relax.mul.=1.20 (0)
+
+OK
+
+Computing residence time...
+====================================
+
+	 step #271 max. res. time: 7 d, 0 h, 0 m (PIPE_1393761), mean: 0 d, 6 h, 57 m
+
+Statistics:
+======================
+	 # of nodes : 380
+	 # of edges : 379
+
+	 diameter     : min : 0.08m (ID: PIPE_1370434)  max : 0.15m (ID: PIPE_1386186)
+	 length       : min : 0.01m (ID: PIPE_1392770)  max : 429.40m (ID: PIPE_2811824)
+	 sum. length  : 5095.69 m 
+	 pipe volume  : 47.37 m^3 
+	 fluid volume : 47.37 m^3 (100.00% of pipe volume)
+
+	 max. inflow          : -0.00 m3/h (ID: NODE_1333198)  
+	 max. consumption     : 2.56 m3/h (ID: NODE_1331004)  
+	 sum of inflow        : 0.00 m3/h
+	 sum of consumption   : 8.90 m3/h
+	 consumption - inflow : 8.90 m3/h
+
+	 node geodetic height : min : 118.99m (ID: NODE_1338461)  max : 175.86m (ID: NODE_1335917)
+
+ 	 number of nonzero Jacobian entries: 1898 out of 576081 (0.33%)

@@ -13,7 +13,7 @@ public:
     data_io(const char *xml_fnev);
     void load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek);
     void load_ini_values(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek);
-    void save_results(double FolyMenny, vector<Csomopont *> cspok, vector<Agelem *> agelemek, bool conv_reached, int staci_debug_level);
+    void save_results(double FolyMenny, double sum_of_inflow, double sum_of_demand, vector<Csomopont *> cspok, vector<Agelem *> agelemek, bool conv_reached, int staci_debug_level);
     void save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek, string eID, string pID, bool is_property_general);
     void save_mod_prop_all_elements(vector<Csomopont *> cspok, vector<Agelem *> agelemek, string pID);
     void save_transport(int mode, vector<Csomopont *> cspok, vector<Agelem *> agelemek);

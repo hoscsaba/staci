@@ -36,7 +36,8 @@ Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const
 
     force_more_iter = false;
     update_diameter = false;
-
+    user1=0.;
+    user2=0.;
 }
 
 //--------------------------------------------------------------
