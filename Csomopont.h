@@ -26,6 +26,10 @@ private:
     double konc_atlag;
     /// Csomoponti atloagos vizkor
     double tt; // travel time
+    /// Node rank
+    int rank;
+    /// WR Graph node index for igraph
+    int index;
     
 
 public:
@@ -72,6 +76,25 @@ public:
     double Get_h()
     {
         return h;
+    }
+    /// Getting rank
+    int Get_rank()
+    {
+        return rank;
+    }
+    /// Increasing the rank
+    void Inc_rank()
+    {
+        rank++;
+    }
+    /// WR Setting index
+    void Set_index(int a_index)
+    {
+        index = a_index;
+    }
+    int Get_index()
+    {
+        return index;
     }
 
     /// Inicializ�ci�

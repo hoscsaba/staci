@@ -685,6 +685,7 @@ void Staci::build_system() {
       if ((agelemek[i]->Get_Cspe_Nev()).compare(cspok[j]->Get_nev()) == 0) {
         e_megvan = true;
         cspe = j;
+        cspok.at(j)->Set_index(j); // WR indexing the nodes
         cspok[j]->ag_ki.push_back(i);
         // log
         //                logfile_write(" OK", 3);
@@ -728,6 +729,7 @@ void Staci::build_system() {
         if ((agelemek[i]->Get_Cspv_Nev()).compare(cspok[j]->Get_nev()) == 0) {
           v_megvan = true;
           cspv = j;
+          cspok.at(j)->Set_index(j); // WR: indexing the nodes
           cspok[j]->ag_be.push_back(i);
           // log
           //                                logfile_write(" OK", 3);
@@ -759,8 +761,10 @@ void Staci::build_system() {
       //        cout<<strstrm.str();
     }
 
-    if (agelemek[i]->Get_Csp_db() == 2)
+    if (agelemek[i]->Get_Csp_db() == 2){
       agelemek[i]->add_csp(cspe, cspv);
+      Add_edge(cspe,cspv); // WR: collecting the edge vector for igraph
+    }
     else
       agelemek[i]->add_csp(cspe, -1);
   }
@@ -2668,6 +2672,7 @@ void Staci::Compute_Sensitivity_Matrix(string parameter, int scale) {
       for (unsigned int j = 0; j < cspok.size(); j++)
         tmp2.push_back(m_dxdmu.at(agelemek.size() + j));
       SM_Pressures.push_back(tmp2);
+      ProgressBar(i,cspok.size());
     }
   }
 
@@ -2679,10 +2684,21 @@ void Staci::Compute_Sensitivity_Matrix(string parameter, int scale) {
     SM_col_name.push_back(cspok.at(j)->Get_nev());
 
   // Compute row-wise and column-wise summitation
-  SM_row_sum_MassFlowRates = row_abs_sum(SM_MassFlowRates);
-  SM_row_sum_Pressures = row_abs_sum(SM_Pressures);
   SM_col_sum_MassFlowRates = col_abs_sum(SM_MassFlowRates);
   SM_col_sum_Pressures = col_abs_sum(SM_Pressures);
+  SM_col_ss_MassFlowRates = col_sqr_sum(SM_MassFlowRates);
+  SM_col_ss_Pressures = col_sqr_sum(SM_Pressures);
+  SM_row_sum_MassFlowRates = row_abs_sum(SM_MassFlowRates);
+  SM_row_sum_Pressures = row_abs_sum(SM_Pressures);
+  SM_row_ss_MassFlowRates = col_sqr_sum(SM_MassFlowRates);
+  SM_row_ss_Pressures = col_sqr_sum(SM_Pressures);
+  
+  SM_sum_sum_MassFlowRates = abs_sum_sum(SM_MassFlowRates);
+  SM_sum_sum_Pressures = abs_sum_sum(SM_Pressures);
+  SM_ss_con_MassFlowRates = Cond_sum_sum(SM_MassFlowRates, "MassFlowRates");
+  SM_ss_con_Pressures = Cond_sum_sum(SM_Pressures, "Pressures");
+  SM_arp_MassFlowRates = Avr_rel_pert(SM_MassFlowRates, "MassFlowRates");
+  SM_arp_Pressures = Avr_rel_pert(SM_Pressures ,"Pressures");
 
   // if scale == 1, every vector is rescaled by the maximum
   if (scale == 1) {
@@ -2716,15 +2732,142 @@ vector<double> Staci::col_abs_sum(vector<vector<double> > M) {
 }
 
 //--------------------------------------------------------------
+vector<double> Staci::col_sqr_sum(vector<vector<double> > M) {
+  vector<double> out(M.at(0).size(), 0.);
+  for (unsigned int j = 0; j < M.at(0).size(); j++) {
+    double sum = 0.;
+    for (unsigned int i = 0; i < M.size(); i++) sum += M.at(i).at(j)*M.at(i).at(j);
+    out.at(j) = sum;
+  }
+  return out;
+}
+
+//--------------------------------------------------------------
 vector<double> Staci::row_abs_sum(vector<vector<double> > M) {
   vector<double> out(M.size(), 0.);
   for (unsigned int i = 0; i < M.size(); i++) {
     double sum = 0.;
-    for (unsigned int j = 0; j < M.at(0).size(); j++)
-      sum += fabs(M.at(i).at(j));
+    for (unsigned int j = 0; j < M.at(0).size(); j++) sum += fabs(M.at(i).at(j));
     out.at(i) = sum;
   }
   return out;
+}
+
+//--------------------------------------------------------------
+vector<double> Staci::row_sqr_sum(vector<vector<double> > M) {
+  vector<double> out(M.size(), 0.);
+  for (unsigned int i = 0; i < M.size(); i++) {
+    double sum = 0.;
+    for (unsigned int j = 0; j < M.at(0).size(); j++) sum += M.at(i).at(j)*M.at(i).at(j);
+    out.at(i) = sum;
+  }
+  return out;
+}
+
+//--------------------------------------------------------------
+double Staci::abs_sum_sum(vector<vector<double> > M){
+  double out = 0;
+  for(unsigned int i=0; i<M.size();i++){
+    for(unsigned int j=0; j<M.at(i).size();j++){
+      out += abs(M.at(i).at(j));
+    }
+  }
+  return out;
+}
+
+//-------------------------------------------------------------
+// WR conditionally sum sum of the matrix
+double Staci::Cond_sum_sum(vector<vector<double> > M, string par_name){
+  double out = 0;
+  int idx = 0, n = M.size();
+  double maxCons = GetMaxConsumption(idx);
+  double treshold, perturb;
+
+  if (par_name == "MassFlowRates"){
+      treshold = .1*GetMaxAbsFlowRate(idx);
+      perturb = .1*maxCons;
+  }else{
+    if (par_name != "Pressures") {
+      cout << " !!!!! WARNING !!!!!! " << endl << " The variable par_name not known, it must be either MassFlowRate or Pressure " << endl << " Switching to Pressure" << endl;
+    }
+    treshold = 1;
+    perturb = .5*maxCons;
+  }
+
+  for(unsigned int i=0; i<n; i++){
+    for(unsigned int j=0; j<M.at(i).size(); j++){
+      if(abs(perturb*M.at(i).at(j)) > treshold){
+        out++;
+      }
+    }
+  }
+  out = out / (n*M.at(0).size());
+  return out;
+}
+
+//--------------------------------------------------------------
+// WR the average relative perturbation that will cause 1m change in pressure
+double Staci::Avr_rel_pert(vector<vector<double> > M, string par_name){
+  int idx = 0, n = M.size(), m = M.at(0).size();
+  double maxCons = GetMaxConsumption(idx);
+  double treshold, perturb = 0;
+
+  if (par_name == "MassFlowRates"){
+      treshold = .1*GetMaxAbsFlowRate(idx);
+  }else{
+    if (par_name != "Pressures") {
+      cout << " !!!!! WARNING !!!!!! " << endl << " The variable par_name not known, it must be either MassFlowRate or Pressure " << endl << " Switching to Pressure" << endl;
+    }
+    treshold = 1;
+  }
+
+  for(unsigned int i=0; i<n; i++){
+    for(unsigned int j=0; j<M.at(i).size(); j++){
+      if(abs(M.at(i).at(j)) > 1e-5){
+        perturb += treshold/abs(M.at(i).at(j));
+      }
+    }
+  }
+  perturb = perturb/n/m;
+  return perturb;
+}
+
+//--------------------------------------------------------------
+// WR Saving matrix to a new file with name of "filename"
+void Staci::Save_matrix(vector<vector<double> > M, string filename){
+  int n = M.size();
+  ofstream file;
+  file.open(filename.c_str());
+  for(unsigned int i=0; i<n;i++){
+    for(unsigned int j=0; j<M.at(i).size();j++){
+      file << M.at(i).at(j) << ',';
+    }
+    file << '\n';
+  }
+}
+//--------------------------------------------------------------
+// WR Saving matrix to az existing file using the file handler "&file"
+void Staci::Save_matrix(vector<vector<double> > M, ofstream &file){
+  int n = M.size();
+  for(unsigned int i=0; i<n;i++){
+    for(unsigned int j=0; j<M.at(i).size();j++){
+      file << M.at(i).at(j) << ',';
+    }
+    file << '\n';
+  }
+}
+
+
+//--------------------------------------------------------------
+// WR Printing matrix to terminal
+void Staci::Print_matrix(vector<vector<double> > M){
+  int n = M.size();
+  for(unsigned int i=0; i<n;i++){
+    for(unsigned int j=0; j<M.at(i).size();j++){
+      printf("%5.1e  ",M.at(i).at(j));
+    }
+    printf("\n");
+  }
 }
 
 //--------------------------------------------------------------
@@ -3169,6 +3312,54 @@ double Staci::GetMaxGeoHeight(int &idx) {
   return cmax;
 }
 
+double Staci::GetMaxAbsFlowRate(int &idx){
+  double c, cmax = -1.e5;
+  for (unsigned int i = 0; i < agelemek.size(); i++) {
+    c = agelemek.at(i)->Get_Q();
+    if (abs(c) > cmax) {
+      cmax = c;
+      idx = i;
+    }
+  }
+  return abs(cmax);
+}
+
+double Staci::GetMinAbsFlowRate(int &idx){
+  double c, cmax = 1.e10;
+  for (unsigned int i = 0; i < agelemek.size(); i++) {
+    c = agelemek.at(i)->Get_Q();
+    if (abs(c) < cmax) {
+      cmax = c;
+      idx = i;
+    }
+  }
+  return abs(cmax);
+}
+
+double Staci::GetMaxPressure(int &idx){
+  double c, cmax = -1.e5;
+  for (unsigned int i = 0; i < cspok.size(); i++) {
+    c = cspok.at(i)->Get_p();
+    if (c > cmax) {
+      cmax = c;
+      idx = i;
+    }
+  }
+  return cmax;
+}
+
+double Staci::GetMinPressure(int &idx){
+  double c, cmax = 1.e10;
+  for (unsigned int i = 0; i < cspok.size(); i++) {
+    c = cspok.at(i)->Get_p();
+    if (c < cmax) {
+      cmax = c;
+      idx = i;
+    }
+  }
+  return cmax;
+}
+
 
 void Staci::Statistics() {
   int idx;
@@ -3207,4 +3398,74 @@ void Staci::Statistics() {
 
 
   logfile_write(m_ss.str(), 1);
+}
+
+// WR Computing rank of a node
+void Staci::Compute_rank()
+{
+  for (int i=0;i<agelemek.size();i++){
+
+    int cspe_idx = agelemek.at(i)->Get_Cspe_Index();
+    cspok.at(cspe_idx)->Inc_rank();
+
+    if(agelemek.at(i)->Get_Csp_db()==2){
+      int cspv_idx = agelemek.at(i)->Get_Cspv_Index();
+      cspok.at(cspv_idx)->Inc_rank();
+    }
+  }
+}
+
+// WR Progress bar for long calcs, n: no. of steps, i: current step
+void Staci::ProgressBar(int i, int n){
+  if(i+1==n) i++;
+  int nn;
+  if(n>100) nn = round(n/100.);
+  nn = 1;
+  if(remainder(i,nn) == 0){
+      cout << "\x1b[A" << "[*] Wait for it ... [";
+      for(int j=0; j<round((double)i/n*20); j++)
+          cout << "#";
+      for(int j=round((double)i/n*20); j<20; j++)
+          cout << " ";
+      cout << "]" << " ... ";
+      printf("%3.0f / 100\n",round((double)i/n*100));
+    }
+}
+
+// WR Calculates average, max, standard deviation of a vector x
+void Staci::Avr_absmax_stddev(vector<double> x, double &a, double &m, double &s){
+  a = 0; m = 0; s = 0;
+  int n = x.size();
+  for(int i=0; i<n; i++){
+      a += x.at(i);
+      if(abs(x.at(i))>m) m = abs(x.at(i));
+  }
+  a /= n;
+  for(int i=0; i<n; i++)
+      s += pow(x.at(i)-a,2);
+  s = pow(s/(n-1),0.5);
+}
+
+// WR Reading doubles from file, separeted with ','
+vector<vector<double> > Staci::CSVRead(ifstream &file){
+string temp,line;
+int k=0;
+vector<vector<double> > v;
+if(file.is_open()){
+  while(getline(file,line)){
+    for (string::iterator j=line.begin(); j!=line.end(); j++){
+      if(*j!=',')
+        temp +=*j;
+      else{
+        //v.at(k).push_back(atof(temp.c_str()));
+        v.at(k).push_back(stod(temp,0)); // not working WHY? TODO
+        k++;
+        temp = "";
+      }
+    }
+    k=0;
+  }
+}else
+  cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!ERROR!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl << "Staci::CSVRead(), File is not open when calling CSVRead function!!!" << endl;
+  return v;
 }

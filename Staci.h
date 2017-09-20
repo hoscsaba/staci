@@ -3,6 +3,7 @@
 #include "Csomopont.h"
 #include "Agelem.h"
 #include "nr.h"
+#include <string>
 
 class Staci
 {
@@ -13,6 +14,7 @@ public:
     Staci(int argc, char *argv[]);
     Staci(string spr_filename);
     ~Staci();
+    void print_header();
     string Get_out_file()
     {
         return out_file.c_str();
@@ -82,6 +84,7 @@ public:
     void m_set_dprop();
     double get_dprop(string ID, string prop);
     void set_dprop(string ID, string prop, double val);
+    void Compute_rank();// WR Computing rank of a node
 
     // ADATMODOSITASHOZ
     string new_def_file, element_ID, property_ID;
@@ -98,6 +101,17 @@ public:
     vector<string> SM_col_name; // Name of the column element ID
     vector<double> SM_col_sum_MassFlowRates; // column-wise sum of SM elements
     vector<double> SM_col_sum_Pressures; // column-wise sum of SM elements
+    vector<double> SM_col_ss_MassFlowRates; // column-wise square sum of SM elements
+    vector<double> SM_col_ss_Pressures; // column-wise square sum of SM elements
+    vector<double> SM_row_ss_MassFlowRates; // row-wise square sum of SM elements
+    vector<double> SM_row_ss_Pressures; // row-wise square sum of SM elements
+
+    double SM_sum_sum_MassFlowRates; // abs sum of the whole SM
+    double SM_sum_sum_Pressures; // abs sum of the whole SM
+    double SM_ss_con_MassFlowRates; // abs sum of the  whole SM with condition
+    double SM_ss_con_Pressures; // abs sum of the  whole SM with condition
+    double SM_arp_MassFlowRates; // average relative perturbation that cause 10% change
+    double SM_arp_Pressures; 
 
     //void Print_Jacobian(Mat_DP jac);
     //void Print_Jacobian(vector<vector<double> > jac);
@@ -106,6 +120,9 @@ public:
     void Print_dxdmu();
     void Compute_dxdmu();
     void Compute_Sensitivity_Matrix(string parameter, int scale);
+    void Print_matrix(vector<vector<double> > M);
+    void Save_matrix(vector<vector<double> > M, string filename);
+    void Save_matrix(vector<vector<double> > M, ofstream &file);
     void Save_Sensitivity();
     void set_do_save_file(const bool save_it)
     {
@@ -126,10 +143,25 @@ public:
     double GetMaxConsumption(int &idx);
     double GetMinGeoHeight(int &idx);
     double GetMaxGeoHeight(int &idx);
-
+    double GetMaxAbsFlowRate(int &idx);
+    double GetMinAbsFlowRate(int &idx);
+    double GetMaxPressure(int &idx);
+    double GetMinPressure(int &idx);
 
     void Statistics();
-
+    void Add_edge(const int a, const int b){ // WR: collecting edge vector
+      edge.push_back(a);
+      edge.push_back(b);
+    }
+    vector<int> Get_edge(){
+        return edge;
+    }
+    void Set_do_print(const bool b){ // WR: Turning on/off header printing
+        do_print = b;
+    }
+    void ProgressBar(int i, int n);// WR Progress bar for long calcs, n: no. of steps, i: current step
+    void Avr_absmax_stddev(vector<double> x, double &a, double &m, double &s);// WR Calculates average, max, standard deviation of a vector x
+    vector<vector<double> > CSVRead(ifstream &file);// WR Reading doubles from file, separeted with ','
 
 private:
     bool van_ini;
@@ -186,10 +218,20 @@ private:
 
     string convert_to_hr_min(double seconds);
 
+    // If set to false, the result file will not be saved!
+    // Only set false for sensitivity analysis
     bool do_save_file;
 
-    vector<double> row_abs_sum(vector<vector<double> > M);
     vector<double> col_abs_sum(vector<vector<double> > M);
+    vector<double> col_sqr_sum(vector<vector<double> > M);
+    vector<double> row_abs_sum(vector<vector<double> > M);
+    vector<double> row_sqr_sum(vector<vector<double> > M);
+    double abs_sum_sum(vector<vector<double> > M);
+    double Cond_sum_sum(vector<vector<double> > M, string par_name);
+    double Avr_rel_pert(vector<vector<double> > M, string par_name);
     void rescale_vec(vector<double>& vec);
     void print_worst_iter(const Vec_DP x, const Vec_DP f, const int a_debug_level);
+
+    vector<int> edge;
+    bool do_print; // do_print controls the header and other stuff printing
 };
