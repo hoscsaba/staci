@@ -31,6 +31,7 @@ bool comparison_function1(const val_and_ID& lhs, const val_and_ID& rhs ) { retur
 
 Staci::Staci(int argc, char *argv[]) {
   // Initiate with command line arguments
+  perform_demand_sensitivity_analysis = false;
   opt = new AnyOption();
   get_command_line_options(argc, argv);
   SetInitialParameters();
@@ -39,6 +40,7 @@ Staci::Staci(int argc, char *argv[]) {
 Staci::Staci(string spr_filename) {
   mode = 0;
   // Just to be able to delete in the destructor
+  perform_demand_sensitivity_analysis = false;
   opt = new AnyOption();
 
   // Initiate directly from file
@@ -47,15 +49,41 @@ Staci::Staci(string spr_filename) {
 }
 
 void Staci::SetInitialParameters() {
+
+  debug_level = 1;
+
+// Add header
+  m_ss.str("");
+  m_ss << endl << "======================================";
+  m_ss << endl << " STACI v.2.0";
+  m_ss << endl << " (c) BME Dept. of Hydrodynamic Systems";
+  m_ss << endl << " (c) C. Hos (cshos@hds.bme.hu)";
+  m_ss << endl << " info: www.hds.bme.hu\\staci_web";
+  m_ss << endl << "======================================" << endl;
+  time_t ido = time(0);
+  m_ss << endl << " date: " << ctime(&ido);
+  m_ss << endl << " input file: " << def_file << endl;
+  logfile_write(m_ss.str(), 1);
+  m_ss.str("");
+
   van_ini = false;
 
   m_nnz = 0; /*!< Number of nonzero entries of the Jacobian. */
   // az adatfile olvasasa
   if (mode >= 0) {
+    // debug_level is set to 0 at this point
+    // as the input data file has not been read yet.
+
+    stringstream ss;
+    ss << endl << " Loading system...";
+    logfile_write(ss.str(), 1);
 
     data_io datta_io(def_file.c_str());
-
     datta_io.load_system(cspok, agelemek);
+
+    ss.str("");
+    ss << " ready." << endl;
+    logfile_write(ss.str(), 1);
 
     // beallitasok
     // cout<<endl<<endl<<"Beallitasok:";
@@ -104,28 +132,12 @@ void Staci::SetInitialParameters() {
 
   // Delete if previous exists...
   ostringstream msg;
-  msg << "\nTrying to delete previous logfile " << out_file.c_str() << "... ";
+  msg << "\n Trying to delete previous logfile " << out_file.c_str() << "... ";
   if (remove(out_file.c_str()) != 0)
-    msg << " file not found, cannot delete it.";
+    msg << " file not found, cannot delete it." << endl;
   else
-    msg << "file successfully deleted.";
-
-  // Add header
-  m_ss.str("");
-  m_ss << endl << "======================================";
-  m_ss << endl << " STACI v.2.0";
-  m_ss << endl << " (c) BME Dept. of Hydrodynamic Systems";
-  m_ss << endl << " (c) C. Hos (cshos@hds.bme.hu)";
-  m_ss << endl << " info: www.hds.bme.hu\\staci_web";
-  m_ss << endl << "======================================" << endl;
-  time_t ido = time(0);
-  m_ss << endl << " date: " << ctime(&ido);
-  m_ss << endl << " input file: " << def_file << endl;
-  if (debug_level > 0) {
-    // cout << m_ss.str();
-    logfile_write(m_ss.str(), 1);
-  }
-  m_ss.str("");
+    msg << "file successfully deleted." << endl;
+  logfile_write(msg.str(), 1);
 
   // If set to false, the result file will not be saved!
   // Only set false for sensitivity analysis
@@ -157,6 +169,7 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
   ///    -e --element_ID
   ///    -p --property_ID
   /// -r sensitivity         (mode=6)
+  /// -d demand_sensitivity         (mode=0)
   /// -e export community structure (mode=7)
 
   opt->addUsage("");
@@ -198,11 +211,19 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
     "\t\t -g  (--get_data) <halofile_regi>.spr -e (--element_ID) <ID_ag/csp> "
     "-p (--property_ID) <ID_adat>");
   opt->addUsage(" ");
+  
   opt->addUsage("\t erzekenysegvizsgalat: ");
   opt->addUsage(
     "\t\t -r  (--sensitivity) <halofile_regi>.spr -e (--element_ID) "
     "<ID_ag/csp> -p (--property_ID) <ID_adat>");
   opt->addUsage(" ");
+
+  opt->addUsage("\t hydraulics + residence time + demand sensitivity: ");
+  opt->addUsage(
+    "\t\t -d  (--demand_sensitivity) <halofile_regi>.spr");
+  opt->addUsage(" ");
+
+
   opt->addUsage("\t check for islands: ");
   opt->addUsage(
     "\t\t -x  (--export_to_connectivity_check) <halofile_regi>.spr");
@@ -222,6 +243,7 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
   opt->setOption("list_all_elements", 'l');
   opt->setOption("get_data", 'g');
   opt->setOption("sensitivity", 'r');
+  opt->setOption("demand_sensitivity", 'd');
   opt->setOption("export_for_connectivity_check", 'x');
 
   opt->processCommandArgs(argc, argv);
@@ -231,11 +253,27 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
     opt->printUsage();
   } else {
     if (opt->getFlag("help") || opt->getFlag('h')) opt->printUsage();
+
     if (opt->getValue('s') != NULL || opt->getValue("stac") != NULL) {
       mode = 0;
+      perform_demand_sensitivity_analysis = false;
       def_file = opt->getValue('s');
       if (debug_level > 0) {
         string msg = "\n Steady-state hydraulic simulation, data file: " +
+                     def_file + "\n";
+        if (debug_level > 0) {
+          // cout << msg;
+          logfile_write(msg, 1);
+        }
+      }
+    }
+
+    if (opt->getValue('d') != NULL || opt->getValue("demand_sensitivity") != NULL) {
+      mode = 0;
+      perform_demand_sensitivity_analysis = true;
+      def_file = opt->getValue('d');
+      if (debug_level > 0) {
+        string msg = "\n Steady-state hydraulic simulation with demand sensitivity computation, data file: " +
                      def_file + "\n";
         if (debug_level > 0) {
           // cout << msg;
@@ -610,11 +648,11 @@ void Staci::set_dprop(string in_element_ID, string in_property_ID,
 void Staci::build_system() {
   ostringstream msg1;
 
-  // for (int i = 0; i < agelemek.size(); i++)
-  // agelemek.at(i)->Info();
-  // cin.get();
-
   bool stop = false;
+
+  msg1 << endl << " Building system...";
+  logfile_write(msg1.str(), 1);
+  msg1.str("");
 
   logfile_write("\n Azonos ID-k keresese....", 3);
   // ELEMEK
@@ -778,14 +816,12 @@ void Staci::build_system() {
     }
   }
 
-
   logfile_write("\t ok.", 3);
 
+  msg1.str("");
+  msg1 << " ready." << endl;
+  logfile_write(msg1.str(), 1);
 
-  // for (unsigned int i = 0; i < cspok.size(); i++) {
-  //   double d = cspok.at(i)->Get_dprop("demand");
-  //   cspok.at(i)->Set_dprop("demand", d * 0.0001);
-  // }
 }
 
 //--------------------------------------------------------------
@@ -898,7 +934,7 @@ void Staci::logfile_write(string msg, int msg_debug_level) {
     ofstream outfile(out_file.c_str(), ios::app);
     outfile << msg;
     outfile.close();
-    cout << msg;
+    cout << msg << flush;
   }
 }
 
@@ -945,13 +981,19 @@ string Staci::list_results() {
 
 //--------------------------------------------------------------
 void Staci::save_results(bool conv_reached) {
+  stringstream ss;
+  ss << endl << "Saving results...";
+  logfile_write(ss.str(), 1);
   if (do_save_file) {
     data_io datta_io(res_file.c_str());
-    datta_io.save_results(FolyMenny, get_sum_of_neg_consumption()*3.600, get_sum_of_pos_consumption()*3.600, cspok, agelemek, conv_reached, debug_level);
+    datta_io.save_results(FolyMenny, get_sum_of_neg_consumption() * 3.600, get_sum_of_pos_consumption() * 3.600, cspok, agelemek, conv_reached, debug_level);
   } else {
     cout << "\n WARNING!\n!!! do_save_file = false, results will not be saved "
          "to the .spr file !!!!\n\n";
   }
+  ss.str("");
+  ss << "done" << endl ;
+  logfile_write(ss.str(), 1);
 }
 
 //--------------------------------------------------------------
@@ -1647,7 +1689,7 @@ void Staci::export_connected_nodes() {
 void Staci::ini() {
   ostringstream strstrm;
   if (!van_ini) {
-    strstrm << endl << endl << " Automatic inicialization...";
+    strstrm << endl << " Automatic inicialization...";
 
     strstrm << endl << "\tnodal pressures:\t" << p_init << " mwc ";
     for (unsigned int i = 0; i < cspok.size(); i++)
@@ -2872,7 +2914,7 @@ void Staci::Print_matrix(vector<vector<double> > M) {
 //--------------------------------------------------------------
 void Staci::solve_residence_time() {
   string max_ID;
-  double max_VAL, mean_VAL, VAL_prev = -61, d_VAL = 1000;
+  double max_VAL, mean_VAL, VAL_prev = -100., d_VAL = 1000.;
 
   m_ss.str("");
   m_ss
@@ -2887,7 +2929,7 @@ void Staci::solve_residence_time() {
   while ((step < step_max) && (d_VAL > 0.1)) {
     residence_time_step(max_ID, max_VAL, mean_VAL);
     if (debug_level > 0) {
-      if ((step % 20) == 0)
+      if ((step % 100) == 0)
         cout << endl
              << "\t step #" << step
              << " max. res. time: " << convert_to_hr_min(max_VAL) << " ("
@@ -2902,7 +2944,7 @@ void Staci::solve_residence_time() {
     m_ss << endl
          << "\t step #" << step
          << " max. res. time: " << convert_to_hr_min(max_VAL) << " (" << max_ID
-         << "), mean: " << convert_to_hr_min(mean_VAL);
+         << "), mean: " << convert_to_hr_min(mean_VAL) << endl << "Finished computing residence time." << endl;
     logfile_write(m_ss.str(), 1);
     // cout << m_ss.str();
   }
@@ -2917,7 +2959,7 @@ void Staci::residence_time_step(string & max_ID, double & max_VAL,
   double TINY_MASS_FLOW_RATE = 1.e-3;
   double TINY_VEL = 0.000001;  // 1m -> 278 hours
 
-  double MAX_TIME = 168 * 3600.;
+  double MAX_TIME = 168. * 3600.;
 
   // 1. lepes: csomoponti atlagkor meghatarozasa
   double szaml, nevezo, c, m;
@@ -3093,17 +3135,6 @@ void Staci::residence_time_step(string & max_ID, double & max_VAL,
         else
           agelemek.at(i)->Set_tt_end(MAX_TIME);
       }
-
-      // if (agelemek.at(i)->Get_nev()=="PIPE21"){
-      //     cout<<endl<<"PIPE21: v="<<v<<", L/v="<<(L/v/3600)<<",
-      //     tt_e="<<tt_e/3600<<", tt_s="<<tt_s/3600;
-      // }
-      //             if (agelemek.at(i)->Get_nev()=="PIPE24"){
-      //     cout<<endl<<"PIPE24: v="<<v<<", L/v="<<(L/v/3600)<<",
-      //     tt_e="<<tt_e/3600<<", tt_s="<<tt_s/3600;
-      // }
-
-      // cin.get();
     } else {
       double v = agelemek.at(i)->Get_v();
       double mp = agelemek.at(i)->Get_mp();
@@ -3456,8 +3487,8 @@ vector<vector<double> > Staci::CSVRead(ifstream &file) {
         if (*j != ',')
           temp += *j;
         else {
-          //v.at(k).push_back(atof(temp.c_str()));
-          v.at(k).push_back(stod(temp, 0)); // not working WHY? TODO
+          v.at(k).push_back(atof(temp.c_str()));
+          //v.at(k).push_back(stod(temp, 0)); // not working WHY? TODO
           k++;
           temp = "";
         }
@@ -3471,12 +3502,21 @@ vector<vector<double> > Staci::CSVRead(ifstream &file) {
 }
 
 void Staci::compute_demand_sensitivity() {
+  stringstream ss;
+  ss << endl << "Computing demand sensitivities...";
+  logfile_write(ss.str(), 1);
+
   Compute_Sensitivity_Matrix("demand", 0);
   Save_Sensitivity_Matrix("SM.txt");
 
+  ss.str("");
+  ss << "ready." << endl;
+  logfile_write(ss.str(), 1);
+
+
   for (unsigned int j = 0; j < agelemek.size(); j++)
     agelemek.at(j)->Set_user1(SM_col_sum_MassFlowRates.at(j));
-  
+
   for (unsigned int j = 0; j < cspok.size(); j++)
     cspok.at(j)->Set_user1(SM_col_sum_Pressures.at(j));
 

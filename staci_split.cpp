@@ -6,7 +6,7 @@
 // Linux
 // #include </usr/include/eigen3/Eigen/Dense>
 // Mac
-#include "/usr/local/Cellar/eigen/3.3.3/include/eigen3/Eigen/Dense"
+#include "/usr/local/Cellar/eigen/3.3.4/include/eigen3/Eigen/Dense"
 #include <algorithm>
 #include <ga/ga.h>
 #include <ga/GASimpleGA.h>
@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
 
     best_Q = -100.;
     obj_offset = 1.0;
-    info = false;
+    info = true;
     fcount = 0;
 
     // Clear logfile
@@ -146,8 +146,6 @@ int main(int argc, char **argv) {
 
     // Load system
     LoadSystem(fname);
-
-    // cout << endl << "LoadSystem() ready." << endl;
 
     // Sensitivity matrix
     if ((obj_type == "A-optimality") || (obj_type == "D-optimality")) {
@@ -634,7 +632,7 @@ void D_Optimize() {
     genome.mutator(Mutator);
 
     GASteadyStateGA ga(genome);
-    if (obj_type == "A-optimality") {
+    if ((obj_type == "A-optimality") || (obj_type == "D-optimality")) {
         ga.minimize();
         best_Q = +100.;
     }
@@ -1041,7 +1039,6 @@ float D_Objective(GAGenome & c) {
         }
     }
 
-
     if (obj_info) {
         cout << endl << "gene:";
         for (int i = 0; i < n_comm; i++)
@@ -1068,105 +1065,106 @@ float D_Objective(GAGenome & c) {
     }
     MatrixXd jac = jacT.transpose();
 
-    int m = jac.rows();
-    int n = jac.cols();
-
-    // if (m > n) {
-    //     if (obj_info) {
-    //         cout << endl << "jac.transpose()*jac:" << endl;
-    //         cout << endl << jac.transpose()*jac;
-    //     }
-    // }
-    // else {
-    //     cout << endl << "jac*jac.transpose():" << endl;
-    //     cout << endl << jac*jac.transpose();
-    // }
-
+    int m = jac.rows(); // number of rows
+    int n = jac.cols(); // numer of columns
+    bool is_det_nil = false;
 
     double Q;
-    if (obj_type == "A-optimality") {
-        double TINY_NUM = 1.e-8;
-        if (!is_same_gene) {
-            // MINIMIZE tr(Cov)
-            // MatrixXd Cov(n_comm, n_comm);
-            MatrixXd Cur, Cov;
-            if (m > n)
-                Cur = jac.transpose() * jac;
+    //if (obj_type == "A-optimality") {
+    double TINY_NUM = 1.e-8;
+    double det;
+    if (!is_same_gene) {
+        MatrixXd Ainv, Cov;
+        if (m > n) { // Overdetermined problem
+            //OLD: Cur = jac.transpose() * jac;
+            MatrixXd tmp = jac.transpose() * jac;
+            det = tmp.determinant();
+            if (det > TINY_NUM) {
+                Ainv = (tmp).inverse() * jac.transpose() ;
+                Cov = Ainv * Ainv.transpose();
+            }
             else
-                Cur = jac * jac.transpose();
+                is_det_nil = true;
+        }
 
-            if (Cur.determinant() > TINY_NUM) {
-                Cov = Cur.inverse();
+        else { // Underdetermined problem
+            // OLD: Cur = jac * jac.transpose();
+            MatrixXd tmp = jac * jac.transpose();
+            det = tmp.determinant();
+            if (det > TINY_NUM) {
+                Ainv = jac.transpose() * (tmp).inverse();
+                Cov = Ainv * Ainv.transpose();
+            }
+            else
+                is_det_nil = true;
+        }
 
-                Q = 0.;
-                for (unsigned int i = 0; i < n_comm; i++)
+
+        if (!is_det_nil) {
+            Q = 0.;
+            if (obj_type == "A-optimality") {
+                int ll = Cov.row(0).size();
+                for (unsigned int i = 0; i < ll; i++) {
                     Q += sqrt(Cov(i, i));
-                // Q = sqrt(Cov.trace());
+                    /*printf("\n \t i=%d, Cov(.,.)=%5.3f, sqrt(.)=%5.3f, Q=%5.3f",i,Cov(i, i),sqrt(Cov(i, i)),Q);*/
+                }
                 Q /= n_comm;
-                if (obj_info) {
-                    cout << endl << endl << "jac.transpose() * jac" << endl << jac.transpose() * jac;
-                    cout << endl << "Cov=" << endl << Cov;
-                    cout << endl << "Tr(J^T*J)=" << Cur.trace() << ", Q=" << Q << endl;
-                }
             }
-            else {
-                Q = 1.e5;
-                if (obj_info) {
-                    cout << endl << "Cur=" << endl << Cur;
-                    cout << endl << "det(Cur)=" << Cur.determinant() << " < " << TINY_NUM << endl;
+            else { // D-optimality
+                // The issue here is that the Cov matrix includes rows and cols with 0, which spoils the determinant.
+                // Hence, use SVD only and use the non-SV eigs.
+                EigenSolver<MatrixXd> es(Cov, false);
+                vector<double> eigs_real(es.eigenvalues().size());
+                vector<double> eigs_imag(es.eigenvalues().size());
+                for (int i = 0; i < es.eigenvalues().size(); i++) {
+                    eigs_real.at(i) = abs(es.eigenvalues()[i].real());
                 }
+                /*std::sort(eigs.begin(), eigs.begin()+eigs.size());*/
+
+                if (obj_info) {
+                    cout << endl << "Eigenvalues:" << es.eigenvalues();
+                }
+                double eig_TOL = eigs_real.at(0) / 1000;
+                Q = 1.;
+                for (unsigned int i = 0; i < es.eigenvalues().size(); i++)
+                    if (fabs(eigs_real.at(i)) > eig_TOL)
+                        Q *= fabs(eigs_real.at(i));
+                Q = pow(Q, 1. / (double)n_comm);
+                //Q = Cov.determinant();
+                //Q = pow(Q, 1. / 2. / (double)n_comm);
             }
-            // cout << "Q=" << Q;
+            if (obj_info) {
+                if (m > n)
+                    cout << endl << "jac.transpose() * jac = " << endl << jac.transpose() * jac << endl;
+                else
+                    cout << endl << "jac * jac.transpose() = " << endl << jac * jac.transpose() << endl;
+                cout << endl << "Cov=" << endl << Cov;
+                //cout << endl << "Tr(J^T*J)=" << Ainv.trace() << ", Q=" << Q << endl;
+            }
         }
         else {
-            if (obj_info) {
-                cout << endl << "Same gene found" << endl;
-            }
             Q = 1.e5;
-            // cout << endl << "SAME GENE!" << endl;
+            if (obj_info) {
+                cout << endl << "jac=" << endl << jac << endl;
+                if (m > n)
+                    cout << endl << "det(J^T*J)=" << det << " < " << TINY_NUM << endl;
+                else
+                    cout << endl << "det(J*J^T)=" << det << " < " << TINY_NUM << endl;
+
+            }
         }
-        // cin.get();
-    }
-    else if (obj_type == "D-optimality") {
-        // MINIMIZE det(Cov) = MAXIMIZE det(Cov^-1)
-        if (!is_same_gene) {
-            // MatrixXd Cur, Cov;
-            if (m > n)
-                // Cur = jac.transpose() * jac;
-                Q = (jac.transpose() * jac).determinant();
-            else
-                // Cur = jac * jac.transpose();
-                Q = (jac * jac.transpose()).determinant();
-
-            // Q = (jac.transpose() * jac).determinant();
-            Q = pow(Q, 1. / 2. / (double)n_comm);
-        }
-        else
-            Q = 0.;
-        // EigenSolver<MatrixXd> es(jac.transpose()*jac,false);
-
-        // cout<<endl<<"Eigenvalues:"<<es.eigenvalues();
-
-        // vector<double> eigs(es.eigenvalues().size());
-        // for (int i=0; i<es.eigenvalues().size(); i++)
-        //     eigs.at(i)=abs(es.eigenvalues()[i].real());
-
-        // std::sort(eigs.begin(), eigs.begin()+eigs.size());
-
-        // Q=1.;
-        // for (unsigned int i=0; i<n_comm; i++)
-        //     Q*=eigs.at(eigs.size()-1-i);
-
-        // Q = pow(Q,1./(double)n_comm);
+        if (obj_info)
+            cout << endl << "--> Q=" << Q << endl;
     }
     else {
-        cout << endl << endl << "???WTF???" << endl << endl;
-        exit(-1);
+        if (obj_info) {
+            cout << endl << "Same gene found, Q=1.e5" << endl;
+        }
+        Q = 1.e5;
     }
 
     if (obj_info)
         cin.get();
-
 
     bool add_info = false;
     if ((obj_type == "D-optimality") && (Q > best_Q))

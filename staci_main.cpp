@@ -199,7 +199,7 @@ void solve_hydraulics(Staci&  feladat, double& time2, double& time3) {
 	int rrs_output = remove( rrs_file.c_str());
 	if (feladat.Get_debug_level() > 0) {
 		ostringstream msg;
-		msg << "\n\nTrying to delete previous *.rrs file ... ";
+		msg << "\n\n Trying to delete previous *.rrs file ... ";
 		if ( rrs_output != 0 )
 			msg << " file not found, cannot delete it.";
 		else
@@ -225,7 +225,8 @@ void solve_hydraulics(Staci&  feladat, double& time2, double& time3) {
 		outfile.close();
 		feladat.logfile_write("\n\nOK", 0);
 		feladat.solve_residence_time();
-		feladat.compute_demand_sensitivity();
+		if (feladat.perform_demand_sensitivity_analysis)
+			feladat.compute_demand_sensitivity();
 	}
 	startTime = clock();
 	feladat.set_res_file(feladat.get_def_file());

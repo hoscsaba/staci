@@ -168,6 +168,7 @@ public:
     void ProgressBar(int i, int n);// WR Progress bar for long calcs, n: no. of steps, i: current step
     void Avr_absmax_stddev(vector<double> x, double &a, double &m, double &s);// WR Calculates average, max, standard deviation of a vector x
     vector<vector<double> > CSVRead(ifstream &file);// WR Reading doubles from file, separeted with ','
+    bool perform_demand_sensitivity_analysis;
 
 private:
     bool van_ini;
