@@ -132,9 +132,8 @@ bool comparison_function2(const val_and_ID_and_comm& lhs, const val_and_ID_and_c
 
 int main(int argc, char **argv) {
 
-    best_Q = -100.;
     obj_offset = 1.0;
-    info = true;
+    info = false;
     fcount = 0;
 
     // Clear logfile
@@ -148,7 +147,15 @@ int main(int argc, char **argv) {
     LoadSystem(fname);
 
     // Sensitivity matrix
+    if ((obj_type == "A-optimality") || (obj_type == "D-optimality"))
+        best_Q = +1.e5;
+    else
+        best_Q = -1.e5;
+
+
+    // Sensitivity matrix
     if ((obj_type == "A-optimality") || (obj_type == "D-optimality")) {
+        best_Q = +1.e5;
         if (weight_type == "friction_coeff") {
             PerformSensitivityAnalysis(true /*is_edge_prop*/, "friction_coeff", "sensitivity_matrix_friction_coeff.csv");
         }
@@ -163,6 +170,8 @@ int main(int argc, char **argv) {
             exit(-1);
         }
     }
+    else
+        best_Q = -1.e5;
 
     for (int i = 0; i < wds->SM_Pressures.size(); i++) {
         vector<double> tmp = wds->SM_Pressures.at(i);
@@ -1167,7 +1176,7 @@ float D_Objective(GAGenome & c) {
         cin.get();
 
     bool add_info = false;
-    if ((obj_type == "D-optimality") && (Q > best_Q))
+    if ((obj_type == "D-optimality") && (Q < best_Q))
         add_info = true;
     if ((obj_type == "A-optimality") && (Q < best_Q))
         add_info = true;
@@ -1196,8 +1205,6 @@ float D_Objective(GAGenome & c) {
         logfile_write(strstrm.str(), 0);
     }
 
-    if (isnan(Q))
-        Q = 0.;
 
     return Q;
 
@@ -1396,6 +1403,7 @@ void LoadSystem(string fname) {
     wds->build_system();
     wds->ini();
     wds->solve_system();
+    wds->compute_demand_sensitivity();
     wds->set_res_file(wds->get_def_file());
     wds->save_results(true);
 

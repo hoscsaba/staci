@@ -30,6 +30,7 @@ struct val_and_ID {
 bool comparison_function1(const val_and_ID& lhs, const val_and_ID& rhs ) { return lhs.val > rhs.val; }
 
 Staci::Staci(int argc, char *argv[]) {
+  debug_level = 1;
   // Initiate with command line arguments
   perform_demand_sensitivity_analysis = false;
   opt = new AnyOption();
@@ -39,6 +40,7 @@ Staci::Staci(int argc, char *argv[]) {
 
 Staci::Staci(string spr_filename) {
   mode = 0;
+  debug_level = 1;
   // Just to be able to delete in the destructor
   perform_demand_sensitivity_analysis = false;
   opt = new AnyOption();
@@ -50,7 +52,6 @@ Staci::Staci(string spr_filename) {
 
 void Staci::SetInitialParameters() {
 
-  debug_level = 1;
 
 // Add header
   m_ss.str("");
@@ -3392,7 +3393,8 @@ double Staci::GetMinPressure(int &idx) {
 
 
 void Staci::Statistics() {
-  int idx;
+  //@todo: if idx is uninitialized, we have an out of index error on Linux
+  int idx=0;
   m_ss.str("");
   m_ss << endl << endl << "Statistics:";
   m_ss << endl << "======================";
@@ -3401,7 +3403,7 @@ void Staci::Statistics() {
   m_ss << endl << "\t # of edges : " << cspok.size() << endl;
 
   m_ss << endl << "\t diameter     : ";
-  m_ss << "min : " << GetMinPipeDiameter(idx) << "m (ID: " << agelemek.at(idx)->Get_nev() << ")  ";
+  m_ss << "min : " << GetMinPipeDiameter(idx) << "m (ID: " << agelemek.at(idx)->Get_nev() << ") ";
   m_ss << "max : " << GetMaxPipeDiameter(idx) << "m (ID: " << agelemek.at(idx)->Get_nev() << ")";
 
   m_ss << endl << "\t length       : ";

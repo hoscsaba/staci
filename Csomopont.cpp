@@ -35,8 +35,8 @@ Csomopont::Csomopont(const string a_nev,
     konc_atlag = 0.0;
     tt = a_tt * 3600.; // travel time, órában jön, de s-ban fogunk számolni
     rank = 0;
-    user1=0.;
-    user2=0.;
+    user1 = 0.;
+    user2 = 0.;
 }
 
 //--------------------------------------------------------------
