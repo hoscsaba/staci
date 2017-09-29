@@ -306,7 +306,9 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
         cin.get();
     }
 
+    cout<<endl<<"Computing sensitivity matrix...";
     wds->Compute_Sensitivity_Matrix(par, 0);
+    cout<<endl<<" ready.";
 
     SM_MFR = wds->SM_MassFlowRates;
     SM_PR  = wds->SM_Pressures;
