@@ -148,14 +148,13 @@ int main(int argc, char **argv) {
 
     // Sensitivity matrix
     if ((obj_type == "A-optimality") || (obj_type == "D-optimality"))
-        best_Q = +1.e5;
+        best_Q = +1.e10;
     else
-        best_Q = -1.e5;
+        best_Q = -1.e10;
 
 
     // Sensitivity matrix
     if ((obj_type == "A-optimality") || (obj_type == "D-optimality")) {
-        best_Q = +1.e5;
         if (weight_type == "friction_coeff") {
             PerformSensitivityAnalysis(true /*is_edge_prop*/, "friction_coeff", "sensitivity_matrix_friction_coeff.csv");
         }
@@ -170,8 +169,6 @@ int main(int argc, char **argv) {
             exit(-1);
         }
     }
-    else
-        best_Q = -1.e5;
 
     for (int i = 0; i < wds->SM_Pressures.size(); i++) {
         vector<double> tmp = wds->SM_Pressures.at(i);
@@ -643,10 +640,8 @@ void D_Optimize() {
     genome.mutator(Mutator);
 
     GASteadyStateGA ga(genome);
-    if ((obj_type == "A-optimality") || (obj_type == "D-optimality")) {
+    if ((obj_type == "A-optimality") || (obj_type == "D-optimality"))
         ga.minimize();
-        best_Q = +100.;
-    }
 
     ga.set(gaNpopulationSize, popsize);
     ga.set(gaNpCrossover, pcross);
