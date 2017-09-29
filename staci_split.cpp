@@ -303,9 +303,9 @@ void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname) {
         cin.get();
     }
 
-    cout<<endl<<"Computing sensitivity matrix...";
+    cout << endl << "Computing sensitivity matrix...";
     wds->Compute_Sensitivity_Matrix(par, 0);
-    cout<<endl<<" ready.";
+    cout << endl << " ready.";
 
     SM_MFR = wds->SM_MassFlowRates;
     SM_PR  = wds->SM_Pressures;
@@ -1173,16 +1173,16 @@ float D_Objective(GAGenome & c) {
         cin.get();
 
     bool add_info = false;
-    if ((obj_type == "D-optimality") && (Q < best_Q))
+
+    if (Q < best_Q) {
         add_info = true;
-    if ((obj_type == "A-optimality") && (Q < best_Q))
-        add_info = true;
-    if ((add_info) || (info)) {
         best = tmp;
         best_Q = Q;
+    }
+    if ((fcount % 1000) == 0)
+        add_info = true;
 
-        //save_state();
-
+    if ((add_info) || (info)) {
         strstrm.str("");
         strstrm << endl << "best : ";
         for (int i = 0; i < n_comm; i++)
