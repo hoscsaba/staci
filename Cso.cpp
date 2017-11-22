@@ -131,12 +131,12 @@ For any of these models, if parameter erdesseg is negative, it is assumed that
 lambda=-erdesseg
 */
 double Cso::surlodas() {
-  double v_min = 0.01;
+  double v_min = 0.001;
   double v = mp / ro / (D * D * pi / 4);
   if (fabs(v) < v_min) v = v_min;
   double nu = 1e-6;
   double lambda_min = 0.001;
-  double lambda_max = 10.0;
+  double lambda_max = 64. / 0.1;
   double dp;
 
   if (friction_model_type == 0)  // Darcy-Wiesenbach
@@ -144,28 +144,45 @@ double Cso::surlodas() {
     if (erdesseg <= 0)
       lambda = -erdesseg;
     else {
-      if (f_count >= 0) {
-        double Re = fabs(v) * D / nu;
+      //if (f_count >= 0) {
 
-        double hiba = 1.0e10, ize = 0.0, lambda_uj = 0.0;
-        unsigned int i = 0;
-        while ((hiba > 1e-6) && (i < 10)) {
+      double Re = fabs(v) * D / nu;
+
+      double hiba = 1.0e10, ize = 0.0, lambda_uj = 0.0;
+      unsigned int i = 0;
+      while ((hiba > 1e-6) && (i < 20)) {
+        if (Re < 2300)
+          lambda_uj = 64. / Re;
+        else {
           ize = -2.0 *
                 log10(erdesseg / 1000 / D / 3.71 + 2.51 / Re / sqrt(lambda));
           lambda_uj = 1 / ize / ize;
-          hiba = fabs((lambda - lambda_uj) / lambda);
-          lambda = lambda_uj;
         }
-        if (i > 8)
-          cout << endl
-               << endl
-               << "WARNING: " << nev << endl
-               << "\t\t pipe " << nev
-               << " friction factor coefficient iteration #" << i;
+
+        if (lambda_uj < lambda_min)
+          lambda_uj = lambda_min;
+        if (lambda > lambda_max)
+          lambda_uj = lambda_max;
+
+        hiba = fabs((lambda - lambda_uj) / lambda);
+        lambda = lambda_uj;
+
+        cout << endl << nev << ": (i=" << i << ") Re = " << fabs(v)*D / nu << ", lambda = " << lambda << endl;
+
+        i++;
+      }
+      /*if (i > 8)
+      cout << endl
+      << endl
+      << "WARNING: " << nev << endl
+      << "\t\t pipe " << nev
+      << " friction factor coefficient iteration #" << i;
       } else
-        lambda = 0.02;
+      lambda = 0.02;*/
+      /*}*/
     }
   }
+  //}
 
   if (friction_model_type == 1)  // Hazen-Williams, C_factor around 100
   {
@@ -184,10 +201,10 @@ double Cso::surlodas() {
           cout << endl
                << "\tWARNING: "
                << " pipe " << nev
-               << " friction factor is set to Hazen-Williams but the friction "
-               "factor is too small (C_HW="
+               << " friction factor is set to Hazen - Williams but the friction "
+               "factor is too small (C_HW = "
                << C_factor << ").";
-          cout << " -> OVERRIDING by C_HW=10.";
+          cout << " -> OVERRIDING by C_HW = 10.";
           C_factor = C_MIN;
           erdesseg = C_MIN;
         }
@@ -202,24 +219,24 @@ double Cso::surlodas() {
     }
   }
 
-  // cout << endl <<nev<< ": lambda=" << lambda << endl;
+  //cout << endl << nev << ": Re = "<<fabs(v)*D/nu<<", lambda = " << lambda << endl;
   //    cin.get();
 
-  if (fabs(lambda) < lambda_min) {
-    cout << endl << "\t WARNING: " << nev << ": v=" << v << "m/s, ";
-    cout << "erdesseg=" << erdesseg;
-    cout << "lambda=" << lambda << "<" << lambda_min << ", overriding by " << lambda_min;
-    lambda = lambda_min;
-    // cin.get();
-  }
+  /* if (fabs(lambda) < lambda_min) {
+  cout << endl << "\t WARNING: " << nev << ": v = " << v << "m / s, ";
+      cout << "erdesseg = " << erdesseg;
+          cout << "lambda = " << lambda << " < " << lambda_min << ", overriding by " << lambda_min;
+              lambda = lambda_min;
+              // cin.get();
+            }
 
-  if (fabs(lambda) > lambda_max) {
-    cout << endl << "\t WARNING: " << nev << ": v=" << v << "m/s, ";
-    cout << "erdesseg=" << erdesseg;
-    cout << " lambda=" << lambda << ">" << lambda_max << ", overriding by " << lambda_max;
-    lambda = lambda_max;
-    // cin.get();
-  }
+              if (fabs(lambda) > lambda_max) {
+      cout << endl << "\t WARNING: " << nev << ": v = " << v << "m / s, ";
+                  cout << "erdesseg = " << erdesseg;
+                      cout << " lambda = " << lambda << " > " << lambda_max << ", overriding by " << lambda_max;
+                          lambda = lambda_max;
+                          // cin.get();
+                        }*/
 
   return lambda;
 }
@@ -253,7 +270,7 @@ double Cso::Get_dprop(string mit) {
     out = konc_atlag;
   else {
     cout << endl
-         << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit=" << mit << endl
+         << "HIBA! Cso::Get_dprop(mit), ismeretlen bemenet: mit = " << mit << endl
          << endl;
     cout << endl << "Name of pipe: " << nev << endl;
     cin.get();
@@ -279,15 +296,15 @@ double Cso::Get_dfdmu(string mit) {
     out = (f1 - f0) / delta_erdesseg;
     erdesseg = old_erdesseg;
 
-    // cout << endl << " out =" << out
-    //      << "Get_dfdmu -> f0=" << f0 << ", f1=" << f1
-    //      << ", (f1-f0)/(Delta)=" << out;
+    // cout << endl << " out = " << out
+    //      << "Get_dfdmu -> f0 = " << f0 << ", f1 = " << f1
+    //      << ", (f1 - f0) / (Delta) = " << out;
     // cin.get();
 
     // out = deriv;
   } else {
     cout << endl
-         << "HIBA! Cso::Get_dfdmu(mit), ismeretlen bemenet: mit=" << mit << endl
+         << "HIBA! Cso::Get_dfdmu(mit), ismeretlen bemenet: mit = " << mit << endl
          << endl;
     cout << endl << "Name of pipe: " << nev << endl;
     out = 0.0;
@@ -308,7 +325,7 @@ void Cso::Set_dprop(string mit, double mire) {
     erdesseg = mire;
   } else {
     cout << endl
-         << "HIBA! Cso::Set_dprop(mit), ismeretlen bemenet: mit=" << mit << endl
+         << "HIBA! Cso::Set_dprop(mit), ismeretlen bemenet: mit = " << mit << endl
          << endl;
   }
 }
