@@ -2960,7 +2960,7 @@ void Staci::residence_time_step(string & max_ID, double & max_VAL,
   double TINY_MASS_FLOW_RATE = 1.e-3;
   double TINY_VEL = 0.000001;  // 1m -> 278 hours
 
-  double MAX_TIME = 168. * 3600.;
+  double MAX_TIME = 2. * 168. * 3600.;
 
   // 1. lepes: csomoponti atlagkor meghatarozasa
   double szaml, nevezo, c, m;

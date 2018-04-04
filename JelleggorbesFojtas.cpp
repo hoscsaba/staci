@@ -40,8 +40,11 @@ void JelleggorbesFojtas::Update_zeta() {
     allasv.at(0) = allas;
     vesztv = interp(e, zeta, allasv);
     veszt = vesztv.at(0);
-    if (veszt < VESZT_MIN)
-        veszt = VESZT_MIN;
+    if (fabs(veszt) < VESZT_MIN)
+        veszt = copysign(VESZT_MIN,veszt);
+
+//double      copysign( double x, double y );
+//Composes a floating point value with the magnitude of x and the sign of y.
 
 // ostringstream strstrm;
 // strstrm << endl << nev<<": az aktualis " << fixed << allas
@@ -73,6 +76,9 @@ string JelleggorbesFojtas::Info() {
     strstrm << "\n";
     strstrm << endl << "       Az aktualis " << fixed << allas
             << "%-os allasnal a vesztesegtenyezo: zeta=" << veszt << endl;
+    if (veszt<0){
+        strstrm<< endl<<"       Mivel ez az értéek negatív Kv értéket jelent!"<< endl;
+    }
 
     return strstrm.str();
 }
@@ -85,7 +91,17 @@ double JelleggorbesFojtas::f(vector<double> x) {
     double he = x[2];
     double hv = x[3];
 
-    ere = (pv - pe) / ro / g + (hv - he) + veszt * mp * fabs(mp);
+    double loss_coeff = veszt;
+    // if veszt<0, it is a Kv value:
+    if (veszt<0){
+        // Kv = Q(m3/h) / sqrt(dp (bar))
+        // Kv = Q(m3/s)*3600 / sqrt(dp *1e5 (Pa))
+        // Kv = mp(kg/s)/ro(kg/m3)*3600 / sqrt(dh(m)*ro(kg/m3)*g(m/s^2) *1e5 (Pa))
+
+        loss_coeff = 1.e5/pow(ro,3.)/9.81/pow(veszt,2.)*pow(3600.,2.);
+    }
+
+    ere = (pv - pe) / ro / g + (hv - he) + loss_coeff * mp * fabs(mp);
 
     headloss = (pe - pv) / ro / g + (he - hv);
 
@@ -95,9 +111,20 @@ double JelleggorbesFojtas::f(vector<double> x) {
 //--------------------------------------------------------------
 vector<double> JelleggorbesFojtas::df(vector<double> x) {
     vector<double> ere;
+
+ double loss_coeff = veszt;
+    // if veszt<0, it is a Kv value:
+    if (veszt<0){
+        // Kv = Q(m3/h) / sqrt(dp (bar))
+        // Kv = Q(m3/s)*3600 / sqrt(dp *1e5 (Pa))
+        // Kv = mp(kg/s)/ro(kg/m3)*3600 / sqrt(dh(m)*ro(kg/m3)*g(m/s^2) *1e5 (Pa))
+
+        loss_coeff = 1.e5/pow(ro,3.)/9.81/pow(veszt,2.)*pow(3600.,2.);
+    }
+
     ere.push_back(-1.0);
     ere.push_back(+1.0);
-    ere.push_back(+2 * veszt * fabs(mp));
+    ere.push_back(2. * loss_coeff * fabs(mp));
     ere.push_back(0.0);
 
     return ere;

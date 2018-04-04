@@ -1,0 +1,81 @@
+
+ Trying to delete previous logfile LOV-LOVOTV-2-input_mod2.spr.ros...  file not found, cannot delete it.
+
+ Building system... ready.
+
+ Automatic inicialization...
+	nodal pressures:	5 mwc 
+	edge mass flow rates:	100 kg/s ...
+
+Solving system...
+====================================
+
+ iter. # 0./100 e_mp=2.75e+03,  e_p=1.00e+06  relax.=0.00, relax.mul.=1.20 (0)
+ iter. # 1./100 e_mp=2.72e+03,  e_p=9.90e+05  relax.=0.01, relax.mul.=1.20 (0)
+ iter. # 2./100 e_mp=2.69e+03,  e_p=9.79e+05  relax.=0.01, relax.mul.=1.20 (0)
+ iter. # 3./100 e_mp=2.65e+03,  e_p=9.65e+05  relax.=0.01, relax.mul.=1.20 (0)
+ iter. # 4./100 e_mp=2.61e+03,  e_p=9.48e+05  relax.=0.02, relax.mul.=1.20 (0)
+ iter. # 5./100 e_mp=2.55e+03,  e_p=9.29e+05  relax.=0.02, relax.mul.=1.20 (0)
+ iter. # 6./100 e_mp=2.49e+03,  e_p=9.07e+05  relax.=0.02, relax.mul.=1.20 (0)
+ iter. # 7./100 e_mp=2.41e+03,  e_p=8.80e+05  relax.=0.03, relax.mul.=1.20 (0)
+ iter. # 8./100 e_mp=2.33e+03,  e_p=8.50e+05  relax.=0.04, relax.mul.=1.20 (0)
+ iter. # 9./100 e_mp=2.23e+03,  e_p=8.14e+05  relax.=0.04, relax.mul.=1.20 (0)
+ iter. # 10./100 e_mp=2.11e+03,  e_p=7.74e+05  relax.=0.05, relax.mul.=1.20 (0)
+ iter. # 11./100 e_mp=1.98e+03,  e_p=7.28e+05  relax.=0.06, relax.mul.=1.20 (0)
+ iter. # 12./100 e_mp=1.83e+03,  e_p=6.77e+05  relax.=0.07, relax.mul.=1.20 (0)
+ iter. # 13./100 e_mp=1.67e+03,  e_p=6.20e+05  relax.=0.09, relax.mul.=1.20 (0)
+ iter. # 14./100 e_mp=1.49e+03,  e_p=5.58e+05  relax.=0.11, relax.mul.=1.20 (0)
+ iter. # 15./100 e_mp=1.30e+03,  e_p=4.91e+05  relax.=0.13, relax.mul.=1.20 (0)
+ iter. # 16./100 e_mp=1.10e+03,  e_p=4.21e+05  relax.=0.15, relax.mul.=1.20 (0)
+ iter. # 17./100 e_mp=8.97e+02,  e_p=3.49e+05  relax.=0.18, relax.mul.=1.20 (0)
+ iter. # 18./100 e_mp=6.98e+02,  e_p=2.77e+05  relax.=0.22, relax.mul.=1.20 (0)
+ iter. # 19./100 e_mp=5.12e+02,  e_p=2.07e+05  relax.=0.27, relax.mul.=1.20 (0)
+ iter. # 20./100 e_mp=3.49e+02,  e_p=1.45e+05  relax.=0.32, relax.mul.=1.20 (0)
+ iter. # 21./100 e_mp=2.15e+02,  e_p=9.16e+04  relax.=0.38, relax.mul.=1.20 (0)
+ iter. # 22./100 e_mp=1.16e+02,  e_p=5.07e+04  relax.=0.46, relax.mul.=1.20 (0)
+ iter. # 23./100 e_mp=5.20e+01,  e_p=2.33e+04  relax.=0.55, relax.mul.=1.20 (0)
+ iter. # 24./100 e_mp=1.75e+01,  e_p=8.01e+03  relax.=0.66, relax.mul.=1.20 (0)
+ iter. # 25./100 e_mp=3.60e+00,  e_p=1.67e+03  relax.=0.79, relax.mul.=1.20 (0)
+ iter. # 26./100 e_mp=1.66e-01,  e_p=7.86e+01  relax.=0.95, relax.mul.=1.20 (0)
+ iter. # 27./100 e_mp=9.50e-15,  e_p=1.52e+00  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 28./100 e_mp=7.31e-15,  e_p=3.80e-01  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 29./100 e_mp=7.21e-15,  e_p=9.58e-02  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 30./100 e_mp=6.51e-15,  e_p=6.28e-02  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 31./100 e_mp=8.07e-15,  e_p=1.27e-02  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 32./100 e_mp=3.91e-15,  e_p=6.11e-03  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 33./100 e_mp=6.02e-15,  e_p=3.47e-03  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 34./100 e_mp=6.83e-15,  e_p=2.21e-03  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 35./100 e_mp=7.08e-15,  e_p=1.55e-03  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 36./100 e_mp=5.20e-15,  e_p=4.69e-04  relax.=1.00, relax.mul.=1.20 (0)
+
+OK
+
+Computing residence time...
+====================================
+
+	 step #532 max. res. time: 7 d, 0 h, 0 m (PIPE_298279), mean: 1 d, 1 h, 3 m
+Finished computing residence time.
+
+Saving results...done
+
+
+Statistics:
+======================
+	 # of nodes : 2486
+	 # of edges : 2459
+
+	 diameter     : min : 0.03m (ID: PIPE_588613)  max : 0.16m (ID: PIPE_298674)
+	 length       : min : 0.03m (ID: PIPE_1385000)  max : 1743.70m (ID: PIPE_621334)
+	 sum. length  : 45223.14 m 
+	 pipe volume  : 615.27 m^3 
+	 fluid volume : 615.27 m^3 (100.00% of pipe volume)
+
+	 max. inflow          : -0.00 m3/h (ID: NODE_5651889)  
+	 max. consumption     : 9.97 m3/h (ID: NODE_1327272)  
+	 sum of inflow        : 0.00 m3/h
+	 sum of consumption   : 30.57 m3/h
+	 consumption - inflow : 30.57 m3/h
+
+	 node geodetic height : min : 173.25m (ID: NODE_1328513)  max : 199.94m (ID: NODE_13082)
+
+ 	 number of nonzero Jacobian entries: 12416 out of 24453025 (0.05%)
