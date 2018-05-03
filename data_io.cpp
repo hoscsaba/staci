@@ -510,6 +510,97 @@ void data_io::curve_reader(const string id, const XMLNode elem,
 }
 
 //--------------------------------------------------------------------------------
+void data_io::replace_value(XMLNode &root_node, string fieldname, double val, string msg) {
+
+
+    //XMLNode tmp = root_node.getChildNode(fieldname.c_str());
+
+    if (!root_node.getChildNode(fieldname.c_str()).isEmpty()) {
+        root_node.getChildNode(fieldname.c_str()).deleteText();
+        ostringstream os;
+        os.str("");
+        os << scientific << setprecision(5) << val;
+        root_node.getChildNode(fieldname.c_str()).addText(os.str().c_str());
+        //cout << endl << endl << "SIKER!" << endl << endl;
+        //cin.get();
+    }
+    else {
+        cout << "\n ERROR!!! subnode <" << fieldname << "> does not exists in " << msg << "!!!\n";
+        //exit(-1);
+    }
+}
+
+//--------------------------------------------------------------------------------
+void data_io::replace_value2(XMLNode &root_node, string fieldname1, int i, string fieldname2,  double val, string msg) {
+
+    if (!root_node.getChildNode(fieldname1.c_str(), i).isEmpty()) {
+        if (!root_node.getChildNode(fieldname1.c_str(), i).getChildNode(fieldname2.c_str()).isEmpty()) {
+            root_node.getChildNode(fieldname1.c_str(), i).getChildNode(fieldname2.c_str()).deleteText();
+            ostringstream os;
+            os.str("");
+            os << scientific << setprecision(5) << val;
+            root_node.getChildNode(fieldname1.c_str(), i).getChildNode(fieldname2.c_str()).addText(os.str().c_str());
+            //cout << endl << endl << "SIKER!" << endl << endl;
+            //cin.get();
+        }
+        else {
+            cout << "\n ERROR!!! subnode <" << fieldname1 << "> -> <" << fieldname2 << "> does not exists in " << msg << "!!!\n";
+            //exit(-1);
+        }
+    }
+    else {
+        cout << "\n ERROR!!! subnode <" << fieldname1 << "> does not exists in " << msg << "!!!\n";
+        //exit(-1);
+    }
+}
+
+//--------------------------------------------------------------------------------
+void data_io::replace_value4(XMLNode &root_node, string fieldname1, int i,
+                             string fieldname2, string fieldname3, string fieldname4,  double val, string msg) {
+
+    if (!root_node.getChildNode(fieldname1.c_str(), i).isEmpty()) {
+        if (!root_node.getChildNode(fieldname1.c_str(), i).getChildNode(fieldname2.c_str()).isEmpty()) {
+            if (!root_node.getChildNode(fieldname1.c_str(), i).getChildNode(fieldname2.c_str()).getChildNode(fieldname3.c_str()).isEmpty()) {
+                if (!root_node.getChildNode(fieldname1.c_str(), i).getChildNode(fieldname2.c_str()).getChildNode(fieldname3.c_str()).getChildNode(fieldname4.c_str()).isEmpty()) {
+                    root_node.getChildNode(fieldname1.c_str(), i).getChildNode(fieldname2.c_str()).getChildNode(fieldname3.c_str()).getChildNode(fieldname4.c_str()).deleteText();
+                    ostringstream os;
+                    os.str("");
+                    os << scientific << setprecision(5) << val;
+                    root_node.getChildNode(fieldname1.c_str(), i).getChildNode(fieldname2.c_str()).getChildNode(fieldname3.c_str()).getChildNode(fieldname4.c_str()).addText(os.str().c_str());
+                    //cout << endl << endl << "SIKER!" << endl << endl;
+                    //cin.get();
+                }
+                else {
+                    cout << "\n ERROR!!! subnode <"
+                         << fieldname1 << "> -> <"
+                         << fieldname2 << "> -> <"
+                         << fieldname3 << "> -> <"
+                         << fieldname4 << ">   does not exists in " << msg << "!!!\n";
+                    //exit(-1);
+                }
+            }
+            else {
+                cout << "\n ERROR!!! subnode <"
+                     << fieldname1 << "> -> <"
+                     << fieldname2 << "> -> <"
+                     << fieldname3 << ">   does not exists in " << msg << "!!!\n";
+            }
+        }
+        else {
+            cout << "\n ERROR!!! subnode <"
+                 << fieldname1 << "> -> <"
+                 << fieldname2 << "> does not exists in " << msg << "!!!\n";
+            //exit(-1);
+        }
+    }
+    else {
+        cout << "\n ERROR!!! subnode <" << fieldname1 << "> does not exists in " << msg << "!!!\n";
+        //exit(-1);
+    }
+}
+
+
+//--------------------------------------------------------------------------------
 void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of_demand, vector<Csomopont *> cspok,
                            vector<Agelem *> agelemek, bool conv_reached, int staci_debug_level) {
 
@@ -523,37 +614,32 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
     XMLNode Node_nodes = xMainNode.getChildNode("nodes");
     XMLNode Node_edges = xMainNode.getChildNode("edges");
 
-    /*debug = false;
-    string debug_string = Node_settings.getChildNode("cpp_xml_debug").getText();
-
-    if (strcmp(debug_string,"true"))
-        debug=true;
-
-    if (debug)
-        cout << endl << endl << "cpp_xml_debug=" << debug_string
-             << " => adatfajl irasa kozbeni debug bekapcsolasa..." << endl;*/
-
     Node_settings.getChildNode("solution_exists").deleteText();
 
     ostringstream os;
     if (conv_reached) {
         Node_settings.getChildNode("solution_exists").addText("true");
-        Node_settings.getChildNode("fluid_volume").deleteText();
-        os.str("");
-        os << scientific << setprecision(5) << FolyMenny;
-        Node_settings.getChildNode("fluid_volume").addText(os.str().c_str());
+
     } else
         Node_settings.getChildNode("solution_exists").addText("false");
 
-    Node_settings.getChildNode("sum_of_inflow").deleteText();
+    replace_value(Node_settings, "fluid_volume", FolyMenny, " <settings>");
+    //Node_settings.getChildNode("fluid_volume").deleteText();
+    //os.str("");
+    //os << scientific << setprecision(5) << FolyMenny;
+    //Node_settings.getChildNode("fluid_volume").addText(os.str().c_str());
+
+    replace_value(Node_settings, "sum_of_inflow", FolyMenny, " <settings>");
+    /*Node_settings.getChildNode("sum_of_inflow").deleteText();
     os.str("");
     os << scientific << setprecision(5) << sum_of_inflow;
-    Node_settings.getChildNode("sum_of_inflow").addText(os.str().c_str());
+    Node_settings.getChildNode("sum_of_inflow").addText(os.str().c_str());*/
 
-    Node_settings.getChildNode("sum_of_demand").deleteText();
+    replace_value(Node_settings, "sum_of_demand", FolyMenny, " <settings>");
+    /*Node_settings.getChildNode("sum_of_demand").deleteText();
     os.str("");
     os << scientific << setprecision(5) << sum_of_demand;
-    Node_settings.getChildNode("sum_of_demand").addText(os.str().c_str());
+    Node_settings.getChildNode("sum_of_demand").addText(os.str().c_str());*/
 
     // Csomopontok es agak szamanak es nevenek kiolvasasa...
     csp_db = Node_nodes.nChildNode("node");
@@ -561,7 +647,6 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
 
     string id, is_endnode;
     bool megvan;
-    double p;
     for (int i = 0; i < csp_db; i++) {
         id = Node_nodes.getChildNode("node", i).getChildNode("id").getText();
         megvan = false;
@@ -571,38 +656,45 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
         if (is_endnode == "false") {
             for (unsigned int j = 0; j < cspok.size(); j++) {
                 if (id == (cspok.at(j)->Get_nev())) {
-                    Node_nodes.getChildNode("node", i).getChildNode("pressure").deleteText();
-                    p = cspok.at(j)->Get_dprop("ro") * 9.81 * cspok.at(j)->Get_p();
+                    megvan = true;
+
+                    double p = cspok.at(j)->Get_dprop("ro") * 9.81 * cspok.at(j)->Get_p();
+                    replace_value2( Node_nodes, "node", i, "pressure", p, id);
+
+                    /*Node_nodes.getChildNode("node", i).getChildNode("pressure").deleteText();
                     ostringstream os;
                     os << scientific << setprecision(5) << p;
                     Node_nodes.getChildNode("node", i).getChildNode("pressure").addText(os.str().c_str());
-                    megvan = true;
+                    */
                     /*if (debug)
                         cout << " => pressure=" << p << "Pa = " << p / 1000 / 9.81 << "m";*/
-
-                    Node_nodes.getChildNode("node", i).getChildNode("head").deleteText();
+                    replace_value2( Node_nodes, "node", i, "head", cspok.at(j)->Get_p(), id);
+                    /*Node_nodes.getChildNode("node", i).getChildNode("head").deleteText();
                     p = cspok.at(j)->Get_p();
                     os.str("");
                     os << scientific << setprecision(5) << p;
-                    Node_nodes.getChildNode("node", i).getChildNode("head").addText(os.str().c_str());
+                    Node_nodes.getChildNode("node", i).getChildNode("head").addText(os.str().c_str());*/
 
-                    Node_nodes.getChildNode("node", i).getChildNode("travel_time").deleteText();
+                    replace_value2( Node_nodes, "node", i, "travel_time", cspok.at(j)->Get_dprop("tt") / 3600., id);
+                    /*Node_nodes.getChildNode("node", i).getChildNode("travel_time").deleteText();
                     p = cspok.at(j)->Get_dprop("tt");
                     os.str("");
                     os << scientific << setprecision(5) << p / 3600.;
-                    Node_nodes.getChildNode("node", i).getChildNode("travel_time").addText(os.str().c_str());
+                    Node_nodes.getChildNode("node", i).getChildNode("travel_time").addText(os.str().c_str());*/
 
-                    Node_nodes.getChildNode("node", i).getChildNode("user1").deleteText();
+                    replace_value2( Node_nodes, "node", i, "user1", cspok.at(j)->Get_user1(), id);
+                    /*Node_nodes.getChildNode("node", i).getChildNode("user1").deleteText();
                     p = cspok.at(j)->Get_user1();
                     os.str("");
                     os << scientific << setprecision(5) << p;
-                    Node_nodes.getChildNode("node", i).getChildNode("user1").addText(os.str().c_str());
+                    Node_nodes.getChildNode("node", i).getChildNode("user1").addText(os.str().c_str());*/
 
-                    Node_nodes.getChildNode("node", i).getChildNode("user2").deleteText();
+                    replace_value2( Node_nodes, "node", i, "user2", cspok.at(j)->Get_user2(), id);
+                    /*Node_nodes.getChildNode("node", i).getChildNode("user2").deleteText();
                     p = cspok.at(j)->Get_user2();
                     os.str("");
                     os << scientific << setprecision(5) << p;
-                    Node_nodes.getChildNode("node", i).getChildNode("user2").addText(os.str().c_str());
+                    Node_nodes.getChildNode("node", i).getChildNode("user2").addText(os.str().c_str());*/
 
                     //cout<<endl<<cspok.at(j)->Get_nev()<<" tt="<<p;
                     //cin.get();
@@ -620,7 +712,7 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
         cout << endl << endl << "Csomopontok eredmenyeinek kiirasa kesz." << endl;
     }
 
-    double mp, q, v, dh, dhpL, tt, aref, user1, user2;
+    //double mp, q, v, dh, dhpL, tt, aref, user1, user2;
     for (int i = 0; i < ag_db; i++) {
         id = Node_edges.getChildNode("edge", i).getChildNode("id").getText();
         megvan = false;
@@ -629,81 +721,93 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
         for (unsigned int j = 0; j < agelemek.size(); j++) {
             //cout << endl << "\t agelemek.at(" << j << ")->Get_nev()=" << agelemek.at(j)->Get_nev();
             if (id == (agelemek.at(j)->Get_nev())) {
-                mp = agelemek.at(i)->Get_mp();
+                replace_value2( Node_edges, "edge", i, "mass_flow_rate", agelemek.at(i)->Get_mp(), id);
+                /*mp = agelemek.at(i)->Get_mp();
                 Node_edges.getChildNode("edge", i).getChildNode("mass_flow_rate").deleteText();
                 ostringstream os;
                 os << scientific << setprecision(5) << mp;
-                Node_edges.getChildNode("edge", i).getChildNode("mass_flow_rate").addText(os.str().c_str());
+                Node_edges.getChildNode("edge", i).getChildNode("mass_flow_rate").addText(os.str().c_str());*/
 
-                q = agelemek.at(i)->Get_Q();
+                replace_value2( Node_edges, "edge", i, "volume_flow_rate", agelemek.at(i)->Get_Q()*3600., id);
+                /*q = agelemek.at(i)->Get_Q();
                 Node_edges.getChildNode("edge", i).getChildNode("volume_flow_rate").deleteText();
                 os.str("");
                 os << scientific << setprecision(5) << q * 3600;
-                Node_edges.getChildNode("edge", i).getChildNode("volume_flow_rate").addText(os.str().c_str());
+                Node_edges.getChildNode("edge", i).getChildNode("volume_flow_rate").addText(os.str().c_str());*/
 
-                v = agelemek.at(i)->Get_v();
-                Node_edges.getChildNode("edge", i).getChildNode("velocity").deleteText();
-                os.str("");
-                os << scientific << setprecision(5) << v;
-                Node_edges.getChildNode("edge", i).getChildNode("velocity").addText(os.str().c_str());
+                replace_value2( Node_edges, "edge", i, "velocity", agelemek.at(i)->Get_v() , id);
+                /*                v = agelemek.at(i)->Get_v();
+                                Node_edges.getChildNode("edge", i).getChildNode("velocity").deleteText();
+                                os.str("");
+                                os << scientific << setprecision(5) << v;
+                                Node_edges.getChildNode("edge", i).getChildNode("velocity").addText(os.str().c_str());*/
 
-                dh = agelemek.at(i)->Get_dprop("headloss");
-                Node_edges.getChildNode("edge", i).getChildNode("headloss").deleteText();
-                os.str("");
-                os << scientific << setprecision(5) << dh;
-                Node_edges.getChildNode("edge", i).getChildNode("headloss").addText(os.str().c_str());
+                replace_value2( Node_edges, "edge", i, "headloss", agelemek.at(i)->Get_dprop("headloss"), id);
+                /*                dh = agelemek.at(i)->Get_dprop("headloss");
+                                Node_edges.getChildNode("edge", i).getChildNode("headloss").deleteText();
+                                os.str("");
+                                os << scientific << setprecision(5) << dh;
+                                Node_edges.getChildNode("edge", i).getChildNode("headloss").addText(os.str().c_str());*/
 
-                dhpL = agelemek.at(i)->Get_dprop("headloss_per_unit_length");
-                Node_edges.getChildNode("edge", i).getChildNode("head_loss_per_unit_length").deleteText();
-                os.str("");
-                os << scientific << setprecision(5) << dhpL;
-                Node_edges.getChildNode("edge", i).getChildNode("head_loss_per_unit_length").addText(os.str().c_str());
+                replace_value2( Node_edges, "edge", i, "head_loss_per_unit_length", agelemek.at(i)->Get_dprop("headloss_per_unit_length"), id);
+                /*                dhpL = agelemek.at(i)->Get_dprop("headloss_per_unit_length");
+                                Node_edges.getChildNode("edge", i).getChildNode("head_loss_per_unit_length").deleteText();
+                                os.str("");
+                                os << scientific << setprecision(5) << dhpL;
+                                Node_edges.getChildNode("edge", i).getChildNode("head_loss_per_unit_length").addText(os.str().c_str());*/
 
-                tt = (agelemek.at(i)->Get_tt_start() + agelemek.at(i)->Get_tt_end()) / 2. / 3600.;
-                Node_edges.getChildNode("edge", i).getChildNode("travel_time").deleteText();
-                os.str("");
-                os << scientific << setprecision(5) << tt;
-                Node_edges.getChildNode("edge", i).getChildNode("travel_time").addText(os.str().c_str());
+                replace_value2( Node_edges, "edge", i, "travel_time", (agelemek.at(i)->Get_tt_start() + agelemek.at(i)->Get_tt_end()) / 2. / 3600., id);
+                /*                tt = (agelemek.at(i)->Get_tt_start() + agelemek.at(i)->Get_tt_end()) / 2. / 3600.;
+                                Node_edges.getChildNode("edge", i).getChildNode("travel_time").deleteText();
+                                os.str("");
+                                os << scientific << setprecision(5) << tt;
+                                Node_edges.getChildNode("edge", i).getChildNode("travel_time").addText(os.str().c_str());*/
 
-                aref = agelemek.at(i)->Get_Aref();
-                // cout<<endl<<"--> "<<agelemek.at(i)->Get_nev()<<" aref="<<aref; cin.get();
-                Node_edges.getChildNode("edge", i).getChildNode("aref").deleteText();
-                os.str("");
-                os << scientific << setprecision(5) << aref;
-                Node_edges.getChildNode("edge", i).getChildNode("aref").addText(os.str().c_str());
+                replace_value2( Node_edges, "edge", i, "aref", agelemek.at(i)->Get_Aref(), id);
+                /*                aref = agelemek.at(i)->Get_Aref();
+                                // cout<<endl<<"--> "<<agelemek.at(i)->Get_nev()<<" aref="<<aref; cin.get();
+                                Node_edges.getChildNode("edge", i).getChildNode("aref").deleteText();
+                                os.str("");
+                                os << scientific << setprecision(5) << aref;
+                                Node_edges.getChildNode("edge", i).getChildNode("aref").addText(os.str().c_str());*/
 
-                user1 = agelemek.at(i)->Get_user1();
-                Node_edges.getChildNode("edge", i).getChildNode("user1").deleteText();
-                os.str("");
-                os << scientific << setprecision(5) << user1;
-                Node_edges.getChildNode("edge", i).getChildNode("user1").addText(os.str().c_str());
+                replace_value2( Node_edges, "edge", i, "user1", agelemek.at(i)->Get_user1() , id);
+                /*                user1 = agelemek.at(i)->Get_user1();
+                                Node_edges.getChildNode("edge", i).getChildNode("user1").deleteText();
+                                os.str("");
+                                os << scientific << setprecision(5) << user1;
+                                Node_edges.getChildNode("edge", i).getChildNode("user1").addText(os.str().c_str());*/
 
-                user2 = agelemek.at(i)->Get_user2();
-                Node_edges.getChildNode("edge", i).getChildNode("user2").deleteText();
-                os.str("");
-                os << scientific << setprecision(5) << user2;
-                Node_edges.getChildNode("edge", i).getChildNode("user2").addText(os.str().c_str());
+                replace_value2( Node_edges, "edge", i, "user2", agelemek.at(i)->Get_user2(), id);
+                /*                user2 = agelemek.at(i)->Get_user2();
+                                Node_edges.getChildNode("edge", i).getChildNode("user2").deleteText();
+                                os.str("");
+                                os << scientific << setprecision(5) << user2;
+                                Node_edges.getChildNode("edge", i).getChildNode("user2").addText(os.str().c_str());*/
 
 
                 megvan = true;
-                if (debug)
+                /*if (debug)
                     cout << " \t=> mass_flow_rate=" << mp
                          << " kg/s, volume_flow_rate=" << q
                          << " m^3/s, velocity=" << v << " m/s"
                          << " m/s, head_loss=" << dh << " m";
-
+*/
                 // Jelleggorbes fojtas - interpolalt dzeta ertek
                 if (agelemek.at(j)->Get_Tipus() == "Jelleggorbes fojtas") {
-                    XMLNode akt_node;
+                    replace_value4( Node_edges, "edge", i, "edge_spec", "valve", "adzeta", agelemek.at(j)->Get_dprop("veszt"), id);
+                    /*
 
-                    if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("valve") > 0)
-                        akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
-                                       "valve").getChildNode("adzeta");
+                                        XMLNode akt_node;
 
-                    akt_node.deleteText();
-                    ostringstream os;
-                    os << scientific << setprecision(5) << agelemek.at(j)->Get_dprop("veszt");
-                    akt_node.addText(os.str().c_str());
+                                        if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("valve") > 0)
+                                            akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
+                                                           "valve").getChildNode("adzeta");
+
+                                        akt_node.deleteText();
+                                        ostringstream os;
+                                        os << scientific << setprecision(5) << agelemek.at(j)->Get_dprop("veszt");
+                                        akt_node.addText(os.str().c_str());*/
 
 
                 }
@@ -893,11 +997,13 @@ void data_io::save_mod_prop_all_elements(vector<Csomopont*> cspok, vector<Agelem
     XMLNode Node_edges = xMainNode.getChildNode("edges");
 
     for (unsigned int i = 0; i < agelemek.size(); i++) {
-        XMLNode akt_node = Node_edges.getChildNode("edge", i);
+        replace_value2( Node_edges, "edge", i, pID, agelemek.at(i)->Get_dprop(pID) , agelemek.at(i)->Get_nev());
+
+        /*XMLNode akt_node = Node_edges.getChildNode("edge", i);
         akt_node.getChildNode(pID.c_str()).deleteText();
         ostringstream os;
         os << scientific << setprecision(5) << agelemek.at(i)->Get_dprop(pID);
-        akt_node.getChildNode(pID.c_str()).addText(os.str().c_str());
+        akt_node.getChildNode(pID.c_str()).addText(os.str().c_str());*/
 
     }
 
@@ -915,10 +1021,11 @@ void data_io::save_mod_prop_all_elements(vector<Csomopont*> cspok, vector<Agelem
         else
             val = 0.0;
 
-        akt_node.getChildNode(pID.c_str()).deleteText();
+replace_value2( Node_nodes, "node", j, pID, val , cspok.at(i)->Get_nev());
+        /*akt_node.getChildNode(pID.c_str()).deleteText();
         ostringstream os;
         os << scientific << setprecision(5) << val;
-        akt_node.getChildNode(pID.c_str()).addText(os.str().c_str());
+        akt_node.getChildNode(pID.c_str()).addText(os.str().c_str());*/
 
     }
 
@@ -1075,7 +1182,7 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
     }
 
     if (!megvan) {
-        cout << "\n\n ERROR!!! data_io.save_mod_prop() -> eID " << eID << " was not found!!!\n\n";
+        cout << "\n ERROR!!! data_io.save_mod_prop() -> eID " << eID << " was not found!!!\n";
         exit(-1);
     } else {
         xMainNode.writeToFile(xml_fnev);
@@ -1247,7 +1354,7 @@ string data_io::read_setting(string which) {
 
 //--------------------------------------------------------------------------------
 double
-data_io::string_to_double(const string &s, const string &elem_name, const string &tag_name, const double &def_value) {
+data_io::string_to_double(const string & s, const string & elem_name, const string & tag_name, const double & def_value) {
     std::istringstream i(s);
     double x;
     if (s.empty()) {

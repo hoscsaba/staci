@@ -33,4 +33,11 @@ private:
     /// gorbek kiolvasasa
     void curve_reader(const string id, const XMLNode node, vector<double> &, vector<double> &);
     double string_to_double( const string &s , const string &elem_name, const string &tag_name, const double &def_value);
+    void replace_value(XMLNode &root_node, string fieldname, double val, string msg);
+//    void replace_value(XMLNode &root_node, string fieldname, string val, string msg);
+    void replace_value2(XMLNode &root_node, string fieldname1, int i, string fieldname2, double val, string msg);
+  //  void replace_value2(XMLNode &root_node, string fieldname1, int i, string fieldname2, string val, string msg);
+    void replace_value4(XMLNode &root_node, string fieldname1, int i,
+                             string fieldname2, string fieldname3, string fieldname4,  double val, string msg);
+
 };
