@@ -1,16 +1,18 @@
-
 -include subdir.mk
 
-# LDFLAGS:   -L/usr/local/lib 
-	# -L/usr/lib -L/usr/local/opt -L/usr/local/Cellar/suite-sparse/4.5.3
-# CFLAGS:	-I/usr/local/opt/tbb/include 
+LINK=   -lm -lumfpack
+INC+=	-I/Users/hoscsaba/Documents/GitHub/SuiteSparse/UMFPACK/include\
+-I/Users/hoscsaba/Documents/GitHub/SuiteSparse/SuiteSparse_config\
+-I/Users/hoscsaba/Documents/GitHub/SuiteSparse/AMD/Include\
+-L/Users/hoscsaba/Documents/GitHub/SuiteSparse/UMFPACK/build
+
 
 all: new_staci
 
 new_staci: $(OBJS) $(USER_OBJS)
-	g++ -I/usr/local/opt/tbb/include -o new_staci $(OBJS) $(USER_OBJS)  -L/usr/local/lib -L/usr/lib -L/usr/local/opt -L/usr/local/Cellar/suite-sparse/4.5.5_1 -lm -lumfpack 
+	g++ -rpath /Users/hoscsaba/Documents/GitHub/SuiteSparse/UMFPACK/build $(INC) $(LINK) $(OBJS) $(USER_OBJS)  -o new_staci 
+
 
 clean:
 	-rm $(OBJS)$(C++_DEPS)$(C_DEPS)$(CC_DEPS)$(CPP_DEPS)$(EXECUTABLES)$(CXX_DEPS)$(C_UPPER_DEPS) new_staci
 	
-	# g++ -o new_staci $(OBJS) $(USER_OBJS) -lm -lumfpack -lga

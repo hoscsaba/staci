@@ -12,7 +12,7 @@
 // Wiley:
 //#include "/usr/include/suitesparse/umfpack.h"
 // Mac:
-#include "/usr/local/include/umfpack.h"
+#include "umfpack.h"
 // #include <suitesparse/umfpack.h>
 
 // TODO: Clear up debug level behaviour in the doc!
