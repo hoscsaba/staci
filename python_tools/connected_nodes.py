@@ -107,14 +107,14 @@ def connected_nodes():
     for components in connected_components(nodes):
         names = sorted(node.name for node in components)
         names = ", ".join(names)
-        print "\nGroup #%i:\n========= \n%s" % (number, names)
+        print("\nGroup #"+str(number)+":\n========= \n"+names)
         number += 1
     number -= 1
 
     if number > 1:
-        print "\n\nAltogether %i groups.\n\n" % (number)
+        print("\n\nAltogether "+str(number)+" groups.\n\n")
     else:
-        print "\n\nAltogether %i group.\n\n" % (number)
+        print("\n\nAltogether "+str(number)+" group.\n\n") 
 
     # The test code...
 if __name__ == "__main__":

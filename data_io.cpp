@@ -121,7 +121,7 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
     int db;
     bool megvan;
     int ezaz = 0;
-    if (debug) {
+    //if (debug) {
         for (int i = 0; i < ag_db; i++) {
             megvan = false;
             db = 0;
@@ -140,7 +140,7 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
             //else
             //  cout<<"????";
         }
-    }
+    //}
 
     if (debug)
         cout << endl << endl << "Az agak reszletesen:" << endl
@@ -454,12 +454,13 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
             cout << agelemek.at(i)->Info();
     }
 
-    if (debug) {
+    //if (debug) {
         cout << endl << endl << endl << "Number of edge types:";
         cout << endl << "\tnode:\t" << csp_db;
         for (int j = 0; j < edge_type_number; j++)
             cout << endl << "\t" << edge_type.at(j) << ":\t" << edge_type_occur.at(j);
-    }
+        cout << endl ;
+   // }
 
     if (debug)
         cin.get();
