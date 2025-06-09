@@ -1,5 +1,5 @@
 
- Trying to delete previous logfile LOV-LOVOTV-2-input_mod.spr.ros... file successfully deleted.
+ Trying to delete previous logfile ../tests/LOV-LOVOTV-2-input_mod.spr.ros... file successfully deleted.
 
  Building system... ready.
 
@@ -23,29 +23,51 @@ Solving system...
  iter. # 10./100 e_mp=4.83e+01,  e_p=2.44e+04  relax.=0.62, relax.mul.=1.20 (0)
  iter. # 11./100 e_mp=1.24e+01,  e_p=6.45e+03  relax.=0.74, relax.mul.=1.20 (0)
  iter. # 12./100 e_mp=1.34e+00,  e_p=7.15e+02  relax.=0.89, relax.mul.=1.20 (0)
- iter. # 13./100 e_mp=1.80e-14,  e_p=4.48e+00  relax.=1.00, relax.mul.=1.20 (0)
- iter. # 14./100 e_mp=8.20e-15,  e_p=1.12e+00  relax.=1.00, relax.mul.=1.20 (0)
- iter. # 15./100 e_mp=8.50e-15,  e_p=2.80e-01  relax.=1.00, relax.mul.=1.20 (0)
- iter. # 16./100 e_mp=6.62e-15,  e_p=7.06e-02  relax.=1.00, relax.mul.=1.20 (0)
- iter. # 17./100 e_mp=7.53e-15,  e_p=2.03e-02  relax.=1.00, relax.mul.=1.20 (0)
- iter. # 18./100 e_mp=7.69e-15,  e_p=1.42e-02  relax.=1.00, relax.mul.=1.20 (0)
- iter. # 19./100 e_mp=6.68e-15,  e_p=1.21e-02  relax.=1.00, relax.mul.=1.20 (0)
- iter. # 20./100 e_mp=5.75e-15,  e_p=1.12e-02  relax.=1.00, relax.mul.=1.20 (0)
- iter. # 21./100 e_mp=8.09e-15,  e_p=1.32e-02  relax.=1.00, relax.mul.=1.20 (0)
- iter. # 22./100 e_mp=8.72e-15,  e_p=8.75e-03  relax.=0.10, relax.mul.=1.20 (0)
- iter. # 23./100 e_mp=8.50e-15,  e_p=5.54e-03  relax.=0.12, relax.mul.=1.20 (0)
- iter. # 24./100 e_mp=9.51e-15,  e_p=3.35e-03  relax.=0.14, relax.mul.=1.20 (0)
- iter. # 25./100 e_mp=9.98e-15,  e_p=1.97e-03  relax.=0.17, relax.mul.=1.20 (0)
- iter. # 26./100 e_mp=7.13e-15,  e_p=1.57e-03  relax.=0.21, relax.mul.=1.20 (0)
- iter. # 27./100 e_mp=8.12e-15,  e_p=1.22e-03  relax.=0.25, relax.mul.=1.20 (0)
- iter. # 28./100 e_mp=7.97e-15,  e_p=9.07e-04  relax.=0.30, relax.mul.=1.20 (0)
+ iter. # 13./100 e_mp=1.68e-14,  e_p=4.48e+00  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 14./100 e_mp=9.00e-15,  e_p=1.12e+00  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 15./100 e_mp=8.03e-15,  e_p=2.80e-01  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 16./100 e_mp=6.37e-15,  e_p=7.06e-02  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 17./100 e_mp=4.59e-15,  e_p=2.03e-02  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 18./100 e_mp=5.18e-15,  e_p=1.42e-02  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 19./100 e_mp=7.49e-15,  e_p=1.21e-02  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 20./100 e_mp=5.84e-15,  e_p=1.12e-02  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 21./100 e_mp=6.40e-15,  e_p=1.32e-02  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 22./100 e_mp=9.14e-15,  e_p=8.75e-03  relax.=0.10, relax.mul.=1.20 (0)
+ iter. # 23./100 e_mp=1.63e-14,  e_p=5.54e-03  relax.=0.12, relax.mul.=1.20 (0)
+ iter. # 24./100 e_mp=1.21e-14,  e_p=3.35e-03  relax.=0.14, relax.mul.=1.20 (0)
+ iter. # 25./100 e_mp=1.07e-14,  e_p=1.97e-03  relax.=0.17, relax.mul.=1.20 (0)
+ iter. # 26./100 e_mp=1.08e-14,  e_p=1.57e-03  relax.=0.21, relax.mul.=1.20 (0)
+ iter. # 27./100 e_mp=7.21e-15,  e_p=1.22e-03  relax.=0.25, relax.mul.=1.20 (0)
+ iter. # 28./100 e_mp=1.01e-14,  e_p=9.07e-04  relax.=0.30, relax.mul.=1.20 (0)
 
 OK
 
 Computing residence time...
 ====================================
 
-	 step #532 max. res. time: 7 d, 0 h, 0 m (PIPE_298279), mean: 1 d, 1 h, 3 m
+	 step #532 max. res. time: 14 d, 0 h, 0 m (PIPE_298279), mean: 1 d, 6 h, 53 m
 Finished computing residence time.
 
-Saving results...
+Saving results...done
+
+
+Statistics:
+======================
+	 # of nodes : 2486
+	 # of edges : 2459
+
+	 diameter     : min : 0.03m (ID: PIPE_588613) max : 0.16m (ID: PIPE_298674)
+	 length       : min : 0.03m (ID: PIPE_1385000)  max : 1743.70m (ID: PIPE_621334)
+	 sum. length  : 45223.14 m 
+	 pipe volume  : 615.27 m^3 
+	 fluid volume : 615.27 m^3 (100.00% of pipe volume)
+
+	 max. inflow          : -0.00 m3/h (ID: NODE_5651889)  
+	 max. consumption     : 9.97 m3/h (ID: NODE_1327272)  
+	 sum of inflow        : 0.00 m3/h
+	 sum of consumption   : 30.57 m3/h
+	 consumption - inflow : 30.57 m3/h
+
+	 node geodetic height : min : 173.25m (ID: NODE_1328513)  max : 199.94m (ID: NODE_13082)
+
+ 	 number of nonzero Jacobian entries: 12416 out of 24453025 (0.05%)

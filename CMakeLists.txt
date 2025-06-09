@@ -1,46 +1,45 @@
-cmake_minimum_required(VERSION 3.6)
-project(staci)
+cmake_minimum_required(VERSION 3.16)
+project(staci VERSION 1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(SOURCE_FILES
-    Agelem.cpp
-    Agelem.h
-    AnyOption.cpp
-    AnyOption.h
-    BukoMutargy.cpp
-    BukoMutargy.h
-    Csatorna.cpp
-    Csatorna.h
-    Cso.cpp
-    Cso.h
-    Csomopont.cpp
-    Csomopont.h
-    data_io.cpp
-    data_io.h
-    JelleggorbesFojtas.cpp
-    JelleggorbesFojtas.h
-    KonstNyomas.cpp
-    KonstNyomas.h
-    lubksb.cpp
-    ludcmp.cpp
-    nr.h
-    nrtypes.h
-    nrtypes_nr.h
-    nrutil.h
-    nrutil_nr.h
-    Staci.cpp
-    Staci.h
-    staci_calibrate.cpp
-    staci_main.cpp
-    StaciException.h
-    Szivattyu.cpp
-    Szivattyu.h
-    Vegakna.cpp
-    Vegakna.h
-    VisszacsapoSzelep.cpp
-    VisszacsapoSzelep.h
-    xmlParser.cpp
-    xmlParser.h staci_calibrate.cpp.backup1.cpp staci_split_graph.cpp)
+# Include headers
+include_directories(${PROJECT_SOURCE_DIR}/include/staci)
+include_directories("/opt/homebrew/include/suitesparse")
+link_directories("/opt/homebrew/lib")
 
-add_executable(staci ${SOURCE_FILES})
+# Collect all .cpp files
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
+    "${PROJECT_SOURCE_DIR}/src/*.cpp"
+)
+
+# Separate main file (Staci.cpp)
+set(MAIN_FILE "${PROJECT_SOURCE_DIR}/src/Staci.cpp")
+set(EXCLUDE_FILES
+        "${PROJECT_SOURCE_DIR}/src/staci_calibrate.cpp"
+        "${PROJECT_SOURCE_DIR}/src/staci_split.cpp"
+)
+
+# Remove excluded files from sources
+list(REMOVE_ITEM SRC_FILES ${MAIN_FILE} ${EXCLUDE_FILES})
+
+# Show final list of sources to compile
+message(STATUS "Final sources: ${SRC_FILES}")
+
+# Add executable
+add_executable(${PROJECT_NAME} ${MAIN_FILE} ${SRC_FILES})
+
+# Add the SuiteSparse include path
+include_directories("/opt/homebrew/include/suitesparse")
+
+# Link SuiteSparse libraries
+target_link_libraries(${PROJECT_NAME}
+        umfpack
+        cholmod
+        amd
+        colamd
+        suitesparseconfig
+)
+
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")

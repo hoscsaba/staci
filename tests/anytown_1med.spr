@@ -103,10 +103,10 @@
 			50
 		</p_init>
 		<sum_of_inflow>
-			0.0
+			6.49981e+03
 		</sum_of_inflow>
 		<sum_of_demand>
-			0.0
+			6.49981e+03
 		</sum_of_demand>
 		<fluid_volume>
 			6.49981e+03
@@ -251,10 +251,10 @@
 				0.00000e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -330,10 +330,10 @@
 				8.96134e-03
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -406,13 +406,13 @@
 				1000
 			</density>
 			<travel_time>
-				1.45397e+00
+				1.45398e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -485,13 +485,13 @@
 				1000
 			</density>
 			<travel_time>
-				7.65871e-01
+				7.65872e-01
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -518,7 +518,7 @@
 				0.0
 			</cl_input>
 			<pressure>
-				4.58597e+05
+				4.58598e+05
 			</pressure>
 			<head>
 				4.67480e+01
@@ -567,10 +567,10 @@
 				2.25140e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -643,13 +643,13 @@
 				1000
 			</density>
 			<travel_time>
-				4.03655e+00
+				4.03690e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -679,7 +679,7 @@
 				4.13730e+05
 			</pressure>
 			<head>
-				4.21743e+01
+				4.21744e+01
 			</head>
 			<endnode>
 				false
@@ -722,13 +722,13 @@
 				1000
 			</density>
 			<travel_time>
-				1.88574e+00
+				1.88811e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -801,13 +801,13 @@
 				1000
 			</density>
 			<travel_time>
-				4.82722e+00
+				4.82756e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -880,13 +880,13 @@
 				1000
 			</density>
 			<travel_time>
-				4.40258e+00
+				4.40377e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -913,7 +913,7 @@
 				0.0
 			</cl_input>
 			<pressure>
-				4.29759e+05
+				4.29760e+05
 			</pressure>
 			<head>
 				4.38083e+01
@@ -959,13 +959,13 @@
 				1000
 			</density>
 			<travel_time>
-				4.75111e+00
+				4.75123e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -992,10 +992,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				2.98528e+05
+				2.98529e+05
 			</pressure>
 			<head>
-				3.04310e+01
+				3.04311e+01
 			</head>
 			<endnode>
 				false
@@ -1038,13 +1038,13 @@
 				1000
 			</density>
 			<travel_time>
-				3.27049e+00
+				3.27054e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -1071,7 +1071,7 @@
 				0.0
 			</cl_input>
 			<pressure>
-				3.27845e+05
+				3.27846e+05
 			</pressure>
 			<head>
 				3.34195e+01
@@ -1117,13 +1117,13 @@
 				1000
 			</density>
 			<travel_time>
-				2.37128e+00
+				2.37134e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -1196,13 +1196,13 @@
 				1000
 			</density>
 			<travel_time>
-				5.44985e+00
+				5.78691e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -1229,10 +1229,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				2.23082e+05
+				2.23080e+05
 			</pressure>
 			<head>
-				2.27403e+01
+				2.27400e+01
 			</head>
 			<endnode>
 				false
@@ -1275,13 +1275,13 @@
 				1000
 			</density>
 			<travel_time>
-				2.96145e+00
+				2.96147e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -1354,13 +1354,13 @@
 				1000
 			</density>
 			<travel_time>
-				3.15459e+00
+				3.15434e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -1390,7 +1390,7 @@
 				2.26905e+05
 			</pressure>
 			<head>
-				2.31300e+01
+				2.31299e+01
 			</head>
 			<endnode>
 				false
@@ -1436,10 +1436,10 @@
 				1.77933e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -1469,7 +1469,7 @@
 				2.28958e+05
 			</pressure>
 			<head>
-				2.33393e+01
+				2.33392e+01
 			</head>
 			<endnode>
 				false
@@ -1515,10 +1515,10 @@
 				7.37222e-01
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -1591,13 +1591,13 @@
 				1000
 			</density>
 			<travel_time>
-				2.86152e+00
+				2.86197e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -1624,10 +1624,10 @@
 				0.0
 			</cl_input>
 			<pressure>
-				4.31849e+05
+				4.31850e+05
 			</pressure>
 			<head>
-				4.40213e+01
+				4.40214e+01
 			</head>
 			<endnode>
 				false
@@ -1673,10 +1673,10 @@
 				1.15224e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -1749,13 +1749,13 @@
 				1000
 			</density>
 			<travel_time>
-				1.68000e+02
+				3.36000e+02
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -1831,10 +1831,10 @@
 				1.16573e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -1910,10 +1910,10 @@
 				0.00000e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -1989,10 +1989,10 @@
 				1.48496e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -2149,10 +2149,10 @@
 				0.00000e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -2218,10 +2218,10 @@
 				0.00000e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -2336,10 +2336,10 @@
 				4.48067e-03
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -2417,10 +2417,10 @@
 				4.67857e-01
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -2438,7 +2438,7 @@
 				7.29659e-02
 			</aref>
 			<mass_flow_rate>
-				8.07737e+01
+				8.07736e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
 				2.90785e+02
@@ -2447,7 +2447,7 @@
 				1.10701e+00
 			</velocity>
 			<headloss>
-				1.30508e+01
+				1.30507e+01
 			</headloss>
 			<head_loss_per_unit_length>
 				3.56812e-03
@@ -2495,13 +2495,13 @@
 				1000
 			</density>
 			<travel_time>
-				3.73092e-01
+				3.73091e-01
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -2579,10 +2579,10 @@
 				3.87416e-01
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -2609,7 +2609,7 @@
 				1.34230e+00
 			</velocity>
 			<headloss>
-				1.24367e+01
+				1.24366e+01
 			</headloss>
 			<head_loss_per_unit_length>
 				3.40022e-03
@@ -2660,10 +2660,10 @@
 				1.85269e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -2681,16 +2681,16 @@
 				5.06707e-02
 			</aref>
 			<mass_flow_rate>
-				3.22800e+01
+				3.22799e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
 				1.16208e+02
 			</volume_flow_rate>
 			<velocity>
-				6.37053e-01
+				6.37052e-01
 			</velocity>
 			<headloss>
-				2.84061e+00
+				2.84060e+00
 			</headloss>
 			<head_loss_per_unit_length>
 				1.55326e-03
@@ -2741,10 +2741,10 @@
 				2.07568e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -2762,16 +2762,16 @@
 				5.06707e-02
 			</aref>
 			<mass_flow_rate>
-				3.10527e+01
+				3.10526e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.11790e+02
+				1.11789e+02
 			</volume_flow_rate>
 			<velocity>
-				6.12832e-01
+				6.12831e-01
 			</velocity>
 			<headloss>
-				3.95954e+00
+				3.95953e+00
 			</headloss>
 			<head_loss_per_unit_length>
 				1.44340e-03
@@ -2822,10 +2822,10 @@
 				2.23575e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -2843,19 +2843,19 @@
 				7.29659e-02
 			</aref>
 			<mass_flow_rate>
-				1.89132e+01
+				1.89131e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				6.80874e+01
+				6.80871e+01
 			</volume_flow_rate>
 			<velocity>
-				2.59206e-01
+				2.59205e-01
 			</velocity>
 			<headloss>
-				6.14095e-01
+				6.14091e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				2.23861e-04
+				2.23859e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -2903,10 +2903,10 @@
 				1.99617e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -2927,7 +2927,7 @@
 				2.37376e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				8.54553e+01
+				8.54552e+01
 			</volume_flow_rate>
 			<velocity>
 				4.68467e-01
@@ -2936,7 +2936,7 @@
 				1.59144e+00
 			</headloss>
 			<head_loss_per_unit_length>
-				8.70210e-04
+				8.70209e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -2981,13 +2981,13 @@
 				1000
 			</density>
 			<travel_time>
-				2.90593e+00
+				2.90594e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -3005,19 +3005,19 @@
 				5.06707e-02
 			</aref>
 			<mass_flow_rate>
-				1.96633e+01
+				1.96632e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				7.07878e+01
+				7.07877e+01
 			</volume_flow_rate>
 			<velocity>
-				3.88060e-01
+				3.88059e-01
 			</velocity>
 			<headloss>
-				1.11894e+00
+				1.11893e+00
 			</headloss>
 			<head_loss_per_unit_length>
-				6.11841e-04
+				6.11838e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -3062,13 +3062,13 @@
 				1000
 			</density>
 			<travel_time>
-				4.43189e+00
+				4.43223e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -3089,16 +3089,16 @@
 				4.68804e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.68770e+02
+				1.68769e+02
 			</volume_flow_rate>
 			<velocity>
-				6.42498e-01
+				6.42497e-01
 			</velocity>
 			<headloss>
-				2.33137e+00
+				2.33136e+00
 			</headloss>
 			<head_loss_per_unit_length>
-				1.27481e-03
+				1.27480e-03
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -3143,13 +3143,13 @@
 				1000
 			</density>
 			<travel_time>
-				4.02848e+00
+				4.02852e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -3167,19 +3167,19 @@
 				3.24293e-02
 			</aref>
 			<mass_flow_rate>
-				-9.94093e+00
+				-9.94101e+00
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-3.57873e+01
+				-3.57876e+01
 			</volume_flow_rate>
 			<velocity>
-				-3.06542e-01
+				-3.06544e-01
 			</velocity>
 			<headloss>
-				1.90216e+00
+				1.90219e+00
 			</headloss>
 			<head_loss_per_unit_length>
-				5.20056e-04
+				5.20064e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -3190,7 +3190,7 @@
 						0.12
 					</roughness>
 					<friction_coeff>
-						2.20645e-02
+						2.20644e-02
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -3224,13 +3224,13 @@
 				1000
 			</density>
 			<travel_time>
-				4.93721e+00
+				4.93840e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -3251,16 +3251,16 @@
 				-2.40735e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-8.66647e+01
+				-8.66646e+01
 			</volume_flow_rate>
 			<velocity>
 				-4.75097e-01
 			</velocity>
 			<headloss>
-				1.63397e+00
+				1.63396e+00
 			</headloss>
 			<head_loss_per_unit_length>
-				8.93465e-04
+				8.93463e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -3305,13 +3305,13 @@
 				1000
 			</density>
 			<travel_time>
-				6.25244e+00
+				6.25280e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -3329,19 +3329,19 @@
 				5.06707e-02
 			</aref>
 			<mass_flow_rate>
-				9.03044e+00
+				9.03037e+00
 			</mass_flow_rate>
 			<volume_flow_rate>
-				3.25096e+01
+				3.25093e+01
 			</volume_flow_rate>
 			<velocity>
-				1.78218e-01
+				1.78217e-01
 			</velocity>
 			<headloss>
-				2.67926e-01
+				2.67922e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				1.46504e-04
+				1.46502e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -3386,13 +3386,13 @@
 				1000
 			</density>
 			<travel_time>
-				3.72166e+00
+				3.72172e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -3413,13 +3413,13 @@
 				-1.82570e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-6.57250e+01
+				-6.57252e+01
 			</volume_flow_rate>
 			<velocity>
-				-5.62977e-01
+				-5.62979e-01
 			</velocity>
 			<headloss>
-				2.98843e+00
+				2.98845e+00
 			</headloss>
 			<head_loss_per_unit_length>
 				1.63410e-03
@@ -3467,13 +3467,13 @@
 				1000
 			</density>
 			<travel_time>
-				2.80994e+00
+				2.80999e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -3494,16 +3494,16 @@
 				-1.05626e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-3.80254e+01
+				-3.80255e+01
 			</volume_flow_rate>
 			<velocity>
-				-5.79044e-01
+				-5.79045e-01
 			</velocity>
 			<headloss>
-				4.50145e+00
+				4.50147e+00
 			</headloss>
 			<head_loss_per_unit_length>
-				2.46142e-03
+				2.46143e-03
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -3548,13 +3548,13 @@
 				1000
 			</density>
 			<travel_time>
-				2.82089e+00
+				2.82094e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -3578,13 +3578,13 @@
 				-2.01985e+02
 			</volume_flow_rate>
 			<velocity>
-				-5.64941e-01
+				-5.64942e-01
 			</velocity>
 			<headloss>
 				1.51302e+00
 			</headloss>
 			<head_loss_per_unit_length>
-				8.27327e-04
+				8.27329e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -3629,13 +3629,13 @@
 				1000
 			</density>
 			<travel_time>
-				8.51856e+01
+				1.69186e+02
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -3653,19 +3653,19 @@
 				3.24293e-02
 			</aref>
 			<mass_flow_rate>
-				6.32600e-02
+				5.69020e-02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				2.27736e-01
+				2.04847e-01
 			</volume_flow_rate>
 			<velocity>
-				1.95071e-03
+				1.75465e-03
 			</velocity>
 			<headloss>
-				1.73334e-04
+				5.07015e-04
 			</headloss>
 			<head_loss_per_unit_length>
-				4.73900e-08
+				1.38620e-07
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -3676,7 +3676,7 @@
 						0.12
 					</roughness>
 					<friction_coeff>
-						4.96508e-02
+						1.79501e-01
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -3710,13 +3710,13 @@
 				1000
 			</density>
 			<travel_time>
-				3.79176e+00
+				3.79171e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -3734,19 +3734,19 @@
 				5.06707e-02
 			</aref>
 			<mass_flow_rate>
-				-9.06062e+00
+				-9.06123e+00
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-3.26182e+01
+				-3.26204e+01
 			</volume_flow_rate>
 			<velocity>
-				-1.78814e-01
+				-1.78826e-01
 			</velocity>
 			<headloss>
-				2.68188e-01
+				2.68221e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				1.46647e-04
+				1.46665e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -3757,7 +3757,7 @@
 						0.12
 					</roughness>
 					<friction_coeff>
-						2.28562e-02
+						2.28560e-02
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -3791,13 +3791,13 @@
 				1000
 			</density>
 			<travel_time>
-				4.93006e+00
+				4.93029e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -3815,19 +3815,19 @@
 				3.24293e-02
 			</aref>
 			<mass_flow_rate>
-				4.18419e+00
+				4.18375e+00
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.50631e+01
+				1.50615e+01
 			</volume_flow_rate>
 			<velocity>
-				1.29025e-01
+				1.29011e-01
 			</velocity>
 			<headloss>
-				1.95990e-01
+				1.95953e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				1.07169e-04
+				1.07148e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -3838,7 +3838,7 @@
 						0.12
 					</roughness>
 					<friction_coeff>
-						2.56651e-02
+						2.56656e-02
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -3872,13 +3872,13 @@
 				1000
 			</density>
 			<travel_time>
-				1.67306e+00
+				1.67309e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -3896,19 +3896,19 @@
 				2.18956e-01
 			</aref>
 			<mass_flow_rate>
-				-1.06784e+02
+				-1.06778e+02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-3.84421e+02
+				-3.84402e+02
 			</volume_flow_rate>
 			<velocity>
-				-4.87693e-01
+				-4.87669e-01
 			</velocity>
 			<headloss>
-				7.02859e-01
+				7.02795e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				3.84328e-04
+				3.84293e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -3919,7 +3919,7 @@
 						0.12
 					</roughness>
 					<friction_coeff>
-						1.67395e-02
+						1.67396e-02
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -3953,13 +3953,13 @@
 				1000
 			</density>
 			<travel_time>
-				4.09795e+00
+				4.09746e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -3977,19 +3977,19 @@
 				9.34820e-02
 			</aref>
 			<mass_flow_rate>
-				-2.51701e+01
+				-2.51764e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-9.06123e+01
+				-9.06352e+01
 			</volume_flow_rate>
 			<velocity>
-				-2.69250e-01
+				-2.69318e-01
 			</velocity>
 			<headloss>
-				3.89715e-01
+				3.89897e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				2.13099e-04
+				2.13199e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -4000,7 +4000,7 @@
 						0.12
 					</roughness>
 					<friction_coeff>
-						1.98970e-02
+						1.98962e-02
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -4034,13 +4034,13 @@
 				1000
 			</density>
 			<travel_time>
-				3.67773e+00
+				3.67760e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -4058,19 +4058,19 @@
 				3.24293e-02
 			</aref>
 			<mass_flow_rate>
-				4.33896e+00
+				4.33923e+00
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.56202e+01
+				1.56212e+01
 			</volume_flow_rate>
 			<velocity>
-				1.33797e-01
+				1.33806e-01
 			</velocity>
 			<headloss>
-				2.09254e-01
+				2.09277e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				1.14421e-04
+				1.14434e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -4081,7 +4081,7 @@
 						0.12
 					</roughness>
 					<friction_coeff>
-						2.54820e-02
+						2.54817e-02
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -4115,13 +4115,13 @@
 				1000
 			</density>
 			<travel_time>
-				2.03937e+00
+				2.03925e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -4139,19 +4139,19 @@
 				1.60886e-01
 			</aref>
 			<mass_flow_rate>
-				-4.60645e+01
+				-4.60705e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-1.65832e+02
+				-1.65854e+02
 			</volume_flow_rate>
 			<velocity>
-				-2.86317e-01
+				-2.86355e-01
 			</velocity>
 			<headloss>
-				3.13316e-01
+				3.13393e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				1.71323e-04
+				1.71365e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -4162,7 +4162,7 @@
 						0.12
 					</roughness>
 					<friction_coeff>
-						1.85582e-02
+						1.85579e-02
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -4196,13 +4196,13 @@
 				1000
 			</density>
 			<travel_time>
-				1.02621e+00
+				1.02620e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -4220,19 +4220,19 @@
 				3.24293e-02
 			</aref>
 			<mass_flow_rate>
-				2.85034e+01
+				2.85036e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.02612e+02
+				1.02613e+02
 			</volume_flow_rate>
 			<velocity>
-				8.78942e-01
+				8.78945e-01
 			</velocity>
 			<headloss>
-				6.89283e+00
+				6.89288e+00
 			</headloss>
 			<head_loss_per_unit_length>
-				3.76904e-03
+				3.76907e-03
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -4277,13 +4277,13 @@
 				1000
 			</density>
 			<travel_time>
-				7.65462e+00
+				7.65361e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -4301,19 +4301,19 @@
 				1.82415e-02
 			</aref>
 			<mass_flow_rate>
-				-1.06884e+00
+				-1.06901e+00
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-3.84782e+00
+				-3.84842e+00
 			</volume_flow_rate>
 			<velocity>
-				-5.85940e-02
+				-5.86030e-02
 			</velocity>
 			<headloss>
-				1.04086e-01
+				1.04114e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				3.79432e-05
+				3.79536e-05
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -4324,7 +4324,7 @@
 						0.13
 					</roughness>
 					<friction_coeff>
-						3.30455e-02
+						3.30443e-02
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -4361,10 +4361,10 @@
 				8.93816e-01
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -4442,10 +4442,10 @@
 				1.01896e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -4475,7 +4475,7 @@
 				6.76834e+00
 			</headloss>
 			<head_loss_per_unit_length>
-				3.70098e-03
+				3.70097e-03
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -4523,10 +4523,10 @@
 				1.15952e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -4544,16 +4544,16 @@
 				7.29659e-02
 			</aref>
 			<mass_flow_rate>
-				4.70809e+01
+				4.70808e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
 				1.69491e+02
 			</volume_flow_rate>
 			<velocity>
-				6.45246e-01
+				6.45245e-01
 			</velocity>
 			<headloss>
-				2.20554e+00
+				2.20553e+00
 			</headloss>
 			<head_loss_per_unit_length>
 				1.20600e-03
@@ -4604,10 +4604,10 @@
 				1.18655e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -4625,19 +4625,19 @@
 				7.29659e-02
 			</aref>
 			<mass_flow_rate>
-				4.40554e+01
+				4.40555e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.58599e+02
+				1.58600e+02
 			</volume_flow_rate>
 			<velocity>
-				6.03781e-01
+				6.03782e-01
 			</velocity>
 			<headloss>
-				1.94821e+00
+				1.94822e+00
 			</headloss>
 			<head_loss_per_unit_length>
-				1.06529e-03
+				1.06530e-03
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -4685,10 +4685,10 @@
 				1.16154e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -4712,13 +4712,13 @@
 				1.17101e+02
 			</volume_flow_rate>
 			<velocity>
-				6.41951e-01
+				6.41950e-01
 			</velocity>
 			<headloss>
-				2.72663e+00
+				2.72662e+00
 			</headloss>
 			<head_loss_per_unit_length>
-				1.49094e-03
+				1.49093e-03
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -4763,13 +4763,13 @@
 				1000
 			</density>
 			<travel_time>
-				2.59817e+00
+				2.60055e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -4787,19 +4787,19 @@
 				7.29659e-02
 			</aref>
 			<mass_flow_rate>
-				-2.60143e+01
+				-2.60141e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-9.36513e+01
+				-9.36508e+01
 			</volume_flow_rate>
 			<velocity>
-				-3.56526e-01
+				-3.56524e-01
 			</velocity>
 			<headloss>
-				7.34132e-01
+				7.34124e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				4.01428e-04
+				4.01424e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -4810,7 +4810,7 @@
 						0.07
 					</roughness>
 					<friction_coeff>
-						1.88859e-02
+						1.88860e-02
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -4844,13 +4844,13 @@
 				1000
 			</density>
 			<travel_time>
-				2.85617e+00
+				2.85854e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -4871,16 +4871,16 @@
 				-1.32626e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-4.77453e+01
+				-4.77455e+01
 			</volume_flow_rate>
 			<velocity>
-				-2.61740e-01
+				-2.61741e-01
 			</velocity>
 			<headloss>
-				5.21086e-01
+				5.21090e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				2.84933e-04
+				2.84936e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -4925,13 +4925,13 @@
 				1000
 			</density>
 			<travel_time>
-				3.99552e+00
+				3.99557e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -4949,19 +4949,19 @@
 				5.06707e-02
 			</aref>
 			<mass_flow_rate>
-				1.24463e+01
+				1.24460e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				4.48065e+01
+				4.48058e+01
 			</volume_flow_rate>
 			<velocity>
-				2.45630e-01
+				2.45626e-01
 			</velocity>
 			<headloss>
-				4.64165e-01
+				4.64150e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				2.53808e-04
+				2.53800e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -5006,13 +5006,13 @@
 				1000
 			</density>
 			<travel_time>
-				4.45162e+00
+				4.45212e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -5030,19 +5030,19 @@
 				5.06707e-02
 			</aref>
 			<mass_flow_rate>
-				8.09407e+00
+				8.09380e+00
 			</mass_flow_rate>
 			<volume_flow_rate>
-				2.91387e+01
+				2.91377e+01
 			</volume_flow_rate>
 			<velocity>
-				1.59739e-01
+				1.59733e-01
 			</velocity>
 			<headloss>
-				2.13050e-01
+				2.13037e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				1.16497e-04
+				1.16490e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -5053,7 +5053,7 @@
 						0.07
 					</roughness>
 					<friction_coeff>
-						2.27525e-02
+						2.27526e-02
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -5087,13 +5087,13 @@
 				1000
 			</density>
 			<travel_time>
-				1.97076e+00
+				1.97078e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -5111,19 +5111,19 @@
 				9.34820e-02
 			</aref>
 			<mass_flow_rate>
-				-2.90089e+01
+				-2.90084e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-1.04432e+02
+				-1.04430e+02
 			</volume_flow_rate>
 			<velocity>
-				-3.10316e-01
+				-3.10310e-01
 			</velocity>
 			<headloss>
-				5.06880e-01
+				5.06864e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				2.77166e-04
+				2.77157e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -5134,7 +5134,7 @@
 						0.12
 					</roughness>
 					<friction_coeff>
-						1.94827e-02
+						1.94828e-02
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -5168,13 +5168,13 @@
 				1000
 			</density>
 			<travel_time>
-				2.33816e+00
+				2.33817e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -5192,19 +5192,19 @@
 				7.29659e-02
 			</aref>
 			<mass_flow_rate>
-				2.17220e+01
+				2.17217e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				7.81992e+01
+				7.81983e+01
 			</volume_flow_rate>
 			<velocity>
-				2.97701e-01
+				2.97697e-01
 			</velocity>
 			<headloss>
-				5.27297e-01
+				5.27286e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				2.88330e-04
+				2.88324e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -5249,13 +5249,13 @@
 				1000
 			</density>
 			<travel_time>
-				4.41292e+00
+				4.41296e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -5273,19 +5273,19 @@
 				5.06707e-02
 			</aref>
 			<mass_flow_rate>
-				-8.86714e+00
+				-8.86704e+00
 			</mass_flow_rate>
 			<volume_flow_rate>
-				-3.19217e+01
+				-3.19213e+01
 			</volume_flow_rate>
 			<velocity>
-				-1.74995e-01
+				-1.74993e-01
 			</velocity>
 			<headloss>
-				2.51120e-01
+				2.51115e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				1.37314e-04
+				1.37311e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -5296,7 +5296,7 @@
 						0.07
 					</roughness>
 					<friction_coeff>
-						2.23457e-02
+						2.23458e-02
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -5330,13 +5330,13 @@
 				1000
 			</density>
 			<travel_time>
-				6.75325e+00
+				6.75245e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -5354,19 +5354,19 @@
 				7.27745e-02
 			</aref>
 			<mass_flow_rate>
-				3.50867e+00
+				3.50920e+00
 			</mass_flow_rate>
 			<volume_flow_rate>
-				1.26312e+01
+				1.26331e+01
 			</volume_flow_rate>
 			<velocity>
-				4.82129e-02
+				4.82202e-02
 			</velocity>
 			<headloss>
-				2.04160e-02
+				2.04214e-02
 			</headloss>
 			<head_loss_per_unit_length>
-				1.11636e-05
+				1.11666e-05
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -5377,7 +5377,7 @@
 						0.12
 					</roughness>
 					<friction_coeff>
-						2.86827e-02
+						2.86817e-02
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -5414,10 +5414,10 @@
 				2.26406e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -5435,19 +5435,19 @@
 				5.06707e-02
 			</aref>
 			<mass_flow_rate>
-				1.65196e+01
+				1.65194e+01
 			</mass_flow_rate>
 			<volume_flow_rate>
-				5.94704e+01
+				5.94698e+01
 			</volume_flow_rate>
 			<velocity>
-				3.26018e-01
+				3.26014e-01
 			</velocity>
 			<headloss>
-				7.78416e-01
+				7.78401e-01
 			</headloss>
 			<head_loss_per_unit_length>
-				4.25643e-04
+				4.25635e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -5492,13 +5492,13 @@
 				1000
 			</density>
 			<travel_time>
-				1.68000e+02
+				3.36000e+02
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -5539,7 +5539,7 @@
 						0.12
 					</roughness>
 					<friction_coeff>
-						4.20382e-02
+						1.85507e-01
 					</friction_coeff>
 					<cl_k>
 						0.016
@@ -5576,10 +5576,10 @@
 				1.15899e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -5600,7 +5600,7 @@
 				1.32012e+02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				4.75243e+02
+				4.75242e+02
 			</volume_flow_rate>
 			<velocity>
 				6.27628e-01
@@ -5609,7 +5609,7 @@
 				1.93343e-02
 			</headloss>
 			<head_loss_per_unit_length>
-				6.34327e-04
+				6.34326e-04
 			</head_loss_per_unit_length>
 			<edge_spec>
 				<pipe>
@@ -5657,10 +5657,10 @@
 				0.00000e+00
 			</travel_time>
 			<user1>
-				0
+				0.00000e+00
 			</user1>
 			<user2>
-				0
+				0.00000e+00
 			</user2>
 			<zone>
 				0
@@ -5681,7 +5681,7 @@
 				1.32012e+02
 			</mass_flow_rate>
 			<volume_flow_rate>
-				4.75243e+02
+				4.75242e+02
 			</volume_flow_rate>
 			<velocity>
 				1.32012e-01
