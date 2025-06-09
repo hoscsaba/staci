@@ -1,0 +1,3 @@
+/Users/hoscsaba/CLionProjects/staci/cmake-build-debug/CMakeFiles/staci.dir
+/Users/hoscsaba/CLionProjects/staci/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/hoscsaba/CLionProjects/staci/cmake-build-debug/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,43 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/staci.dir/src/Agelem.cpp.o"
+  "CMakeFiles/staci.dir/src/Agelem.cpp.o.d"
+  "CMakeFiles/staci.dir/src/AnyOption.cpp.o"
+  "CMakeFiles/staci.dir/src/AnyOption.cpp.o.d"
+  "CMakeFiles/staci.dir/src/BukoMutargy.cpp.o"
+  "CMakeFiles/staci.dir/src/BukoMutargy.cpp.o.d"
+  "CMakeFiles/staci.dir/src/Csatorna.cpp.o"
+  "CMakeFiles/staci.dir/src/Csatorna.cpp.o.d"
+  "CMakeFiles/staci.dir/src/Cso.cpp.o"
+  "CMakeFiles/staci.dir/src/Cso.cpp.o.d"
+  "CMakeFiles/staci.dir/src/Csomopont.cpp.o"
+  "CMakeFiles/staci.dir/src/Csomopont.cpp.o.d"
+  "CMakeFiles/staci.dir/src/JelleggorbesFojtas.cpp.o"
+  "CMakeFiles/staci.dir/src/JelleggorbesFojtas.cpp.o.d"
+  "CMakeFiles/staci.dir/src/KonstNyomas.cpp.o"
+  "CMakeFiles/staci.dir/src/KonstNyomas.cpp.o.d"
+  "CMakeFiles/staci.dir/src/Staci.cpp.o"
+  "CMakeFiles/staci.dir/src/Staci.cpp.o.d"
+  "CMakeFiles/staci.dir/src/Szivattyu.cpp.o"
+  "CMakeFiles/staci.dir/src/Szivattyu.cpp.o.d"
+  "CMakeFiles/staci.dir/src/Vegakna.cpp.o"
+  "CMakeFiles/staci.dir/src/Vegakna.cpp.o.d"
+  "CMakeFiles/staci.dir/src/VisszacsapoSzelep.cpp.o"
+  "CMakeFiles/staci.dir/src/VisszacsapoSzelep.cpp.o.d"
+  "CMakeFiles/staci.dir/src/data_io.cpp.o"
+  "CMakeFiles/staci.dir/src/data_io.cpp.o.d"
+  "CMakeFiles/staci.dir/src/lubksb.cpp.o"
+  "CMakeFiles/staci.dir/src/lubksb.cpp.o.d"
+  "CMakeFiles/staci.dir/src/ludcmp.cpp.o"
+  "CMakeFiles/staci.dir/src/ludcmp.cpp.o.d"
+  "CMakeFiles/staci.dir/src/staci_main.cpp.o"
+  "CMakeFiles/staci.dir/src/staci_main.cpp.o.d"
+  "CMakeFiles/staci.dir/src/xmlParser.cpp.o"
+  "CMakeFiles/staci.dir/src/xmlParser.cpp.o.d"
+  "staci"
+  "staci.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/staci.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

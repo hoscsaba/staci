@@ -1,0 +1,68 @@
+
+ Trying to delete previous logfile ../tests/anytown_1med.spr.ros...  file not found, cannot delete it.
+
+ Building system... ready.
+
+ Automatic inicialization...
+	nodal pressures:	50 mwc 
+	edge mass flow rates:	1 kg/s ...
+
+Solving system...
+====================================
+
+ iter. # 0./100 e_mp=1.52e+02,  e_p=1.00e+02  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 1./100 e_mp=1.47e-11,  e_p=2.41e+05  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 2./100 e_mp=1.66e-11,  e_p=2.18e+05  relax.=0.10, relax.mul.=1.20 (0)
+ iter. # 3./100 e_mp=2.55e-11,  e_p=1.92e+05  relax.=0.12, relax.mul.=1.20 (0)
+ iter. # 4./100 e_mp=2.04e-11,  e_p=1.66e+05  relax.=0.14, relax.mul.=1.20 (0)
+ iter. # 5./100 e_mp=1.83e-11,  e_p=1.39e+05  relax.=0.17, relax.mul.=1.20 (0)
+ iter. # 6./100 e_mp=1.30e-11,  e_p=1.12e+05  relax.=0.21, relax.mul.=1.20 (0)
+ iter. # 7./100 e_mp=1.32e-11,  e_p=8.56e+04  relax.=0.25, relax.mul.=1.20 (0)
+ iter. # 8./100 e_mp=9.13e-12,  e_p=6.20e+04  relax.=0.30, relax.mul.=1.20 (0)
+ iter. # 9./100 e_mp=5.40e-12,  e_p=4.18e+04  relax.=0.36, relax.mul.=1.20 (0)
+ iter. # 10./100 e_mp=6.62e-12,  e_p=2.58e+04  relax.=0.43, relax.mul.=1.20 (0)
+ iter. # 11./100 e_mp=2.17e-12,  e_p=1.42e+04  relax.=0.52, relax.mul.=1.20 (0)
+ iter. # 12./100 e_mp=1.22e-12,  e_p=6.69e+03  relax.=0.62, relax.mul.=1.20 (0)
+ iter. # 13./100 e_mp=1.44e-12,  e_p=2.53e+03  relax.=0.74, relax.mul.=1.20 (0)
+ iter. # 14./100 e_mp=1.52e-12,  e_p=7.28e+02  relax.=0.89, relax.mul.=1.20 (0)
+ iter. # 15./100 e_mp=2.78e-13,  e_p=2.36e+02  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 16./100 e_mp=2.16e-13,  e_p=6.17e+01  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 17./100 e_mp=1.82e-13,  e_p=2.18e+01  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 18./100 e_mp=4.52e-14,  e_p=8.47e+00  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 19./100 e_mp=1.26e-13,  e_p=6.18e-01  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 20./100 e_mp=9.29e-14,  e_p=1.19e-01  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 21./100 e_mp=9.43e-14,  e_p=1.53e-02  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 22./100 e_mp=4.69e-14,  e_p=1.53e-03  relax.=1.00, relax.mul.=1.20 (0)
+ iter. # 23./100 e_mp=1.07e-13,  e_p=1.82e-04  relax.=1.00, relax.mul.=1.20 (0)
+
+OK
+
+Computing residence time...
+====================================
+
+	 step #11 max. res. time: 14 d, 0 h, 0 m (PIPE122), mean: 0 d, 16 h, 49 m
+Finished computing residence time.
+
+Saving results...done
+
+
+Statistics:
+======================
+	 # of nodes : 44
+	 # of edges : 23
+
+	 diameter     : min : 0.15m (ID: PIPE116) max : 1.01m (ID: PIPE74)
+	 length       : min : 30.48m (ID: PIPE74)  max : 3657.60m (ID: PIPE77)
+	 sum. length  : 81473.04 m 
+	 pipe volume  : 6499.83 m^3 
+	 fluid volume : 6499.81 m^3 (100.00% of pipe volume)
+
+	 max. inflow          : -0.00 m3/h (ID: NODE64)  
+	 max. consumption     : 227.10 m3/h (ID: NODE169)  
+	 sum of inflow        : 0.00 m3/h
+	 sum of consumption   : 2225.58 m3/h
+	 consumption - inflow : 2225.58 m3/h
+
+	 node geodetic height : min : 0.00m (ID: NODE210)  max : 36.58m (ID: NODE121)
+
+ 	 number of nonzero Jacobian entries: 216 out of 4489 (4.81%)
