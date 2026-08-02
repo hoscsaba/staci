@@ -1,4 +1,3 @@
-using namespace std;
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -8,6 +7,8 @@ using namespace std;
 #include <ctime>
 //#include "Agelem.h"
 #include "BukoMutargy.h"
+
+using namespace std;
 
 BukoMutargy::BukoMutargy(const string a_nev, const string a_cspe_nev,
                          const string a_cspv_nev, const double a_ro, const double Aref, const double a_Hf,

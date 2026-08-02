@@ -1004,9 +1004,6 @@ string Load_Settings() {
         type_of_pipe_selection = 2;
     }
     if (!type_of_pipe_selection_is_set) {
-        /**
-         * @todo Add more informative error message
-         */
 
         stringstream msg;
         msg.str("");

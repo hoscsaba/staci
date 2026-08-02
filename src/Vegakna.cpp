@@ -1,5 +1,3 @@
-using namespace std;
-
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -7,6 +5,8 @@ using namespace std;
 #include <math.h>
 #include "Agelem.h"
 #include "Vegakna.h"
+
+using namespace std;
 
 Vegakna::Vegakna(const string a_nev, const string a_csp_nev, const double a_ro, const double Aref,
                  const double a_Hf, const double a_H, const double a_mp, const double a_tt) :
@@ -138,5 +138,4 @@ double Vegakna::Get_dprop(string mit) {
     }
     return out;
 }
-
 

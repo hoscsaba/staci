@@ -1,4 +1,3 @@
-using namespace std;
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -8,6 +7,8 @@ using namespace std;
 #include <ctime>
 #include <stdlib.h>
 #include "Csomopont.h"
+
+using namespace std;
 
 Csomopont::Csomopont(const string a_nev,
                      const double a_h,

@@ -1,11 +1,11 @@
-using namespace std;
-
 #include <cmath>
 #include <vector>
 #include <iostream>
 #include <sstream>
 #include "Agelem.h"
 #include "KonstNyomas.h"
+
+using namespace std;
 
 KonstNyomas::KonstNyomas(
     const string a_nev,

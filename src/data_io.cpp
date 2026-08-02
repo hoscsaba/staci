@@ -1,5 +1,3 @@
-using namespace std;
-
 #include <algorithm>
 #include <iostream>
 #include <sstream>
@@ -19,9 +17,7 @@ using namespace std;
 #include "data_io.h"
 #include "xmlParser.h"
 
-// TODO
-// 2014.05.07. HCs. Ha a felhasznalo veletlenul kitorli pl. a klor adatot csompontnal, elhasal az egesz! Hibavisszajelzest!
-
+using namespace std;
 
 data_io::data_io(const char *a_xml_fnev) {
     xml_fnev = a_xml_fnev;

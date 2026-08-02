@@ -1,5 +1,3 @@
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -10,6 +8,7 @@ using namespace std;
 #include <stdlib.h>
 #include "Agelem.h"
 
+using namespace std;
 
 Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const double a_ro) {
     // tipus

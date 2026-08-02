@@ -1,17 +1,20 @@
 #ifndef CSOMOPONT_H
 #define CSOMOPONT_H
 
+#include <string>
+#include <vector>
+
 class Csomopont
 {
 public:
     /// Bemen� �gak nyilv�ntart�sa
-    vector<int> ag_be;
+    std::vector<int> ag_be;
     /// Kimen� �gak nyilv�ntart�sa
-    vector<int> ag_ki;
+    std::vector<int> ag_ki;
 
 private:
     /// A csomopont neve
-    string nev;
+    std::string nev;
     /// HEAD = p[Pa]/ro/g
     double p_head;
     /// Suruseg
@@ -36,7 +39,7 @@ private:
 
 public:
     /// Konstruktor
-    Csomopont(const string nev,
+    Csomopont(const std::string nev,
               const double h,
               const double fogy,
               const double cl_be,
@@ -48,7 +51,7 @@ public:
     /// Destruktor
     ~Csomopont();
     // Info
-    string Info(bool check_if_lonely);
+    std::string Info(bool check_if_lonely);
     /// Nyomas beallitasa
     void Set_p(double x)
     {
@@ -65,7 +68,7 @@ public:
         fogy = a_fogy;
     }
     /// Az elem neve
-    string Get_nev()
+    std::string Get_nev()
     {
         return nev;
     }
@@ -119,9 +122,9 @@ public:
     /// Inicializ�ci�
     void Ini(int mode, double value);
     /// Double �rt�kek be�ll�t�sa
-    void Set_dprop(string mit, double value);
+    void Set_dprop(std::string mit, double value);
     /// Double �rt�kek lek�r�se
-    double Get_dprop(string mit);
+    double Get_dprop(std::string mit);
 
 
 };

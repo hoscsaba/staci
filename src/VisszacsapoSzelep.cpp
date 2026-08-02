@@ -1,4 +1,3 @@
-using namespace std;
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -6,6 +5,8 @@ using namespace std;
 #include <cmath>
 #include "Agelem.h"
 #include "VisszacsapoSzelep.h"
+
+using namespace std;
 
 VisszacsapoSzelep::VisszacsapoSzelep(const string a_nev,
                                      const string a_cspe_nev,

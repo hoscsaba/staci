@@ -1,5 +1,3 @@
-using namespace std;
-
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -8,6 +6,8 @@ using namespace std;
 #include <cmath>
 #include "Agelem.h"
 #include "JelleggorbesFojtas.h"
+
+using namespace std;
 
 JelleggorbesFojtas::JelleggorbesFojtas(const string a_nev,
                                        const string a_cspe_nev,

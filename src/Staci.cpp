@@ -15,9 +15,6 @@
 #include "umfpack.h"
 // #include <suitesparse/umfpack.h>
 
-// TODO: Clear up debug level behaviour in the doc!
-// TODO: log file cleanup!
-
 struct val_and_ID {
   double val, x;
   string ID;
@@ -2198,53 +2195,47 @@ bool Staci::umfpack_solver(Vec_I_DP xr, Vec_I_DP f) {
   vTx.reserve(m_nnz);
 
   int n = agelemek.size() + cspok.size();
-  int nz = 0;
   for (int col = 0; col < n; col++)
     for (int row = 0; row < n; row++)
       if (!m_is_element_empty[row][col]) {
-        // vTi.push_back(row);
-        // vTj.push_back(col);
-        // vTx.push_back(m_jac[row][col]);
-        vTi[nz] = row;
-        vTj[nz] = col;
-        vTx[nz] = m_jac[row][col];
-        nz++;
+        vTi.push_back(row);
+        vTj.push_back(col);
+        vTx.push_back(m_jac[row][col]);
       }
 
-  int Ap[n + 1];
-  int Ai[nz];
-  double Ax[nz];
+  const int nz = static_cast<int>(vTi.size());
+  vector<int> Ap(n + 1);
+  vector<int> Ai(nz);
+  vector<double> Ax(nz);
   int status;
-  int Ti[nz];
-  int Tj[nz];
-  double Tx[nz];
-  double dx[n];
-  for (int i = 0; i < n; i++) dx[i] = 0.;
+  vector<int> Ti(vTi);
+  vector<int> Tj(vTj);
+  vector<double> Tx(vTx);
+  vector<double> dx(n, 0.);
 
   void *Symbolic, *Numeric;
 
-  for (int i = 0; i < nz; i++) {
-    Ti[i] = vTi[i];
-    Tj[i] = vTj[i];
-    Tx[i] = vTx[i];
-  }
-
-  double b[n];
+  vector<double> b(n);
   for (int i = 0; i < n; i++) b[i] = f[i];
 
   /* convert matrix from triplet form to compressed-column form */
-  status = umfpack_di_triplet_to_col(n, n, nz, Ti, Tj, Tx, Ap, Ai, Ax, NULL);
+  status = umfpack_di_triplet_to_col(n, n, nz, Ti.data(), Tj.data(),
+                                     Tx.data(), Ap.data(), Ai.data(), Ax.data(),
+                                     NULL);
 
   /* symbolic analysis */
-  status = umfpack_di_symbolic(n, n, Ap, Ai, Ax, &Symbolic, NULL, NULL);
+  status = umfpack_di_symbolic(n, n, Ap.data(), Ai.data(), Ax.data(),
+                               &Symbolic, NULL, NULL);
 
   /* LU factorization */
-  umfpack_di_numeric(Ap, Ai, Ax, Symbolic, &Numeric, NULL, NULL);
+  umfpack_di_numeric(Ap.data(), Ai.data(), Ax.data(), Symbolic, &Numeric,
+                     NULL, NULL);
 
   umfpack_di_free_symbolic(&Symbolic);
 
   /* solve system */
-  umfpack_di_solve(UMFPACK_A, Ap, Ai, Ax, dx, b, Numeric, NULL, NULL);
+  umfpack_di_solve(UMFPACK_A, Ap.data(), Ai.data(), Ax.data(), dx.data(),
+                   b.data(), Numeric, NULL, NULL);
 
   umfpack_di_free_numeric(&Numeric);
 
@@ -2481,53 +2472,47 @@ void Staci::Compute_dxdmu() {
   vTx.reserve(m_nnz);
 
   int n = agelemek.size() + cspok.size();
-  int nz = 0;
   for (int col = 0; col < n; col++)
     for (int row = 0; row < n; row++)
       if (!m_is_element_empty[row][col]) {
-        // vTi.push_back(row);
-        // vTj.push_back(col);
-        // vTx.push_back(m_jac[row][col]);
-        vTi[nz] = row;
-        vTj[nz] = col;
-        vTx[nz] = m_jac[row][col];
-        nz++;
+        vTi.push_back(row);
+        vTj.push_back(col);
+        vTx.push_back(m_jac[row][col]);
       }
 
-  int Ap[n + 1];
-  int Ai[nz];
-  double Ax[nz];
+  const int nz = static_cast<int>(vTi.size());
+  vector<int> Ap(n + 1);
+  vector<int> Ai(nz);
+  vector<double> Ax(nz);
   int status;
-  int Ti[nz];
-  int Tj[nz];
-  double Tx[nz];
-  double dx[n];
-  for (int i = 0; i < n; i++) dx[i] = 0.;
+  vector<int> Ti(vTi);
+  vector<int> Tj(vTj);
+  vector<double> Tx(vTx);
+  vector<double> dx(n, 0.);
 
   void *Symbolic, *Numeric;
 
-  for (int i = 0; i < nz; i++) {
-    Ti[i] = vTi[i];
-    Tj[i] = vTj[i];
-    Tx[i] = vTx[i];
-  }
-
-  double b[n];
+  vector<double> b(n);
   for (int i = 0; i < n; i++) b[i] = -m_dfdmu[i];
 
   /* convert matrix from triplet form to compressed-column form */
-  status = umfpack_di_triplet_to_col(n, n, nz, Ti, Tj, Tx, Ap, Ai, Ax, NULL);
+  status = umfpack_di_triplet_to_col(n, n, nz, Ti.data(), Tj.data(),
+                                     Tx.data(), Ap.data(), Ai.data(), Ax.data(),
+                                     NULL);
 
   /* symbolic analysis */
-  status = umfpack_di_symbolic(n, n, Ap, Ai, Ax, &Symbolic, NULL, NULL);
+  status = umfpack_di_symbolic(n, n, Ap.data(), Ai.data(), Ax.data(),
+                               &Symbolic, NULL, NULL);
 
   /* LU factorization */
-  umfpack_di_numeric(Ap, Ai, Ax, Symbolic, &Numeric, NULL, NULL);
+  umfpack_di_numeric(Ap.data(), Ai.data(), Ax.data(), Symbolic, &Numeric,
+                     NULL, NULL);
 
   umfpack_di_free_symbolic(&Symbolic);
 
   /* solve system */
-  umfpack_di_solve(UMFPACK_A, Ap, Ai, Ax, dx, b, Numeric, NULL, NULL);
+  umfpack_di_solve(UMFPACK_A, Ap.data(), Ai.data(), Ax.data(), dx.data(),
+                   b.data(), Numeric, NULL, NULL);
 
   umfpack_di_free_numeric(&Numeric);
 

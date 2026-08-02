@@ -1,4 +1,3 @@
-using namespace std;
 #include <ctime>
 #include <iostream>
 #include <iomanip>
@@ -7,6 +6,8 @@ using namespace std;
 #include "Staci.h"
 #include "time.h"
 #include <numeric>
+
+using namespace std;
 
 void solve_hydraulics(Staci&  feladat, double& time2, double& time3);
 
