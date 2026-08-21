@@ -15,6 +15,14 @@
 #include "epanet_document.h"
 #include <string>
 
+struct UmfpackSymbolicDeleter {
+    void operator()(void *symbolic) const noexcept;
+};
+
+struct UmfpackNumericDeleter {
+    void operator()(void *numeric) const noexcept;
+};
+
 class Staci
 {
 public:
@@ -210,17 +218,20 @@ private:
     void build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern);
     void build_vectors_frozen_Jacobian(Vec_DP &x, Vec_DP &f);
 
-    void nr_solver(Vec_DP x, Vec_DP f);
     void pbcg_solver(Vec_I_DP x, Vec_I_DP f);
-    bool umfpack_solver(Vec_I_DP x, Vec_I_DP f);
+    bool umfpack_solver(const Vec_DP &x, const Vec_DP &f);
+    bool solve_sparse_system(const vector<double> &rhs, vector<double> &solution);
+    void build_sparse_pattern();
+    int sparse_position(int column, int row) const;
+    double sparse_value(int row, int column) const;
+    void invalidate_numeric_factorization();
 
-    string iter_info(Vec_DP x, Vec_DP f, int iter, double e_mp, double e_p);
+    string iter_info(const Vec_DP &x, const Vec_DP &f, int iter, double e_mp, double e_p);
     void
-    compute_error(Vec_DP f, double &e_mp, double &e_p, double &e_mp_r,
+    compute_error(const Vec_DP &f, double &e_mp, double &e_p, double &e_mp_r,
                   double &e_p_r, bool &konv_ok);
     void update_relax(double e_mp, double e_p, double &e_mp_r, double &e_p_r);
 
-    vector<vector<double> > m_jac; // Jacobia
     vector<double>  m_dfdmu; // derivative of eqs. w.r.t. parameter
     vector<double>  m_dxdmu; // derivative of eqs. w.r.t. parameter
     int m_nnz;  /*!< Number of nonzero entries of the Jacobian. */
@@ -228,15 +239,18 @@ private:
     void Compute_dfdmu();
 
 
-    // UMFPACK
-    /* nemnulla elemek */
-    vector<vector<bool> > m_is_element_empty;
-    /* Ti[k] is row index of entry k, as matrix is scanned columnwise */
-    vector<int> m_Ti;
-    /* Tj[k] is column index of entry k, as matrix is scanned columnwise */
-    vector<int> m_Tj;
-    /* value of entry k, as matrix is scanned columnwise */
-    vector<double> m_Tx;
+    // UMFPACK compressed-column matrix. Its sparsity pattern depends only on
+    // network topology and is therefore shared by all Newton and EPS steps.
+    vector<int> m_Ap;
+    vector<int> m_Ai;
+    vector<double> m_Ax;
+    vector<int> m_edge_flow_position;
+    vector<int> m_edge_start_head_position;
+    vector<int> m_edge_end_head_position;
+    bool m_sparse_pattern_valid = false;
+    bool m_numeric_factorization_valid = false;
+    std::unique_ptr<void, UmfpackSymbolicDeleter> m_umfpack_symbolic;
+    std::unique_ptr<void, UmfpackNumericDeleter> m_umfpack_numeric;
 
     string convert_to_hr_min(double seconds);
 
@@ -252,7 +266,7 @@ private:
     double Cond_sum_sum(vector<vector<double> > M, string par_name);
     double Avr_rel_pert(vector<vector<double> > M, string par_name);
     void rescale_vec(vector<double>& vec);
-    void print_worst_iter(const Vec_DP x, const Vec_DP f, const int a_debug_level);
+    void print_worst_iter(const Vec_DP &x, const Vec_DP &f, const int a_debug_level);
 
     vector<int> edge;
 

@@ -8,6 +8,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <algorithm>
+#include <array>
+#include <limits>
 #include "StaciException.h"
 #include "data_io.h"
 #include "epanet_writer.h"
@@ -25,6 +27,16 @@ bool has_inp_extension(string filename) {
 // Mac:
 #include "umfpack.h"
 // #include <suitesparse/umfpack.h>
+
+void UmfpackSymbolicDeleter::operator()(void *symbolic) const noexcept {
+  if (symbolic != nullptr)
+    umfpack_di_free_symbolic(&symbolic);
+}
+
+void UmfpackNumericDeleter::operator()(void *numeric) const noexcept {
+  if (numeric != nullptr)
+    umfpack_di_free_numeric(&numeric);
+}
 
 struct val_and_ID {
   double val, x;
@@ -1122,21 +1134,9 @@ void Staci::save_modified_network() {
 
 //--------------------------------------------------------------
 void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern) {
-  unsigned long int N = cspok.size() + agelemek.size();
-  Vec_DP col(N);
-  m_jac.clear();
-  m_jac.reserve(N);
-  vector<double> jac_row(N, 0.0);
-
-  for (int i = 0; i < N; i++) m_jac.push_back(jac_row);
-
-  if (create_sparse_pattern) {
-    m_is_element_empty.clear();
-    vector<bool> tmp(N, true);
-    for (int i = 0; i < N; i++) m_is_element_empty.push_back(tmp);
-  }
-
-  // A matrix mintazatanak mente
+  if (create_sparse_pattern || !m_sparse_pattern_valid)
+    build_sparse_pattern();
+  invalidate_numeric_factorization();
 
   // aktualis x kiszedes az elemekbol
   //---------------------------------------------------
@@ -1149,7 +1149,6 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern) {
     //      cout<<"\n x="<<x[agelemek.size() + i];
   }
   // f es Jacobi kiertekelese az aktualis adatokkal
-  int Q_indx, pe_indx, pv_indx;
   vector<double> pevhev(4, 0.0);
   vector<double> jv;
 
@@ -1173,31 +1172,13 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern) {
     // cout<<endl<<jv;
     // pevhev.clear();
 
-    Q_indx = i;
-    pe_indx = agelemek[i]->Get_Cspe_Index();
-    pv_indx = agelemek[i]->Get_Cspv_Index();
-
-    m_jac[i][agelemek.size() + pe_indx] = jv.at(0);
-    if (create_sparse_pattern) {
-      m_is_element_empty[i][agelemek.size() + pe_indx] = false;
-      m_nnz++;
-    }
+    m_Ax[m_edge_start_head_position[i]] = jv.at(0);
 
     if (agelemek[i]->Get_Csp_db() == 2) {
-      m_jac[i][agelemek.size() + pv_indx] = jv.at(1);
-      if (create_sparse_pattern) {
-        m_is_element_empty[i][agelemek.size() + pv_indx] = false;
-        m_nnz++;
-      }
+      m_Ax[m_edge_end_head_position[i]] = jv.at(1);
     }
 
-    m_jac[i][Q_indx] = jv.at(2);
-    if (create_sparse_pattern) {
-      m_is_element_empty[i][Q_indx] = false;
-      m_nnz++;
-    }
-
-    col[i] = jv.at(3);
+    m_Ax[m_edge_flow_position[i]] = jv.at(2);
     jv.clear();
   }
 
@@ -1205,21 +1186,10 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern) {
     f[agelemek.size() + i] = -cspok[i]->Get_fogy();
     for (unsigned int j = 0; j < cspok[i]->ag_be.size(); j++) {
       f[agelemek.size() + i] += agelemek[cspok[i]->ag_be.at(j)]->Get_mp();
-      m_jac[agelemek.size() + i][cspok[i]->ag_be.at(j)] = +1.0;
-      if (create_sparse_pattern) {
-        m_is_element_empty[agelemek.size() + i][cspok[i]->ag_be.at(j)] = false;
-        m_nnz++;
-      }
     }
     for (unsigned int j = 0; j < cspok[i]->ag_ki.size(); j++) {
       f[agelemek.size() + i] -= agelemek[cspok[i]->ag_ki.at(j)]->Get_mp();
-      m_jac[agelemek.size() + i][cspok[i]->ag_ki.at(j)] = -1.0;
-      if (create_sparse_pattern) {
-        m_is_element_empty[agelemek.size() + i][cspok[i]->ag_ki.at(j)] = false;
-        m_nnz++;
-      }
     }
-    col[agelemek.size() + i] = -cspok[i]->Get_fogy();
   }
 
   //    int NN = x.size();
@@ -1270,6 +1240,83 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern) {
   // }
 }
 
+void Staci::build_sparse_pattern() {
+  const int edge_count = static_cast<int>(agelemek.size());
+  const int node_count = static_cast<int>(cspok.size());
+  const int n = edge_count + node_count;
+  vector<vector<int> > column_rows(n);
+
+  for (int edge = 0; edge < edge_count; ++edge) {
+    const int start_node = agelemek[edge]->Get_Cspe_Index();
+    const int end_node = agelemek[edge]->Get_Cspv_Index();
+    column_rows[edge].push_back(edge);
+    column_rows[edge].push_back(edge_count + start_node);
+    column_rows[edge_count + start_node].push_back(edge);
+    if (agelemek[edge]->Get_Csp_db() == 2) {
+      column_rows[edge].push_back(edge_count + end_node);
+      column_rows[edge_count + end_node].push_back(edge);
+    }
+  }
+
+  m_Ap.assign(n + 1, 0);
+  m_Ai.clear();
+  for (int column = 0; column < n; ++column) {
+    vector<int> &rows = column_rows[column];
+    sort(rows.begin(), rows.end());
+    rows.erase(unique(rows.begin(), rows.end()), rows.end());
+    m_Ap[column] = static_cast<int>(m_Ai.size());
+    m_Ai.insert(m_Ai.end(), rows.begin(), rows.end());
+  }
+  m_Ap[n] = static_cast<int>(m_Ai.size());
+  m_Ax.assign(m_Ai.size(), 0.0);
+  m_nnz = static_cast<int>(m_Ai.size());
+
+  m_edge_flow_position.resize(edge_count);
+  m_edge_start_head_position.resize(edge_count);
+  m_edge_end_head_position.assign(edge_count, -1);
+  for (int edge = 0; edge < edge_count; ++edge) {
+    const int start_node = agelemek[edge]->Get_Cspe_Index();
+    const int end_node = agelemek[edge]->Get_Cspv_Index();
+    m_edge_flow_position[edge] = sparse_position(edge, edge);
+    m_edge_start_head_position[edge] =
+        sparse_position(edge_count + start_node, edge);
+    m_Ax[sparse_position(edge, edge_count + start_node)] -= 1.0;
+    if (agelemek[edge]->Get_Csp_db() == 2) {
+      m_edge_end_head_position[edge] =
+          sparse_position(edge_count + end_node, edge);
+      m_Ax[sparse_position(edge, edge_count + end_node)] += 1.0;
+    }
+  }
+
+  m_umfpack_symbolic.reset();
+  m_umfpack_numeric.reset();
+  m_numeric_factorization_valid = false;
+  m_sparse_pattern_valid = true;
+}
+
+int Staci::sparse_position(int column, int row) const {
+  const auto first = m_Ai.begin() + m_Ap.at(column);
+  const auto last = m_Ai.begin() + m_Ap.at(column + 1);
+  const auto found = lower_bound(first, last, row);
+  if (found == last || *found != row)
+    throw logic_error("Jacobian sparsity pattern is missing an expected entry.");
+  return static_cast<int>(found - m_Ai.begin());
+}
+
+double Staci::sparse_value(int row, int column) const {
+  if (column < 0 || column + 1 >= static_cast<int>(m_Ap.size()))
+    return 0.0;
+  const auto first = m_Ai.begin() + m_Ap[column];
+  const auto last = m_Ai.begin() + m_Ap[column + 1];
+  const auto found = lower_bound(first, last, row);
+  return found != last && *found == row ? m_Ax[found - m_Ai.begin()] : 0.0;
+}
+
+void Staci::invalidate_numeric_factorization() {
+  m_umfpack_numeric.reset();
+  m_numeric_factorization_valid = false;
+}
+
 //--------------------------------------------------------------
 void Staci::build_vectors_frozen_Jacobian(Vec_DP &x, Vec_DP &f) {
   // int N = cspok.size() + agelemek.size();
@@ -1312,10 +1359,7 @@ void Staci::build_vectors_frozen_Jacobian(Vec_DP &x, Vec_DP &f) {
 //--------------------------------------------------------------
 bool Staci::solve_system() {
   const int N = cspok.size() + agelemek.size();
-  Mat_DP invjac(N, N);
-  // Mat_DP jac(N, N), invjac(N, N);
-  Vec_DP col(N), b(N), x(N), dx(N), f(N), xu(N);
-  Vec_INT indx(N);
+  Vec_DP x(N), f(N);
   int iter = 0;
   double e_mp = 1e10, e_p = 1e10, e_mp_r = 1e10, e_p_r = 1e10;
   bool konv_ok = false;
@@ -1335,33 +1379,47 @@ bool Staci::solve_system() {
     // cout << m_ss.str();
   }
 
-  // Solver
-  build_vectors(x, f, true);
-
   // Iteracio!!!
   bool comp_ok = true;
-  // cout<<endl<<"debug_level:"<<debug_level<<endl; cin.get();
-  while ((iter < iter_max + 1) && (!konv_ok)) {
+  while ((iter < iter_max) && (!konv_ok)) {
     if (debug_level > 0) progress_file_write((double)iter / iter_max * 100.0);
 
-    if ((e_mp > 0.1 || e_p > 0.1) || (iter % 5 == 0))
-      build_vectors(x, f, false);
+    bool used_frozen_jacobian = false;
+    if (iter == 0 || (e_mp > 0.1 || e_p > 0.1) || (iter % 5 == 0))
+      build_vectors(x, f, !m_sparse_pattern_valid);
     else {
       build_vectors_frozen_Jacobian(x, f);
+      used_frozen_jacobian = true;
     }
 
     compute_error(f, e_mp, e_p, e_mp_r, e_p_r, konv_ok);
 
+    // A frozen Jacobian is useful only while it keeps reducing the scaled
+    // residual. If progress reverses, rebuild at the current state before
+    // taking another Newton step; otherwise the stale factorization can drive
+    // a nearly converged solution far away from the root.
+    if (used_frozen_jacobian) {
+      const double pressure_scale = max(e_p_max, numeric_limits<double>::min());
+      const double flow_scale = max(e_mp_max, numeric_limits<double>::min());
+      const double error = max(e_p / pressure_scale, e_mp / flow_scale);
+      const double previous_error =
+          max(e_p_r / pressure_scale, e_mp_r / flow_scale);
+      if (!isfinite(error) || error >= previous_error)
+        build_vectors(x, f, false);
+    }
+
     logfile_write(iter_info(x, f, iter, e_mp, e_p), 1);
 
-    print_worst_iter(x, f, 3);
+    if (debug_level >= 3)
+      print_worst_iter(x, f, 3);
 
-    update_relax(e_mp, e_p, e_mp_r, e_p_r);
+    if (konv_ok)
+      break;
+
+    if (iter > 0)
+      update_relax(e_mp, e_p, e_mp_r, e_p_r);
 
     comp_ok = umfpack_solver(x, f);
-
-    if ((e_mp < e_mp_max) && (e_p < e_p_max))
-      konv_ok = true;
 
     m_ss.str("");
     for (unsigned int i = 0; i < agelemek.size(); i++)
@@ -1370,14 +1428,16 @@ bool Staci::solve_system() {
       m_ss << endl << "\t" << cspok.at(i)->Get_nev() << ": \tp =" << x[agelemek.size() + i] << ", \tf=" << f[agelemek.size() + i];
     logfile_write(m_ss.str(), 4);
 
-    if ((!comp_ok) && (iter > 100)) {
-      cout << endl
-           << endl
-           << "WARNING: Staci::solve_system() -> umfpack_solver did not "
-           "provide a solution, switching back to nr_solver!!\n\n";
-      nr_solver(x, f);
-    } else
-      iter++;
+    ++iter;
+    if (!comp_ok) {
+      logfile_write("\nERROR: sparse linear solve failed; nonlinear solve stopped.\n", 1);
+      break;
+    }
+  }
+
+  if (!konv_ok && comp_ok) {
+    build_vectors_frozen_Jacobian(x, f);
+    compute_error(f, e_mp, e_p, e_mp_r, e_p_r, konv_ok);
   }
 
   if (!konv_ok)
@@ -1394,7 +1454,7 @@ bool Staci::solve_system() {
   return konv_ok;
 }
 
-void Staci::print_worst_iter(const Vec_DP x, const Vec_DP f , const int a_debug_level) {
+void Staci::print_worst_iter(const Vec_DP &x, const Vec_DP &f , const int a_debug_level) {
 
   vector<val_and_ID> v_edges;
   vector<val_and_ID> v_nodes;
@@ -2257,119 +2317,89 @@ void Staci::Set_FolyTerf() {
 }
 
 //--------------------------------------------------------------
-void Staci::nr_solver(Vec_DP x, Vec_DP f) {
-  int N = x.size();
-  Vec_DP col(N), b(N), dx(N), xu(N);
-  Vec_INT indx(N);
-  Mat_DP invjac(N, N), jac(N, N);
-  DP d;
+bool Staci::umfpack_solver(const Vec_DP &xr, const Vec_DP &f) {
+  const int n = static_cast<int>(agelemek.size() + cspok.size());
+  vector<double> rhs(n);
+  vector<double> dx;
+  for (int i = 0; i < n; ++i)
+    rhs[i] = f[i];
 
-  for (int i = 0; i < N; i++)
-    for (int j = 0; j < N; j++) jac[i][j] = m_jac[i][j];
-
-  NR::ludcmp(jac, indx, d);
-
-  for (int j = 0; j < N; j++) {
-    for (int i = 0; i < N; i++) col[i] = 0.0;
-    col[j] = 1.0;
-    NR::lubksb(jac, indx, col);
-    for (int i = 0; i < N; i++) invjac[i][j] = col[i];
-  }
-
-  for (int i = 0; i < N; i++) {
-    dx[i] = 0;
-    for (int j = 0; j < N; j++) dx[i] += invjac[i][j] * f[j];
-    xu[i] = x[i] - m_relax * dx[i];
-  }
-
-  // Visszairas
-  //------------------------
-  for (unsigned int i = 0; i < agelemek.size(); i++) agelemek[i]->Set_mp(xu[i]);
-  for (unsigned int i = 0; i < cspok.size(); i++)
-    cspok[i]->Set_p(xu[agelemek.size() + i]);
-}
-
-//--------------------------------------------------------------
-bool Staci::umfpack_solver(Vec_I_DP xr, Vec_I_DP f) {
-  // Build sparse matrix
-  /* Ti[k] is row index of entry k, as matrix is scanned columnwise */
-
-  //    cout<<endl<<"\n m_nnz="<<m_nnz<<endl;
-
-  vector<int> vTi;
-  vTi.reserve(m_nnz);
-  /* Tj[k] is column index of entry k, as matrix is scanned columnwise */
-  vector<int> vTj;
-  vTj.reserve(m_nnz);
-  /* value of entry k, as matrix is scanned columnwise */
-  vector<double> vTx;
-  vTx.reserve(m_nnz);
-
-  int n = agelemek.size() + cspok.size();
-  for (int col = 0; col < n; col++)
-    for (int row = 0; row < n; row++)
-      if (!m_is_element_empty[row][col]) {
-        vTi.push_back(row);
-        vTj.push_back(col);
-        vTx.push_back(m_jac[row][col]);
-      }
-
-  const int nz = static_cast<int>(vTi.size());
-  vector<int> Ap(n + 1);
-  vector<int> Ai(nz);
-  vector<double> Ax(nz);
-  int status;
-  vector<int> Ti(vTi);
-  vector<int> Tj(vTj);
-  vector<double> Tx(vTx);
-  vector<double> dx(n, 0.);
-
-  void *Symbolic, *Numeric;
-
-  vector<double> b(n);
-  for (int i = 0; i < n; i++) b[i] = f[i];
-
-  /* convert matrix from triplet form to compressed-column form */
-  status = umfpack_di_triplet_to_col(n, n, nz, Ti.data(), Tj.data(),
-                                     Tx.data(), Ap.data(), Ai.data(), Ax.data(),
-                                     NULL);
-
-  /* symbolic analysis */
-  status = umfpack_di_symbolic(n, n, Ap.data(), Ai.data(), Ax.data(),
-                               &Symbolic, NULL, NULL);
-
-  /* LU factorization */
-  umfpack_di_numeric(Ap.data(), Ai.data(), Ax.data(), Symbolic, &Numeric,
-                     NULL, NULL);
-
-  umfpack_di_free_symbolic(&Symbolic);
-
-  /* solve system */
-  umfpack_di_solve(UMFPACK_A, Ap.data(), Ai.data(), Ax.data(), dx.data(),
-                   b.data(), Numeric, NULL, NULL);
-
-  umfpack_di_free_numeric(&Numeric);
-
-  bool success = true;
-  for (int i = 0; i < n; i++)
-    if (isnan(dx[i])) {
-      //            cout << "\n\n!!!!\nStaci.cpp, umfpack_solver() -> x[" << i
-      //                    << "]=NaN!!!\n\n";
-      success = false;
-      break;
-    }
-
-  // Visszairas
-  //------------------------
+  const bool success = solve_sparse_system(rhs, dx);
   if (success) {
-    for (unsigned int i = 0; i < agelemek.size(); i++)
+    for (unsigned int i = 0; i < agelemek.size(); ++i)
       agelemek[i]->Set_mp(xr[i] - m_relax * dx[i]);
-    for (unsigned int i = 0; i < cspok.size(); i++)
+    for (unsigned int i = 0; i < cspok.size(); ++i)
       cspok[i]->Set_p(xr[agelemek.size() + i] -
                       m_relax * dx[agelemek.size() + i]);
   }
-
   return success;
+}
+
+bool Staci::solve_sparse_system(const vector<double> &rhs,
+                                vector<double> &solution) {
+  const int n = static_cast<int>(agelemek.size() + cspok.size());
+  if (!m_sparse_pattern_valid || static_cast<int>(rhs.size()) != n)
+    return false;
+
+  array<double, UMFPACK_CONTROL> control;
+  array<double, UMFPACK_INFO> info;
+  umfpack_di_defaults(control.data());
+
+  if (!m_umfpack_symbolic) {
+    void *symbolic = nullptr;
+    const int status = umfpack_di_symbolic(
+        n, n, m_Ap.data(), m_Ai.data(), m_Ax.data(), &symbolic,
+        control.data(), info.data());
+    if (status != UMFPACK_OK || symbolic == nullptr) {
+      if (symbolic != nullptr)
+        umfpack_di_free_symbolic(&symbolic);
+      logfile_write("\nERROR: UMFPACK symbolic analysis failed (status " +
+                        to_string(status) + ").\n", 1);
+      return false;
+    }
+    m_umfpack_symbolic.reset(symbolic);
+  }
+
+  if (!m_numeric_factorization_valid || !m_umfpack_numeric) {
+    void *numeric = nullptr;
+    const int status = umfpack_di_numeric(
+        m_Ap.data(), m_Ai.data(), m_Ax.data(), m_umfpack_symbolic.get(),
+        &numeric, control.data(), info.data());
+    if (status != UMFPACK_OK || numeric == nullptr) {
+      if (numeric != nullptr)
+        umfpack_di_free_numeric(&numeric);
+      logfile_write("\nERROR: UMFPACK numeric factorization failed (status " +
+                        to_string(status) + ").\n", 1);
+      return false;
+    }
+    m_umfpack_numeric.reset(numeric);
+    m_numeric_factorization_valid = true;
+    const double reciprocal_condition = info[UMFPACK_RCOND];
+    if (isfinite(reciprocal_condition) && reciprocal_condition > 0.0 &&
+        reciprocal_condition < 1.0e-14) {
+      logfile_write("\nWARNING: UMFPACK reports an ill-conditioned Jacobian "
+                    "(estimated reciprocal condition " +
+                        to_string(reciprocal_condition) + ").\n", 1);
+    }
+  }
+
+  solution.assign(n, 0.0);
+  const int status = umfpack_di_solve(
+      UMFPACK_A, m_Ap.data(), m_Ai.data(), m_Ax.data(), solution.data(),
+      rhs.data(), m_umfpack_numeric.get(), control.data(), info.data());
+  if (status != UMFPACK_OK) {
+    logfile_write("\nERROR: UMFPACK solve failed (status " +
+                      to_string(status) + ").\n", 1);
+    return false;
+  }
+
+  for (double value : solution) {
+    if (!isfinite(value)) {
+      logfile_write("\nERROR: UMFPACK returned a non-finite solution.\n", 1);
+      return false;
+    }
+  }
+  return true;
 }
 
 //--------------------------------------------------------------
@@ -2422,7 +2452,7 @@ void Staci::Print_Jacobian()
     while (strstrm_nev.size() < MAX_NEV_HOSSZ) strstrm_nev.append(" ");
     strstrm << strstrm_nev;
     for (unsigned int j = 0; j < agelemek.size() + cspok.size(); j++)
-      strstrm << "; " << m_jac[i][j];
+      strstrm << "; " << sparse_value(i, j);
     strstrm << endl;
   }
   for (unsigned int i = 0; i < cspok.size(); i++) {
@@ -2430,7 +2460,7 @@ void Staci::Print_Jacobian()
     while (strstrm_nev.size() < MAX_NEV_HOSSZ) strstrm_nev.append(" ");
     strstrm << strstrm_nev;
     for (unsigned int j = 0; j < agelemek.size() + cspok.size(); j++)
-      strstrm << ";" << m_jac[agelemek.size() + i][j];
+      strstrm << ";" << sparse_value(agelemek.size() + i, j);
     strstrm << endl;
   }
 
@@ -2442,7 +2472,7 @@ void Staci::Print_Jacobian()
 }
 
 //--------------------------------------------------------------
-string Staci::iter_info(Vec_DP x, Vec_DP f, int iter, double e_mp, double e_p) {
+string Staci::iter_info(const Vec_DP &x, const Vec_DP &f, int iter, double e_mp, double e_p) {
   m_ss.str("");
 
   int num = 0;
@@ -2463,7 +2493,7 @@ string Staci::iter_info(Vec_DP x, Vec_DP f, int iter, double e_mp, double e_p) {
 }
 
 //--------------------------------------------------------------
-void Staci::compute_error(Vec_DP f, double & e_mp, double & e_p, double & e_mp_r,
+void Staci::compute_error(const Vec_DP &f, double & e_mp, double & e_p, double & e_mp_r,
                           double & e_p_r, bool & konv_ok) {
   e_mp_r = e_mp;
   e_p_r = e_p;
@@ -2473,10 +2503,13 @@ void Staci::compute_error(Vec_DP f, double & e_mp, double & e_p, double & e_mp_r
   for (unsigned int i = 0; i < cspok.size(); i++)
     e_mp += f[agelemek.size() + i] * f[agelemek.size() + i];
 
-  e_mp = pow(e_mp, 0.5);
-  e_p = pow(e_p, 0.5);
+  // RMS norms keep the configured dimensional tolerances independent of the
+  // number of equations in a network.
+  e_mp = cspok.empty() ? 0.0 : sqrt(e_mp / cspok.size());
+  e_p = agelemek.empty() ? 0.0 : sqrt(e_p / agelemek.size());
 
-  if ((e_p < e_p_max) && (e_mp < e_mp_max)) konv_ok = true;
+  konv_ok = isfinite(e_p) && isfinite(e_mp) &&
+            e_p < e_p_max && e_mp < e_mp_max;
 }
 
 //--------------------------------------------------------------
@@ -2484,14 +2517,12 @@ void Staci::update_relax(double e_mp, double e_p, double & e_mp_r,
                          double & e_p_r) {
   m_RELAX_MIN = 0.01;
   m_RELAX_MAX = 1.0;
-  double hiba, hiba_r;
-  if (e_p > e_mp) {
-    hiba = e_p;
-    hiba_r = e_p_r;
-  } else {
-    hiba = e_mp;
-    hiba_r = e_mp_r;
-  }
+  // Compare dimensionless residuals. Pressure-head errors [m] and mass-flow
+  // errors [kg/s] must not be compared directly.
+  const double pressure_scale = max(e_p_max, numeric_limits<double>::min());
+  const double flow_scale = max(e_mp_max, numeric_limits<double>::min());
+  const double hiba = max(e_p / pressure_scale, e_mp / flow_scale);
+  const double hiba_r = max(e_p_r / pressure_scale, e_mp_r / flow_scale);
   if (hiba < hiba_r)
     m_relax = m_relax * m_relax_mul;
   else
@@ -2577,76 +2608,15 @@ void Staci::Compute_dfdmu() {
 //--------------------------------------------------------------
 void Staci::Compute_dxdmu() {
   Compute_dfdmu();
+  const int n = static_cast<int>(agelemek.size() + cspok.size());
+  vector<double> rhs(n);
+  for (int i = 0; i < n; ++i)
+    rhs[i] = -m_dfdmu[i];
 
-  // Build sparse matrix
-  /* Ti[k] is row index of entry k, as matrix is scanned columnwise */
-
-  vector<int> vTi;
-  vTi.reserve(m_nnz);
-  /* Tj[k] is column index of entry k, as matrix is scanned columnwise */
-  vector<int> vTj;
-  vTj.reserve(m_nnz);
-  /* value of entry k, as matrix is scanned columnwise */
-  vector<double> vTx;
-  vTx.reserve(m_nnz);
-
-  int n = agelemek.size() + cspok.size();
-  for (int col = 0; col < n; col++)
-    for (int row = 0; row < n; row++)
-      if (!m_is_element_empty[row][col]) {
-        vTi.push_back(row);
-        vTj.push_back(col);
-        vTx.push_back(m_jac[row][col]);
-      }
-
-  const int nz = static_cast<int>(vTi.size());
-  vector<int> Ap(n + 1);
-  vector<int> Ai(nz);
-  vector<double> Ax(nz);
-  int status;
-  vector<int> Ti(vTi);
-  vector<int> Tj(vTj);
-  vector<double> Tx(vTx);
-  vector<double> dx(n, 0.);
-
-  void *Symbolic, *Numeric;
-
-  vector<double> b(n);
-  for (int i = 0; i < n; i++) b[i] = -m_dfdmu[i];
-
-  /* convert matrix from triplet form to compressed-column form */
-  status = umfpack_di_triplet_to_col(n, n, nz, Ti.data(), Tj.data(),
-                                     Tx.data(), Ap.data(), Ai.data(), Ax.data(),
-                                     NULL);
-
-  /* symbolic analysis */
-  status = umfpack_di_symbolic(n, n, Ap.data(), Ai.data(), Ax.data(),
-                               &Symbolic, NULL, NULL);
-
-  /* LU factorization */
-  umfpack_di_numeric(Ap.data(), Ai.data(), Ax.data(), Symbolic, &Numeric,
-                     NULL, NULL);
-
-  umfpack_di_free_symbolic(&Symbolic);
-
-  /* solve system */
-  umfpack_di_solve(UMFPACK_A, Ap.data(), Ai.data(), Ax.data(), dx.data(),
-                   b.data(), Numeric, NULL, NULL);
-
-  umfpack_di_free_numeric(&Numeric);
-
-  // bool success = true;
-  for (int i = 0; i < n; i++)
-    if (isnan(dx[i])) {
-      cout << "\n\n!!!!\nStaci.cpp, dxdmu() -> x[" << i << "]=NaN!!!\n\n";
-      break;
-    }
-
-  // Visszairas
-  //------------------------
-  m_dxdmu.clear();
-
-  for (unsigned int i = 0; i < n; i++) m_dxdmu.push_back(dx[i]);
+  vector<double> dx;
+  if (!solve_sparse_system(rhs, dx))
+    throw StaciException("Staci::Compute_dxdmu(): sparse linear solve failed.");
+  m_dxdmu = dx;
 }
 
 //--------------------------------------------------------------
