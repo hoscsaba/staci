@@ -865,7 +865,7 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
                 }
 
                 // Csatorna eseten kiirjuk: node_from, node_to, lejtes
-                if (agelemek.at(j)->GetType() == "Csatorna") {
+                if (auto *distributed = dynamic_cast<DistributedResults *>(agelemek.at(j))) {
                     XMLNode akt_node;
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel1") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
@@ -936,7 +936,7 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
 
 
                 // Speci resz: Csatorna eseten kiirjuk a sebesseg- es szintelszlast is
-                if (agelemek.at(j)->GetType() == "Csatorna") {
+                if (auto *distributed = dynamic_cast<DistributedResults *>(agelemek.at(j))) {
                     XMLNode akt_node;
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode("channel");
@@ -962,8 +962,8 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
 
                         if (melyik == "curve_yf") {
                             // Fen�kg�rbe
-                            vector<double> xf = agelemek.at(j)->Get_res("xf");
-                            vector<double> yf = agelemek.at(j)->Get_res("yf");
+                            const vector<double> &xf = distributed->Get_res("xf");
+                            const vector<double> &yf = distributed->Get_res("yf");
 
                             for (unsigned int pdb = 0; pdb < xf.size(); pdb++)
                                 os << "<point_x>" << xf.at(pdb)
@@ -975,8 +975,8 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
 
                         if (melyik == "curve_y") {
                             // V�zfelszin g�rbe
-                            vector<double> x = agelemek.at(j)->Get_res("x");
-                            vector<double> y = agelemek.at(j)->Get_res("y");
+                            const vector<double> &x = distributed->Get_res("x");
+                            const vector<double> &y = distributed->Get_res("y");
                             for (unsigned int pdb = 0; pdb < x.size(); pdb++)
                                 os << "<point_x>" << x.at(pdb)
                                    << "</point_x><point_y>" << y.at(pdb)
@@ -987,8 +987,8 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
 
                         if (melyik == "curve_p") {
                             // Nyom�sg�rbe
-                            vector<double> x = agelemek.at(j)->Get_res("x");
-                            vector<double> y = agelemek.at(j)->Get_res("p");
+                            const vector<double> &x = distributed->Get_res("x");
+                            const vector<double> &y = distributed->Get_res("p");
                             for (unsigned int pdb = 0; pdb < x.size(); pdb++)
                                 os << "<point_x>" << x.at(pdb)
                                    << "</point_x><point_y>" << y.at(pdb)
@@ -999,8 +999,8 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
 
                         if (melyik == "curve_v") {
                             // Sebess�geloszl�s
-                            vector<double> x = agelemek.at(j)->Get_res("x");
-                            vector<double> v = agelemek.at(j)->Get_res("v");
+                            const vector<double> &x = distributed->Get_res("x");
+                            const vector<double> &v = distributed->Get_res("v");
                             for (unsigned int pdb = 0; pdb < x.size(); pdb++)
                                 os << "<point_x>" << x.at(pdb)
                                    << "</point_x><point_y>" << v.at(pdb)

@@ -8,7 +8,7 @@
 
 using namespace std;
 
-Cso::Cso(const string a_nev, const string a_cspe_nev, const string a_cspv_nev,
+Cso::Cso(const string &a_nev, const string &a_cspe_nev, const string &a_cspv_nev,
          const double a_ro, const double a_L, const double a_D,
          const double a_erdesseg, const double a_cl_k, const double a_cl_w,
          const double a_mp) : Agelem(a_nev, a_D * a_D * M_PI / 4., a_mp, a_ro) {
@@ -33,7 +33,7 @@ Cso::Cso(const string a_nev, const string a_cspe_nev, const string a_cspv_nev,
 DW (friction_model_type = 0) -> Darcy Wiesenbach
 HW (friction_model_type = 1) -> Hazen-Williams
 */
-void Cso::Set_friction_model(string a_fric_type) {
+void Cso::Set_friction_model(const string &a_fric_type) {
   if (a_fric_type == "DW")
     friction_model_type = 0;
   else {
@@ -70,7 +70,7 @@ string Cso::Info() {
 }
 
 //--------------------------------------------------------------
-double Cso::f(vector<double> x) {
+double Cso::f(const vector<double> &x) {
   double ere, tag1;
   double pe = x[0] * ro * g;
   double pv = x[1] * ro * g;
@@ -90,7 +90,7 @@ double Cso::f(vector<double> x) {
 }
 
 //--------------------------------------------------------------
-vector<double> Cso::df(vector<double> x) {
+vector<double> Cso::df(const vector<double> &x) {
   // double pe=x[0]*ro*g;
   // double pv=x[1]*ro*g;
   double he = x[2];
@@ -240,7 +240,7 @@ double Cso::surlodas() {
 }
 
 //--------------------------------------------------------------
-double Cso::Get_dprop(string mit) {
+double Cso::Get_dprop(const string &mit) {
   double out = 0.0;
   if (mit == "Aref")
     out = Aref;
@@ -277,7 +277,7 @@ double Cso::Get_dprop(string mit) {
 }
 
 //--------------------------------------------------------------
-double Cso::Get_dfdmu(string mit) {
+double Cso::Get_dfdmu(const string &mit) {
   double out = 0.0;
   if (mit == "diameter")
     out = -5. * surlodas() * L / pow(D, 6) * 8 / ro / pow(pi, 2) * mp *
@@ -311,7 +311,7 @@ double Cso::Get_dfdmu(string mit) {
 }
 
 //--------------------------------------------------------------
-void Cso::Set_dprop(string mit, double mire) {
+void Cso::Set_dprop(const string &mit, double mire) {
   if (mit == "diameter") {
     D = mire;
     Aref = D * D * M_PI / 4.;

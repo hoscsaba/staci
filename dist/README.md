@@ -16,11 +16,12 @@ Pushing a tag whose name starts with `v` also runs the workflow.
 
 Linux and macOS are packaged as `.tar.gz` files so the executable permission is
 preserved. Windows is packaged as a `.zip` file. Each archive contains an
-installed `bin/staci` or `bin/staci.exe` executable and this README. The Windows
-archive also includes the vcpkg-provided runtime DLLs required by the
-executable.
+installed `staci`, `staci_calibrate`, and `staci_split` executables in `bin/`
+(with `.exe` suffixes on Windows) and this README. The Windows archive also
+includes the vcpkg-provided runtime DLLs required by the executables.
 
-Linux and macOS artifacts expect compatible SuiteSparse and HDF5 runtimes to be
-installed on the target computer. HDF5 provides the chunked EPS result file.
-If shared runtime dependencies are not suitable for a release, build on the
-target system using the instructions in the repository README.
+Linux and macOS artifacts expect compatible SuiteSparse, HDF5, pagmo2, TBB,
+Boost, Eigen3, and igraph runtimes to be installed on the target computer.
+HDF5 provides the chunked EPS result file. If shared runtime dependencies are
+not suitable for a release, build on the target system using the instructions
+in the repository README.

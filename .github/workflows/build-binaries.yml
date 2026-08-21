@@ -28,20 +28,20 @@ jobs:
       - name: Check out source
         uses: actions/checkout@v6
 
-      - name: Install SuiteSparse and HDF5 on Linux
+      - name: Install dependencies on Linux
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install --yes libsuitesparse-dev libhdf5-dev
+          sudo apt-get install --yes libsuitesparse-dev libhdf5-dev libpagmo-dev libeigen3-dev libigraph-dev
 
-      - name: Install SuiteSparse and HDF5 on macOS
+      - name: Install dependencies on macOS
         if: runner.os == 'macOS'
-        run: brew install suite-sparse hdf5
+        run: brew install suite-sparse hdf5 pagmo eigen igraph
 
-      - name: Install SuiteSparse and HDF5 on Windows
+      - name: Install dependencies on Windows
         if: runner.os == 'Windows'
         shell: pwsh
-        run: vcpkg install suitesparse:x64-windows hdf5:x64-windows
+        run: vcpkg install suitesparse:x64-windows hdf5:x64-windows pagmo2:x64-windows eigen3:x64-windows igraph:x64-windows
 
       - name: Configure on Linux or macOS
         if: runner.os != 'Windows'

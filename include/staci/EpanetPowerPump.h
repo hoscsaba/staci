@@ -12,12 +12,13 @@ public:
                     double hydraulic_power_watts,
                     double initial_mass_flow_rate);
 
-    double f(vector<double> x) override;
-    vector<double> df(vector<double> x) override;
+    double f(const vector<double> &state) override;
+    vector<double> df(const vector<double> &state) override;
     void Ini(int mode, double value) override;
-    double Get_dprop(string property) override;
+    double Get_dprop(const string &property) override;
+    void Set_dprop(const string &property, double value) override;
     string Info() override;
-    string GetType() const override { return "EpanetPowerPump"; }
+    string_view GetType() const noexcept override { return "EpanetPowerPump"; }
 
 private:
     double hydraulic_power;

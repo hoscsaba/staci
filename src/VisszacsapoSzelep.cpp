@@ -8,9 +8,9 @@
 
 using namespace std;
 
-VisszacsapoSzelep::VisszacsapoSzelep(const string a_nev,
-                                     const string a_cspe_nev,
-                                     const string a_cspv_nev,
+VisszacsapoSzelep::VisszacsapoSzelep(const string &a_nev,
+                                     const string &a_cspe_nev,
+                                     const string &a_cspv_nev,
                                      const double a_ro,
                                      const double Aref,
                                      const double a_dzeta_e,
@@ -38,13 +38,13 @@ string VisszacsapoSzelep::Info()
     ostringstream strstrm;
     strstrm << Agelem::Info();
     strstrm << "\nkapcsolodas : " << cspv_nev << "(index:" << cspv_index << ")\n";
-    strstrm << "\n\t átfolyási tényezõ folyásirányban : " << dzeta_e;
-    strstrm << "\n\t átfolyási tényezõ zárás iráynyban: " << dzeta_v << "\n";
+    strstrm << "\n\t forward flow coefficient : " << dzeta_e;
+    strstrm << "\n\t reverse flow coefficient : " << dzeta_v << "\n";
     return strstrm.str();
 }
 
 //--------------------------------------------------------------
-double VisszacsapoSzelep::f(vector<double> x)
+double VisszacsapoSzelep::f(const vector<double> &x)
 {
     double ere, veszt;
     double pe = x[0] * ro * g;
@@ -71,7 +71,7 @@ double VisszacsapoSzelep::f(vector<double> x)
 }
 
 //--------------------------------------------------------------
-vector<double> VisszacsapoSzelep::df(vector<double> x)
+vector<double> VisszacsapoSzelep::df(const vector<double> &x)
 {
     vector<double> ere;
     if (mp > 0)
@@ -103,7 +103,7 @@ void VisszacsapoSzelep::Ini(int mode, double value)
 }
 
 //--------------------------------------------------------------
-void VisszacsapoSzelep::Set_dprop(string mit, double mire)
+void VisszacsapoSzelep::Set_dprop(const string &mit, double mire)
 {
     //    if (mit=="diameter")
     //      D=mire;
@@ -114,7 +114,7 @@ void VisszacsapoSzelep::Set_dprop(string mit, double mire)
     //      }
 }
 
-double VisszacsapoSzelep::Get_dprop(string mit) {
+double VisszacsapoSzelep::Get_dprop(const string &mit) {
     double out = 0.0;
     // if (mit == "Aref")
     //   out = Aref;

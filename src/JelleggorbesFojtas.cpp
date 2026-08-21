@@ -9,13 +9,13 @@
 
 using namespace std;
 
-JelleggorbesFojtas::JelleggorbesFojtas(const string a_nev,
-                                       const string a_cspe_nev,
-                                       const string a_cspv_nev,
+JelleggorbesFojtas::JelleggorbesFojtas(const string &a_nev,
+                                       const string &a_cspe_nev,
+                                       const string &a_cspv_nev,
                                        const double a_ro,
                                        const double a_Aref,
-                                       vector<double> a_e,
-                                       vector<double> a_zeta,
+                                       const vector<double> &a_e,
+                                       const vector<double> &a_zeta,
                                        double a_allas,
                                        const double a_mp) :
         Agelem(a_nev, a_Aref, a_mp, a_ro) {
@@ -83,7 +83,7 @@ string JelleggorbesFojtas::Info() {
 }
 
 //--------------------------------------------------------------
-double JelleggorbesFojtas::f(vector<double> x) {
+double JelleggorbesFojtas::f(const vector<double> &x) {
     double ere;
     double pe = x[0] * ro * g;
     double pv = x[1] * ro * g;
@@ -108,7 +108,7 @@ double JelleggorbesFojtas::f(vector<double> x) {
 }
 
 //--------------------------------------------------------------
-vector<double> JelleggorbesFojtas::df(vector<double> x) {
+vector<double> JelleggorbesFojtas::df(const vector<double> &x) {
     vector<double> ere;
 
  double loss_coeff = veszt;
@@ -138,7 +138,7 @@ void JelleggorbesFojtas::Ini(int mode, double value) {
 }
 
 //--------------------------------------------------------------
-void JelleggorbesFojtas::Set_dprop(string mit, double mire) {
+void JelleggorbesFojtas::Set_dprop(const string &mit, double mire) {
     if (mit == "position") {
         allas = mire;
         Update_zeta();
@@ -151,7 +151,7 @@ void JelleggorbesFojtas::Set_dprop(string mit, double mire) {
 }
 
 //--------------------------------------------------------------
-double JelleggorbesFojtas::Get_dprop(string mit) {
+double JelleggorbesFojtas::Get_dprop(const string &mit) {
 
     double out = 0.0;
     if (mit == "position")

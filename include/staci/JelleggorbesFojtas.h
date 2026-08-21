@@ -8,24 +8,24 @@ private:
   int fokszam;
   double headloss;
 public:
-  JelleggorbesFojtas(const string nev,
-   const string a_cspe_nev,
-   const string a_cspv_nev,
+  JelleggorbesFojtas(const string &nev,
+   const string &a_cspe_nev,
+   const string &a_cspv_nev,
    const double a_ro,
    const double Aref,
-   const vector <double>e,
-   const vector <double> zeta,
+   const vector<double> &e,
+   const vector<double> &zeta,
    const double allas,
    const double a_mp);
   void Update_zeta();
-  ~JelleggorbesFojtas();
-  string Info();
-  double f(vector<double>);
-  vector<double> df(vector<double>);
-  void Ini(int mode, double value);
-  void Set_dprop(string mit, double mire);
-  double Get_dprop(string mit);
-  string GetType() const override
+  ~JelleggorbesFojtas() override;
+  string Info() override;
+  double f(const vector<double> &state) override;
+  vector<double> df(const vector<double> &state) override;
+  void Ini(int mode, double value) override;
+  void Set_dprop(const string &property, double value) override;
+  double Get_dprop(const string &property) override;
+  string_view GetType() const noexcept override
   {
     return "JelleggorbesFojtas";
   }

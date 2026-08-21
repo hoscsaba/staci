@@ -10,8 +10,8 @@
 
 using namespace std;
 
-BukoMutargy::BukoMutargy(const string a_nev, const string a_cspe_nev,
-                         const string a_cspv_nev, const double a_ro, const double Aref, const double a_Hf,
+BukoMutargy::BukoMutargy(const string &a_nev, const string &a_cspe_nev,
+                         const string &a_cspv_nev, const double a_ro, const double Aref, const double a_Hf,
                          const bool a_is_opened, const double a_width,
                          const double a_overflow_height, const double a_discharge_coeff,
                          const double a_valve_coeff, const double a_mp) :
@@ -56,7 +56,7 @@ string BukoMutargy::Info()
 }
 
 //--------------------------------------------------------------
-double BukoMutargy::f(vector<double> x)
+double BukoMutargy::f(const vector<double> &x)
 {
   double ere;
   double pe = x[0] * ro * g;
@@ -112,26 +112,27 @@ double BukoMutargy::f(vector<double> x)
 }
 
 //--------------------------------------------------------------
-vector<double> BukoMutargy::df(vector<double> x)
+vector<double> BukoMutargy::df(const vector<double> &x)
 {
-  vector<double> ere, temp = x;
+  vector<double> ere;
+  vector<double> perturbed = x;
   double f1 = f(x), f2, dtemp;
 
   // df/dhe
-  x.at(0) *= 1.01;
-  f2 = f(x);
-  ere.push_back((f2 - f1) / 0.01 / x.at(0));
+  perturbed.at(0) *= 1.01;
+  f2 = f(perturbed);
+  ere.push_back((f2 - f1) / 0.01 / perturbed.at(0));
 
   // df/dhv
-  x = temp;
-  x.at(1) *= 1.01;
-  f2 = f(x);
-  ere.push_back((f2 - f1) / 0.01 / x.at(1));
+  perturbed = x;
+  perturbed.at(1) *= 1.01;
+  f2 = f(perturbed);
+  ere.push_back((f2 - f1) / 0.01 / perturbed.at(1));
 
   // df/dmp
   dtemp = mp;
   mp *= 1.01;
-  f2 = f(x);
+  f2 = f(perturbed);
   ere.push_back((f2 - f1) / 0.01 / mp);
   mp = dtemp;
 
@@ -164,7 +165,7 @@ void BukoMutargy::Ini(int mode, double value)
 }
 
 //--------------------------------------------------------------
-void BukoMutargy::Set_dprop(string mit, double mire) {
+void BukoMutargy::Set_dprop(const string &mit, double mire) {
 //    if (mit=="diameter")
 //      D=mire;
 //    else
@@ -174,7 +175,7 @@ void BukoMutargy::Set_dprop(string mit, double mire) {
 //      }
 }
 
-double BukoMutargy::Get_dprop(string mit) {
+double BukoMutargy::Get_dprop(const string &mit) {
   double out = 0.0;
   // if (mit == "Aref")
   //   out = Aref;

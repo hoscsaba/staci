@@ -8,7 +8,7 @@
 
 using namespace std;
 
-Vegakna::Vegakna(const string a_nev, const string a_csp_nev, const double a_ro, const double Aref,
+Vegakna::Vegakna(const string &a_nev, const string &a_csp_nev, const double a_ro, const double Aref,
                  const double a_Hf, const double a_H, const double a_mp, const double a_tt) :
     Agelem(a_nev, Aref, a_mp, a_ro, a_tt) {
     //Kotelezo adatok minden Agelemnel:
@@ -40,13 +40,13 @@ string Vegakna::Info() {
 }
 
 /*//--------------------------------------------------------------
- double Vegakna::f(vector<double> x) {
+ double Vegakna::f(const vector<double> &x) {
  double ere=x.at(1)+x.at(3)-p/ro/g;
  return ere;
  }*/
 
 //--------------------------------------------------------------
-double Vegakna::f(vector<double> x) {
+double Vegakna::f(const vector<double> &x) {
     if (!enabled)
         return mp;
     //    double pe=x[0]*ro*g;
@@ -65,7 +65,7 @@ double Vegakna::f(vector<double> x) {
 }
 
 //--------------------------------------------------------------
-vector<double> Vegakna::df(vector<double> x) {
+vector<double> Vegakna::df(const vector<double> &x) {
     vector<double> ere;
     if (!enabled) {
         ere.push_back(0.0);
@@ -88,7 +88,7 @@ vector<double> Vegakna::df(vector<double> x) {
 }
 /*
  //--------------------------------------------------------------
- vector<double> Vegakna::df(vector<double> x) {
+ vector<double> Vegakna::df(const vector<double> &x) {
  vector<double> ere;
  ere.push_back(0.0);
  ere.push_back(1.0);
@@ -107,7 +107,7 @@ void Vegakna::Ini(int mode, double value) {
 }
 
 //--------------------------------------------------------------
-void Vegakna::Set_dprop(string mit, double mire) {
+void Vegakna::Set_dprop(const string &mit, double mire) {
 
     if (mit == "bottom_level")
         Hf = mire;
@@ -122,7 +122,7 @@ void Vegakna::Set_dprop(string mit, double mire) {
 }
 
 //--------------------------------------------------------------
-double Vegakna::Get_dprop(string mit) {
+double Vegakna::Get_dprop(const string &mit) {
 
     double out = 0.0;
     if (mit == "bottom_level")

@@ -1,7 +1,7 @@
 #include "Agelem.h"
 using namespace std;
 
-class Csatorna : public Agelem {
+class Csatorna : public Agelem, public DistributedResults {
 private:
 	/// A csatorna hossza [m]-ben
 	double L;
@@ -55,7 +55,7 @@ private:
 	double cl_k, cl_w;
 
 	/// Eredm�nyeloszl�sok kisz�m�t�sa
-	void build_res();
+	void build_res() override;
 
 	/// Ki kell-e __numerikusan__ sz�m�tani a Jacobi elemeit: [df_dye, df_dyv, df_dQ]
 	vector<bool> num_eval_jac;
@@ -112,8 +112,8 @@ public:
 	//			const double Hmax, const double a_cl_k, const double a_cl_w);
 
 	/// Konstruktor k�r km. eset�n
-	Csatorna(const string nev, const string a_cspe_nev,
-	         const string a_cspv_nev, const double a_ro, const double Aref, const double L,
+	Csatorna(const string &nev, const string &a_cspe_nev,
+	         const string &a_cspv_nev, double a_ro, double Aref, double L,
 	         const double ze, const double zv, const double surl,
 	         const int int_steps, const int debugl, const double dia,
 	         const double a_cl_k, const double a_cl_w, const bool is_reversed, const double a_mp);
@@ -128,20 +128,20 @@ public:
 	//			const vector<double> aak, const double a_cl_k, const double a_cl_w);
 
 	/// Destruktor
-	~Csatorna();
+	~Csatorna() override;
 
 	/// Inform�ci�
-	string Info();
+	string Info() override;
 
 	/// �gegyenlet �rt�ke
-	double f(vector<double>);
+	double f(const vector<double> &state) override;
 
 	/// �gegyenlet derv�ltja
-	vector<double> df(vector<double>);
+	vector<double> df(const vector<double> &state) override;
 	// vector<double> df_simple(vector<double>);
 
 	/// Inicializ�ci�
-	void Ini(int mode, double value);
+	void Ini(int mode, double value) override;
 
 	/// Keresztmetszeti jellemzok szamitasa
 	void keresztmetszet(const double y, double &A, double &B, double &Rh);
@@ -162,16 +162,16 @@ public:
 	void compute_distr();
 
 	/// Eredm�nyeloszl�sok visszaad�sa
-	vector<double> Get_res(string mit);
+	const vector<double> &Get_res(const string &property) override;
 
 	/// Surl�dosi modell
 	double surlodas();
 
 	/// Get Double property
-	double Get_dprop(string mit);
+	double Get_dprop(const string &property) override;
 
 	/// Folyadekterfogat az elemben
-	double Get_FolyTerf();
+	double Get_FolyTerf() override;
 
 	/// Hibauzenet
 	void error(string fv, string msg);
@@ -179,16 +179,16 @@ public:
 	/// Figyelmeztetes
 	void warning(string fv, string msg);
 
-	string GetType() const override {
+	string_view GetType() const noexcept override {
 		return "Csatorna";
 	}
 
-	void Set_dprop(string mit, double mire);
+	void Set_dprop(const string &property, double value) override;
 
 	/// Overriding Agelem::SetLogFile()
 	// void virtual SetLogFile();
 
-	double virtual Get_v()
+	double Get_v() override
 	{
 		if (!res_ready)
 			build_res();

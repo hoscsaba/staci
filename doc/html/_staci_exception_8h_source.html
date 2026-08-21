@@ -106,15 +106,24 @@ document.addEventListener('DOMContentLoaded', () => {
   <div class="headertitle"><div class="title">StaciException.h</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="fragment"><div class="foldopen" id="foldopen00001" data-start="{" data-end="};">
-<div class="line"><a id="l00001" name="l00001"></a><span class="lineno"><a class="line" href="class_staci_exception.html">    1</a></span><span class="keyword">class </span>StaciException{</div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> <span class="keywordtype">string</span> hibauzenet; <span class="comment">//verbal description of the error</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> StaciException(<span class="keywordtype">string</span> d):hibauzenet(d){}</div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> <span class="keywordtype">string</span> getDescription() {<span class="keywordflow">return</span> hibauzenet;}</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>};</div>
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef STACI_EXCEPTION_H</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define STACI_EXCEPTION_H</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;stdexcept&gt;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
+<div class="foldopen" id="foldopen00007" data-start="{" data-end="};">
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno"><a class="line" href="class_staci_exception.html">    7</a></span><span class="keyword">class </span>StaciException : <span class="keyword">public</span> std::runtime_error</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>{</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    <span class="keyword">explicit</span> StaciException(<span class="keyword">const</span> std::string &amp;message)</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>        : std::runtime_error(message) {}</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    std::string getDescription()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> what(); }</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>};</div>
 </div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span> </div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

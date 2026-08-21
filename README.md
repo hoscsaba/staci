@@ -27,8 +27,12 @@ STACI can:
   valves, overflows, and several open-channel cross-sections;
 - write convergence markers, progress logs, and updated network/result files.
 
-The repository currently builds a command-line executable named `staci`. It
-does not yet install a separate C++ link library or stable public API.
+The repository builds three command-line executables: `staci`, the
+`staci_calibrate` pipe-calibration tool, and the `staci_split` network
+partitioning/sensor-placement tool. The optimization tools use pagmo2; the
+splitter keeps its graph-aware mutation operator and uses Eigen3 and igraph.
+The project does not yet install a separate C++ link library or stable public
+API.
 
 ## Precompiled executables
 
@@ -53,8 +57,13 @@ SuiteSparse runtime requirements can change between releases.
 - CMake 3.16 or newer;
 - a C++17 compiler;
 - SuiteSparse with UMFPACK, CHOLMOD, AMD, COLAMD, and SuiteSparseConfig.
+- pagmo2 and its Boost/TBB dependencies;
+- Eigen3 and igraph (used by `staci_split`);
 - HDF5 development files (optional for general STACI use, required for the
   chunked EPS `.h5` output).
+
+The optimizer targets are enabled by default. A minimal hydraulic-only build
+can omit them with `-DSTACI_BUILD_OPTIMIZERS=OFF`.
 
 CMake first uses SuiteSparse's official imported `SuiteSparse::UMFPACK` target.
 For older system packages without CMake metadata, it falls back to finding the
@@ -66,7 +75,8 @@ headers and libraries in standard installation prefixes.
 
 ```bash
 sudo apt update
-sudo apt install build-essential cmake libsuitesparse-dev libhdf5-dev
+sudo apt install build-essential cmake libsuitesparse-dev libhdf5-dev \
+  libpagmo-dev libeigen3-dev libigraph-dev
 
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel
@@ -96,7 +106,7 @@ Install the command-line tools and dependencies:
 
 ```bash
 xcode-select --install
-brew install cmake suite-sparse hdf5
+brew install cmake suite-sparse hdf5 pagmo eigen igraph
 ```
 
 Configure and build with Apple Clang:
@@ -124,7 +134,8 @@ with C++** workload, CMake, Git, and vcpkg.
 In PowerShell:
 
 ```powershell
-vcpkg install suitesparse:x64-windows hdf5:x64-windows
+vcpkg install suitesparse:x64-windows hdf5:x64-windows pagmo2:x64-windows \
+  eigen3:x64-windows igraph:x64-windows
 
 cmake -S . -B build `
   -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
@@ -159,14 +170,29 @@ For a multi-configuration generator such as Visual Studio:
 cmake --install build --config Release --prefix install
 ```
 
-The installed executable is `install/bin/staci` on Unix-like systems and
-`install\bin\staci.exe` on Windows.
+The installed executables are `staci`, `staci_calibrate`, and `staci_split`
+(with `.exe` suffixes on Windows).
 
 ## Run the integration tests
 
+The CTest suite includes deterministic, fixed-seed pagmo tests for both
+optimizer programs. The calibration test uses the small `anytown_1med.spr`
+network, while the splitter test uses `LOV-LOVOTV-2-input_mod.spr`, which has
+2486 edge elements (2479 elements participate in splitting after excluding
+fixed-pressure and pool boundary elements):
+
+```bash
+ctest --test-dir build --output-on-failure
+```
+
+The test configurations use very small populations and generation counts; they
+verify integration and file output, not optimization quality.
+
 The portable Python test runner recursively tests every `.spr` and `.inp` file
-under `tests/`. It uses temporary copies, so hydraulic calculations never
-overwrite the original test networks. On Linux and macOS:
+under `tests/`. It uses copies below `tests/test-results/`, so hydraulic
+calculations never overwrite the original test networks. The runner also tests
+`staci_calibrate` and runs `staci_split` on the large LOV network with both two
+and three requested segments. On Linux and macOS:
 
 ```bash
 python3 tests/run_tests.py --binary ./build/staci
@@ -192,16 +218,26 @@ required datasets, SI unit attributes, extendible time dimension, and
 16-frame chunking. This check requires either the Python `h5py` package or the
 `h5dump` command-line utility; use the `H5DUMP` environment variable if the
 utility is not on `PATH`. The HDF5 test output is always retained in a
-timestamped directory below `tests/test-results/hdf5/`, and its exact path is
-printed at the end of the run.
+directory below `tests/test-results/hdf5/`.
 
 The runner continues after individual failures and writes the full
-human-readable report to `tests/run_tests.log`. That report is recreated on
-every run, and old generated STACI sidecar logs (`.ros`, `.rps`, `.rrs`, and
-related variants) are removed at startup, so the report describes only the
-latest test run. Use `--keep-workdir` to retain the other generated files in a
-timestamped directory below `tests/test-results/runs/` for debugging. Retained
-HDF5 files are not deleted by later test runs.
+human-readable report to `tests/test-results/run_tests.log`. Before every run,
+the complete `tests/test-results/` directory is deleted and recreated, so it
+contains only the latest results. Generated artifacts are grouped as follows:
+
+- `networks/`: SPR and INP integration-test copies and their outputs;
+- `hdf5/`: the retained chunked EPS HDF5 test file and related SI outputs;
+- `calibration/`: calibration settings, logs, and best result;
+- `split/2-segments/` and `split/3-segments/`: splitter settings, membership,
+  logs, and `network-2-segments.png` or `network-3-segments.png`.
+
+The two PNG files are generated directly from the SPR coordinates, links, and
+the splitter's `membership.txt`; no plotting package is required. The splitter
+uses one graph seed per segment and assigns nodes with a multi-source graph
+traversal, so every segment is connected by construction. The test independently
+checks this property and fails if any requested segment contains multiple graph
+components. Old generated STACI sidecar logs (`.ros`, `.rps`, `.rrs`, and
+related variants) are also removed at startup.
 
 ## Quick start
 

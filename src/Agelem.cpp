@@ -10,62 +10,40 @@
 
 using namespace std;
 
-Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const double a_ro) {
-    // tomegaram es suruseg
-    mp = a_mp;
-
-    ro = a_ro;
-
-    // azonosito
-    nev = a_nev;
-    Aref = a_Aref;
-    // Csomopontok vektora
-    cspe_index = -1, cspv_index = -1;
-    string cspe_nev = "nincs_cspe_nev", cspv_nev = "nincs_cspv_nev";
-    FolyTerf = 0;
-    debug_level = 0;
-
-    tt_start = 0.;
-    tt_end = 0.;
-
-    if (fabs(a_ro) < 1.0e-3)
-        error("Agelem constructor", "Density (ro) is zero up to machine precision!");
-
-    force_more_iter = false;
-    update_diameter = false;
-    user1=0.;
-    user2=0.;
-    enabled = true;
-}
+Agelem::Agelem(const string &a_nev, double a_Aref, double a_mp, double a_ro)
+    : Agelem(a_nev, a_Aref, a_mp, a_ro, 0.0) {}
 
 //--------------------------------------------------------------
-Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const double a_ro, const double a_tt) {
-    // tomegaram es suruseg
-    mp = a_mp;
-
-    ro = a_ro;
-
-    // azonosito
-    nev = a_nev;
-    Aref = a_Aref;
-    // Csomopontok vektora
-    cspe_index = -1, cspv_index = -1;
-    string cspe_nev = "nincs_cspe_nev", cspv_nev = "nincs_cspv_nev";
-    FolyTerf = 0;
-    debug_level = 0;
-
-    tt_start = a_tt * 3600; // Az adatfajlbol oraban olvassuk ki, oraban
-    tt_end = a_tt * 3600; // Az adatfajlbol oraban olvassuk ki, oraban
-
+Agelem::Agelem(const string &a_nev, double a_Aref, double a_mp, double a_ro, double a_tt)
+    : mp(a_mp),
+      ro(a_ro),
+      Aref(a_Aref),
+      nev(a_nev),
+      cspe_index(-1),
+      cspv_index(-1),
+      cspe_nev("nincs_cspe_nev"),
+      cspv_nev("nincs_cspv_nev"),
+      csp_db(0),
+      FolyTerf(0.0),
+      head_loss(0.0),
+      out_file(),
+      debug_level(0),
+      tt_start(a_tt * 3600.0),
+      tt_end(a_tt * 3600.0),
+      user1(0.0),
+      user2(0.0),
+      enabled(true),
+      konc(),
+      vel(),
+      konc_atlag(0.0),
+      ido(0.0),
+      cL(1.0),
+      cT(0.0),
+      cdt(0.0),
+      force_more_iter(false),
+      update_diameter(false) {
     if (fabs(a_ro) < 1.0e-3)
         error("Agelem constructor", "Density (ro) is zero up to machine precision!");
-
-    enabled = true;
-
-}
-
-//--------------------------------------------------------------
-Agelem::~Agelem() {
 }
 
 //--------------------------------------------------------------
@@ -80,19 +58,14 @@ string Agelem::Info() {
 }
 
 //--------------------------------------------------------------
-void Agelem::add_csp(const int a_cspe_index, const int a_cspv_index) {
+void Agelem::add_csp(int a_cspe_index, int a_cspv_index) {
     cspe_index = a_cspe_index;
     cspv_index = a_cspv_index;
 }
 
 //--------------------------------------------------------------
-vector<double> Agelem::Get_res(string mit) {
-    vector<double> x;
-    return x;
-}
-
-//--------------------------------------------------------------
-vector<double> Agelem::interp(vector<double> x, vector<double> y, vector<double> xg) {
+vector<double> Agelem::interp(const vector<double> &x, const vector<double> &y,
+                              const vector<double> &xg) {
     vector<double> yg;
     double xp, xn, yp, yn;
 
@@ -152,7 +125,7 @@ vector<double> Agelem::interp(vector<double> x, vector<double> y, vector<double>
 }
 
 //--------------------------------------------------------------
-void Agelem::set_up_grid(double a_konc, vector<double> a_vel, double a_cL) {
+void Agelem::set_up_grid(double a_konc, const vector<double> &a_vel, double a_cL) {
     //konc.clear(); vel.clear();
     // Vizminoseg adatok:
     for (unsigned int i = 0; i < a_vel.size(); i++)
@@ -180,7 +153,7 @@ string Agelem::show_grid(double ido) {
 }
 
 //--------------------------------------------------------------
-double Agelem::mean(vector<double> x) {
+double Agelem::mean(const vector<double> &x) {
     double mean = 0;
     for (unsigned int i = 0; i < x.size(); i++)
         mean += x.at(i);
@@ -188,7 +161,7 @@ double Agelem::mean(vector<double> x) {
 }
 
 //--------------------------------------------------------------
-void Agelem::error(string fv, string msg) {
+void Agelem::error(const string &fv, const string &msg) {
     ostringstream strstrm;
     strstrm.str("");
     strstrm << "\n\n******** ERROR *********";
@@ -201,7 +174,7 @@ void Agelem::error(string fv, string msg) {
 }
 
 //--------------------------------------------------------------
-void Agelem::logfile_write(string msg, int msg_debug_level) {
+void Agelem::logfile_write(const string &msg, int msg_debug_level) {
     if (debug_level >= msg_debug_level) {
         ofstream outfile(out_file.c_str(), ios::app);
         outfile << msg;

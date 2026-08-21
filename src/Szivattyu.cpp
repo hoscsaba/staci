@@ -7,9 +7,10 @@
 
 using namespace std;
 
-Szivattyu::Szivattyu(const string a_nev, const string a_cspe_nev,
-                     const string a_cspv_nev, const double a_ro, const double Aref, vector<double> a_q,
-                     vector<double> a_H, const double a_mp) : Agelem(a_nev, Aref, a_mp, a_ro) {
+Szivattyu::Szivattyu(const string &a_nev, const string &a_cspe_nev,
+                     const string &a_cspv_nev, double a_ro, double Aref,
+                     const vector<double> &a_q, const vector<double> &a_H,
+                     double a_mp) : Agelem(a_nev, Aref, a_mp, a_ro) {
     //Kotelezo adatok minden Agelemnel:
     csp_db = 2;
     cspe_nev = a_cspe_nev;
@@ -112,7 +113,7 @@ The function evaluates the curve fit by the constructor \sa Szivattyu()
 and elevations in positions 0 through 3.
 \return (double) function error (should be zero)
 \sa PumpCharCurve()
-*/double Szivattyu::f(vector<double> x) {
+*/double Szivattyu::f(const vector<double> &x) {
     if (!enabled)
         return mp;
     double ere;
@@ -158,7 +159,7 @@ double Szivattyu::PumpCharCurve(double qq) {
 
 
 //--------------------------------------------------------------
-vector<double> Szivattyu::df(vector<double> x) {
+vector<double> Szivattyu::df(const vector<double> &x) {
     vector<double> ere;
     if (!enabled) {
         ere.push_back(0.0);
@@ -206,7 +207,7 @@ void Szivattyu::Ini(int mode, double value) {
 }
 
 //--------------------------------------------------------------
-void Szivattyu::Set_dprop(string mit, double mire) {
+void Szivattyu::Set_dprop(const string &mit, double mire) {
     if ((mit == "concentration") || (mit == "konc_atlag")) {
         konc_atlag = mire;
     } else {
@@ -216,7 +217,7 @@ void Szivattyu::Set_dprop(string mit, double mire) {
 }
 
 //--------------------------------------------------------------
-double Szivattyu::Get_dprop(string mit) {
+double Szivattyu::Get_dprop(const string &mit) {
 
     double out = 0.0;
     if (mit == "Aref")

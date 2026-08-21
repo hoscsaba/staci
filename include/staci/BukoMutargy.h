@@ -18,23 +18,23 @@ private:
 
 public:
     /// Konstruktor
-    BukoMutargy(const string nev, const string a_cspe_nev, const string a_cspv_nev, const double a_ro, const double Aref,
+    BukoMutargy(const string &nev, const string &a_cspe_nev, const string &a_cspv_nev, const double a_ro, const double Aref,
                 const double Hf, const bool is_opened, const double width, const double overflow_height,
                 const double discharge_coeff, const double valve_coeff, const double a_mp);
     /// Destruktor
-    ~BukoMutargy();
+    ~BukoMutargy() override;
     /// Információ
-    string Info();
+    string Info() override;
     /// Ágegyenlet értéke
-    double f(vector<double>);
+    double f(const vector<double> &state) override;
     /// Ágegyenlet linarizáltja
-    vector<double> df(vector<double>);
+    vector<double> df(const vector<double> &state) override;
     /// Inicializáció
-    void Ini(int mode, double value);
+    void Ini(int mode, double value) override;
     /// Keresztmetszeti jellemzok szamitasa
-    string GetType() const override {
+    string_view GetType() const noexcept override {
         return "BukoMutargy";
     }
-    void Set_dprop(string mit, double mire);
-    double Get_dprop(string mit);
+    void Set_dprop(const string &property, double value) override;
+    double Get_dprop(const string &property) override;
 };

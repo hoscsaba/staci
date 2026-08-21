@@ -6,5 +6,5 @@ var searchData=
   ['build_20on_20linux_3',['Build on Linux',['../index.html#autotoc_md4',1,'']]],
   ['build_20on_20macos_4',['Build on macOS',['../index.html#autotoc_md7',1,'']]],
   ['build_20on_20windows_5',['Build on Windows',['../index.html#autotoc_md8',1,'']]],
-  ['bukomutargy_6',['BukoMutargy',['../class_buko_mutargy.html',1,'BukoMutargy'],['../class_buko_mutargy.html#ae4ce2dece863cab87563635402c393c1',1,'BukoMutargy::BukoMutargy()']]]
+  ['bukomutargy_6',['BukoMutargy',['../class_buko_mutargy.html',1,'BukoMutargy'],['../class_buko_mutargy.html#acb9c45ccc043ba6d5100d2db259a2397',1,'BukoMutargy::BukoMutargy()']]]
 ];

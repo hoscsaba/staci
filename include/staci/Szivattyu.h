@@ -7,17 +7,17 @@ private:
 	int fokszam;
 	double mer_szorzo;
 public:
-	Szivattyu(const string nev, const string a_cspe_nev,
-			const string a_cspv_nev, const double a_ro, const double Aref, const vector<double> q,
-			const vector<double> H, const double a_mp);
-	~Szivattyu();
-	string Info();
-	double f(vector<double>);
-	vector<double> df(vector<double>);
-	void Ini(int mode, double value);
-	void Set_dprop(string mit, double mire);
-	double Get_dprop(string mit);
-	string GetType() const override {
+	Szivattyu(const string &nev, const string &a_cspe_nev,
+			const string &a_cspv_nev, double a_ro, double Aref, const vector<double> &q,
+			const vector<double> &H, double a_mp);
+	~Szivattyu() override;
+	string Info() override;
+	double f(const vector<double> &state) override;
+	vector<double> df(const vector<double> &state) override;
+	void Ini(int mode, double value) override;
+	void Set_dprop(const string &property, double value) override;
+	double Get_dprop(const string &property) override;
+	string_view GetType() const noexcept override {
 		return "Szivattyu";
 	}
 	double PumpCharCurve(double q);
@@ -29,7 +29,7 @@ public:
 		for (double &value : result) value *= 3600.0;
 		return result;
 	}
-	vector<double> GetCurveHead() const {
+	const vector<double> &GetCurveHead() const {
 		return H;
 	}
 };

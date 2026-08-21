@@ -49,12 +49,12 @@
 
 //--------------------------------------------------------------
 /// K�r km.
-Csatorna::Csatorna(const string a_nev, const string a_cspe_nev,
-                   const string a_cspv_nev, const double a_ro, const double Aref, const double a_L,
+Csatorna::Csatorna(const string &a_nev, const string &a_cspe_nev,
+                   const string &a_cspv_nev, const double a_ro, const double Aref, const double a_L,
                    const double a_ze, const double a_zv, const double a_erd,
                    const int a_int_steps, const int a_debugl, const double a_dia,
                    const double a_cl_k, const double a_cl_w, const bool a_is_reversed, const double a_mp) :
-	Agelem(a_nev, a_dia * a_dia * pi / 4, a_mp, a_ro) {
+	Agelem(a_nev, a_dia * a_dia * 3.14159265358979323846 / 4.0, a_mp, a_ro) {
 	//Kotelezo adatok minden Agelemnel:
 	csp_db = 2;
 	cspe_nev = a_cspe_nev;
@@ -187,7 +187,7 @@ string Csatorna::Info() {
  * Az elj�r�s kisz�m�tja a deriv�ltakat is, �gy @see df csak visszaadja az �rt�ket.
  */
 
-// double Csatorna::f(vector<double> x) {
+// double Csatorna::f(const vector<double> &x) {
 //
 // if (is_simplified)
 // return f_simple(x);
@@ -216,7 +216,7 @@ string Csatorna::Info() {
 // return ere / ro / g;
 // }
 
-double Csatorna::f(vector<double> x) {
+double Csatorna::f(const vector<double> &x) {
 	pe = x[0] * ro * g;
 	pv = x[1] * ro * g;
 	he = x[2];
@@ -494,7 +494,7 @@ void Csatorna::which_case(const double ye, const double yv) {
 /**
  * @return df �rt�ke
 //  */
-vector<double> Csatorna::df(vector<double> x) {
+vector<double> Csatorna::df(const vector<double> &x) {
 
 	return jac;
 }
@@ -1230,9 +1230,7 @@ void Csatorna::build_res() {
 }
 
 //--------------------------------------------------------------
-vector<double> Csatorna::Get_res(string mit) {
-	vector<double> empty;
-
+const vector<double> &Csatorna::Get_res(const string &mit) {
 	if (!res_ready)
 		build_res();
 
@@ -1253,6 +1251,7 @@ vector<double> Csatorna::Get_res(string mit) {
 		strstrm.str("");
 		strstrm << "Nincs ilyen valtozo: " << mit;
 		error("Get_res()", strstrm.str());
+		static const vector<double> empty;
 		return empty;
 	}
 }
@@ -1278,7 +1277,7 @@ double Csatorna::surlodas() {
 }
 
 //--------------------------------------------------------------
-double Csatorna::Get_dprop(string mit) {
+double Csatorna::Get_dprop(const string &mit) {
 	double out = 0.0;
 	if (mit == "Aref")
 		out = Aref;
@@ -1835,7 +1834,7 @@ void Csatorna::error(string fv, string msg) {
 }
 
 //--------------------------------------------------------------
-void Csatorna::Set_dprop(string mit, double mire) {
+void Csatorna::Set_dprop(const string &mit, double mire) {
 	//    if (mit=="diameter")
 	//      D=mire;
 	//    else

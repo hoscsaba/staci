@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['konstnyomas_0',['KonstNyomas',['../class_konst_nyomas.html',1,'']]]
+  ['jelleggorbesfojtas_0',['JelleggorbesFojtas',['../class_jelleggorbes_fojtas.html',1,'']]]
 ];

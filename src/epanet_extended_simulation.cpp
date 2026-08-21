@@ -264,7 +264,7 @@ public:
             if (from == node_indices.end() || to == node_indices.end())
                 continue;
             const bool pipe = link->GetType() == "Cso";
-            std::string output_type = upper(link->GetType());
+            std::string output_type = upper(std::string(link->GetType()));
             if (pipe)
                 output_type = "PIPE";
             else if (is_pump(link))

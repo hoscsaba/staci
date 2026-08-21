@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<settings>
+  <global_debug_level>1</global_debug_level>
+  <Staci_debug_level>0</Staci_debug_level>
+  <dir_name>@STACI_CALIBRATE_TEST_DIR@/</dir_name>
+  <fname_prefix>calibrate_network_</fname_prefix>
+  <logfilename>calibrate-test.log</logfilename>
+  <best_logfilename>calibrate-best.log</best_logfilename>
+  <sollwert_dfile>calibrate_targets.csv</sollwert_dfile>
+  <Start_of_Periods>0</Start_of_Periods>
+  <Num_of_Periods>1</Num_of_Periods>
+  <Spoil_Active_Pipes>no</Spoil_Active_Pipes>
+  <dt>1.0</dt>
+  <weight_p_err>1.0</weight_p_err>
+  <type_of_pipe_selection>largest_diameter</type_of_pipe_selection>
+  <num_of_active_pipes>1</num_of_active_pipes>
+  <popsize>4</popsize>
+  <ngen>1</ngen>
+  <pmut>0.2</pmut>
+  <pcross>0.8</pcross>
+</settings>

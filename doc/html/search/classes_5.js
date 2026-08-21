@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['huffcode_0',['huffcode',['../classhuffcode.html',1,'']]]
+  ['frictionmodelconfigurable_0',['FrictionModelConfigurable',['../class_friction_model_configurable.html',1,'']]]
 ];

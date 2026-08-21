@@ -18,17 +18,20 @@ from pathlib import Path
 import platform
 import re
 import shutil
+import struct
 import subprocess
 import sys
-import tempfile
 import time
 import traceback
-from typing import Dict, Iterable, List, Optional, Sequence, Tuple
+import xml.etree.ElementTree as ET
+import zlib
+from typing import Callable, Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPOSITORY_DIR = SCRIPT_DIR.parent
-DEFAULT_LOG = SCRIPT_DIR / "run_tests.log"
+DEFAULT_RESULTS_DIR = SCRIPT_DIR / "test-results"
+DEFAULT_LOG = DEFAULT_RESULTS_DIR / "run_tests.log"
 HDF5_SIGNATURE = bytes.fromhex("894844460d0a1a0a")
 COMMAND_TIMEOUT_SECONDS = 300.0
 SPR_HYDRAULICS_MAX_BYTES = 1_000_000
@@ -101,6 +104,16 @@ def parse_arguments() -> argparse.Namespace:
         help="Path to staci or staci.exe. If omitted, common build locations are searched.",
     )
     parser.add_argument(
+        "--calibrate-binary",
+        type=Path,
+        help="Path to staci_calibrate; by default it is searched beside staci.",
+    )
+    parser.add_argument(
+        "--split-binary",
+        type=Path,
+        help="Path to staci_split; by default it is searched beside staci.",
+    )
+    parser.add_argument(
         "--log",
         type=Path,
         default=DEFAULT_LOG,
@@ -115,7 +128,7 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument(
         "--keep-workdir",
         action="store_true",
-        help="Keep generated files in tests/test-results instead of deleting them.",
+        help="Deprecated compatibility option; test-results are now always retained.",
     )
     parser.add_argument(
         "--timeout",
@@ -172,6 +185,23 @@ def resolve_binary(requested: Optional[Path]) -> Path:
     )
 
 
+def resolve_companion_binary(primary: Path, requested: Optional[Path], stem: str) -> Path:
+    names = (f"{stem}.exe", stem) if os.name == "nt" else (stem, f"{stem}.exe")
+    candidates: List[Path] = []
+    if requested is not None:
+        candidates.append(requested.expanduser())
+    for directory in (primary.parent, primary.parent / "Release", primary.parent / "Debug"):
+        candidates.extend(directory / name for name in names)
+    for candidate in candidates:
+        resolved = candidate.resolve()
+        if resolved.is_file():
+            return resolved
+    raise TestFailure(
+        f"{stem} was not found beside {primary}. Build optimizer targets or pass "
+        f"--{'calibrate' if stem == 'staci_calibrate' else 'split'}-binary explicitly."
+    )
+
+
 def discover_networks(tests_dir: Path) -> Tuple[List[Path], List[Path]]:
     tests_dir = tests_dir.resolve()
     generated_root = (tests_dir / "test-results").resolve()
@@ -200,6 +230,18 @@ def remove_previous_logs(tests_dir: Path, current_log: Path) -> List[Path]:
             path.unlink()
             removed.append(path)
     return removed
+
+
+def recreate_results_root(tests_dir: Path) -> Path:
+    """Delete results from earlier runs and create a clean, predictable layout."""
+    results_root = (tests_dir / "test-results").resolve()
+    if results_root.parent != tests_dir.resolve() or results_root.name != "test-results":
+        raise TestFailure(f"Refusing to clean unexpected results directory: {results_root}")
+    if results_root.exists():
+        shutil.rmtree(results_root)
+    for name in ("networks", "hdf5", "split", "calibration"):
+        (results_root / name).mkdir(parents=True, exist_ok=True)
+    return results_root
 
 
 def format_command(command: Sequence[str]) -> str:
@@ -515,6 +557,287 @@ def check_hdf5(binary: Path, source: Path, case_dir: Path, log: Log) -> None:
     )
 
 
+def write_settings(path: Path, values: Sequence[Tuple[str, str]]) -> None:
+    root = ET.Element("settings")
+    for name, value in values:
+        ET.SubElement(root, name).text = value
+    ET.ElementTree(root).write(path, encoding="utf-8", xml_declaration=True)
+
+
+def check_calibration(
+    binary: Path, tests_dir: Path, case_dir: Path, log: Log
+) -> None:
+    shutil.copy2(tests_dir / "anytown_1med.spr", case_dir / "calibrate_network_0.spr")
+    shutil.copy2(tests_dir / "calibrate_targets.csv", case_dir / "calibrate_targets.csv")
+    write_settings(case_dir / "staci_calibrate_settings.xml", (
+        ("global_debug_level", "1"),
+        ("Staci_debug_level", "0"),
+        ("dir_name", str(case_dir) + os.sep),
+        ("fname_prefix", "calibrate_network_"),
+        ("logfilename", "calibrate-test.log"),
+        ("best_logfilename", "calibrate-best.log"),
+        ("sollwert_dfile", "calibrate_targets.csv"),
+        ("Start_of_Periods", "0"),
+        ("Num_of_Periods", "1"),
+        ("Spoil_Active_Pipes", "no"),
+        ("dt", "1.0"),
+        ("weight_p_err", "1.0"),
+        ("type_of_pipe_selection", "largest_diameter"),
+        ("num_of_active_pipes", "1"),
+        ("popsize", "4"),
+        ("ngen", "1"),
+        ("pmut", "0.2"),
+        ("pcross", "0.8"),
+    ))
+    output = run_command(log, (str(binary), "--seed", "12345"), case_dir, "pagmo calibration")
+    if "Optimization finished" not in output:
+        raise TestFailure("Calibration did not print its completion marker")
+    require_file(case_dir / "calibrate-test.log", "calibration log")
+    require_file(case_dir / "calibrate-best.log", "best calibration result")
+
+
+def parse_membership(path: Path, expected_segments: int) -> Dict[str, int]:
+    require_file(path, "split membership")
+    memberships: Dict[str, int] = {}
+    declared_segments: Optional[int] = None
+    declared_nodes: Optional[int] = None
+    for raw_line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        line = raw_line.strip()
+        match = re.match(r"n_comm\s*:\s*(\d+)", line)
+        if match:
+            declared_segments = int(match.group(1))
+            continue
+        match = re.match(r"n_nodes\s*:\s*(\d+)", line)
+        if match:
+            declared_nodes = int(match.group(1))
+            continue
+        match = re.match(r"#(\d+)\s*;\s*(.*)", line)
+        if match:
+            segment = int(match.group(1))
+            for node_id in (item.strip() for item in match.group(2).split(";")):
+                if node_id:
+                    memberships[node_id] = segment
+    if declared_segments != expected_segments:
+        raise TestFailure(
+            f"Membership declares {declared_segments} segments, expected {expected_segments}"
+        )
+    if declared_nodes is None or len(memberships) != declared_nodes:
+        raise TestFailure(
+            f"Membership contains {len(memberships)} nodes, expected {declared_nodes}"
+        )
+    if set(memberships.values()) != set(range(expected_segments)):
+        raise TestFailure("One or more requested network segments are empty")
+    return memberships
+
+
+def png_chunk(chunk_type: bytes, data: bytes) -> bytes:
+    payload = chunk_type + data
+    return struct.pack(">I", len(data)) + payload + struct.pack(">I", zlib.crc32(payload) & 0xffffffff)
+
+
+def render_split_png(
+    network_path: Path,
+    memberships: Dict[str, int],
+    segment_count: int,
+    output_path: Path,
+) -> None:
+    tree = ET.parse(network_path)
+    coordinates: Dict[str, Tuple[float, float]] = {}
+    for node in tree.findall(".//nodes/node"):
+        node_id = (node.findtext("id") or "").strip()
+        try:
+            coordinates[node_id] = (
+                float((node.findtext("xcoord") or "").strip()),
+                float((node.findtext("ycoord") or "").strip()),
+            )
+        except ValueError:
+            continue
+    edges: List[Tuple[str, str]] = []
+    for edge in tree.findall(".//edges/edge"):
+        first = (edge.findtext("node_from") or "").strip()
+        second = (edge.findtext("node_to") or "").strip()
+        if first in coordinates and second in coordinates:
+            edges.append((first, second))
+    if not coordinates or len(edges) < 100:
+        raise TestFailure(
+            f"Cannot plot a large network: {len(coordinates)} positioned nodes, {len(edges)} edges"
+        )
+
+    width, height, margin, legend_height = 1800, 1400, 35, 55
+    image = bytearray([255]) * (width * height * 3)
+    xs = [point[0] for point in coordinates.values()]
+    ys = [point[1] for point in coordinates.values()]
+    scale = min(
+        (width - 2 * margin) / max(max(xs) - min(xs), 1.0),
+        (height - 2 * margin - legend_height) / max(max(ys) - min(ys), 1.0),
+    )
+    plot_width = (max(xs) - min(xs)) * scale
+    plot_height = (max(ys) - min(ys)) * scale
+    x_offset = (width - plot_width) / 2.0
+    y_offset = legend_height + (height - legend_height - plot_height) / 2.0
+
+    def position(node_id: str) -> Tuple[int, int]:
+        x, y = coordinates[node_id]
+        return (
+            int(round(x_offset + (x - min(xs)) * scale)),
+            int(round(y_offset + (max(ys) - y) * scale)),
+        )
+
+    def pixel(x: int, y: int, color: Tuple[int, int, int]) -> None:
+        if 0 <= x < width and 0 <= y < height:
+            offset = (y * width + x) * 3
+            image[offset:offset + 3] = bytes(color)
+
+    def line(a: Tuple[int, int], b: Tuple[int, int], color: Tuple[int, int, int]) -> None:
+        x0, y0 = a
+        x1, y1 = b
+        dx, sx = abs(x1 - x0), 1 if x0 < x1 else -1
+        dy, sy = -abs(y1 - y0), 1 if y0 < y1 else -1
+        error = dx + dy
+        while True:
+            pixel(x0, y0, color)
+            if x0 == x1 and y0 == y1:
+                break
+            twice = 2 * error
+            if twice >= dy:
+                error += dy
+                x0 += sx
+            if twice <= dx:
+                error += dx
+                y0 += sy
+
+    node_colors = ((210, 45, 55), (35, 105, 210), (30, 155, 85))
+    edge_colors = ((238, 145, 150), (135, 180, 235), (135, 205, 165))
+    for first, second in edges:
+        first_segment = memberships.get(first)
+        second_segment = memberships.get(second)
+        color = (
+            edge_colors[first_segment]
+            if first_segment is not None and first_segment == second_segment
+            else (125, 125, 125)
+        )
+        line(position(first), position(second), color)
+    for node_id, segment in memberships.items():
+        if node_id not in coordinates:
+            continue
+        x, y = position(node_id)
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                pixel(x + dx, y + dy, node_colors[segment])
+    for segment in range(segment_count):
+        left = margin + segment * 55
+        for x in range(left, left + 36):
+            for y in range(12, 42):
+                pixel(x, y, node_colors[segment])
+
+    raw = b"".join(b"\x00" + bytes(image[row * width * 3:(row + 1) * width * 3]) for row in range(height))
+    description = (
+        f"STACI split test: {segment_count} colored segments; "
+        f"{len(memberships)} nodes and {len(edges)} links"
+    ).encode("latin-1")
+    png = b"\x89PNG\r\n\x1a\n"
+    png += png_chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
+    png += png_chunk(b"tEXt", b"Description\x00" + description)
+    png += png_chunk(b"IDAT", zlib.compress(raw, 6))
+    png += png_chunk(b"IEND", b"")
+    output_path.write_bytes(png)
+
+
+def validate_connected_segments(
+    network_path: Path, memberships: Dict[str, int], segment_count: int
+) -> None:
+    adjacency: Dict[str, Set[str]] = {node_id: set() for node_id in memberships}
+    tree = ET.parse(network_path)
+    for edge in tree.findall(".//edges/edge"):
+        first = (edge.findtext("node_from") or "").strip()
+        second = (edge.findtext("node_to") or "").strip()
+        if first in adjacency and second in adjacency:
+            adjacency[first].add(second)
+            adjacency[second].add(first)
+    for segment in range(segment_count):
+        remaining = {node for node, value in memberships.items() if value == segment}
+        if not remaining:
+            raise TestFailure(f"Segment {segment} is empty")
+        frontier = [remaining.pop()]
+        while frontier:
+            node = frontier.pop()
+            for neighbour in adjacency[node]:
+                if neighbour in remaining and memberships[neighbour] == segment:
+                    remaining.remove(neighbour)
+                    frontier.append(neighbour)
+        if remaining:
+            raise TestFailure(
+                f"Segment {segment} is disconnected: {len(remaining)} nodes lie outside its main component"
+            )
+
+
+def check_split(
+    binary: Path,
+    tests_dir: Path,
+    case_dir: Path,
+    segment_count: int,
+    log: Log,
+) -> None:
+    network = case_dir / "split-network.spr"
+    shutil.copy2(tests_dir / "LOV-LOVOTV-2-input_mod.spr", network)
+    write_settings(case_dir / "staci_split_settings.xml", (
+        ("global_debug_level", "1"),
+        ("n_comm", str(segment_count)),
+        ("weight_type", "topology"),
+        ("weight_type_mod", "diameter"),
+        ("fname", str(network)),
+        ("logfilename", "split-test.log"),
+        ("obj_type", "modularity"),
+        ("popsize", "4"),
+        ("ngen", "2"),
+        ("pmut", "0.25"),
+        ("pcross", "0.8"),
+    ))
+    output = run_command(
+        log, (str(binary), "--seed", "12345"), case_dir,
+        f"pagmo split into {segment_count} segments",
+    )
+    match = re.search(r"# of pipes\s*:\s*(\d+)", output)
+    if match is None or int(match.group(1)) < 100:
+        raise TestFailure("Splitter did not process a network with at least 100 edge elements")
+    membership_path = case_dir / "membership.txt"
+    memberships = parse_membership(membership_path, segment_count)
+    validate_connected_segments(network, memberships, segment_count)
+    log.write(f"  Connectivity: all {segment_count} segments are connected")
+    png_path = case_dir / f"network-{segment_count}-segments.png"
+    render_split_png(network, memberships, segment_count, png_path)
+    require_file(png_path, "colored network PNG")
+    log.write(f"  Visualization: {png_path}")
+
+
+def run_action(
+    kind: str,
+    label: str,
+    action: Callable[[], None],
+    log: Log,
+) -> Tuple[bool, float, str]:
+    log.section(f"{kind}: {label}", "-")
+    print(f"Testing {kind}: {label} ...", flush=True)
+    started = time.monotonic()
+    try:
+        action()
+        elapsed = time.monotonic() - started
+        log.write(f"RESULT: PASS ({elapsed:.3f} s)")
+        print(f"  PASS ({elapsed:.3f} s)", flush=True)
+        return True, elapsed, ""
+    except Exception as error:
+        elapsed = time.monotonic() - started
+        details = f"{type(error).__name__}: {error}"
+        log.write(f"RESULT: FAIL ({elapsed:.3f} s)")
+        log.write(f"REASON: {details}")
+        if not isinstance(error, TestFailure):
+            log.write("TRACEBACK:")
+            for line in traceback.format_exc().rstrip().splitlines():
+                log.write(f"  {line}")
+        print(f"  FAIL ({elapsed:.3f} s): {error}", flush=True)
+        return False, elapsed, details
+
+
 def run_case(
     kind: str,
     source: Path,
@@ -560,17 +883,6 @@ def run_case(
         return False, elapsed, details
 
 
-def make_work_root(
-    keep: bool, tests_dir: Path, run_stamp: str
-) -> Tuple[Path, Optional[tempfile.TemporaryDirectory]]:
-    if keep:
-        destination = tests_dir / "test-results" / "runs" / run_stamp
-        destination.mkdir(parents=True)
-        return destination, None
-    temporary = tempfile.TemporaryDirectory(prefix="staci-tests-")
-    return Path(temporary.name), temporary
-
-
 def main() -> int:
     global COMMAND_TIMEOUT_SECONDS, FULL_SPR_HYDRAULICS, SPR_HYDRAULICS_MAX_BYTES
     arguments = parse_arguments()
@@ -586,17 +898,16 @@ def main() -> int:
     log_path = arguments.log.expanduser().resolve()
     tests_dir = arguments.tests_dir.expanduser().resolve()
     removed_logs = remove_previous_logs(tests_dir, log_path)
+    results_root = recreate_results_root(tests_dir)
     log = Log(log_path)
-    temporary: Optional[tempfile.TemporaryDirectory] = None
     try:
         started_utc = dt.datetime.now(dt.timezone.utc)
-        run_stamp = started_utc.strftime("%Y%m%dT%H%M%SZ")
         binary = resolve_binary(arguments.binary)
         spr_files, inp_files = discover_networks(tests_dir)
-        work_root, temporary = make_work_root(
-            arguments.keep_workdir, tests_dir, run_stamp
-        )
-        hdf5_work_root = tests_dir / "test-results" / "hdf5" / run_stamp
+        work_root = results_root / "networks"
+        hdf5_work_root = results_root / "hdf5"
+        calibration_root = results_root / "calibration"
+        split_root = results_root / "split"
 
         log.write("STACI integration test report")
         log.write("=============================")
@@ -605,7 +916,7 @@ def main() -> int:
         log.write(f"Python: {platform.python_version()}")
         log.write(f"Executable: {binary}")
         log.write(f"Tests directory: {tests_dir}")
-        log.write(f"Work directory: {work_root}")
+        log.write(f"Clean results directory: {results_root}")
         log.write(f"Discovered: {len(spr_files)} SPR, {len(inp_files)} INP")
         log.write(f"Removed previous STACI sidecar logs: {len(removed_logs)}")
         log.write(f"Command timeout: {COMMAND_TIMEOUT_SECONDS:g} s")
@@ -639,6 +950,42 @@ def main() -> int:
             if hdf5_result.is_file():
                 log.write(f"Persistent HDF5 result: {hdf5_result}")
 
+        passed, elapsed, reason = run_action(
+            "CALIBRATION",
+            "anytown_1med.spr",
+            lambda: check_calibration(
+                resolve_companion_binary(binary, arguments.calibrate_binary, "staci_calibrate"),
+                tests_dir,
+                calibration_root,
+                log,
+            ),
+            log,
+        )
+        results.append(("CALIBRATION", Path("anytown_1med.spr"), passed, elapsed, reason))
+
+        for segment_count in (2, 3):
+            case_dir = split_root / f"{segment_count}-segments"
+            case_dir.mkdir(parents=True, exist_ok=True)
+            passed, elapsed, reason = run_action(
+                "SPLIT",
+                f"LOV-LOVOTV-2-input_mod.spr / {segment_count} segments",
+                lambda count=segment_count, directory=case_dir: check_split(
+                    resolve_companion_binary(binary, arguments.split_binary, "staci_split"),
+                    tests_dir,
+                    directory,
+                    count,
+                    log,
+                ),
+                log,
+            )
+            results.append((
+                "SPLIT",
+                Path(f"LOV-LOVOTV-2-input_mod.spr ({segment_count} segments)"),
+                passed,
+                elapsed,
+                reason,
+            ))
+
         passed_count = sum(1 for result in results if result[2])
         failed_count = len(results) - passed_count
         log.section("SUMMARY", "-")
@@ -658,8 +1005,11 @@ def main() -> int:
         print(f"Log: {log_path}")
         if inp_files and hdf5_result.is_file():
             print(f"Persistent HDF5 result: {hdf5_result}")
-        if arguments.keep_workdir:
-            print(f"Generated files: {work_root}")
+        print(f"Generated files: {results_root}")
+        for segment_count in (2, 3):
+            png = split_root / f"{segment_count}-segments" / f"network-{segment_count}-segments.png"
+            if png.is_file():
+                print(f"Split visualization: {png}")
         return 0 if failed_count == 0 else 1
     except Exception as error:
         log.section("FATAL ERROR")
@@ -671,8 +1021,6 @@ def main() -> int:
         return 2
     finally:
         log.close()
-        if temporary is not None:
-            temporary.cleanup()
 
 
 if __name__ == "__main__":

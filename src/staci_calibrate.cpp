@@ -1,5 +1,8 @@
 #include <stdio.h>
-#include <ga/ga.h>
+#include <pagmo/algorithm.hpp>
+#include <pagmo/algorithms/sga.hpp>
+#include <pagmo/population.hpp>
+#include <pagmo/problem.hpp>
 #include <vector>
 #include "Staci.h"
 #include <iomanip>
@@ -11,8 +14,6 @@
 
 using namespace std;
 using namespace boost;
-
-#define cout STD_COUT
 
 int global_debug_level;
 int Staci_debug_level;
@@ -75,7 +76,7 @@ double get_A(string PoolName);
 
 double Compute_Error();
 
-float Objective(GAGenome &);
+double Objective(const pagmo::vector_double &);
 
 bool do_PerformSensitivityAnalysis;
 
@@ -94,7 +95,7 @@ int Obj_Eval;
 
 string Load_Settings();
 
-void PrintBestDataFile(GAGenome &);
+void PrintBestDataFile(const pagmo::vector_double &);
 
 string List_Active_Pipes();
 
@@ -106,6 +107,19 @@ int ngen;
 float pmut;
 float pcross;
 float best_obj;
+
+struct CalibrationProblem {
+    pagmo::vector_double lower_bounds;
+    pagmo::vector_double upper_bounds;
+
+    pagmo::vector_double fitness(const pagmo::vector_double &x) const {
+        return {Objective(x)};
+    }
+
+    std::pair<pagmo::vector_double, pagmo::vector_double> get_bounds() const {
+        return {lower_bounds, upper_bounds};
+    }
+};
 
 int main(int argc, char **argv) {
 
@@ -160,15 +174,18 @@ int main(int argc, char **argv) {
     // you use that seed number.
 
     unsigned int seed = 0;
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i++], "seed") == 0) {
-            seed = atoi(argv[i]);
+    for (int i = 1; i + 1 < argc; ++i) {
+        const std::string_view argument(argv[i]);
+        if (argument == "seed" || argument == "--seed") {
+            seed = static_cast<unsigned>(std::stoul(argv[++i]));
         }
     }
 
-    // Set up GA stuff
-    GABin2DecPhenotype map;
-    double LOWER_BOUND, UPPER_BOUND;
+    // Set up the real-valued pagmo optimization problem. The old GAlib code
+    // quantized each diameter into 16 bits; pagmo can optimize the SI-valued
+    // diameters directly without that artificial discretization.
+    pagmo::vector_double lower_bounds;
+    pagmo::vector_double upper_bounds;
     stringstream msg;
     logfile_write("\n\nSetting up LOWER_BOUND, UPPER_BOUND...", 0);
     msg.str("");
@@ -177,10 +194,11 @@ int main(int argc, char **argv) {
     for (unsigned int i = 0; i < pipe_name.size(); i++) {
         if (pipe_is_active.at(i)) {
             dia = wds.at(0)->get_dprop(pipe_name.at(i), "diameter");
-            LOWER_BOUND = 0.5 * dia;
-            UPPER_BOUND = 2.0 * dia;
-            map.add(16, LOWER_BOUND, UPPER_BOUND);
-            msg << "\t" << pipe_name.at(i) << " D=" << dia << ", LB=" << LOWER_BOUND << ", UB=" << UPPER_BOUND << endl;
+            const double lower_bound = 0.5 * dia;
+            const double upper_bound = 2.0 * dia;
+            lower_bounds.push_back(lower_bound);
+            upper_bounds.push_back(upper_bound);
+            msg << "\t" << pipe_name.at(i) << " D=" << dia << ", LB=" << lower_bound << ", UB=" << upper_bound << endl;
         }
     }
     msg << endl;
@@ -190,32 +208,26 @@ int main(int argc, char **argv) {
     if (bool_Spoil_Active_Pipes)
         Spoil_Active_Pipes();
 
-    // Create the template genome using the phenotype map we just made.
-
-    GABin2DecGenome genome(map, Objective);
-
-    // Now create the GA using the genome and run it.  We'll use sigma truncation
-    // scaling so that we can handle negative objective scores.
-
     logfile_write("Starting optimization...\n", 0);
 
-    GASimpleGA ga(genome);
-    GASigmaTruncationScaling scaling;
-    ga.minimize();
-    ga.populationSize(popsize);
-    ga.nGenerations(ngen);
-    ga.pMutation(pmut);
-    ga.pCrossover(pcross);
-    ga.scaling(scaling);
+    pagmo::problem problem{CalibrationProblem{lower_bounds, upper_bounds}};
+    pagmo::population population{problem, static_cast<pagmo::population::size_type>(popsize), seed};
+    pagmo::algorithm algorithm{pagmo::sga(
+        static_cast<unsigned>(ngen), pcross, 10.0, pmut, 20.0, 2u,
+        "sbx", "polynomial", "tournament", seed)};
+    algorithm.set_verbosity(10u);
+    population = algorithm.evolve(population);
+    const pagmo::vector_double genome = population.champion_x();
 
-    ga.scoreFrequency(10);
-    ga.flushFrequency(10);
-    ga.scoreFilename("bog.dat");
-    ga.evolve(seed);
+    ofstream score_file("bog.dat", ios::out | ios::trunc);
+    if (const auto *sga = algorithm.extract<pagmo::sga>()) {
+        for (const auto &entry : sga->get_log()) {
+            score_file << std::get<0>(entry) << ';' << std::get<1>(entry)
+                       << ';' << std::get<2>(entry) << ';' << std::get<3>(entry) << '\n';
+        }
+    }
 
     do_PerformSensitivityAnalysis = true;
-    ga.statistics().write("bog_stats.dat");
-    genome = ga.statistics().bestIndividual();
     Objective(genome);
     PrintBestDataFile(genome);
 
@@ -229,22 +241,21 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void PrintBestDataFile(GAGenome &x) {
-    GABin2DecGenome &genome = (GABin2DecGenome &) x;
+void PrintBestDataFile(const pagmo::vector_double &genome) {
 
     ofstream resfile;
     resfile.open("best.dat", ios::out);
     resfile << scientific << setprecision(5);
 
-    for (unsigned int j = 0; j < genome.nPhenotypes(); j++)
+    for (unsigned int j = 0; j < genome.size(); j++)
         if (pipe_is_active.at(j))
             resfile << pipe_name.at(j) << " ; ";
     resfile << endl;
-    for (unsigned int j = 0; j < genome.nPhenotypes(); j++)
-        resfile << genome.phenotype(j) << " ; ";
+    for (double value : genome)
+        resfile << value << " ; ";
     resfile << endl;
-    for (unsigned int j = 0; j < genome.nPhenotypes(); j++)
-        resfile << genome.phenotype(j) / pipe_origD.at(j) << " ; ";
+    for (unsigned int j = 0; j < genome.size(); j++)
+        resfile << genome.at(j) / pipe_origD.at(j) << " ; ";
     resfile << endl;
 
     for (unsigned int i = 0; i < Sollwert_Pool_Staci_ID.size(); i++)
@@ -263,21 +274,19 @@ void PrintBestDataFile(GAGenome &x) {
     resfile.close();
 }
 
-float
-Objective(GAGenome &x) {
-    GABin2DecGenome &genome = (GABin2DecGenome &) x;
+double Objective(const pagmo::vector_double &genome) {
 
     bool success = false;
 
     for (unsigned int i = 0; i < wds.size(); i++) {
         int k = 0;
         if (i > 0) {
-            wds.at(i)->ini(wds.at(i - 1));
+            wds.at(i)->ini(wds.at(i - 1).get());
         } else
             wds.at(i)->ini();
         for (unsigned int j = 0; j < pipe_name.size(); j++)
             if (pipe_is_active.at(j)) {
-                wds.at(i)->set_dprop(pipe_name.at(j), "diameter", genome.phenotype(k));
+                wds.at(i)->set_dprop(pipe_name.at(j), "diameter", genome.at(k));
                 k++;
             }
         last_computation_OK = wds.at(i)->solve_system();
@@ -315,8 +324,8 @@ Objective(GAGenome &x) {
         ofstream best_logfile;
         best_logfile.open(best_logfilename.c_str(), ios::app);
         best_logfile << Obj_Eval << "; " << err << scientific << setprecision(5);
-        for (unsigned int i = 0; i < genome.nPhenotypes(); i++)
-            best_logfile << "; " << genome.phenotype(i);
+        for (double value : genome)
+            best_logfile << "; " << value;
         best_logfile << endl;
         best_logfile.close();
         PrintBestDataFile(genome);
@@ -461,7 +470,7 @@ void Set_Up_Active_Pipes() {
     pipe_name.clear();
     pipe_is_active.clear();
     for (unsigned int i = 0; i < wds.at(0)->agelemek.size(); i++)
-        if (strcmp(wds.at(0)->agelemek.at(i)->GetType().c_str(), "Cso") == 0) {
+        if (wds.at(0)->agelemek.at(i)->GetType() == "Cso") {
             pipe_origD.push_back(wds.at(0)->agelemek.at(i)->Get_dprop("diameter"));
             pipe_name.push_back(wds.at(0)->agelemek.at(i)->Get_nev());
             pipe_is_active.push_back(true);
@@ -472,7 +481,7 @@ void Set_Up_Active_Pipes() {
         num_of_active_pipes = 0;
         int k = 0;
         for (unsigned int i = 0; i < wds.at(0)->agelemek.size(); i++)
-            if (strcmp(wds.at(0)->agelemek.at(i)->GetType().c_str(), "Cso") == 0) {
+            if (wds.at(0)->agelemek.at(i)->GetType() == "Cso") {
                 if (wds.at(0)->agelemek.at(i)->Get_dprop("diameter") > Dmin) {
                     pipe_is_active.at(k) = true;
                     num_of_active_pipes++;
@@ -599,7 +608,7 @@ void Spoil_Active_Pipes() {
     msg << endl << "Spoiling active pipes....";
     for (unsigned int i = 0; i < wds.at(0)->agelemek.size(); i++) {
         string name1 = wds.at(0)->agelemek.at(i)->Get_nev();
-        if (strcmp(wds.at(0)->agelemek.at(i)->GetType().c_str(), "Cso") == 0) {
+        if (wds.at(0)->agelemek.at(i)->GetType() == "Cso") {
             for (unsigned j = 0; j < pipe_name.size(); j++) {
                 string name2 = pipe_name.at(j);
                 if ((pipe_is_active.at(j)) && (0 == strcmp(name1.c_str(), name2.c_str()))) {
@@ -715,8 +724,8 @@ void Update_Reservoirs(unsigned int i) {
 
     for (unsigned int j = 0; j < wds.at(i)->agelemek.size(); j++) {
 
-        string type = wds.at(i)->agelemek.at(j)->GetType();
-        if (strcmp(type.c_str(), "Vegakna") == 0) {
+        const string_view type = wds.at(i)->agelemek.at(j)->GetType();
+        if (type == "Vegakna") {
             string PoolName = wds.at(i)->agelemek.at(j)->Get_nev();
             double mp_prev = wds.at(i - 1)->agelemek.at(j)->Get_dprop("mass_flow_rate");
             double Q = mp_prev / 1000. * 3600.;
@@ -853,8 +862,8 @@ int Find_Pool_Index(string PoolName) {
     bool found = false;
     int idx = -1;
     for (unsigned int j = 0; j < wds.at(0)->agelemek.size(); j++) {
-        string type = wds.at(0)->agelemek.at(j)->GetType();
-        if (strcmp(type.c_str(), "Vegakna") == 0) {
+        const string_view type = wds.at(0)->agelemek.at(j)->GetType();
+        if (type == "Vegakna") {
             string Name = wds.at(0)->agelemek.at(j)->Get_nev();
             if (strcmp(Name.c_str(), PoolName.c_str()) == 0) {
                 found = true;
@@ -962,6 +971,10 @@ vector<string> csv_read_row(istream &in, char delimiter) {
             ss << c;
         }
     }
+    if (!ss.str().empty()) {
+        row.push_back(ss.str());
+    }
+    return row;
 }
 
 string Load_Settings() {

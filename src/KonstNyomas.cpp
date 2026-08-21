@@ -8,13 +8,13 @@
 using namespace std;
 
 KonstNyomas::KonstNyomas(
-    const string a_nev,
-    const double a_Aref,
-    const string a_csp_nev,
-    const double a_ro,
-    const double a_p,
-    const double a_mp,
-    const double a_tt) :
+    const string &a_nev,
+    double a_Aref,
+    const string &a_csp_nev,
+    double a_ro,
+    double a_p,
+    double a_mp,
+    double a_tt) :
 
     Agelem(a_nev, a_Aref, a_mp, a_ro, a_tt) {
     //Kotelezo adatok minden Agelemnel:
@@ -42,13 +42,13 @@ string KonstNyomas::Info() {
 }
 
 //--------------------------------------------------------------
-double KonstNyomas::f(vector<double> x) {
+double KonstNyomas::f(const vector<double> &x) {
     double ere = x[0] - p / ro / g;
     return ere;
 }
 
 //--------------------------------------------------------------
-vector<double> KonstNyomas::df(vector<double> x) {
+vector<double> KonstNyomas::df(const vector<double> &x) {
     vector<double> ere;
     ere.push_back(1);
     ere.push_back(0);
@@ -67,7 +67,7 @@ void KonstNyomas::Ini(int mode, double value) {
 }
 
 //--------------------------------------------------------------
-void KonstNyomas::Set_dprop(string mit, double mire) {
+void KonstNyomas::Set_dprop(const string &mit, double mire) {
 
     if (mit == "head") {
         p = mire * ro * g;
@@ -79,7 +79,7 @@ void KonstNyomas::Set_dprop(string mit, double mire) {
     }
 }
 
-double KonstNyomas::Get_dprop(string mit) {
+double KonstNyomas::Get_dprop(const string &mit) {
     double out = 0.0;
     if (mit == "head")
         out = p / ro / g;

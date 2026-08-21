@@ -1,32 +1,4 @@
 var searchData=
 [
-  ['nrmat_0',['NRMat',['../class_n_r_mat.html',1,'']]],
-  ['nrmat3d_1',['NRMat3d',['../class_n_r_mat3d.html',1,'']]],
-  ['nrmat3d_3c_20dp_20_3e_2',['NRMat3d&lt; DP &gt;',['../class_n_r_mat3d.html',1,'']]],
-  ['nrmat_3c_20bool_20_3e_3',['NRMat&lt; bool &gt;',['../class_n_r_mat.html',1,'']]],
-  ['nrmat_3c_20char_20_3e_4',['NRMat&lt; char &gt;',['../class_n_r_mat.html',1,'']]],
-  ['nrmat_3c_20complex_3c_20dp_20_3e_20_3e_5',['NRMat&lt; complex&lt; DP &gt; &gt;',['../class_n_r_mat.html',1,'']]],
-  ['nrmat_3c_20complex_3c_20float_20_3e_20_3e_6',['NRMat&lt; complex&lt; float &gt; &gt;',['../class_n_r_mat.html',1,'']]],
-  ['nrmat_3c_20dp_20_3e_7',['NRMat&lt; DP &gt;',['../class_n_r_mat.html',1,'']]],
-  ['nrmat_3c_20float_20_3e_8',['NRMat&lt; float &gt;',['../class_n_r_mat.html',1,'']]],
-  ['nrmat_3c_20int_20_3e_9',['NRMat&lt; int &gt;',['../class_n_r_mat.html',1,'']]],
-  ['nrmat_3c_20long_20_3e_10',['NRMat&lt; long &gt;',['../class_n_r_mat.html',1,'']]],
-  ['nrmat_3c_20unsigned_20char_20_3e_11',['NRMat&lt; unsigned char &gt;',['../class_n_r_mat.html',1,'']]],
-  ['nrmat_3c_20unsigned_20int_20_3e_12',['NRMat&lt; unsigned int &gt;',['../class_n_r_mat.html',1,'']]],
-  ['nrmat_3c_20unsigned_20long_20_3e_13',['NRMat&lt; unsigned long &gt;',['../class_n_r_mat.html',1,'']]],
-  ['nrvec_14',['NRVec',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20bool_20_3e_15',['NRVec&lt; bool &gt;',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20char_20_3e_16',['NRVec&lt; char &gt;',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20complex_3c_20dp_20_3e_20_3e_17',['NRVec&lt; complex&lt; DP &gt; &gt;',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20complex_3c_20float_20_3e_20_3e_18',['NRVec&lt; complex&lt; float &gt; &gt;',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20dp_20_3e_19',['NRVec&lt; DP &gt;',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20float_20_3e_20',['NRVec&lt; float &gt;',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20fstream_20_2a_20_3e_21',['NRVec&lt; fstream * &gt;',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20int_20_3e_22',['NRVec&lt; int &gt;',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20long_20_3e_23',['NRVec&lt; long &gt;',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20nrmat_3c_20dp_20_3e_20_2a_20_3e_24',['NRVec&lt; NRMat&lt; DP &gt; * &gt;',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20unsigned_20char_20_3e_25',['NRVec&lt; unsigned char &gt;',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20unsigned_20int_20_3e_26',['NRVec&lt; unsigned int &gt;',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20unsigned_20long_20_2a_20_3e_27',['NRVec&lt; unsigned long * &gt;',['../class_n_r_vec.html',1,'']]],
-  ['nrvec_3c_20unsigned_20long_20_3e_28',['NRVec&lt; unsigned long &gt;',['../class_n_r_vec.html',1,'']]]
+  ['konstnyomas_0',['KonstNyomas',['../class_konst_nyomas.html',1,'']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['bukomutargy_0',['BukoMutargy',['../class_buko_mutargy.html#ae4ce2dece863cab87563635402c393c1',1,'BukoMutargy']]]
+  ['bukomutargy_0',['BukoMutargy',['../class_buko_mutargy.html#acb9c45ccc043ba6d5100d2db259a2397',1,'BukoMutargy']]]
 ];

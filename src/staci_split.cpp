@@ -4,23 +4,24 @@
 #include <memory>
 #include "Staci.h"
 #include "xmlParser.h"
-// Linux
-// #include </usr/include/eigen3/Eigen/Dense>
-// Mac
-#include "/usr/local/Cellar/eigen/3.3.4/include/eigen3/Eigen/Dense"
+#include <Eigen/Dense>
 #include <algorithm>
-#include <ga/ga.h>
-#include <ga/GASimpleGA.h>
-#include <ga/GAListGenome.h>
+#include <pagmo/algorithm.hpp>
+#include <pagmo/population.hpp>
+#include <pagmo/problem.hpp>
+#include <limits>
+#include <numeric>
+#include <queue>
+#include <random>
 
 #include <igraph/igraph.h>
 
-float Objective(GAGenome &);
+using Genome = std::vector<int>;
+
+double Objective(const Genome &);
 
 using namespace std;
 using namespace Eigen;
-
-#define cout STD_COUT
 
 // These global variables are coming from the datafile
 string fname;
@@ -50,21 +51,22 @@ void LoadMatrices(MatrixXd &A, VectorXd &W, VectorXd &p, string weight_type);
 void LoadSystem(string fname);
 
 void save_state();
-void save_state(const igraph_vector_t *v);
+void save_state(const igraph_vector_int_t *v);
 
 void logfile_write(string msg, int debug_level);
 
-int Mutator(GAGenome & c, float prob_mut);
-int Q_Mutator(GAGenome & c, float prob_mut);
-int D_Mutator(GAGenome & c, float prob_mut);
+int Mutator(Genome &c, double prob_mut, std::mt19937 &rng);
+int Q_Mutator(Genome &c, double prob_mut, std::mt19937 &rng);
+int D_Mutator(Genome &c, double prob_mut, std::mt19937 &rng);
 
-void Initializer(GAGenome & c);
-void Q_Initializer(GAGenome & c);
-void D_Initializer(GAGenome & c);
+void Initializer(Genome &c, std::mt19937 &rng);
+void Q_Initializer(Genome &c, std::mt19937 &rng);
+void D_Initializer(Genome &c, std::mt19937 &rng);
+Genome BuildConnectedMembership(const Genome &seeds);
 
-float Objective(GAGenome &);
-float Q_Objective(GAGenome &);
-float D_Objective(GAGenome &);
+double Objective(const Genome &);
+double Q_Objective(const Genome &);
+double D_Objective(const Genome &);
 
 void Optimize();
 void Q_Optimize();
@@ -72,7 +74,7 @@ void D_Optimize();
 
 void Load_Settings();
 
-void Save_Membership(GAGenome & c);
+void Save_Membership(const Genome &c);
 void Save_Membership2();
 
 double GetAbsMaxCoeff(vector< vector<double> > M);
@@ -87,12 +89,13 @@ stringstream strstrm;
 string logfilename;
 
 string obj_type;
+unsigned optimizer_seed = 0u;
 
 void print(igraph_t *g);
 int print_vector(const igraph_vector_t *v);
 int print_matrix(const igraph_matrix_t *m);
 int igraph_community_eigenvector();
-void copy_to_best(const igraph_vector_t *v);
+void copy_to_best(const igraph_vector_int_t *v);
 
 void PerformSensitivityAnalysis(bool is_edge_prop, string par, string fname);
 
@@ -130,12 +133,114 @@ struct val_and_ID_and_comm {
 
 bool comparison_function2(const val_and_ID_and_comm& lhs, const val_and_ID_and_comm& rhs ) { return lhs.val > rhs.val; }
 
+struct SplitProblem {
+    std::size_t dimension;
+
+    pagmo::vector_double fitness(const pagmo::vector_double &x) const {
+        Genome genome(x.size());
+        std::transform(x.begin(), x.end(), genome.begin(), [](double value) {
+            return static_cast<int>(std::llround(value));
+        });
+        return {Objective(genome)};
+    }
+
+    std::pair<pagmo::vector_double, pagmo::vector_double> get_bounds() const {
+        const double upper = n_n - 1.0;
+        return {pagmo::vector_double(dimension, 0.0), pagmo::vector_double(dimension, upper)};
+    }
+
+    pagmo::vector_double::size_type get_nix() const {
+        return dimension;
+    }
+};
+
+class SplitSteadyStateGA {
+public:
+    SplitSteadyStateGA() = default;
+    SplitSteadyStateGA(unsigned generations, double crossover_probability,
+                       double mutation_probability, unsigned seed)
+        : generations_(generations), crossover_probability_(crossover_probability),
+          mutation_probability_(mutation_probability), seed_(seed) {}
+
+    pagmo::population evolve(const pagmo::population &input) const {
+        pagmo::population population(input);
+        if (population.size() < 2u) {
+            throw std::invalid_argument("staci_split requires a population of at least two individuals");
+        }
+
+        std::mt19937 rng(seed_);
+        std::uniform_int_distribution<std::size_t> individual(0u, population.size() - 1u);
+        std::bernoulli_distribution crossover(crossover_probability_);
+
+        for (unsigned generation = 0; generation < generations_; ++generation) {
+            const auto &fitnesses = population.get_f();
+            auto tournament = [&]() {
+                const auto first = individual(rng);
+                const auto second = individual(rng);
+                return fitnesses[first][0] <= fitnesses[second][0] ? first : second;
+            };
+
+            const auto parent_a = tournament();
+            const auto parent_b = tournament();
+            pagmo::vector_double candidate = population.get_x()[parent_a];
+            if (crossover(rng)) {
+                std::bernoulli_distribution take_second(0.5);
+                const auto &second = population.get_x()[parent_b];
+                for (std::size_t i = 0; i < candidate.size(); ++i) {
+                    if (take_second(rng)) {
+                        candidate[i] = second[i];
+                    }
+                }
+            }
+
+            Genome genome(candidate.size());
+            std::transform(candidate.begin(), candidate.end(), genome.begin(), [](double value) {
+                return static_cast<int>(std::llround(value));
+            });
+            Mutator(genome, mutation_probability_, rng);
+            std::transform(genome.begin(), genome.end(), candidate.begin(), [](int value) {
+                return static_cast<double>(value);
+            });
+
+            const auto candidate_fitness = population.get_problem().fitness(candidate);
+            const auto &updated_fitnesses = population.get_f();
+            std::size_t worst = 0u;
+            for (std::size_t i = 1; i < population.size(); ++i) {
+                if (updated_fitnesses[i][0] > updated_fitnesses[worst][0]) {
+                    worst = i;
+                }
+            }
+            if (candidate_fitness[0] < updated_fitnesses[worst][0]) {
+                population.set_xf(worst, candidate, candidate_fitness);
+            }
+        }
+        return population;
+    }
+
+    void set_seed(unsigned seed) { seed_ = seed; }
+    void set_verbosity(unsigned verbosity) { verbosity_ = verbosity; }
+    std::string get_name() const { return "STACI graph-aware steady-state GA"; }
+
+private:
+    unsigned generations_ = 1u;
+    double crossover_probability_ = 0.9;
+    double mutation_probability_ = 0.02;
+    mutable unsigned seed_ = 0u;
+    unsigned verbosity_ = 0u;
+};
+
 
 int main(int argc, char **argv) {
 
     obj_offset = 1.0;
     info = false;
     fcount = 0;
+
+    for (int i = 1; i + 1 < argc; ++i) {
+        if (std::string_view(argv[i]) == "--seed" || std::string_view(argv[i]) == "seed") {
+            optimizer_seed = static_cast<unsigned>(std::stoul(argv[++i]));
+        }
+    }
 
     // Clear logfile
     ofstream ofs(logfilename.c_str(), std::ios::out | std::ios::trunc);
@@ -171,17 +276,15 @@ int main(int argc, char **argv) {
         }
     }
 
-    for (int i = 0; i < wds->SM_Pressures.size(); i++) {
-        vector<double> tmp = wds->SM_Pressures.at(i);
-        SM.push_back(tmp);
-        tmp.clear();
+    if ((obj_type == "A-optimality") || (obj_type == "D-optimality")) {
+        for (const auto &pressures : wds->SM_Pressures)
+            SM.push_back(pressures);
+
+        const double maxSM = GetAbsMaxCoeff(SM);
+        for (auto &row : SM)
+            for (double &value : row)
+                value /= maxSM;
     }
-
-
-    double maxSM = GetAbsMaxCoeff(SM);
-    for (int i = 0; i < SM.size(); i++)
-        for (int j = 0; j < SM.at(0).size(); j++)
-            SM.at(i).at(j) /= maxSM;
 
     // Number of funeval for complete enumeration
     f_ce = pow((double) n_comm, (double) n_n);
@@ -195,8 +298,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void Save_Membership(GAGenome & c) {
-    GA1DArrayAlleleGenome<int> &genome = (GA1DArrayAlleleGenome<int> &) c;
+void Save_Membership(const Genome &genome) {
 
     stringstream strstrm;
     strstrm.str("");
@@ -213,7 +315,7 @@ void Save_Membership(GAGenome & c) {
         fprintf(pFile, "#%d; ", i);
         strstrm << endl << "comm. #" << i << ": ";
         for (int j = 0 ; j < n_n; j++) {
-            if (genome.gene(j) == i) {
+            if (genome.at(j) == i) {
                 fprintf (pFile, "%s; ", wds->cspok.at(j)->Get_nev().c_str());
                 strstrm << wds->cspok.at(j)->Get_nev().c_str() << " ";
                 node_count++;
@@ -520,27 +622,17 @@ void Optimize() {
 }
 
 void Q_Optimize() {
-    GAAlleleSet<int> alleles;
-    for (int i = 0; i < n_comm; i++)
-        alleles.add(i);
-
-    GA1DArrayAlleleGenome<int> genome(n_n, alleles, Objective);
-
-    genome.initializer(Initializer);
-    genome.mutator(Mutator);
-
-    GASteadyStateGA ga(genome);
-
-    ga.set(gaNpopulationSize, popsize);
-    ga.set(gaNpCrossover, pcross);
-    ga.set(gaNpMutation, pmut);
-    ga.set(gaNnGenerations, ngen);
-    ga.set(gaNscoreFrequency, 100);
-    ga.set(gaNflushFrequency, 100);
-    ga.set(gaNselectScores, GAStatistics::Maximum | GAStatistics::Minimum | GAStatistics::Mean);
-    ga.set(gaNscoreFilename, "bog.dat");
-
-    ga.evolve();
+    pagmo::problem problem{SplitProblem{static_cast<std::size_t>(n_comm)}};
+    pagmo::population population{problem, static_cast<pagmo::population::size_type>(popsize), optimizer_seed};
+    Genome initialized(static_cast<std::size_t>(n_comm));
+    std::mt19937 initializer_rng(optimizer_seed);
+    Q_Initializer(initialized, initializer_rng);
+    pagmo::vector_double initialized_values(initialized.begin(), initialized.end());
+    best_Q = -1.e10;
+    population.set_x(0u, initialized_values);
+    pagmo::algorithm algorithm{SplitSteadyStateGA(
+        static_cast<unsigned>(ngen), pcross, pmut, optimizer_seed)};
+    population = algorithm.evolve(population);
     cout << endl << "done." << endl;
 
     // genome = ga.statistics().bestIndividual();
@@ -573,6 +665,13 @@ void Q_Optimize() {
 
     // Save_Membership(genome);
     Save_Membership2();
+
+    // Sensitivity-based node ranking is an optional post-processing step. It
+    // is not meaningful for topology- or pressure-drop-weighted modularity and
+    // can request unsupported pipe properties from channel-only networks.
+    if (weight_type != "sensitivity") {
+        return;
+    }
 
 
     // Add total sensitivities
@@ -628,33 +727,11 @@ void Q_Optimize() {
 }
 
 void D_Optimize() {
-
-    vector<int> best(n_comm, 0);
-
-    GAAlleleSet<int> alleles;
-    for (int i = 0; i < n_n; i++)
-        alleles.add(i);
-
-    GA1DArrayAlleleGenome<int> genome(n_comm, alleles, Objective);
-
-    genome.initializer(Initializer);
-    genome.mutator(Mutator);
-
-    GASteadyStateGA ga(genome);
-    if ((obj_type == "A-optimality") || (obj_type == "D-optimality"))
-        ga.minimize();
-
-    ga.set(gaNpopulationSize, popsize);
-    ga.set(gaNpCrossover, pcross);
-    ga.set(gaNpMutation, pmut);
-    ga.set(gaNnGenerations, ngen);
-    ga.set(gaNscoreFrequency, 100);
-    ga.set(gaNflushFrequency, 100);
-    ga.set(gaNselectScores, GAStatistics::Maximum | GAStatistics::Minimum | GAStatistics::Mean);
-    ga.set(gaNscoreFilename, "bog.dat");
-    // ga.elitism();
-
-    ga.evolve();
+    pagmo::problem problem{SplitProblem{static_cast<std::size_t>(n_comm)}};
+    pagmo::population population{problem, static_cast<pagmo::population::size_type>(popsize), optimizer_seed};
+    pagmo::algorithm algorithm{SplitSteadyStateGA(
+        static_cast<unsigned>(ngen), pcross, pmut, optimizer_seed)};
+    population = algorithm.evolve(population);
     cout << endl << "done." << endl;
 
     // genome = ga.statistics().bestIndividual();
@@ -697,6 +774,7 @@ void D_Optimize() {
 
 }
 
+#if 0 // Historical GAlib operators retained temporarily for algorithm comparison.
 void Initializer(GAGenome & c) {
     if (obj_type == "modularity") {
         Q_Initializer(c);
@@ -992,56 +1070,229 @@ int D_Mutator(GAGenome & c, float prob_mut) {
 }
 
 
+#endif
+
+void Initializer(Genome &c, std::mt19937 &rng) {
+    if (obj_type == "modularity") {
+        Q_Initializer(c, rng);
+    } else {
+        D_Initializer(c, rng);
+    }
+}
+
+void Q_Initializer(Genome &child, std::mt19937 &rng) {
+    vector<vector<int>> adjacency(static_cast<std::size_t>(n_n));
+    for (int index : pipe_idx) {
+        const int first = wds->agelemek.at(index)->Get_Cspe_Index();
+        const int second = wds->agelemek.at(index)->Get_Cspv_Index();
+        if (first >= 0 && second >= 0) {
+            adjacency.at(first).push_back(second);
+            adjacency.at(second).push_back(first);
+        }
+    }
+
+    std::uniform_int_distribution<int> random_node(0, n_n - 1);
+    child.at(0) = random_node(rng);
+    for (std::size_t next_seed = 1; next_seed < child.size(); ++next_seed) {
+        vector<int> distances(static_cast<std::size_t>(n_n), -1);
+        queue<int> frontier;
+        for (std::size_t i = 0; i < next_seed; ++i) {
+            distances.at(child.at(i)) = 0;
+            frontier.push(child.at(i));
+        }
+        while (!frontier.empty()) {
+            const int node = frontier.front();
+            frontier.pop();
+            for (int neighbour : adjacency.at(node)) {
+                if (distances.at(neighbour) < 0) {
+                    distances.at(neighbour) = distances.at(node) + 1;
+                    frontier.push(neighbour);
+                }
+            }
+        }
+        child.at(next_seed) = static_cast<int>(std::distance(
+            distances.begin(), max_element(distances.begin(), distances.end())));
+    }
+}
+
+void D_Initializer(Genome &child, std::mt19937 &rng) {
+    vector<int> nodes(static_cast<std::size_t>(n_n));
+    std::iota(nodes.begin(), nodes.end(), 0);
+    std::shuffle(nodes.begin(), nodes.end(), rng);
+    std::copy_n(nodes.begin(), child.size(), child.begin());
+}
+
+int Mutator(Genome &child, double prob_mut, std::mt19937 &rng) {
+    return obj_type == "modularity"
+        ? Q_Mutator(child, prob_mut, rng)
+        : D_Mutator(child, prob_mut, rng);
+}
+
+int Q_Mutator(Genome &child, double prob_mut, std::mt19937 &rng) {
+    std::bernoulli_distribution mutate(prob_mut);
+    std::uniform_int_distribution<int> random_node(0, n_n - 1);
+    int mutations = 0;
+    for (int &seed : child) {
+        if (!mutate(rng)) {
+            continue;
+        }
+        vector<int> neighbours;
+        for (int index : pipe_idx) {
+            const int first = wds->agelemek.at(index)->Get_Cspe_Index();
+            const int second = wds->agelemek.at(index)->Get_Cspv_Index();
+            if (first == seed && second >= 0) {
+                neighbours.push_back(second);
+            } else if (second == seed && first >= 0) {
+                neighbours.push_back(first);
+            }
+        }
+        if (neighbours.empty()) {
+            seed = random_node(rng);
+        } else {
+            std::uniform_int_distribution<std::size_t> neighbour(0u, neighbours.size() - 1u);
+            seed = neighbours.at(neighbour(rng));
+        }
+        ++mutations;
+    }
+
+    vector<bool> used(static_cast<std::size_t>(n_n), false);
+    for (int &seed : child) {
+        while (seed < 0 || seed >= n_n || used.at(seed)) {
+            seed = random_node(rng);
+            ++mutations;
+        }
+        used.at(seed) = true;
+    }
+    return mutations;
+}
+
+Genome BuildConnectedMembership(const Genome &raw_seeds) {
+    if (raw_seeds.size() != static_cast<std::size_t>(n_comm)) {
+        throw invalid_argument("The modularity genome must contain one seed per segment");
+    }
+
+    Genome seeds = raw_seeds;
+    vector<bool> used(static_cast<std::size_t>(n_n), false);
+    for (std::size_t community = 0; community < seeds.size(); ++community) {
+        int &seed = seeds.at(community);
+        if (seed < 0 || seed >= n_n || used.at(seed)) {
+            seed = -1;
+            for (int candidate = 0; candidate < n_n; ++candidate) {
+                if (!used.at(candidate)) {
+                    seed = candidate;
+                    break;
+                }
+            }
+        }
+        if (seed < 0) {
+            throw runtime_error("Cannot select unique segment seeds");
+        }
+        used.at(seed) = true;
+    }
+
+    vector<vector<int>> adjacency(static_cast<std::size_t>(n_n));
+    for (int index : pipe_idx) {
+        const int first = wds->agelemek.at(index)->Get_Cspe_Index();
+        const int second = wds->agelemek.at(index)->Get_Cspv_Index();
+        if (first >= 0 && second >= 0) {
+            adjacency.at(first).push_back(second);
+            adjacency.at(second).push_back(first);
+        }
+    }
+
+    Genome membership(static_cast<std::size_t>(n_n), -1);
+    queue<int> frontier;
+    for (int community = 0; community < n_comm; ++community) {
+        membership.at(seeds.at(community)) = community;
+        frontier.push(seeds.at(community));
+    }
+    while (!frontier.empty()) {
+        const int node = frontier.front();
+        frontier.pop();
+        for (int neighbour : adjacency.at(node)) {
+            if (membership.at(neighbour) < 0) {
+                membership.at(neighbour) = membership.at(node);
+                frontier.push(neighbour);
+            }
+        }
+    }
+    if (any_of(membership.begin(), membership.end(), [](int value) { return value < 0; })) {
+        throw runtime_error("The network is disconnected; connected segment assignment is impossible");
+    }
+    return membership;
+}
+
+int D_Mutator(Genome &child, double prob_mut, std::mt19937 &rng) {
+    if (prob_mut <= 0.0) {
+        return 0;
+    }
+    std::bernoulli_distribution mutate(prob_mut);
+    std::uniform_int_distribution<int> node(0, n_n - 1);
+    int mutations = 0;
+    for (int &gene : child) {
+        if (mutate(rng)) {
+            gene = node(rng);
+            ++mutations;
+        }
+    }
+
+    vector<bool> used(static_cast<std::size_t>(n_n), false);
+    for (int &gene : child) {
+        if (!used.at(gene)) {
+            used.at(gene) = true;
+            continue;
+        }
+        vector<int> available;
+        for (int candidate = 0; candidate < n_n; ++candidate) {
+            if (!used.at(candidate)) {
+                available.push_back(candidate);
+            }
+        }
+        std::uniform_int_distribution<std::size_t> replacement(0u, available.size() - 1u);
+        gene = available.at(replacement(rng));
+        used.at(gene) = true;
+        ++mutations;
+    }
+    return mutations;
+}
+
 void save_state() {
     for (int i = 0; i < n_n; i++) {
         wds->cspok.at(i)->Set_dprop("concentration", best.at(i));
     }
-
-    for (int i = 0; i < wds->agelemek.size(); i++) {
-        int idx_n1 = wds->agelemek.at(i)->Get_Cspe_Index();
-        int idx_n2 = wds->agelemek.at(i)->Get_Cspv_Index();
-        if (idx_n1 < 0)
-            idx_n1 = idx_n2;
-        if (idx_n2 < 0)
-            idx_n2 = idx_n1;
-        double comm1 = (double) best.at(idx_n1);
-        double comm2 = (double) best.at(idx_n2);
-        double comm = (comm1 + comm2) / 2.;
-        // cout<<endl<<"edge #"<<i<<": "<<wds->agelemek.at(i)->Get_nev()<<", community # "<<comm;
-        wds->agelemek.at(i)->Set_dprop("concentration", comm);
-    }
-
-    wds->save_mod_prop_all_elements("concentration");
+    // Community membership is a node property. Older Agelem implementations
+    // silently accepted "concentration" for every link, while the modern
+    // capability-based interface correctly rejects it for unsupported links.
 }
 
-float Objective(GAGenome & c) {
+double Objective(const Genome &c) {
     if (obj_type == "modularity") {
-        Q_Objective(c);
+        return -Q_Objective(BuildConnectedMembership(c));
     }
     else if ((obj_type == "D-optimality") || (obj_type == "A-optimality")) {
-        D_Objective(c);
+        return D_Objective(c);
     }
     else {
         cout << endl << "ERROR: !!bad obj_type value: " << obj_type << " !!!" << endl << endl;
         exit(-1);
 
     }
+    return std::numeric_limits<double>::infinity();
 }
 
-float D_Objective(GAGenome & c) {
-    GA1DArrayAlleleGenome<int> &genome = (GA1DArrayAlleleGenome<int> &) c;
+double D_Objective(const Genome &genome) {
 
     fcount++;
     bool obj_info = false;
 
     vector<int> tmp(n_comm);
     for (int i = 0; i < n_comm; i++)
-        tmp.at(i) = genome.gene(i);
+        tmp.at(i) = genome.at(i);
 
     bool is_same_gene = false;
     for (int i = 0; i < tmp.size(); i++) {
         for (int j = 0; j < tmp.size(); j++) {
-            if ((genome.gene(i) == genome.gene(j)) && (i != j))
+            if ((genome.at(i) == genome.at(j)) && (i != j))
                 is_same_gene = true;
         }
     }
@@ -1049,7 +1300,7 @@ float D_Objective(GAGenome & c) {
     if (obj_info) {
         cout << endl << "gene:";
         for (int i = 0; i < n_comm; i++)
-            cout << " " << genome.gene(i);
+            cout << " " << genome.at(i);
         cout << endl;
 
 
@@ -1065,7 +1316,7 @@ float D_Objective(GAGenome & c) {
     // vector< vector<double> > SM_tr(SM.at(0).size(),SM.size());
     MatrixXd jacT(SM.size(), n_comm);
     for (int i = 0; i < n_comm; i++) {
-        int col = genome.gene(i);
+        int col = genome.at(i);
         for (int j = 0; j < SM.size(); j++) {
             jacT(j, i) = SM.at(j).at(col);
         }
@@ -1208,8 +1459,7 @@ float D_Objective(GAGenome & c) {
 
 }
 
-float Q_Objective(GAGenome & c) {
-    GA1DArrayAlleleGenome<int> &genome = (GA1DArrayAlleleGenome<int> &) c;
+double Q_Objective(const Genome &genome) {
 
     fcount++;
 
@@ -1217,7 +1467,7 @@ float Q_Objective(GAGenome & c) {
     vector<int> tmp(n_n);
     vector<int> empty_comm(n_comm, 0);
     for (int i = 0; i < n_n; i++) {
-        tmp.at(i) = genome.gene(i);
+        tmp.at(i) = genome.at(i);
         for (int j = 0; j < n_comm; j++) {
             if (j == tmp.at(i))
                 empty_comm.at(j) = 1;
@@ -1234,7 +1484,7 @@ float Q_Objective(GAGenome & c) {
         int idx_n1 = wds->agelemek.at(pipe_idx.at(i))->Get_Cspe_Index();
         int idx_n2 = wds->agelemek.at(pipe_idx.at(i))->Get_Cspv_Index();
 
-        if (genome.gene(idx_n1) != genome.gene(idx_n2))
+        if (genome.at(idx_n1) != genome.at(idx_n2))
             n_c++;
     }
 
@@ -1244,7 +1494,7 @@ float Q_Objective(GAGenome & c) {
     for (int m = 0; m < n_comm; m++) {
         Qtmp = 0.;
         for (int i = 0; i < n_n; i++) {
-            if (genome.gene(i) == m) {
+            if (genome.at(i) == m) {
                 Qtmp += p(i);
             }
         }
@@ -1401,20 +1651,17 @@ void LoadSystem(string fname) {
     wds->build_system();
     wds->ini();
     wds->solve_system();
-    wds->compute_demand_sensitivity();
-    wds->set_res_file(wds->get_def_file());
-    wds->save_results(true);
 
     n_n = wds->cspok.size();
 
     for (unsigned int i = 0; i < wds->agelemek.size(); i++) {
         bool add_this = true;
-        string type = wds->agelemek.at(i)->GetType();
+        const string_view type = wds->agelemek.at(i)->GetType();
         // cout<<endl<<"i = "<<i<<", type : "<<type<<", ID : "<<wds->agelemek.at(i)->Get_nev();
 
-        if (0 == strcmp(type.c_str(), "Vegakna"))
+        if (type == "Vegakna")
             add_this = false;
-        if (0 == strcmp(type.c_str(), "KonstNyomas"))
+        if (type == "KonstNyomas")
             add_this = false;
 
         if (add_this) {
@@ -1511,11 +1758,11 @@ void Load_Settings() {
 }
 
 void print(igraph_t *g) {
-    igraph_vector_t el;
+    igraph_vector_int_t el;
     long int i, j, n;
     char ch = igraph_is_directed(g) ? '>' : '-';
 
-    igraph_vector_init(&el, 0);
+    igraph_vector_int_init(&el, 0);
     igraph_get_edgelist(g, &el, 0);
     n = igraph_ecount(g);
 
@@ -1525,7 +1772,7 @@ void print(igraph_t *g) {
     }
     printf("\n");
 
-    igraph_vector_destroy(&el);
+    igraph_vector_int_destroy(&el);
 }
 
 int print_vector(const igraph_vector_t *v) {
@@ -1563,19 +1810,19 @@ int igraph_community_eigenvector() {
         }
     }
 
-    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_set_attribute_table(&igraph_cattribute_table);
 
     // igraph_weighted_adjacency(&g, &mat, IGRAPH_ADJ_UNDIRECTED,0,1);
-    igraph_adjacency(&g, &mat, IGRAPH_ADJ_UNDIRECTED);
+    igraph_adjacency(&g, &mat, IGRAPH_ADJ_UNDIRECTED, IGRAPH_NO_LOOPS);
 
     //igraph_t g;
-    igraph_matrix_t merges;
-    igraph_vector_t membership;
+    igraph_matrix_int_t merges;
+    igraph_vector_int_t membership;
     igraph_vector_t x;
     igraph_arpack_options_t options;
 
-    igraph_matrix_init(&merges, 0, 0);
-    igraph_vector_init(&membership, 0);
+    igraph_matrix_int_init(&merges, 0, 0);
+    igraph_vector_int_init(&membership, 0);
     igraph_vector_init(&x, 0);
     igraph_arpack_options_init(&options);
 
@@ -1594,7 +1841,7 @@ int igraph_community_eigenvector() {
 //============== EIGENVECTORS =========================
 
     igraph_community_leading_eigenvector(&g, &weights, &merges,
-                                         &membership, n_c + 1,
+                                         &membership, n_comm - 1,
                                          &options, /*modularity=*/ 0,
                                          /*start=*/ 0, /*eigenvalues=*/ 0,
                                          /*eigenvectors=*/ 0, /*history=*/ 0,
@@ -1637,21 +1884,21 @@ int igraph_community_eigenvector() {
     copy_to_best(&membership);
 
     igraph_vector_destroy(&x);
-    igraph_vector_destroy(&membership);
-    igraph_matrix_destroy(&merges);
+    igraph_vector_int_destroy(&membership);
+    igraph_matrix_int_destroy(&merges);
     igraph_destroy(&g);
 
     return 0;
 }
 
-void copy_to_best(const igraph_vector_t *v) {
-    long int length = igraph_vector_size(v);
+void copy_to_best(const igraph_vector_int_t *v) {
+    long int length = igraph_vector_int_size(v);
     best.clear();
     for (int i = 0; i < length; i++)
         best.push_back( (int) VECTOR(*v)[i]);
 }
 
-void save_state(const igraph_vector_t *v) {
+void save_state(const igraph_vector_int_t *v) {
     for (int i = 0; i < n_n; i++) {
         wds->cspok.at(i)->Set_dprop("concentration", (double)VECTOR(*v)[i]);
     }

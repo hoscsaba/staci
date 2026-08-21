@@ -1,8 +1,31 @@
 #ifndef AGELEM_H
 #define AGELEM_H
 #include <iostream>
+#include <string_view>
 #include <vector>
 using namespace std;
+
+class ParameterSensitivity
+{
+public:
+    virtual ~ParameterSensitivity() = default;
+    virtual double Get_dfdmu(const string &property) = 0;
+};
+
+class FrictionModelConfigurable
+{
+public:
+    virtual ~FrictionModelConfigurable() = default;
+    virtual void Set_friction_model(const string &friction_model) = 0;
+};
+
+class DistributedResults
+{
+public:
+    virtual ~DistributedResults() = default;
+    virtual void build_res() = 0;
+    virtual const vector<double> &Get_res(const string &which) = 0;
+};
 
 class Agelem
 {
@@ -29,7 +52,7 @@ protected:
     /// Nyomaseses
     double head_loss;
     /// Standard error message
-    void error(string fv, string msg);
+    void error(const string &function_name, const string &message);
     string out_file;
     int debug_level;
     /// vizkor az elejen
@@ -42,24 +65,24 @@ protected:
 
 
 public:
-    void logfile_write(string msg, int msg_debug_level);
+    void logfile_write(const string &msg, int msg_debug_level);
     /// Konstruktor
-    Agelem(const string nev, const double Aref, const double mp, const double ro);
+    Agelem(const string &nev, double Aref, double mp, double ro);
     /// Konstruktor with travel time
-    Agelem(const string nev, const double Aref, const double mp, const double ro, const double tt);
+    Agelem(const string &nev, double Aref, double mp, double ro, double tt);
     /// Destruktor
-    virtual ~Agelem();
+    virtual ~Agelem() = default;
 
     /// Csomopont beallitasa
-    virtual void add_csp(const int cspe_index, const int cspv_index);
+    void add_csp(int cspe_index, int cspv_index);
     /// Az agegyenlet erteke, nullara rendezve, v.o.m.-ben
-    virtual double f(vector<double>) = 0;
+    virtual double f(const vector<double> &state) = 0;
     /// Jacobi: df/dhe, df/dhv, df/dmp, konstans tag
-    virtual vector<double> df(vector<double>) = 0;
+    virtual vector<double> df(const vector<double> &state) = 0;
     /// Inicializacio, mode=0 -> automatikus, mode=1 -> value beirasa
     virtual void Ini(int mode, double value) = 0;
     /// Get double property, Cso es Csatorna akarja elulirja
-    virtual double Get_dprop(string mit) = 0;
+    virtual double Get_dprop(const string &property) = 0;
     /// Informacio
     virtual string Info();
     /// Get double property, Cso es Csatorna akarja felulirja
@@ -67,16 +90,8 @@ public:
     {
         return Aref;
     }
-    /// Get equation derivative w.r.t. parameter
-    virtual double Get_dfdmu(string mit)
-    {
-        return 0.0;
-    }
-    virtual void Set_dprop(string mit, double mire) {
-
-    };
-
-    virtual void Set_friction_model(string friction_model) {};
+    /// Set a supported numeric property.
+    virtual void Set_dprop(const string &property, double value) = 0;
 
     /// Tomegaram visszaadasa
     double Get_mp()
@@ -102,17 +117,17 @@ public:
         return mp / ro / Aref;
     }
     /// Nev visszaadasa
-    string Get_nev()
+    const string &Get_nev() const
     {
         return nev;
     }
     /// cspe_nev visszaadasa
-    string Get_Cspe_Nev()
+    const string &Get_Cspe_Nev() const
     {
         return cspe_nev;
     }
     /// cspv_nev visszaadasa
-    string Get_Cspv_Nev()
+    const string &Get_Cspv_Nev() const
     {
         return cspv_nev;
     }
@@ -155,24 +170,17 @@ public:
     {
         return FolyTerf;
     }
-    virtual void Set_FolyTerf()
-    {
-    }
-    virtual void build_res()
-    {
-    }
     /// Returns the runtime type identifier used throughout STACI.
-    virtual string GetType() const = 0;
+    virtual string_view GetType() const noexcept = 0;
     void Set_enabled(bool value) { enabled = value; }
     bool Is_enabled() const { return enabled; }
-    /// Eredmenyvektor visszaadasa (csak Csatorna eseten)
-    virtual vector<double> Get_res(string which);
     /// Matlab-szeru linearis interpolacio
-    vector<double> interp(vector<double> x, vector<double> y, vector<double> xg);
+    vector<double> interp(const vector<double> &x, const vector<double> &y,
+                          const vector<double> &xg);
     /// Atlag szamitasa
-    double mean(vector<double> x);
+    double mean(const vector<double> &x);
     /// Vizminoseghez numerikus halo
-    void set_up_grid(double a_konc, vector<double> a_vel, double a_cL);
+    void set_up_grid(double a_konc, const vector<double> &a_vel, double a_cL);
     /// Vizminoseghez numerikus halo kiirasa
     string show_grid(double ido);
     /// Vizminoseghez koncentracio- es sebessegeloszlas

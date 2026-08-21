@@ -19,19 +19,46 @@ list(REMOVE_ITEM SRC_FILES ${MAIN_FILE} ${EXCLUDE_FILES})
 
 add_executable(${PROJECT_NAME} ${MAIN_FILE} ${SRC_FILES})
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    CXX_EXTENSIONS OFF
-)
+option(STACI_BUILD_OPTIMIZERS "Build the pagmo2-based calibrate and split tools" ON)
+set(STACI_EXECUTABLE_TARGETS ${PROJECT_NAME})
+if(STACI_BUILD_OPTIMIZERS)
+    find_package(Pagmo CONFIG REQUIRED)
+    find_package(Eigen3 CONFIG REQUIRED)
+    find_package(igraph CONFIG REQUIRED)
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-    "${PROJECT_SOURCE_DIR}/include/staci"
-)
+    set(STACI_OPTIMIZER_COMMON_SOURCES ${SRC_FILES} ${MAIN_FILE})
+    list(REMOVE_ITEM STACI_OPTIMIZER_COMMON_SOURCES
+        "${PROJECT_SOURCE_DIR}/src/staci_main.cpp"
+    )
+
+    add_executable(staci_calibrate
+        "${PROJECT_SOURCE_DIR}/src/staci_calibrate.cpp"
+        ${STACI_OPTIMIZER_COMMON_SOURCES}
+    )
+    target_link_libraries(staci_calibrate PRIVATE Pagmo::pagmo)
+
+    add_executable(staci_split
+        "${PROJECT_SOURCE_DIR}/src/staci_split.cpp"
+        ${STACI_OPTIMIZER_COMMON_SOURCES}
+    )
+    target_link_libraries(staci_split PRIVATE Pagmo::pagmo Eigen3::Eigen igraph::igraph)
+    list(APPEND STACI_EXECUTABLE_TARGETS staci_calibrate staci_split)
+endif()
+
+foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+    target_compile_features(${staci_target} PRIVATE cxx_std_17)
+    set_target_properties(${staci_target} PROPERTIES CXX_EXTENSIONS OFF)
+    target_include_directories(${staci_target} PRIVATE
+        "${PROJECT_SOURCE_DIR}/include/staci"
+    )
+endforeach()
 
 # M_PI is available by default with GCC and Clang, but MSVC requires this
 # definition before including <cmath> or <math.h>.
 if(MSVC)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE _USE_MATH_DEFINES)
+    foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+        target_compile_definitions(${staci_target} PRIVATE _USE_MATH_DEFINES)
+    endforeach()
 endif()
 
 # HDF5 is optional at build time so the legacy executable remains portable on
@@ -43,12 +70,18 @@ if(STACI_ENABLE_HDF5)
     find_package(HDF5 COMPONENTS C QUIET)
     if(HDF5_FOUND)
         set(STACI_HAS_HDF5 ON)
-        target_compile_definitions(${PROJECT_NAME} PRIVATE STACI_HAS_HDF5=1)
+        foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+            target_compile_definitions(${staci_target} PRIVATE STACI_HAS_HDF5=1)
+        endforeach()
         if(TARGET HDF5::HDF5)
-            target_link_libraries(${PROJECT_NAME} PRIVATE HDF5::HDF5)
+            foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+                target_link_libraries(${staci_target} PRIVATE HDF5::HDF5)
+            endforeach()
         else()
-            target_include_directories(${PROJECT_NAME} PRIVATE ${HDF5_INCLUDE_DIRS})
-            target_link_libraries(${PROJECT_NAME} PRIVATE ${HDF5_LIBRARIES})
+            foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+                target_include_directories(${staci_target} PRIVATE ${HDF5_INCLUDE_DIRS})
+                target_link_libraries(${staci_target} PRIVATE ${HDF5_LIBRARIES})
+            endforeach()
         endif()
         find_program(STACI_H5DUMP_EXECUTABLE NAMES h5dump
             HINTS "${HDF5_ROOT}/bin")
@@ -66,9 +99,13 @@ endif()
 find_package(UMFPACK CONFIG QUIET)
 
 if(TARGET SuiteSparse::UMFPACK)
-    target_link_libraries(${PROJECT_NAME} PRIVATE SuiteSparse::UMFPACK)
+    foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+        target_link_libraries(${staci_target} PRIVATE SuiteSparse::UMFPACK)
+    endforeach()
 elseif(TARGET SuiteSparse::UMFPACK_static)
-    target_link_libraries(${PROJECT_NAME} PRIVATE SuiteSparse::UMFPACK_static)
+    foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+        target_link_libraries(${staci_target} PRIVATE SuiteSparse::UMFPACK_static)
+    endforeach()
 else()
     # Some Linux distributions ship SuiteSparse without CMake package files.
     # Fall back to normal CMake searches; callers can use CMAKE_PREFIX_PATH or
@@ -115,25 +152,74 @@ else()
         SUITESPARSE_CONFIG_LIBRARY
     )
 
-    target_include_directories(${PROJECT_NAME} PRIVATE
-        "${SUITESPARSE_INCLUDE_DIR}"
-    )
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-        "${SUITESPARSE_UMFPACK_LIBRARY}"
-        "${SUITESPARSE_CHOLMOD_LIBRARY}"
-        "${SUITESPARSE_AMD_LIBRARY}"
-        "${SUITESPARSE_COLAMD_LIBRARY}"
-        "${SUITESPARSE_CONFIG_LIBRARY}"
-    )
+    foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+        target_include_directories(${staci_target} PRIVATE "${SUITESPARSE_INCLUDE_DIR}")
+        target_link_libraries(${staci_target} PRIVATE
+            "${SUITESPARSE_UMFPACK_LIBRARY}"
+            "${SUITESPARSE_CHOLMOD_LIBRARY}"
+            "${SUITESPARSE_AMD_LIBRARY}"
+            "${SUITESPARSE_COLAMD_LIBRARY}"
+            "${SUITESPARSE_CONFIG_LIBRARY}"
+        )
+    endforeach()
 endif()
 
 include(GNUInstallDirs)
-install(TARGETS ${PROJECT_NAME}
+install(TARGETS ${STACI_EXECUTABLE_TARGETS}
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
 )
 
 include(CTest)
 if(BUILD_TESTING)
+    if(STACI_BUILD_OPTIMIZERS)
+        set(STACI_CALIBRATE_TEST_DIR "${CMAKE_CURRENT_BINARY_DIR}/optimizer-tests/calibrate")
+        set(STACI_SPLIT_TEST_DIR "${CMAKE_CURRENT_BINARY_DIR}/optimizer-tests/split")
+        file(MAKE_DIRECTORY "${STACI_CALIBRATE_TEST_DIR}" "${STACI_SPLIT_TEST_DIR}")
+        configure_file(
+            "${PROJECT_SOURCE_DIR}/tests/staci_calibrate_settings.xml.in"
+            "${STACI_CALIBRATE_TEST_DIR}/staci_calibrate_settings.xml"
+            @ONLY
+        )
+        configure_file(
+            "${PROJECT_SOURCE_DIR}/tests/calibrate_targets.csv"
+            "${STACI_CALIBRATE_TEST_DIR}/calibrate_targets.csv"
+            COPYONLY
+        )
+        configure_file(
+            "${PROJECT_SOURCE_DIR}/tests/anytown_1med.spr"
+            "${STACI_CALIBRATE_TEST_DIR}/calibrate_network_0.spr"
+            COPYONLY
+        )
+        configure_file(
+            "${PROJECT_SOURCE_DIR}/tests/staci_split_settings.xml.in"
+            "${STACI_SPLIT_TEST_DIR}/staci_split_settings.xml"
+            @ONLY
+        )
+        configure_file(
+            "${PROJECT_SOURCE_DIR}/tests/LOV-LOVOTV-2-input_mod.spr"
+            "${STACI_SPLIT_TEST_DIR}/split-network.spr"
+            COPYONLY
+        )
+
+        add_test(NAME pagmo_calibrate_small_network
+            COMMAND $<TARGET_FILE:staci_calibrate> --seed 12345
+        )
+        set_tests_properties(pagmo_calibrate_small_network PROPERTIES
+            WORKING_DIRECTORY "${STACI_CALIBRATE_TEST_DIR}"
+            PASS_REGULAR_EXPRESSION "Optimization finished"
+            TIMEOUT 120
+        )
+
+        add_test(NAME pagmo_split_large_network
+            COMMAND $<TARGET_FILE:staci_split> --seed 12345
+        )
+        set_tests_properties(pagmo_split_large_network PROPERTIES
+            WORKING_DIRECTORY "${STACI_SPLIT_TEST_DIR}"
+            PASS_REGULAR_EXPRESSION "# of pipes : 2479"
+            TIMEOUT 300
+        )
+    endif()
+
     add_executable(staci_epanet_document_test
         "${PROJECT_SOURCE_DIR}/tests/test_epanet_document.cpp"
         "${PROJECT_SOURCE_DIR}/src/epanet_document.cpp"

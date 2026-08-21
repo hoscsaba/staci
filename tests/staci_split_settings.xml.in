@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<settings>
+  <global_debug_level>1</global_debug_level>
+  <n_comm>2</n_comm>
+  <weight_type>topology</weight_type>
+  <weight_type_mod>diameter</weight_type_mod>
+  <fname>@STACI_SPLIT_TEST_DIR@/split-network.spr</fname>
+  <logfilename>split-test.log</logfilename>
+  <obj_type>modularity</obj_type>
+  <popsize>4</popsize>
+  <ngen>2</ngen>
+  <pmut>0.25</pmut>
+  <pcross>0.8</pcross>
+</settings>

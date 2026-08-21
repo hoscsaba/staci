@@ -5,23 +5,23 @@ class KonstNyomas: public Agelem
 private:
     double p;
 public:
-    KonstNyomas(const string nev,
-                const double Aref,
-                const string cspnev,
-                const double a_ro,
-                const double p,
-                const double mp,
-                const double tt);
+    KonstNyomas(const string &nev,
+                double Aref,
+                const string &cspnev,
+                double a_ro,
+                double p,
+                double mp,
+                double tt);
 
-    ~KonstNyomas();
-    string Info();
-    double f(vector<double>);
-    vector<double> df(vector<double>);
-    void Ini(int mode, double value);
-    void Set_dprop(string mit, double mire);
-    string GetType() const override
+    ~KonstNyomas() override;
+    string Info() override;
+    double f(const vector<double> &state) override;
+    vector<double> df(const vector<double> &state) override;
+    void Ini(int mode, double value) override;
+    void Set_dprop(const string &property, double value) override;
+    string_view GetType() const noexcept override
     {
         return "KonstNyomas";
     }
-    double Get_dprop(string mit);
+    double Get_dprop(const string &property) override;
 };

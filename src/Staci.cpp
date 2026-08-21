@@ -879,13 +879,9 @@ void Staci::build_system() {
   }
 
   // Surlodas beallitasa
-  for (unsigned int i = 0; i < agelemek.size(); i++) {
-    if (agelemek[i]->GetType() == "Cso") {
-      /*cout << endl << "friction_model:" << friction_model;
-      cin.get();*/
-      agelemek[i]->Set_friction_model(friction_model);
-    }
-  }
+  for (Agelem *edge : agelemek)
+    if (auto *configurable = dynamic_cast<FrictionModelConfigurable *>(edge))
+      configurable->Set_friction_model(friction_model);
 
   logfile_write("\t ok.", 3);
 
@@ -1388,11 +1384,9 @@ bool Staci::solve_system() {
     print_worst_iter(x, f, 1);
 
   if (konv_ok) {
-    for (unsigned int i = 0; i < agelemek.size(); i++) {
-      if (0 == strcmp( (agelemek.at(i)->GetType()).c_str(), "Csatorna")) {
-        agelemek.at(i)->build_res();
-      }
-    }
+    for (Agelem *edge : agelemek)
+      if (auto *distributed = dynamic_cast<DistributedResults *>(edge))
+        distributed->build_res();
   }
 
   Set_FolyTerf();
@@ -1441,7 +1435,7 @@ void Staci::print_worst_iter(const Vec_DP x, const Vec_DP f , const int a_debug_
   // if (!konv_ok) m_ss << "\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n";
   // for (unsigned int i = 0; i < agelemek.size(); i++)
   //   m_ss << "\n\t" << agelemek[i]->Get_nev().c_str() << "("
-  //        << agelemek[i]->GetType().c_str() << "): mp=" << x[i]
+  //        << agelemek[i]->GetType() << "): mp=" << x[i]
   //        << ", f=" << f[i];
 
   // for (unsigned int i = 0; i < cspok.size(); i++)
@@ -1896,8 +1890,8 @@ void Staci::set_up_transport() {
   for (i = 0; i < agelemek.size(); i++) {
     v.clear();
     // cout<<endl<<"Agelem: "<<agelemek.at(i)->Get_nev();
-    if (agelemek.at(i)->GetType() == "Csatorna") {
-      v = agelemek.at(i)->Get_res("v");
+    if (auto *distributed = dynamic_cast<DistributedResults *>(agelemek.at(i))) {
+      v = distributed->Get_res("v");
       hossz = agelemek.at(i)->Get_dprop("L");
       agelemek.at(i)->set_up_grid(0.0, v, hossz);
     } else {
@@ -2542,11 +2536,19 @@ void Staci::Compute_dfdmu() {
   for (int i = 0; i < agelemek.size(); i++) {
     if (((property_ID == "diameter") || (property_ID == "friction_coeff"))  &&
         (element_ID == agelemek.at(i)->Get_nev())) {
-      double dfdmu = agelemek.at(i)->Get_dfdmu(property_ID);
+      // The element exists, but not every hydraulic element exposes pipe
+      // parameters. Such rows have a zero derivative instead of being treated
+      // as an unknown element/property pair.
+      megvan = true;
+      auto *sensitivity = dynamic_cast<ParameterSensitivity *>(agelemek.at(i));
+      if (sensitivity == nullptr) {
+        m_dfdmu.push_back(0.0);
+        continue;
+      }
+      double dfdmu = sensitivity->Get_dfdmu(property_ID);
       // cout<<endl<<"Hali! element:"<<agelemek.at(i)->Get_nev()<<", dfdmu="<<dfdmu;
       // cin.get();
       m_dfdmu.push_back(dfdmu);
-      megvan = true;
     } else
       m_dfdmu.push_back(0.0);
   }
@@ -3154,7 +3156,7 @@ void Staci::residence_time_step(string & max_ID, double & max_VAL,
 
   double v, L, tt_s, tt_e;
   for (int i = 0; i < agelemek.size(); i++) {
-    string type = agelemek.at(i)->GetType();
+    const string_view type = agelemek.at(i)->GetType();
     int cspe_id = agelemek.at(i)->Get_Cspe_Index();
     int cspv_id = agelemek.at(i)->Get_Cspv_Index();
 
@@ -3321,7 +3323,7 @@ string Staci::convert_to_hr_min(double input_seconds) {
 double Staci::GetMinPipeDiameter(int &idx) {
   double D, Dmin = 1.e5;
   for (unsigned int i = 0; i < agelemek.size(); i++) {
-    if (0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Cso") || 0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Csatorna")) {
+    if (agelemek.at(i)->GetType() == "Cso" || agelemek.at(i)->GetType() == "Csatorna") {
       D = agelemek.at(i)->Get_dprop("diameter");
       if (D < Dmin) {
         Dmin = D;
@@ -3335,7 +3337,7 @@ double Staci::GetMinPipeDiameter(int &idx) {
 double Staci::GetMaxPipeDiameter(int &idx) {
   double D, Dmax = 0.;
   for (unsigned int i = 0; i < agelemek.size(); i++) {
-    if (0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Cso") || 0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Csatorna")) {
+    if (agelemek.at(i)->GetType() == "Cso" || agelemek.at(i)->GetType() == "Csatorna") {
       D = agelemek.at(i)->Get_dprop("diameter");
       if (D > Dmax) {
         Dmax = D;
@@ -3349,7 +3351,7 @@ double Staci::GetMaxPipeDiameter(int &idx) {
 double Staci::GetMinPipeLength(int &idx) {
   double L, Lmin = 1.e5;
   for (unsigned int i = 0; i < agelemek.size(); i++) {
-    if (0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Cso") || 0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Csatorna")) {
+    if (agelemek.at(i)->GetType() == "Cso" || agelemek.at(i)->GetType() == "Csatorna") {
       L = agelemek.at(i)->Get_dprop("length");
       if (L < Lmin) {
         Lmin = L;
@@ -3363,7 +3365,7 @@ double Staci::GetMinPipeLength(int &idx) {
 double Staci::GetMaxPipeLength(int &idx) {
   double L, Lmax = 0.;
   for (unsigned int i = 0; i < agelemek.size(); i++) {
-    if (0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Cso") || 0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Csatorna")) {
+    if (agelemek.at(i)->GetType() == "Cso" || agelemek.at(i)->GetType() == "Csatorna") {
       L = agelemek.at(i)->Get_dprop("length");
       if (L > Lmax) {
         Lmax = L;
@@ -3377,7 +3379,7 @@ double Staci::GetMaxPipeLength(int &idx) {
 double Staci::GetSumPipeLength() {
   double Lsum = 0.;
   for (unsigned int i = 0; i < agelemek.size(); i++) {
-    if (0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Cso") || 0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Csatorna"))
+    if (agelemek.at(i)->GetType() == "Cso" || agelemek.at(i)->GetType() == "Csatorna")
       Lsum += agelemek.at(i)->Get_dprop("length");
   }
   return Lsum;
@@ -3386,7 +3388,7 @@ double Staci::GetSumPipeLength() {
 double Staci::GetSumPipeVolume() {
   double L, D, VolSum = 0.;
   for (unsigned int i = 0; i < agelemek.size(); i++) {
-    if (0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Cso") || 0 == strcmp((agelemek.at(i)->GetType()).c_str(), "Csatorna")) {
+    if (agelemek.at(i)->GetType() == "Cso" || agelemek.at(i)->GetType() == "Csatorna") {
       L = agelemek.at(i)->Get_dprop("length");
       D = agelemek.at(i)->Get_dprop("diameter");
       VolSum += L * D * D * 3.1416 / 4.;

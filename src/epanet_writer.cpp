@@ -195,7 +195,9 @@ void EpanetWriter::write(const std::string &filename,
     std::vector<std::pair<std::string, Szivattyu *> > curve_pumps;
     output << "\n[PUMPS]\n;ID\tNode1\tNode2\tParameters\n";
     for (Agelem *edge : edges) {
-        if (edge->GetType() != "Szivattyu" && edge->GetType() != "EpanetPowerPump")
+        auto *power_pump = dynamic_cast<EpanetPowerPump *>(edge);
+        auto *curve_pump = dynamic_cast<Szivattyu *>(edge);
+        if (power_pump == nullptr && curve_pump == nullptr)
             continue;
         const std::string from = edge->Get_Cspe_Nev();
         const std::string to = edge->Get_Cspv_Nev();
@@ -203,19 +205,19 @@ void EpanetWriter::write(const std::string &filename,
             continue;
         const std::string link_id = safe_id(edge->Get_nev(), used_link_ids);
         output << link_id << '\t' << node_ids[from] << '\t' << node_ids[to] << '\t';
-        if (edge->GetType() == "EpanetPowerPump") {
-            output << "POWER\t" << edge->Get_dprop("power") / 1000.0 << '\n';
+        if (power_pump != nullptr) {
+            output << "POWER\t" << power_pump->Get_dprop("power") / 1000.0 << '\n';
         } else {
             const std::string curve_id = "STACI_CURVE_" + std::to_string(curve_pumps.size() + 1);
             output << "HEAD\t" << curve_id << '\n';
-            curve_pumps.push_back(std::make_pair(curve_id, dynamic_cast<Szivattyu *>(edge)));
+            curve_pumps.push_back(std::make_pair(curve_id, curve_pump));
         }
     }
 
     output << "\n[CURVES]\n;ID\tFlow\tHead\n";
     for (const auto &entry : curve_pumps) {
         const std::vector<double> flow = entry.second->GetCurveFlowM3PerHour();
-        const std::vector<double> head = entry.second->GetCurveHead();
+        const std::vector<double> &head = entry.second->GetCurveHead();
         std::vector<std::pair<double, double> > points;
         for (std::size_t i = 0; i < flow.size() && i < head.size(); ++i)
             points.push_back(std::make_pair(flow[i], head[i]));
@@ -232,7 +234,7 @@ void EpanetWriter::write(const std::string &filename,
     }
 
     for (Agelem *edge : edges) {
-        const std::string type = edge->GetType();
+        const std::string_view type = edge->GetType();
         if (type != "Cso" && type != "Szivattyu" && type != "EpanetPowerPump" &&
             type != "KonstNyomas" && type != "Vegakna")
             std::cerr << "WARNING [EPANET][EXPORT][" << edge->Get_nev() << "]: STACI type '"
