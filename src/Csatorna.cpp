@@ -56,7 +56,6 @@ Csatorna::Csatorna(const string a_nev, const string a_cspe_nev,
                    const double a_cl_k, const double a_cl_w, const bool a_is_reversed, const double a_mp) :
 	Agelem(a_nev, a_dia * a_dia * pi / 4, a_mp, a_ro) {
 	//Kotelezo adatok minden Agelemnel:
-	tipus = "Csatorna";
 	csp_db = 2;
 	cspe_nev = a_cspe_nev;
 	cspv_nev = a_cspv_nev;
@@ -128,7 +127,6 @@ string Csatorna::Info() {
 	ostringstream strstrm;
 	strstrm << Agelem::Info();
 	cout << setprecision(3);
-	strstrm << endl << "       tipusa : " << tipus;
 	strstrm << endl << "  kapcsolodas : " << cspe_nev << "(index:" << cspe_index
 	        << ") ==> " << cspv_nev << "(index:" << cspv_index << ")";
 	strstrm << endl << "       adatok : hossz [m]         : " << L;
@@ -179,10 +177,8 @@ string Csatorna::Info() {
 
 /// �gegyenlet �s deriv�ltak sz�m�t�sa
 /**
- * @param x[0] = pe/ro/g - nyom�s [v.o.m.] az �gelem elej�n
- * @param x[1] = pv/ro/g - nyom�s [v.o.m.] az �gelem v�g�n
- * @param x[2] = he/ro/g - �gelem elej�n a csom�pont nullszintje [m]
- * @param x[3] = hv/ro/g - �gelem v�g�n a csom�pont nullszintje [m]
+ * @param x State vector: x[0] and x[1] are the upstream and downstream
+ * pressure heads; x[2] and x[3] are the corresponding node elevations.
  * @return f �rt�ke
  *
  * �gelem elej�n az abszol�t nyom�sszint: he(aknafen�k) + pe/ro/g = x[0]+x[1]
@@ -538,10 +534,10 @@ void Csatorna::Ini(int mode, double value) {
 
 /// Keresztmetszeti jellemz�k sz�m�t�sa
 /**
- * @param y v�zszint
- * @param &A nedves�tett ter�let
- * @param &B nedves�tett ker�let
- * @param &Rh hidraulikai sug�r (A/B)
+ * @param yy v�zszint
+ * @param A nedves�tett ter�let
+ * @param B nedves�tett ker�let
+ * @param Rh hidraulikai sug�r (A/B)
  */
 
 void Csatorna::keresztmetszet(const double yy, double & A, double & B, double & Rh) {
@@ -842,6 +838,7 @@ vector<double> Csatorna::normal_szint(const double Q) {
 /**
  * @param x x koordin�ta
  * @param y y koordin�ta
+ * @param mp t�meg�ram
  * @return dy/dx �rt�ke
  */
 
@@ -868,6 +865,7 @@ double Csatorna::nyf_ode(const double x, const double y, const double mp) {
  * @param y0  depth at x=0
  * @param dx0 initial dx step
  * @param x0  initial x value (defines direction of integration)
+ * @param mp   mass flow rate
  * @return y result of integration
  */
 
@@ -1846,4 +1844,3 @@ void Csatorna::Set_dprop(string mit, double mire) {
 	     << mit << endl << endl;
 	//      }
 }
-

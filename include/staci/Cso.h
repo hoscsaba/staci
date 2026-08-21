@@ -22,7 +22,7 @@ public:
     double Get_dprop(string mit);
     double Get_dfdmu(string mit);
     void Set_dprop(string mit, double mire);
-    string GetType()
+    string GetType() const override
     {
         return "Cso";
     }    

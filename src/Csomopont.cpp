@@ -10,7 +10,7 @@
 
 using namespace std;
 
-Csomopont::Csomopont(const string a_nev,
+Csomopont::Csomopont(const std::string a_nev,
                      const double a_h,
                      const double a_fogy,
                      const double a_cl_be,

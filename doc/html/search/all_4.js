@@ -1,4 +1,26 @@
 var searchData=
 [
-  ['error',['error',['../class_agelem.html#acf0a31790483a62b9b1f46a2bd73b59a',1,'Agelem::error()'],['../class_csatorna.html#a765dd9b66d2a18b567a6045d17266a10',1,'Csatorna::error()']]]
+  ['easiest_20first_0',['EPANET–STACI compatibility TODO (easiest first)',['../index.html#autotoc_md14',1,'']]],
+  ['elements_1',['List network elements',['../index.html#autotoc_md16',1,'']]],
+  ['epanet–staci_20compatibility_20todo_20easiest_20first_2',['EPANET–STACI compatibility TODO (easiest first)',['../index.html#autotoc_md14',1,'']]],
+  ['epanet_3',['Export a STACI network to EPANET',['../index.html#autotoc_md13',1,'']]],
+  ['epanet_20extended_20period_20simulation_4',['Run an EPANET extended-period simulation',['../index.html#autotoc_md15',1,'']]],
+  ['epanet_20network_5',['Import an EPANET network',['../index.html#autotoc_md12',1,'']]],
+  ['epanetdocument_6',['EpanetDocument',['../class_epanet_document.html',1,'']]],
+  ['epanetdocumentline_7',['EpanetDocumentLine',['../struct_epanet_document_line.html',1,'']]],
+  ['epanetextendedsimulation_8',['EpanetExtendedSimulation',['../class_epanet_extended_simulation.html',1,'']]],
+  ['epanetpowerpump_9',['EpanetPowerPump',['../class_epanet_power_pump.html',1,'']]],
+  ['epanetreader_10',['EpanetReader',['../class_epanet_reader.html',1,'']]],
+  ['epanetwriter_11',['EpanetWriter',['../class_epanet_writer.html',1,'']]],
+  ['epslinkinfo_12',['EpsLinkInfo',['../struct_eps_link_info.html',1,'']]],
+  ['epsnodeinfo_13',['EpsNodeInfo',['../struct_eps_node_info.html',1,'']]],
+  ['epsoutputmetadata_14',['EpsOutputMetadata',['../struct_eps_output_metadata.html',1,'']]],
+  ['epsresultframe_15',['EpsResultFrame',['../struct_eps_result_frame.html',1,'']]],
+  ['epsresultwriter_16',['EpsResultWriter',['../class_eps_result_writer.html',1,'']]],
+  ['epstankinfo_17',['EpsTankInfo',['../struct_eps_tank_info.html',1,'']]],
+  ['error_18',['error',['../class_agelem.html#acf0a31790483a62b9b1f46a2bd73b59a',1,'Agelem::error()'],['../class_csatorna.html#a765dd9b66d2a18b567a6045d17266a10',1,'Csatorna::error()']]],
+  ['executables_19',['Precompiled executables',['../index.html#autotoc_md2',1,'']]],
+  ['export_20a_20staci_20network_20to_20epanet_20',['Export a STACI network to EPANET',['../index.html#autotoc_md13',1,'']]],
+  ['export_20connectivity_21',['Export connectivity',['../index.html#autotoc_md22',1,'']]],
+  ['extended_20period_20simulation_22',['Run an EPANET extended-period simulation',['../index.html#autotoc_md15',1,'']]]
 ];

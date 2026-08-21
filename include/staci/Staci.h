@@ -7,6 +7,7 @@
 
 
 #include <vector>
+#include <memory>
 #include "AnyOption.h"
 #include "Csomopont.h"
 #include "Agelem.h"
@@ -17,12 +18,18 @@
 class Staci
 {
 public:
+    // Non-owning compatibility views. The pointed-to objects are owned by
+    // owned_cspok and owned_agelemek for the complete lifetime of this Staci.
     vector<Csomopont *> cspok;
     vector<Agelem *> agelemek;
     void export_connected_nodes();
     Staci(int argc, char *argv[]);
     Staci(string spr_filename);
     ~Staci();
+    Staci(const Staci &) = delete;
+    Staci &operator=(const Staci &) = delete;
+    Staci(Staci &&) noexcept = default;
+    Staci &operator=(Staci &&) noexcept = default;
     void print_header();
     string Get_out_file()
     {
@@ -183,7 +190,9 @@ private:
     string friction_model;
     stringstream m_ss;
     string def_file, out_file, ini_file, aisee_file, res_file;
-    AnyOption *opt;
+    std::unique_ptr<AnyOption> opt;
+    std::vector<std::unique_ptr<Csomopont> > owned_cspok;
+    std::vector<std::unique_ptr<Agelem> > owned_agelemek;
     EpanetDocument epanet_document;
     bool has_epanet_document;
 
@@ -191,6 +200,7 @@ private:
     string progress_file;
 
     void SetInitialParameters();
+    void rebuild_network_views();
 
     void progress_file_write(double percent);
     void get_command_line_options(int argc, char *argv[]);

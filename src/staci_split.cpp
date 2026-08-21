@@ -1,6 +1,7 @@
 // #include <stdio.h>
 #include <vector>
 #include <sstream>
+#include <memory>
 #include "Staci.h"
 #include "xmlParser.h"
 // Linux
@@ -28,7 +29,7 @@ double pcross, pmut;
 string weight_type;
 string weight_type_mod;
 
-Staci *wds;
+unique_ptr<Staci> wds;
 int n_n, n_p, n_comm;
 int fcount;
 double f_ce;
@@ -1396,7 +1397,7 @@ void LoadMatrices(MatrixXd & A, VectorXd & W, VectorXd & p, string weight_type) 
 
 void LoadSystem(string fname) {
 
-    wds = new Staci(fname.c_str());
+    wds = make_unique<Staci>(fname.c_str());
     wds->build_system();
     wds->ini();
     wds->solve_system();
@@ -1408,12 +1409,12 @@ void LoadSystem(string fname) {
 
     for (unsigned int i = 0; i < wds->agelemek.size(); i++) {
         bool add_this = true;
-        string tipus = wds->agelemek.at(i)->GetType();
-        // cout<<endl<<"i = "<<i<<", tipus : "<<tipus<<", ID : "<<wds->agelemek.at(i)->Get_nev();
+        string type = wds->agelemek.at(i)->GetType();
+        // cout<<endl<<"i = "<<i<<", type : "<<type<<", ID : "<<wds->agelemek.at(i)->Get_nev();
 
-        if (0 == strcmp(tipus.c_str(), "Vegakna"))
+        if (0 == strcmp(type.c_str(), "Vegakna"))
             add_this = false;
-        if (0 == strcmp(tipus.c_str(), "KonstNyomas"))
+        if (0 == strcmp(type.c_str(), "KonstNyomas"))
             add_this = false;
 
         if (add_this) {

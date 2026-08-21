@@ -19,11 +19,7 @@ public:
     vector<double> df(vector<double>);
     void Ini(int mode, double value);
     void Set_dprop(string mit, double mire);
-    string GetType()
-    {
-        return "KonstNyomas";
-    }
-    string Get_Tipus()
+    string GetType() const override
     {
         return "KonstNyomas";
     }

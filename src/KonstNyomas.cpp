@@ -18,7 +18,6 @@ KonstNyomas::KonstNyomas(
 
     Agelem(a_nev, a_Aref, a_mp, a_ro, a_tt) {
     //Kotelezo adatok minden Agelemnel:
-    tipus = "Konstans nyomas";
     csp_db = 1;
 
     /*cspe_nev="<nincs>";

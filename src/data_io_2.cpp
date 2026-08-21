@@ -35,7 +35,8 @@ data_io::data_io(const char* xml_file_)
     }
 }
 
-void data_io::load_system(vector<Csomopont*>& cspok, vector<Agelem*>& agelemek) {
+void data_io::load_system(vector<unique_ptr<Csomopont> >& cspok,
+                          vector<unique_ptr<Agelem> >& agelemek) {
     file<> fdoc(xml_file);
     xml_document<> doc;
     doc.parse<0>(fdoc.data());
@@ -65,7 +66,7 @@ void data_io::load_system(vector<Csomopont*>& cspok, vector<Agelem*>& agelemek) 
             double pressure = string_to_double(get_child(n, "pressure")->value(), id, "<pressure>", 0);
             double density = string_to_double(get_child(n, "density")->value(), id, "<density>", 0);
             double tt = string_to_double(get_child(n, "travel_time")->value(), id, "<travel_time>", 0);
-            cspok.push_back(new Csomopont(id, height, demand, cl_input, pressure, density, tt));
+            cspok.push_back(make_unique<Csomopont>(id, height, demand, cl_input, pressure, density, tt));
         }
     }
 
@@ -88,7 +89,7 @@ void data_io::load_system(vector<Csomopont*>& cspok, vector<Agelem*>& agelemek) 
         switch (type_idx) {
             case 0: { // press
                 double pres = atof(get_child(spec, "press")->first_node("pressure")->value());
-                agelemek.push_back(new KonstNyomas(id, aref, from, density, pres, mfr, tt));
+                agelemek.push_back(make_unique<KonstNyomas>(id, aref, from, density, pres, mfr, tt));
                 break;
             }
             case 1: { // pipe
@@ -97,7 +98,7 @@ void data_io::load_system(vector<Csomopont*>& cspok, vector<Agelem*>& agelemek) 
                 double rough = atof(get_child(spec, "pipe")->first_node("roughness")->value());
                 double cl_k = atof(get_child(spec, "pipe")->first_node("cl_k")->value());
                 double cl_w = atof(get_child(spec, "pipe")->first_node("cl_w")->value());
-                agelemek.push_back(new Cso(id, from, to, density, L, D, rough, cl_k, cl_w, mfr));
+                agelemek.push_back(make_unique<Cso>(id, from, to, density, L, D, rough, cl_k, cl_w, mfr));
                 break;
             }
             // ... implement other cases similarly ...

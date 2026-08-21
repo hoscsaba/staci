@@ -19,8 +19,6 @@ protected:
     const double g = 9.81;
     /// Az agelem neve
     string nev;
-    /// Az agelem tipusa, pl. Cso, Csatorna, stb.
-    string tipus;
     /// Az elejen es vegen levo csompont indexe
     int cspe_index, cspv_index;
     /// Az elejen es vegen levo csompont neve
@@ -108,11 +106,6 @@ public:
     {
         return nev;
     }
-    /// Tipus visszaadasa
-    string Get_Tipus()
-    {
-        return tipus;
-    }
     /// cspe_nev visszaadasa
     string Get_Cspe_Nev()
     {
@@ -168,7 +161,8 @@ public:
     virtual void build_res()
     {
     }
-    virtual string GetType() = 0;
+    /// Returns the runtime type identifier used throughout STACI.
+    virtual string GetType() const = 0;
     void Set_enabled(bool value) { enabled = value; }
     bool Is_enabled() const { return enabled; }
     /// Eredmenyvektor visszaadasa (csak Csatorna eseten)

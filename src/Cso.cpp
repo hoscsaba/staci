@@ -13,7 +13,6 @@ Cso::Cso(const string a_nev, const string a_cspe_nev, const string a_cspv_nev,
          const double a_erdesseg, const double a_cl_k, const double a_cl_w,
          const double a_mp) : Agelem(a_nev, a_D * a_D * M_PI / 4., a_mp, a_ro) {
   // Kotelezo adatok minden Agelemnel:
-  tipus = "Cso";
   csp_db = 2;
   cspe_nev = a_cspe_nev;
   cspv_nev = a_cspv_nev;
@@ -57,7 +56,6 @@ Cso::~Cso() {}
 string Cso::Info() {
   ostringstream strstrm;
   strstrm << Agelem::Info();
-  strstrm << "\n       tipusa : " << tipus;
   strstrm << "\n  kapcsolodas : " << cspe_nev << "(index:" << cspe_index
           << ") --> " << cspv_nev << "(index:" << cspv_index << ")\n";
   strstrm << "       adatok : L=" << L << "[m], D=" << D

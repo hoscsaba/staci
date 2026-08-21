@@ -11,7 +11,6 @@ EpanetPowerPump::EpanetPowerPump(const string &name,
                                  double initial_mass_flow_rate)
     : Agelem(name, 1.0, initial_mass_flow_rate, density),
       hydraulic_power(hydraulic_power_watts) {
-    tipus = "EPANET constant-power pump";
     csp_db = 2;
     cspe_nev = node_from;
     cspv_nev = node_to;
@@ -66,7 +65,6 @@ double EpanetPowerPump::Get_dprop(string property) {
 string EpanetPowerPump::Info() {
     std::ostringstream out;
     out << Agelem::Info();
-    out << "\n       type  : " << tipus;
     out << "\n       nodes : " << cspe_nev << " -> " << cspv_nev;
     out << "\n       power : " << hydraulic_power << " W\n";
     return out.str();

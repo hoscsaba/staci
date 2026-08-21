@@ -20,7 +20,6 @@ JelleggorbesFojtas::JelleggorbesFojtas(const string a_nev,
                                        const double a_mp) :
         Agelem(a_nev, a_Aref, a_mp, a_ro) {
     //Kotelezo adatok minden Agelemnel:
-    tipus = "Jelleggorbes fojtas";
     csp_db = 2;
     cspe_nev = a_cspe_nev;
     cspv_nev = a_cspv_nev;

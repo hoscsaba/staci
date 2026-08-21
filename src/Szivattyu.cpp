@@ -11,7 +11,6 @@ Szivattyu::Szivattyu(const string a_nev, const string a_cspe_nev,
                      const string a_cspv_nev, const double a_ro, const double Aref, vector<double> a_q,
                      vector<double> a_H, const double a_mp) : Agelem(a_nev, Aref, a_mp, a_ro) {
     //Kotelezo adatok minden Agelemnel:
-    tipus = "Szivattyu";
     csp_db = 2;
     cspe_nev = a_cspe_nev;
     cspv_nev = a_cspv_nev;
@@ -88,7 +87,6 @@ Szivattyu::~Szivattyu() {}
 string Szivattyu::Info() {
     ostringstream strstrm;
     strstrm << Agelem::Info();
-    strstrm << endl << "       tipusa : " << tipus;
     strstrm << endl << "  kapcsolodas : " << cspe_nev << "(index:" << cspe_index << ") --> " << cspv_nev << "(index:"
             << cspv_index << ")\n";
     cout << setprecision(3);
@@ -110,11 +108,8 @@ string Szivattyu::Info() {
 //! Pump branch equation
 /*!
 The function evaluates the curve fit by the constructor \sa Szivattyu()
-\param x vector<double>
-\param x(0)=pstart/ro/g
-\param x(1)=pend/ro/g
-\param x(2)=zstart
-\param x(3)=zend
+\param x State vector containing the upstream and downstream pressure heads
+and elevations in positions 0 through 3.
 \return (double) function error (should be zero)
 \sa PumpCharCurve()
 */double Szivattyu::f(vector<double> x) {

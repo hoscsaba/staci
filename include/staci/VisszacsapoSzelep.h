@@ -15,7 +15,7 @@ public:
 	vector<double> df(vector<double>);
 	void Ini(int mode, double value);
 	void Set_dprop(string mit, double mire);
-	string GetType() {
+	string GetType() const override {
 		return "VisszacsapoSzelep";
 	}
 	double Get_dprop(string mit);

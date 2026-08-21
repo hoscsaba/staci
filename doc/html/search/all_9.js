@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['jelleggorbesfojtas',['JelleggorbesFojtas',['../class_jelleggorbes_fojtas.html',1,'']]]
+  ['jelleggorbesfojtas_0',['JelleggorbesFojtas',['../class_jelleggorbes_fojtas.html',1,'']]]
 ];

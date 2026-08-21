@@ -1,11 +1,7 @@
 var searchData=
 [
-  ['xml',['XML',['../struct_x_m_l.html',1,'']]],
-  ['xmlattribute',['XMLAttribute',['../struct_x_m_l_attribute.html',1,'']]],
-  ['xmlcharacterentity',['XMLCharacterEntity',['../struct_x_m_l_character_entity.html',1,'']]],
-  ['xmlclear',['XMLClear',['../struct_x_m_l_clear.html',1,'']]],
-  ['xmlnode',['XMLNode',['../struct_x_m_l_node.html',1,'']]],
-  ['xmlnodecontents',['XMLNodeContents',['../struct_x_m_l_node_contents.html',1,'']]],
-  ['xmlparserbase64tool',['XMLParserBase64Tool',['../class_x_m_l_parser_base64_tool.html',1,'']]],
-  ['xmlresults',['XMLResults',['../struct_x_m_l_results.html',1,'']]]
+  ['val_5fand_5fid_0',['val_and_ID',['../structval__and___i_d.html',1,'']]],
+  ['val_5fand_5fid_5fand_5fcomm_1',['val_and_ID_and_comm',['../structval__and___i_d__and__comm.html',1,'']]],
+  ['vegakna_2',['Vegakna',['../class_vegakna.html',1,'']]],
+  ['visszacsaposzelep_3',['VisszacsapoSzelep',['../class_visszacsapo_szelep.html',1,'']]]
 ];

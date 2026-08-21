@@ -11,8 +11,6 @@
 using namespace std;
 
 Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const double a_ro) {
-    // tipus
-    string tipus;
     // tomegaram es suruseg
     mp = a_mp;
 
@@ -42,8 +40,6 @@ Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const
 
 //--------------------------------------------------------------
 Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const double a_ro, const double a_tt) {
-    // tipus
-    string tipus;
     // tomegaram es suruseg
     mp = a_mp;
 
@@ -76,7 +72,7 @@ Agelem::~Agelem() {
 string Agelem::Info() {
     ostringstream strstrm;
     strstrm << "\n Agelem neve  : " << nev;
-    // strstrm << "\n        tipusa: " << tipus;
+    strstrm << "\n        type  : " << GetType();
     strstrm << "\n        ro    : " << ro << " [kg/m^3]";
     strstrm << "\n        Aref  : " << Aref << " [m^2]";
     strstrm << "\n        mp    : " << mp / ro * 3600 << " [m3/h]";

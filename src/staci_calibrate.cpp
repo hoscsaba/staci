@@ -6,6 +6,7 @@
 #include <boost/tokenizer.hpp>
 #include <numeric>
 #include <list>
+#include <memory>
 #include "xmlParser.h"
 
 using namespace std;
@@ -32,7 +33,7 @@ void logfile_write(string msg, int debug_level);
 
 int Num_of_Periods;
 int Start_of_Periods;
-vector<Staci *> wds;
+vector<unique_ptr<Staci> > wds;
 
 vector<string> Sollwert_Node_Staci_ID;
 vector<int> Sollwert_Node_Staci_Idx;
@@ -460,7 +461,7 @@ void Set_Up_Active_Pipes() {
     pipe_name.clear();
     pipe_is_active.clear();
     for (unsigned int i = 0; i < wds.at(0)->agelemek.size(); i++)
-        if (strcmp(wds.at(0)->agelemek.at(i)->Get_Tipus().c_str(), "Cso") == 0) {
+        if (strcmp(wds.at(0)->agelemek.at(i)->GetType().c_str(), "Cso") == 0) {
             pipe_origD.push_back(wds.at(0)->agelemek.at(i)->Get_dprop("diameter"));
             pipe_name.push_back(wds.at(0)->agelemek.at(i)->Get_nev());
             pipe_is_active.push_back(true);
@@ -471,7 +472,7 @@ void Set_Up_Active_Pipes() {
         num_of_active_pipes = 0;
         int k = 0;
         for (unsigned int i = 0; i < wds.at(0)->agelemek.size(); i++)
-            if (strcmp(wds.at(0)->agelemek.at(i)->Get_Tipus().c_str(), "Cso") == 0) {
+            if (strcmp(wds.at(0)->agelemek.at(i)->GetType().c_str(), "Cso") == 0) {
                 if (wds.at(0)->agelemek.at(i)->Get_dprop("diameter") > Dmin) {
                     pipe_is_active.at(k) = true;
                     num_of_active_pipes++;
@@ -598,7 +599,7 @@ void Spoil_Active_Pipes() {
     msg << endl << "Spoiling active pipes....";
     for (unsigned int i = 0; i < wds.at(0)->agelemek.size(); i++) {
         string name1 = wds.at(0)->agelemek.at(i)->Get_nev();
-        if (strcmp(wds.at(0)->agelemek.at(i)->Get_Tipus().c_str(), "Cso") == 0) {
+        if (strcmp(wds.at(0)->agelemek.at(i)->GetType().c_str(), "Cso") == 0) {
             for (unsigned j = 0; j < pipe_name.size(); j++) {
                 string name2 = pipe_name.at(j);
                 if ((pipe_is_active.at(j)) && (0 == strcmp(name1.c_str(), name2.c_str()))) {
@@ -701,7 +702,7 @@ void Load_WDS_Systems() {
         msg << "\n\t" << fname.str();
         logfile_write(msg.str(), 2);
 
-        wds.push_back(new Staci(fname.str()));
+        wds.push_back(make_unique<Staci>(fname.str()));
         wds.at(i)->build_system();
         wds.at(i)->ini();
     }
@@ -714,7 +715,7 @@ void Update_Reservoirs(unsigned int i) {
 
     for (unsigned int j = 0; j < wds.at(i)->agelemek.size(); j++) {
 
-        string type = wds.at(i)->agelemek.at(j)->Get_Tipus();
+        string type = wds.at(i)->agelemek.at(j)->GetType();
         if (strcmp(type.c_str(), "Vegakna") == 0) {
             string PoolName = wds.at(i)->agelemek.at(j)->Get_nev();
             double mp_prev = wds.at(i - 1)->agelemek.at(j)->Get_dprop("mass_flow_rate");
@@ -852,7 +853,7 @@ int Find_Pool_Index(string PoolName) {
     bool found = false;
     int idx = -1;
     for (unsigned int j = 0; j < wds.at(0)->agelemek.size(); j++) {
-        string type = wds.at(0)->agelemek.at(j)->Get_Tipus();
+        string type = wds.at(0)->agelemek.at(j)->GetType();
         if (strcmp(type.c_str(), "Vegakna") == 0) {
             string Name = wds.at(0)->agelemek.at(j)->Get_nev();
             if (strcmp(Name.c_str(), PoolName.c_str()) == 0) {

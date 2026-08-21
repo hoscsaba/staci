@@ -77,7 +77,8 @@ void data_io::warn_epanet_write_unsupported(const string &operation) const {
 }
 
 //--------------------------------------------------------------------------------
-void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek) {
+void data_io::load_system(vector<unique_ptr<Csomopont> > &cspok,
+                          vector<unique_ptr<Agelem> > &agelemek) {
     if (is_epanet_input) {
         epanet_reader->load_system(cspok, agelemek);
         return;
@@ -128,7 +129,7 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
             tt = string_to_double(Node_nodes.getChildNode("node", i).getChildNode("travel_time").getText(), id,
                                   "<travel_time>", 0.0);
 
-            cspok.push_back(new Csomopont(id, height, demand, cl_be, pressure, ro, tt));
+            cspok.push_back(make_unique<Csomopont>(id, height, demand, cl_be, pressure, ro, tt));
 
             if (debug)
                 cout << cspok.at(j)->Info(false);
@@ -236,7 +237,7 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                     // pmax = pres;
                     darab++;
                     agelemek.push_back(
-                        new KonstNyomas(id, aref, node_from, density, pres, mass_flow_rate, travel_time));
+                        make_unique<KonstNyomas>(id, aref, node_from, density, pres, mass_flow_rate, travel_time));
                     if (debug)
                         cout << " OK";
                     break;
@@ -254,7 +255,7 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                         cout << ", length=" << L << "m, diameter=" << D
                              << "m, roughness=" << erdesseg << "mm";
                     agelemek.push_back(
-                        new Cso(id, node_from, node_to, density, L, D, erdesseg, cl_k, cl_w, mass_flow_rate));
+                        make_unique<Cso>(id, node_from, node_to, density, L, D, erdesseg, cl_k, cl_w, mass_flow_rate));
                     if (debug)
                         cout << " OK";
                     break;
@@ -265,7 +266,7 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                     int jgpsz = elem.getChildNode("curve").getChildNode("points").nChildNode("point_x");
                     vector<double> Q(jgpsz), H(jgpsz);
                     curve_reader(id, elem.getChildNode("curve"), Q, H);
-                    agelemek.push_back(new Szivattyu(id, node_from, node_to, density, aref, Q, H, mass_flow_rate));
+                    agelemek.push_back(make_unique<Szivattyu>(id, node_from, node_to, density, aref, Q, H, mass_flow_rate));
                     if (debug)
                         cout << " OK";
                     break;
@@ -293,8 +294,8 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                         cout << "Warning! element " << id << " actual setting=" << allas << " < e(0) " << e.at(0)
                              << endl;
 
-                    agelemek.push_back(new JelleggorbesFojtas(id, node_from, node_to, density, aref, e, zeta, allas,
-                                       mass_flow_rate));
+                    agelemek.push_back(make_unique<JelleggorbesFojtas>(
+                        id, node_from, node_to, density, aref, e, zeta, allas, mass_flow_rate));
                     if (debug)
                         cout << " OK";
                     break;
@@ -313,7 +314,7 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                              << "m";//, szumma_patlag=" << patlag;
 
                     agelemek.push_back(
-                        new Vegakna(id, node_from, density, aref, Hb, Hw, mass_flow_rate, travel_time));
+                        make_unique<Vegakna>(id, node_from, density, aref, Hb, Hw, mass_flow_rate, travel_time));
                     if (debug)
                         cout << " OK";
                     break;
@@ -386,9 +387,9 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                     if (debug)
                         cout << endl << "\t\t kor geometria: D=" << dia;
                     agelemek.push_back(
-                        new Csatorna(id, node_from, node_to, density, dia * dia * M_PI / 4., L, ze, zv,
-                                     erdesseg, int_steps, debugl, dia, cl_k, cl_w, is_reversed,
-                                     mass_flow_rate));
+                        make_unique<Csatorna>(id, node_from, node_to, density, dia * dia * M_PI / 4., L, ze, zv,
+                                              erdesseg, int_steps, debugl, dia, cl_k, cl_w, is_reversed,
+                                              mass_flow_rate));
                     break;
                 }
 
@@ -449,8 +450,8 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                              << ", discharge_coeff=" << dc << ", valve_coeff="
                              << vc;
                     agelemek.push_back(
-                        new BukoMutargy(id, node_from, node_to, density, aref, bh, is_opened, wi, oh, dc, vc,
-                                        mass_flow_rate));
+                        make_unique<BukoMutargy>(id, node_from, node_to, density, aref, bh, is_opened,
+                                                 wi, oh, dc, vc, mass_flow_rate));
                     if (debug)
                         cout << "  OK";
                     break;
@@ -464,7 +465,8 @@ void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek
                         cout << endl << "loss_coeff_b(ack):" << lcv;
                     }
                     agelemek.push_back(
-                        new VisszacsapoSzelep(id, node_from, node_to, density, aref, lce, lcv, mass_flow_rate));
+                        make_unique<VisszacsapoSzelep>(id, node_from, node_to, density, aref, lce, lcv,
+                                                       mass_flow_rate));
                     if (debug)
                         cout << "  OK";
                     break;
@@ -629,8 +631,9 @@ void data_io::replace_value4(XMLNode &root_node, string fieldname1, int i,
 
 
 //--------------------------------------------------------------------------------
-void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of_demand, vector<Csomopont *> cspok,
-                           vector<Agelem *> agelemek, bool conv_reached, int staci_debug_level) {
+void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of_demand,
+                           const vector<Csomopont *> &cspok, const vector<Agelem *> &agelemek,
+                           bool conv_reached, int staci_debug_level) {
 
     if (is_epanet_input) {
         warn_epanet_write_unsupported("Saving hydraulic results");
@@ -827,7 +830,7 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
                          << " m/s, head_loss=" << dh << " m";
 */
                 // Jelleggorbes fojtas - interpolalt dzeta ertek
-                if (agelemek.at(j)->Get_Tipus() == "Jelleggorbes fojtas") {
+                if (agelemek.at(j)->GetType() == "JelleggorbesFojtas") {
                     replace_value4( Node_edges, "edge", i, "edge_spec", "valve", "adzeta", agelemek.at(j)->Get_dprop("veszt"), id);
                     /*
 
@@ -846,7 +849,7 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
                 }
 
                 // Cso es Csatorna eseten kiirjuk a referncia keresztmetszet sz�m�tott �rt�k�t
-                if (agelemek.at(j)->Get_Tipus() == "Csatorna" || agelemek.at(j)->Get_Tipus() == "Cso") {
+                if (agelemek.at(j)->GetType() == "Csatorna" || agelemek.at(j)->GetType() == "Cso") {
                     XMLNode akt_node;
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel1") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
@@ -862,7 +865,7 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
                 }
 
                 // Csatorna eseten kiirjuk: node_from, node_to, lejtes
-                if (agelemek.at(j)->Get_Tipus() == "Csatorna") {
+                if (agelemek.at(j)->GetType() == "Csatorna") {
                     XMLNode akt_node;
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel1") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode(
@@ -878,7 +881,7 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
                 }
 
                 // Speci resz: Cso es Csatorna eseten kiirjuk a csosurlodasi tenyezo erteket
-                if (agelemek.at(j)->Get_Tipus() == "Csatorna" || agelemek.at(j)->Get_Tipus() == "Cso") {
+                if (agelemek.at(j)->GetType() == "Csatorna" || agelemek.at(j)->GetType() == "Cso") {
                     XMLNode akt_node;
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode("channel");
@@ -900,7 +903,7 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
                     akt_node.getChildNode("friction_coeff").addText(os.str().c_str());
                 }
 
-                if (agelemek.at(j)->Get_Tipus() == "Csatorna") {
+                if (agelemek.at(j)->GetType() == "Csatorna") {
                     XMLNode akt_node;
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode("channel");
@@ -933,7 +936,7 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
 
 
                 // Speci resz: Csatorna eseten kiirjuk a sebesseg- es szintelszlast is
-                if (agelemek.at(j)->Get_Tipus() == "Csatorna") {
+                if (agelemek.at(j)->GetType() == "Csatorna") {
                     XMLNode akt_node;
                     if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("channel") > 0)
                         akt_node = Node_edges.getChildNode("edge", i).getChildNode("edge_spec").getChildNode("channel");
@@ -1020,7 +1023,8 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
 }
 
 //--------------------------------------------------------------------------------
-void data_io::save_mod_prop_all_elements(vector<Csomopont*> cspok, vector<Agelem*> agelemek, string pID) {
+void data_io::save_mod_prop_all_elements(const vector<Csomopont*> &cspok,
+                                         const vector<Agelem*> &agelemek, string pID) {
 
     if (is_epanet_input) {
         warn_epanet_write_unsupported("Saving modified properties");
@@ -1071,7 +1075,8 @@ replace_value2( Node_nodes, "node", j, pID, val , cspok.at(i)->Get_nev());
 }
 
 //--------------------------------------------------------------------------------
-void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek, string eID, string pID,
+void data_io::save_mod_prop(const vector<Csomopont *> &cspok, const vector<Agelem *> &agelemek,
+                            string eID, string pID,
                             bool is_property_general) {
 
     if (is_epanet_input) {
@@ -1123,7 +1128,7 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
                          << agelemek.at(j)->Get_nev();
                     cout << endl << "\tpID : " << pID;
                     cout << endl << "\tval : " << agelemek.at(j)->Get_dprop(pID);
-                    cout << endl << "\ttip : " << agelemek.at(j)->Get_Tipus();
+                    cout << endl << "\ttip : " << agelemek.at(j)->GetType();
                 }
                 if (is_property_general) {
                     XMLNode akt_node = Node_edges.getChildNode("edge", i);
@@ -1135,7 +1140,7 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
                 } else {
 
                     // Cso
-                    if (agelemek.at(j)->Get_Tipus() == "Cso") {
+                    if (agelemek.at(j)->GetType() == "Cso") {
                         XMLNode akt_node;
 
                         if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("pipe") > 0)
@@ -1149,7 +1154,7 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
                     }
 
                     // Vegakna
-                    if (agelemek.at(j)->Get_Tipus() == "Vegakna") {
+                    if (agelemek.at(j)->GetType() == "Vegakna") {
                         XMLNode akt_node;
 
                         if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("pool") > 0)
@@ -1163,7 +1168,7 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
                     }
 
                     // Jelleggorbes fojtas
-                    if (agelemek.at(j)->Get_Tipus() == "Jelleggorbes fojtas") {
+                    if (agelemek.at(j)->GetType() == "JelleggorbesFojtas") {
                         XMLNode akt_node;
 
                         if (Node_edges.getChildNode("edge", i).getChildNode("edge_spec").nChildNode("valve") > 0)
@@ -1294,8 +1299,8 @@ void data_io::load_ini_values(vector<Csomopont *> &cspok, vector<Agelem *> &agel
 }
 
 //--------------------------------------------------------------------------------
-void data_io::save_transport(int mode, vector<Csomopont *> cspok,
-                             vector<Agelem *> agelemek) {
+void data_io::save_transport(int mode, const vector<Csomopont *> &cspok,
+                             const vector<Agelem *> &agelemek) {
     if (is_epanet_input) {
         warn_epanet_write_unsupported("Saving transport results");
         return;

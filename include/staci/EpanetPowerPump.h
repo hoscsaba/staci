@@ -17,7 +17,7 @@ public:
     void Ini(int mode, double value) override;
     double Get_dprop(string property) override;
     string Info() override;
-    string GetType() override { return "EpanetPowerPump"; }
+    string GetType() const override { return "EpanetPowerPump"; }
 
 private:
     double hydraulic_power;

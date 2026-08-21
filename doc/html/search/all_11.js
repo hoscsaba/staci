@@ -1,7 +1,11 @@
 var searchData=
 [
-  ['tipus',['tipus',['../class_agelem.html#a6e1c3128174609a0dd8fbee09c0d9162',1,'Agelem']]],
-  ['todo_20list',['Todo List',['../todo.html',1,'']]],
-  ['tt_5fend',['tt_end',['../class_agelem.html#af07d516eda5f43a676f9f417436e0d9c',1,'Agelem']]],
-  ['tt_5fstart',['tt_start',['../class_agelem.html#a09ea41e75493961eb2b1d755c74e95f6',1,'Agelem']]]
+  ['részekre_20bontása_0',['Hidraulikus hálózat részekre bontása',['../md_doc_2staci__split__manual.html',1,'']]],
+  ['read_20a_20property_1',['Read a property',['../index.html#autotoc_md18',1,'']]],
+  ['reference_2',['Command-line reference',['../index.html#autotoc_md23',1,'']]],
+  ['requirements_3',['Requirements',['../index.html#autotoc_md3',1,'']]],
+  ['ro_4',['ro',['../class_agelem.html#a520072191e53f368a04ca80b8b583a3f',1,'Agelem']]],
+  ['run_20a_20steady_20state_20hydraulic_20simulation_5',['Run a steady-state hydraulic simulation',['../index.html#autotoc_md17',1,'']]],
+  ['run_20an_20epanet_20extended_20period_20simulation_6',['Run an EPANET extended-period simulation',['../index.html#autotoc_md15',1,'']]],
+  ['run_20the_20integration_20tests_7',['Run the integration tests',['../index.html#autotoc_md10',1,'']]]
 ];

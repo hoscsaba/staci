@@ -1,21 +1,21 @@
 STACI integration test report
 =============================
-Started UTC: 2026-08-21T10:45:50.251397+00:00
+Started UTC: 2026-08-21T12:09:09.795301+00:00
 Platform: macOS-26.5.2-arm64-arm-64bit-Mach-O
 Python: 3.14.6
-Executable: /Users/hoscsaba/CLionProjects/staci/build/staci
+Executable: /private/tmp/staci-leak-build.Mr3aQb/staci
 Tests directory: /Users/hoscsaba/CLionProjects/staci/tests
-Work directory: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4
+Work directory: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z
 Discovered: 6 SPR, 4 INP
-Removed previous STACI sidecar logs: 5
+Removed previous STACI sidecar logs: 23
 Command timeout: 300 s
 SPR hydraulics: files <= 1.00 MB
 
 SPR: LOV-LOVOTV-2-input_mod.spr
 -------------------------------
   Hydraulic solve: SKIPPED for 4.85 MB SPR (automatic limit 1.00 MB; use --full-spr-hydraulics to force it)
-  Command (export SPR to EPANET): /Users/hoscsaba/CLionProjects/staci/build/staci --export-epanet /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod.spr -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod-export.inp
-  Exit code: 0; elapsed: 7.600 s
+  Command (export SPR to EPANET): /private/tmp/staci-leak-build.Mr3aQb/staci --export-epanet /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod.spr -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod-export.inp
+  Exit code: 0; elapsed: 3.584 s
   Program output (237 lines):
     |
     | ======================================
@@ -25,9 +25,9 @@ SPR: LOV-LOVOTV-2-input_mod.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:45:50 2026
+    |  date: Fri Aug 21 14:09:09 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod.spr
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod.spr
     |
     |  Loading system...
     |
@@ -46,7 +46,7 @@ SPR: LOV-LOVOTV-2-input_mod.spr
     | 	checkvalve:	0
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod.spr.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod.spr.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     | WARNING [EPANET][EXPORT][POOL_203]: tank minimum and maximum levels were inferred.
@@ -208,18 +208,18 @@ SPR: LOV-LOVOTV-2-input_mod.spr
     | WARNING [EPANET][EXPORT][VALVE_12495]: STACI type 'JelleggorbesFojtas' has no lossless EPANET mapping and was skipped.
     | WARNING [EPANET][EXPORT][VALVE_13599]: STACI type 'JelleggorbesFojtas' has no lossless EPANET mapping and was skipped.
     | WARNING [EPANET][EXPORT][VALVE_13532]: STACI type 'JelleggorbesFojtas' has no lossless EPANET mapping and was skipped.
-    | EPANET export: wrote /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod-export.inp using metric LPS units.
+    | EPANET export: wrote /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod-export.inp using metric LPS units.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 4.620 sec  (81.7 %)
-    | 	 Building the system  : 1.034 sec  (18.3 %)
+    | 	 Reading data files   : 2.838 sec  (80.9 %)
+    | 	 Building the system  : 0.672 sec  (19.1 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 5.655 sec
-  Command (reload exported INP): /Users/hoscsaba/CLionProjects/staci/build/staci -l /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod-export.inp
-  Exit code: 0; elapsed: 0.831 s
+    | 	 Overall              : 3.510 sec
+  Command (reload exported INP): /private/tmp/staci-leak-build.Mr3aQb/staci -l /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod-export.inp
+  Exit code: 0; elapsed: 0.755 s
   Program output (40 lines):
     |
     | ======================================
@@ -229,12 +229,12 @@ SPR: LOV-LOVOTV-2-input_mod.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:45:57 2026
+    |  date: Fri Aug 21 14:09:13 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod-export.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod-export.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod-export.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod-export.inp
     |   units: LPS
     |   imported STACI nodes: 2459
     |   imported STACI elements: 2293
@@ -245,7 +245,7 @@ SPR: LOV-LOVOTV-2-input_mod.spr
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod-export.inp.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod.spr/LOV-LOVOTV-2-input_mod-export.inp.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
@@ -255,19 +255,19 @@ SPR: LOV-LOVOTV-2-input_mod.spr
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.019 sec  ( 2.4 %)
-    | 	 Building the system  : 0.763 sec  (97.6 %)
+    | 	 Reading data files   : 0.013 sec  ( 1.9 %)
+    | 	 Building the system  : 0.709 sec  (98.1 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.782 sec
-RESULT: PASS (8.437 s)
+    | 	 Overall              : 0.723 sec
+RESULT: PASS (4.344 s)
 
 SPR: LOV-LOVOTV-2-input_mod2.spr
 --------------------------------
   Hydraulic solve: SKIPPED for 5.42 MB SPR (automatic limit 1.00 MB; use --full-spr-hydraulics to force it)
-  Command (export SPR to EPANET): /Users/hoscsaba/CLionProjects/staci/build/staci --export-epanet /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2.spr -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2-export.inp
-  Exit code: 0; elapsed: 14.316 s
+  Command (export SPR to EPANET): /private/tmp/staci-leak-build.Mr3aQb/staci --export-epanet /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2.spr -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2-export.inp
+  Exit code: 0; elapsed: 3.918 s
   Program output (237 lines):
     |
     | ======================================
@@ -277,9 +277,9 @@ SPR: LOV-LOVOTV-2-input_mod2.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:45:58 2026
+    |  date: Fri Aug 21 14:09:14 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2.spr
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2.spr
     |
     |  Loading system...
     |
@@ -298,7 +298,7 @@ SPR: LOV-LOVOTV-2-input_mod2.spr
     | 	checkvalve:	0
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2.spr.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2.spr.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     | WARNING [EPANET][EXPORT][POOL_203]: tank minimum and maximum levels were inferred.
@@ -460,18 +460,18 @@ SPR: LOV-LOVOTV-2-input_mod2.spr
     | WARNING [EPANET][EXPORT][VALVE_12495]: STACI type 'JelleggorbesFojtas' has no lossless EPANET mapping and was skipped.
     | WARNING [EPANET][EXPORT][VALVE_13599]: STACI type 'JelleggorbesFojtas' has no lossless EPANET mapping and was skipped.
     | WARNING [EPANET][EXPORT][VALVE_13532]: STACI type 'JelleggorbesFojtas' has no lossless EPANET mapping and was skipped.
-    | EPANET export: wrote /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2-export.inp using metric LPS units.
+    | EPANET export: wrote /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2-export.inp using metric LPS units.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 4.943 sec  (82.6 %)
-    | 	 Building the system  : 1.041 sec  (17.4 %)
+    | 	 Reading data files   : 3.180 sec  (82.3 %)
+    | 	 Building the system  : 0.682 sec  (17.7 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 5.984 sec
-  Command (reload exported INP): /Users/hoscsaba/CLionProjects/staci/build/staci -l /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2-export.inp
-  Exit code: 0; elapsed: 14.708 s
+    | 	 Overall              : 3.862 sec
+  Command (reload exported INP): /private/tmp/staci-leak-build.Mr3aQb/staci -l /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2-export.inp
+  Exit code: 0; elapsed: 0.625 s
   Program output (40 lines):
     |
     | ======================================
@@ -481,12 +481,12 @@ SPR: LOV-LOVOTV-2-input_mod2.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:46:13 2026
+    |  date: Fri Aug 21 14:09:18 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2-export.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2-export.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2-export.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2-export.inp
     |   units: LPS
     |   imported STACI nodes: 2459
     |   imported STACI elements: 2293
@@ -497,7 +497,7 @@ SPR: LOV-LOVOTV-2-input_mod2.spr
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2-export.inp.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-LOV-LOVOTV-2-input_mod2.spr/LOV-LOVOTV-2-input_mod2-export.inp.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
@@ -507,19 +507,19 @@ SPR: LOV-LOVOTV-2-input_mod2.spr
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.023 sec  ( 2.3 %)
-    | 	 Building the system  : 0.946 sec  (97.7 %)
+    | 	 Reading data files   : 0.014 sec  ( 2.2 %)
+    | 	 Building the system  : 0.596 sec  (97.8 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.968 sec
-RESULT: PASS (29.049 s)
+    | 	 Overall              : 0.609 sec
+RESULT: PASS (4.550 s)
 
 SPR: VIZ-SOPTVR-2-660-input.spr
 -------------------------------
   Hydraulic solve: SKIPPED for 12.69 MB SPR (automatic limit 1.00 MB; use --full-spr-hydraulics to force it)
-  Command (export SPR to EPANET): /Users/hoscsaba/CLionProjects/staci/build/staci --export-epanet /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input.spr -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input-export.inp
-  Exit code: 0; elapsed: 39.641 s
+  Command (export SPR to EPANET): /private/tmp/staci-leak-build.Mr3aQb/staci --export-epanet /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input.spr -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input-export.inp
+  Exit code: 0; elapsed: 75.016 s
   Program output (663 lines):
     |
     | ======================================
@@ -529,9 +529,9 @@ SPR: VIZ-SOPTVR-2-660-input.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:46:27 2026
+    |  date: Fri Aug 21 14:09:18 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input.spr
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input.spr
     |
     |  Loading system...
     |
@@ -550,7 +550,7 @@ SPR: VIZ-SOPTVR-2-660-input.spr
     | 	checkvalve:	0
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input.spr.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input.spr.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     | WARNING [EPANET][EXPORT][POOL_239]: tank minimum and maximum levels were inferred.
@@ -712,18 +712,18 @@ SPR: VIZ-SOPTVR-2-660-input.spr
     | WARNING [EPANET][EXPORT][VALVE_11018]: STACI type 'JelleggorbesFojtas' has no lossless EPANET mapping and was skipped.
     | WARNING [EPANET][EXPORT][VALVE_12037]: STACI type 'JelleggorbesFojtas' has no lossless EPANET mapping and was skipped.
     | WARNING [EPANET][EXPORT][VALVE_57052324]: STACI type 'JelleggorbesFojtas' has no lossless EPANET mapping and was skipped.
-    | EPANET export: wrote /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input-export.inp using metric LPS units.
+    | EPANET export: wrote /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input-export.inp using metric LPS units.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 24.187 sec  (75.2 %)
-    | 	 Building the system  : 7.969 sec  (24.8 %)
+    | 	 Reading data files   : 26.167 sec  (67.7 %)
+    | 	 Building the system  : 12.457 sec  (32.3 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 32.156 sec
-  Command (reload exported INP): /Users/hoscsaba/CLionProjects/staci/build/staci -l /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input-export.inp
-  Exit code: 0; elapsed: 9.548 s
+    | 	 Overall              : 38.624 sec
+  Command (reload exported INP): /private/tmp/staci-leak-build.Mr3aQb/staci -l /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input-export.inp
+  Exit code: 0; elapsed: 32.261 s
   Program output (39 lines):
     |
     | ======================================
@@ -733,12 +733,12 @@ SPR: VIZ-SOPTVR-2-660-input.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:07 2026
+    |  date: Fri Aug 21 14:10:33 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input-export.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input-export.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input-export.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input-export.inp
     |   units: LPS
     |   imported STACI nodes: 7872
     |   imported STACI elements: 7340
@@ -748,7 +748,7 @@ SPR: VIZ-SOPTVR-2-660-input.spr
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input-export.inp.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-VIZ-SOPTVR-2-660-input.spr/VIZ-SOPTVR-2-660-input-export.inp.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
@@ -758,21 +758,21 @@ SPR: VIZ-SOPTVR-2-660-input.spr
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.041 sec  ( 0.5 %)
-    | 	 Building the system  : 8.140 sec  (99.5 %)
+    | 	 Reading data files   : 0.072 sec  ( 0.6 %)
+    | 	 Building the system  : 11.932 sec  (99.4 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 8.181 sec
-RESULT: PASS (49.221 s)
+    | 	 Overall              : 12.004 sec
+RESULT: PASS (107.294 s)
 
 SPR: anytown_1med.spr
 ---------------------
-  Command (steady-state hydraulics): /Users/hoscsaba/CLionProjects/staci/build/staci -s /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-anytown_1med.spr/anytown_1med.spr
-  Exit code: 0; elapsed: 0.069 s
+  Command (steady-state hydraulics): /private/tmp/staci-leak-build.Mr3aQb/staci -s /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-anytown_1med.spr/anytown_1med.spr
+  Exit code: 0; elapsed: 0.320 s
   Program output (12249 lines):
     |
-    |  Steady-state hydraulic simulation, data file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-anytown_1med.spr/anytown_1med.spr
+    |  Steady-state hydraulic simulation, data file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-anytown_1med.spr/anytown_1med.spr
     |
     | ======================================
     |  STACI v.2.0
@@ -781,9 +781,9 @@ SPR: anytown_1med.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:06 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-anytown_1med.spr/anytown_1med.spr
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-anytown_1med.spr/anytown_1med.spr
     |
     |  Loading system...
     |
@@ -802,7 +802,7 @@ SPR: anytown_1med.spr
     | 	checkvalve:	0
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-anytown_1med.spr/anytown_1med.spr.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-anytown_1med.spr/anytown_1med.spr.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
@@ -966,14 +966,14 @@ SPR: anytown_1med.spr
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.022 sec  (43.5 %)
+    | 	 Reading data files   : 0.034 sec  (41.4 %)
     | 	 Building the system  : 0.000 sec  ( 0.5 %)
-    | 	 Number cranching     : 0.023 sec  (45.1 %)
-    | 	 Writing result files : 0.006 sec  (10.9 %)
+    | 	 Number cranching     : 0.039 sec  (47.2 %)
+    | 	 Writing result files : 0.009 sec  (10.9 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.051 sec
-  Command (export SPR to EPANET): /Users/hoscsaba/CLionProjects/staci/build/staci --export-epanet /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-anytown_1med.spr/anytown_1med.spr -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-anytown_1med.spr/anytown_1med-export.inp
-  Exit code: 0; elapsed: 0.036 s
+    | 	 Overall              : 0.083 sec
+  Command (export SPR to EPANET): /private/tmp/staci-leak-build.Mr3aQb/staci --export-epanet /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-anytown_1med.spr/anytown_1med.spr -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-anytown_1med.spr/anytown_1med-export.inp
+  Exit code: 0; elapsed: 0.103 s
   Program output (44 lines):
     |
     | ======================================
@@ -983,9 +983,9 @@ SPR: anytown_1med.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:06 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-anytown_1med.spr/anytown_1med.spr
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-anytown_1med.spr/anytown_1med.spr
     |
     |  Loading system...
     |
@@ -1004,23 +1004,23 @@ SPR: anytown_1med.spr
     | 	checkvalve:	0
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-anytown_1med.spr/anytown_1med.spr.ros... file successfully deleted.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-anytown_1med.spr/anytown_1med.spr.ros... file successfully deleted.
     |
     |  Building system... ready.
     | WARNING [EPANET][EXPORT][POOL62]: tank minimum and maximum levels were inferred.
     | WARNING [EPANET][EXPORT][POOL220]: tank minimum and maximum levels were inferred.
-    | EPANET export: wrote /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-anytown_1med.spr/anytown_1med-export.inp using metric LPS units.
+    | EPANET export: wrote /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-anytown_1med.spr/anytown_1med-export.inp using metric LPS units.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.022 sec  (98.8 %)
-    | 	 Building the system  : 0.000 sec  ( 1.2 %)
+    | 	 Reading data files   : 0.033 sec  (98.2 %)
+    | 	 Building the system  : 0.001 sec  ( 1.8 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.022 sec
-  Command (reload exported INP): /Users/hoscsaba/CLionProjects/staci/build/staci -l /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-anytown_1med.spr/anytown_1med-export.inp
-  Exit code: 0; elapsed: 0.014 s
+    | 	 Overall              : 0.034 sec
+  Command (reload exported INP): /private/tmp/staci-leak-build.Mr3aQb/staci -l /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-anytown_1med.spr/anytown_1med-export.inp
+  Exit code: 0; elapsed: 0.048 s
   Program output (40 lines):
     |
     | ======================================
@@ -1030,12 +1030,12 @@ SPR: anytown_1med.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:06 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-anytown_1med.spr/anytown_1med-export.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-anytown_1med.spr/anytown_1med-export.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-anytown_1med.spr/anytown_1med-export.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-anytown_1med.spr/anytown_1med-export.inp
     |   units: LPS
     |   imported STACI nodes: 23
     |   imported STACI elements: 44
@@ -1046,7 +1046,7 @@ SPR: anytown_1med.spr
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-anytown_1med.spr/anytown_1med-export.inp.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-anytown_1med.spr/anytown_1med-export.inp.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
@@ -1056,21 +1056,21 @@ SPR: anytown_1med.spr
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.001 sec  (81.1 %)
-    | 	 Building the system  : 0.000 sec  (18.9 %)
+    | 	 Reading data files   : 0.002 sec  (80.8 %)
+    | 	 Building the system  : 0.000 sec  (19.2 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.001 sec
-RESULT: PASS (0.122 s)
+    | 	 Overall              : 0.002 sec
+RESULT: PASS (0.492 s)
 
 SPR: channel.spr
 ----------------
-  Command (steady-state hydraulics): /Users/hoscsaba/CLionProjects/staci/build/staci -s /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel.spr
-  Exit code: 0; elapsed: 0.094 s
+  Command (steady-state hydraulics): /private/tmp/staci-leak-build.Mr3aQb/staci -s /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel.spr
+  Exit code: 0; elapsed: 1.488 s
   Program output (145 lines):
     |
-    |  Steady-state hydraulic simulation, data file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel.spr
+    |  Steady-state hydraulic simulation, data file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel.spr
     |
     | ======================================
     |  STACI v.2.0
@@ -1079,9 +1079,9 @@ SPR: channel.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:06 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel.spr
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel.spr
     |
     |  Loading system...
     |
@@ -1100,7 +1100,7 @@ SPR: channel.spr
     | 	checkvalve:	0
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel.spr.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel.spr.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
@@ -1156,7 +1156,7 @@ SPR: channel.spr
     |
     | Saving results...
     |
-    | Output file name:/var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel.spr, saving results...
+    | Output file name:/Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel.spr, saving results...
     |  ERROR!!! subnode <sum_of_inflow> does not exists in  <settings>!!!
     |
     |  ERROR!!! subnode <sum_of_demand> does not exists in  <settings>!!!
@@ -1208,14 +1208,14 @@ SPR: channel.spr
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.037 sec  (46.5 %)
-    | 	 Building the system  : 0.000 sec  ( 0.1 %)
-    | 	 Number cranching     : 0.036 sec  (44.8 %)
-    | 	 Writing result files : 0.007 sec  ( 8.6 %)
+    | 	 Reading data files   : 0.059 sec  (29.4 %)
+    | 	 Building the system  : 0.000 sec  ( 0.2 %)
+    | 	 Number cranching     : 0.129 sec  (64.5 %)
+    | 	 Writing result files : 0.012 sec  ( 5.8 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.080 sec
-  Command (export SPR to EPANET): /Users/hoscsaba/CLionProjects/staci/build/staci --export-epanet /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel.spr -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel-export.inp
-  Exit code: 0; elapsed: 0.019 s
+    | 	 Overall              : 0.200 sec
+  Command (export SPR to EPANET): /private/tmp/staci-leak-build.Mr3aQb/staci --export-epanet /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel.spr -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel-export.inp
+  Exit code: 0; elapsed: 0.333 s
   Program output (45 lines):
     |
     | ======================================
@@ -1225,9 +1225,9 @@ SPR: channel.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:08 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel.spr
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel.spr
     |
     |  Loading system...
     |
@@ -1246,24 +1246,24 @@ SPR: channel.spr
     | 	checkvalve:	0
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel.spr.ros... file successfully deleted.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel.spr.ros... file successfully deleted.
     |
     |  Building system... ready.
     | WARNING [EPANET][EXPORT][POOL16]: tank minimum and maximum levels were inferred.
     | WARNING [EPANET][EXPORT][POOL19]: tank minimum and maximum levels were inferred.
     | WARNING [EPANET][EXPORT][CHANNEL10]: STACI type 'Csatorna' has no lossless EPANET mapping and was skipped.
-    | EPANET export: wrote /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel-export.inp using metric LPS units.
+    | EPANET export: wrote /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel-export.inp using metric LPS units.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.006 sec  (98.9 %)
-    | 	 Building the system  : 0.000 sec  ( 1.1 %)
+    | 	 Reading data files   : 0.016 sec  (96.2 %)
+    | 	 Building the system  : 0.001 sec  ( 3.8 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.007 sec
-  Command (reload exported INP): /Users/hoscsaba/CLionProjects/staci/build/staci -l /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel-export.inp
-  Exit code: 0; elapsed: 0.014 s
+    | 	 Overall              : 0.017 sec
+  Command (reload exported INP): /private/tmp/staci-leak-build.Mr3aQb/staci -l /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel-export.inp
+  Exit code: 0; elapsed: 0.107 s
   Program output (40 lines):
     |
     | ======================================
@@ -1273,12 +1273,12 @@ SPR: channel.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:08 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel-export.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel-export.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel-export.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel-export.inp
     |   units: LPS
     |   imported STACI nodes: 2
     |   imported STACI elements: 2
@@ -1289,7 +1289,7 @@ SPR: channel.spr
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-channel.spr/channel-export.inp.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-channel.spr/channel-export.inp.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
@@ -1299,21 +1299,21 @@ SPR: channel.spr
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.001 sec  (89.9 %)
-    | 	 Building the system  : 0.000 sec  (10.1 %)
+    | 	 Reading data files   : 0.002 sec  (78.9 %)
+    | 	 Building the system  : 0.001 sec  (21.1 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.001 sec
-RESULT: PASS (0.130 s)
+    | 	 Overall              : 0.003 sec
+RESULT: PASS (1.939 s)
 
 SPR: tmp.spr
 ------------
-  Command (steady-state hydraulics): /Users/hoscsaba/CLionProjects/staci/build/staci -s /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp.spr
-  Exit code: 0; elapsed: 0.041 s
+  Command (steady-state hydraulics): /private/tmp/staci-leak-build.Mr3aQb/staci -s /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp.spr
+  Exit code: 0; elapsed: 1.478 s
   Program output (131 lines):
     |
-    |  Steady-state hydraulic simulation, data file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp.spr
+    |  Steady-state hydraulic simulation, data file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp.spr
     |
     | ======================================
     |  STACI v.2.0
@@ -1322,9 +1322,9 @@ SPR: tmp.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:08 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp.spr
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp.spr
     |
     |  Loading system...
     |
@@ -1343,7 +1343,7 @@ SPR: tmp.spr
     | 	checkvalve:	0
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp.spr.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp.spr.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
@@ -1385,7 +1385,7 @@ SPR: tmp.spr
     |
     | Saving results...
     |
-    | Output file name:/var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp.spr, saving results...
+    | Output file name:/Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp.spr, saving results...
     |  ERROR!!! subnode <sum_of_inflow> does not exists in  <settings>!!!
     |
     |  ERROR!!! subnode <sum_of_demand> does not exists in  <settings>!!!
@@ -1437,14 +1437,14 @@ SPR: tmp.spr
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.006 sec  (20.2 %)
-    | 	 Building the system  : 0.000 sec  ( 0.3 %)
-    | 	 Number cranching     : 0.020 sec  (74.7 %)
-    | 	 Writing result files : 0.001 sec  ( 4.9 %)
+    | 	 Reading data files   : 0.012 sec  (10.9 %)
+    | 	 Building the system  : 0.001 sec  ( 0.6 %)
+    | 	 Number cranching     : 0.092 sec  (84.8 %)
+    | 	 Writing result files : 0.004 sec  ( 3.7 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.027 sec
-  Command (export SPR to EPANET): /Users/hoscsaba/CLionProjects/staci/build/staci --export-epanet /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp.spr -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp-export.inp
-  Exit code: 0; elapsed: 0.019 s
+    | 	 Overall              : 0.108 sec
+  Command (export SPR to EPANET): /private/tmp/staci-leak-build.Mr3aQb/staci --export-epanet /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp.spr -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp-export.inp
+  Exit code: 0; elapsed: 0.345 s
   Program output (45 lines):
     |
     | ======================================
@@ -1454,9 +1454,9 @@ SPR: tmp.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:10 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp.spr
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp.spr
     |
     |  Loading system...
     |
@@ -1475,24 +1475,24 @@ SPR: tmp.spr
     | 	checkvalve:	0
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp.spr.ros... file successfully deleted.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp.spr.ros... file successfully deleted.
     |
     |  Building system... ready.
     | WARNING [EPANET][EXPORT][POOL16]: tank minimum and maximum levels were inferred.
     | WARNING [EPANET][EXPORT][POOL19]: tank minimum and maximum levels were inferred.
     | WARNING [EPANET][EXPORT][CHANNEL10]: STACI type 'Csatorna' has no lossless EPANET mapping and was skipped.
-    | EPANET export: wrote /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp-export.inp using metric LPS units.
+    | EPANET export: wrote /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp-export.inp using metric LPS units.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.006 sec  (98.7 %)
-    | 	 Building the system  : 0.000 sec  ( 1.3 %)
+    | 	 Reading data files   : 0.013 sec  (95.5 %)
+    | 	 Building the system  : 0.001 sec  ( 4.5 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.006 sec
-  Command (reload exported INP): /Users/hoscsaba/CLionProjects/staci/build/staci -l /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp-export.inp
-  Exit code: 0; elapsed: 0.014 s
+    | 	 Overall              : 0.014 sec
+  Command (reload exported INP): /private/tmp/staci-leak-build.Mr3aQb/staci -l /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp-export.inp
+  Exit code: 0; elapsed: 0.177 s
   Program output (40 lines):
     |
     | ======================================
@@ -1502,12 +1502,12 @@ SPR: tmp.spr
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:10 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp-export.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp-export.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp-export.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp-export.inp
     |   units: LPS
     |   imported STACI nodes: 2
     |   imported STACI elements: 2
@@ -1518,7 +1518,7 @@ SPR: tmp.spr
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/spr-tmp.spr/tmp-export.inp.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/spr-tmp.spr/tmp-export.inp.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
@@ -1528,18 +1528,18 @@ SPR: tmp.spr
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.001 sec  (89.8 %)
-    | 	 Building the system  : 0.000 sec  (10.2 %)
+    | 	 Reading data files   : 0.002 sec  (90.6 %)
+    | 	 Building the system  : 0.000 sec  ( 9.4 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.001 sec
-RESULT: PASS (0.075 s)
+    | 	 Overall              : 0.002 sec
+RESULT: PASS (2.040 s)
 
 INP: epanet_eps_smoke.inp
 -------------------------
-  Command (lossless EPANET metadata round trip): /Users/hoscsaba/CLionProjects/staci/build/staci --export-epanet /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_eps_smoke.inp/epanet_eps_smoke-roundtrip.inp
-  Exit code: 0; elapsed: 0.014 s
+  Command (lossless EPANET metadata round trip): /private/tmp/staci-leak-build.Mr3aQb/staci --export-epanet /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_eps_smoke.inp/epanet_eps_smoke-roundtrip.inp
+  Exit code: 0; elapsed: 0.105 s
   Program output (37 lines):
     |
     | ======================================
@@ -1549,12 +1549,12 @@ INP: epanet_eps_smoke.inp
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:10 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp
     |   units: LPS
     |   imported STACI nodes: 3
     |   imported STACI elements: 5
@@ -1566,20 +1566,20 @@ INP: epanet_eps_smoke.inp
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.001 sec  (89.6 %)
-    | 	 Building the system  : 0.000 sec  (10.4 %)
+    | 	 Reading data files   : 0.003 sec  (82.0 %)
+    | 	 Building the system  : 0.001 sec  (18.0 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.001 sec
-  Command (EPANET extended-period simulation): /Users/hoscsaba/CLionProjects/staci/build/staci --epanet-eps /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_eps_smoke.inp/epanet_eps_smoke-eps
-  Exit code: 0; elapsed: 0.033 s
+    | 	 Overall              : 0.004 sec
+  Command (EPANET extended-period simulation): /private/tmp/staci-leak-build.Mr3aQb/staci --epanet-eps /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_eps_smoke.inp/epanet_eps_smoke-eps
+  Exit code: 0; elapsed: 0.434 s
   Program output (37 lines):
     |
     | ======================================
@@ -1589,12 +1589,12 @@ INP: epanet_eps_smoke.inp
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:10 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp
     |   units: LPS
     |   imported STACI nodes: 3
     |   imported STACI elements: 5
@@ -1603,27 +1603,27 @@ INP: epanet_eps_smoke.inp
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp.ros... file successfully deleted.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_eps_smoke.inp/epanet_eps_smoke.inp.ros... file successfully deleted.
     |
     |  Building system... ready.
     |
     | EPANET EPS complete: 3 hydraulic states, 0 failed states.
-    | Results: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_eps_smoke.inp/epanet_eps_smoke-eps.h5, /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_eps_smoke.inp/epanet_eps_smoke-eps.meta.json and SI CSV files.
+    | Results: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_eps_smoke.inp/epanet_eps_smoke-eps.h5, /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_eps_smoke.inp/epanet_eps_smoke-eps.meta.json and SI CSV files.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.001 sec  (88.9 %)
-    | 	 Building the system  : 0.000 sec  (11.1 %)
+    | 	 Reading data files   : 0.002 sec  (72.1 %)
+    | 	 Building the system  : 0.001 sec  (27.9 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.001 sec
-RESULT: PASS (0.049 s)
+    | 	 Overall              : 0.003 sec
+RESULT: PASS (0.565 s)
 
 INP: epanet_metadata_roundtrip.inp
 ----------------------------------
-  Command (lossless EPANET metadata round trip): /Users/hoscsaba/CLionProjects/staci/build/staci --export-epanet /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip-roundtrip.inp
-  Exit code: 0; elapsed: 0.014 s
+  Command (lossless EPANET metadata round trip): /private/tmp/staci-leak-build.Mr3aQb/staci --export-epanet /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip-roundtrip.inp
+  Exit code: 0; elapsed: 0.146 s
   Program output (35 lines):
     |
     | ======================================
@@ -1633,12 +1633,12 @@ INP: epanet_metadata_roundtrip.inp
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:11 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp
     |   units: LPS
     |   imported STACI nodes: 2
     |   imported STACI elements: 2
@@ -1648,20 +1648,20 @@ INP: epanet_metadata_roundtrip.inp
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.001 sec  (90.7 %)
-    | 	 Building the system  : 0.000 sec  ( 9.3 %)
+    | 	 Reading data files   : 0.002 sec  (82.1 %)
+    | 	 Building the system  : 0.001 sec  (17.9 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.001 sec
-  Command (EPANET extended-period simulation): /Users/hoscsaba/CLionProjects/staci/build/staci --epanet-eps /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip-eps
-  Exit code: 0; elapsed: 0.019 s
+    | 	 Overall              : 0.003 sec
+  Command (EPANET extended-period simulation): /private/tmp/staci-leak-build.Mr3aQb/staci --epanet-eps /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip-eps
+  Exit code: 0; elapsed: 0.200 s
   Program output (81 lines):
     |
     | ======================================
@@ -1671,12 +1671,12 @@ INP: epanet_metadata_roundtrip.inp
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:11 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp
     |   units: LPS
     |   imported STACI nodes: 2
     |   imported STACI elements: 2
@@ -1685,7 +1685,7 @@ INP: epanet_metadata_roundtrip.inp
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp.ros... file successfully deleted.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip.inp.ros... file successfully deleted.
     |
     |  Building system... ready.
     |
@@ -1734,22 +1734,22 @@ INP: epanet_metadata_roundtrip.inp
     | P1: (i=0) Re = 12732.4, lambda = 0.0301221
     |
     | EPANET EPS complete: 1 hydraulic states, 0 failed states.
-    | Results: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip-eps.h5, /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip-eps.meta.json and SI CSV files.
+    | Results: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip-eps.h5, /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_metadata_roundtrip.inp/epanet_metadata_roundtrip-eps.meta.json and SI CSV files.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.001 sec  (90.2 %)
-    | 	 Building the system  : 0.000 sec  ( 9.8 %)
+    | 	 Reading data files   : 0.002 sec  (82.2 %)
+    | 	 Building the system  : 0.000 sec  (17.8 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.001 sec
-RESULT: PASS (0.035 s)
+    | 	 Overall              : 0.003 sec
+RESULT: PASS (0.388 s)
 
 INP: epanet_smoke.inp
 ---------------------
-  Command (lossless EPANET metadata round trip): /Users/hoscsaba/CLionProjects/staci/build/staci --export-epanet /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_smoke.inp/epanet_smoke.inp -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_smoke.inp/epanet_smoke-roundtrip.inp
-  Exit code: 0; elapsed: 0.014 s
+  Command (lossless EPANET metadata round trip): /private/tmp/staci-leak-build.Mr3aQb/staci --export-epanet /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_smoke.inp/epanet_smoke.inp -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_smoke.inp/epanet_smoke-roundtrip.inp
+  Exit code: 0; elapsed: 1.856 s
   Program output (36 lines):
     |
     | ======================================
@@ -1759,12 +1759,12 @@ INP: epanet_smoke.inp
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:13 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_smoke.inp/epanet_smoke.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_smoke.inp/epanet_smoke.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_smoke.inp/epanet_smoke.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_smoke.inp/epanet_smoke.inp
     |   units: LPS
     |   imported STACI nodes: 3
     |   imported STACI elements: 3
@@ -1775,20 +1775,20 @@ INP: epanet_smoke.inp
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_smoke.inp/epanet_smoke.inp.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_smoke.inp/epanet_smoke.inp.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.001 sec  (89.6 %)
-    | 	 Building the system  : 0.000 sec  (10.4 %)
+    | 	 Reading data files   : 0.002 sec  (86.0 %)
+    | 	 Building the system  : 0.000 sec  (14.0 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.001 sec
-  Command (EPANET extended-period simulation): /Users/hoscsaba/CLionProjects/staci/build/staci --epanet-eps /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_smoke.inp/epanet_smoke.inp -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_smoke.inp/epanet_smoke-eps
-  Exit code: 0; elapsed: 0.019 s
+    | 	 Overall              : 0.002 sec
+  Command (EPANET extended-period simulation): /private/tmp/staci-leak-build.Mr3aQb/staci --epanet-eps /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_smoke.inp/epanet_smoke.inp -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_smoke.inp/epanet_smoke-eps
+  Exit code: 0; elapsed: 1.859 s
   Program output (37 lines):
     |
     | ======================================
@@ -1798,12 +1798,12 @@ INP: epanet_smoke.inp
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:13 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_smoke.inp/epanet_smoke.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_smoke.inp/epanet_smoke.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_smoke.inp/epanet_smoke.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_smoke.inp/epanet_smoke.inp
     |   units: LPS
     |   imported STACI nodes: 3
     |   imported STACI elements: 3
@@ -1812,27 +1812,27 @@ INP: epanet_smoke.inp
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_smoke.inp/epanet_smoke.inp.ros... file successfully deleted.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_smoke.inp/epanet_smoke.inp.ros... file successfully deleted.
     |
     |  Building system... ready.
     |
     | EPANET EPS complete: 1 hydraulic states, 0 failed states.
-    | Results: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_smoke.inp/epanet_smoke-eps.h5, /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-epanet_smoke.inp/epanet_smoke-eps.meta.json and SI CSV files.
+    | Results: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_smoke.inp/epanet_smoke-eps.h5, /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-epanet_smoke.inp/epanet_smoke-eps.meta.json and SI CSV files.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.001 sec  (91.2 %)
-    | 	 Building the system  : 0.000 sec  ( 8.8 %)
+    | 	 Reading data files   : 0.002 sec  (75.2 %)
+    | 	 Building the system  : 0.001 sec  (24.8 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.001 sec
-RESULT: PASS (0.034 s)
+    | 	 Overall              : 0.003 sec
+RESULT: PASS (3.751 s)
 
 INP: ky16.inp
 -------------
-  Command (lossless EPANET metadata round trip): /Users/hoscsaba/CLionProjects/staci/build/staci --export-epanet /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-ky16.inp/ky16.inp -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-ky16.inp/ky16-roundtrip.inp
-  Exit code: 0; elapsed: 0.101 s
+  Command (lossless EPANET metadata round trip): /private/tmp/staci-leak-build.Mr3aQb/staci --export-epanet /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-ky16.inp/ky16.inp -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-ky16.inp/ky16-roundtrip.inp
+  Exit code: 0; elapsed: 5.159 s
   Program output (47 lines):
     |
     | ======================================
@@ -1842,12 +1842,12 @@ INP: ky16.inp
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:16 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-ky16.inp/ky16.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-ky16.inp/ky16.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-ky16.inp/ky16.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-ky16.inp/ky16.inp
     |   units: GPM
     |   imported STACI nodes: 798
     |   imported STACI elements: 922
@@ -1869,20 +1869,20 @@ INP: ky16.inp
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-ky16.inp/ky16.inp.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-ky16.inp/ky16.inp.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.010 sec  (11.3 %)
-    | 	 Building the system  : 0.076 sec  (88.7 %)
+    | 	 Reading data files   : 0.018 sec  (12.7 %)
+    | 	 Building the system  : 0.122 sec  (87.3 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.086 sec
-  Command (EPANET extended-period simulation): /Users/hoscsaba/CLionProjects/staci/build/staci --epanet-eps /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-ky16.inp/ky16.inp -o /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-ky16.inp/ky16-eps
-  Exit code: 0; elapsed: 11.165 s
+    | 	 Overall              : 0.139 sec
+  Command (EPANET extended-period simulation): /private/tmp/staci-leak-build.Mr3aQb/staci --epanet-eps /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-ky16.inp/ky16.inp -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-ky16.inp/ky16-eps
+  Exit code: 0; elapsed: 15.946 s
   Program output (40 lines):
     |
     | ======================================
@@ -1892,12 +1892,12 @@ INP: ky16.inp
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:17 2026
+    |  date: Fri Aug 21 14:11:20 2026
     |
-    |  input file: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-ky16.inp/ky16.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-ky16.inp/ky16.inp
     |
     |  Loading system...
-    | EPANET import: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-ky16.inp/ky16.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-ky16.inp/ky16.inp
     |   units: GPM
     |   imported STACI nodes: 798
     |   imported STACI elements: 922
@@ -1908,28 +1908,28 @@ INP: ky16.inp
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-ky16.inp/ky16.inp.ros... file successfully deleted.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-ky16.inp/ky16.inp.ros... file successfully deleted.
     |
     |  Building system... ready.
     | WARNING [EPANET][EPS][TANKS][T-4]: Maximum level reached; level was clamped.
     |
     | EPANET EPS complete: 25 hydraulic states, 0 failed states.
-    | Results: /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-ky16.inp/ky16-eps.h5, /var/folders/80/hb8qws610ss10rp08w75klcr0000gn/T/staci-tests-5bydcje4/inp-ky16.inp/ky16-eps.meta.json and SI CSV files.
+    | Results: /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-ky16.inp/ky16-eps.h5, /Users/hoscsaba/CLionProjects/staci/tests/test-results/runs/20260821T120909Z/inp-ky16.inp/ky16-eps.meta.json and SI CSV files.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.009 sec  (11.1 %)
-    | 	 Building the system  : 0.076 sec  (88.9 %)
+    | 	 Reading data files   : 0.016 sec  (13.1 %)
+    | 	 Building the system  : 0.109 sec  (86.9 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.085 sec
-RESULT: PASS (11.270 s)
+    | 	 Overall              : 0.126 sec
+RESULT: PASS (21.193 s)
 
 HDF5: epanet_eps_smoke.inp
 --------------------------
-  Command (generate HDF5 EPS output): /Users/hoscsaba/CLionProjects/staci/build/staci --epanet-eps /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke.inp -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5
-  Exit code: 0; elapsed: 0.109 s
+  Command (generate HDF5 EPS output): /private/tmp/staci-leak-build.Mr3aQb/staci --epanet-eps /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke.inp -o /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5
+  Exit code: 0; elapsed: 0.182 s
   Program output (37 lines):
     |
     | ======================================
@@ -1939,12 +1939,12 @@ HDF5: epanet_eps_smoke.inp
     |  info: www.hds.bme.hu\staci_web
     | ======================================
     |
-    |  date: Fri Aug 21 12:47:28 2026
+    |  date: Fri Aug 21 14:11:36 2026
     |
-    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke.inp
+    |  input file: /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke.inp
     |
     |  Loading system...
-    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke.inp
+    | EPANET import: /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke.inp
     |   units: LPS
     |   imported STACI nodes: 3
     |   imported STACI elements: 5
@@ -1953,25 +1953,25 @@ HDF5: epanet_eps_smoke.inp
     |
     |  ready.
     |
-    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke.inp.ros...  file not found, cannot delete it.
+    |  Trying to delete previous logfile /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke.inp.ros...  file not found, cannot delete it.
     |
     |  Building system... ready.
     |
     | EPANET EPS complete: 3 hydraulic states, 0 failed states.
-    | Results: /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5, /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.meta.json and SI CSV files.
+    | Results: /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5, /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.meta.json and SI CSV files.
     |
     | Timing:
     | ============================
-    | 	 Reading data files   : 0.002 sec  (90.0 %)
-    | 	 Building the system  : 0.000 sec  (10.0 %)
+    | 	 Reading data files   : 0.002 sec  (79.9 %)
+    | 	 Building the system  : 0.001 sec  (20.1 %)
     | 	 Number cranching     : 0.000 sec  ( 0.0 %)
     | 	 Writing result files : 0.000 sec  ( 0.0 %)
     | 	---------------------------------------------
-    | 	 Overall              : 0.002 sec
-  Command (list HDF5 datasets): /opt/homebrew/Cellar/hdf5/2.2.0/bin/h5dump -n /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5
-  Exit code: 0; elapsed: 0.043 s
+    | 	 Overall              : 0.003 sec
+  Command (list HDF5 datasets): /opt/homebrew/Cellar/hdf5/2.2.0/bin/h5dump -n /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5
+  Exit code: 0; elapsed: 0.079 s
   Program output (39 lines):
-    | HDF5 "/Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5" {
+    | HDF5 "/Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5" {
     | FILE_CONTENTS {
     |  group      /
     |  group      /links
@@ -2010,10 +2010,10 @@ HDF5: epanet_eps_smoke.inp
     |  dataset    /time
     |  }
     | }
-  Command (inspect HDF5 chunking): /opt/homebrew/Cellar/hdf5/2.2.0/bin/h5dump -pH -d /time -d /nodes/head -d /links/flow_rate -d /tanks/level /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5
-  Exit code: 0; elapsed: 0.019 s
+  Command (inspect HDF5 chunking): /opt/homebrew/Cellar/hdf5/2.2.0/bin/h5dump -pH -d /time -d /nodes/head -d /links/flow_rate -d /tanks/level /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5
+  Exit code: 0; elapsed: 0.054 s
   Program output (176 lines):
-    | HDF5 "/Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5" {
+    | HDF5 "/Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5" {
     | DATASET "/time" {
     |    DATATYPE  H5T_STD_I64LE
     |    DATASPACE  SIMPLE { ( 3 ) / ( H5S_UNLIMITED ) }
@@ -2189,10 +2189,10 @@ HDF5: epanet_eps_smoke.inp
     |    }
     | }
     | }
-  Command (inspect HDF5 SI units): /opt/homebrew/Cellar/hdf5/2.2.0/bin/h5dump -a /time/unit -a /nodes/head/unit -a /nodes/pressure_head/unit -a /nodes/demand/unit -a /links/flow_rate/unit -a /links/velocity/unit -a /links/headloss/unit -a /tanks/level/unit -a /tanks/volume/unit -a /tanks/inflow/unit /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5
-  Exit code: 0; elapsed: 0.035 s
+  Command (inspect HDF5 SI units): /opt/homebrew/Cellar/hdf5/2.2.0/bin/h5dump -a /time/unit -a /nodes/head/unit -a /nodes/pressure_head/unit -a /nodes/demand/unit -a /links/flow_rate/unit -a /links/velocity/unit -a /links/headloss/unit -a /tanks/level/unit -a /tanks/volume/unit -a /tanks/inflow/unit /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5
+  Exit code: 0; elapsed: 0.024 s
   Program output (122 lines):
-    | HDF5 "/Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5" {
+    | HDF5 "/Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5" {
     | ATTRIBUTE "unit" {
     |    DATATYPE  H5T_STRING {
     |       STRSIZE H5T_VARIABLE;
@@ -2316,8 +2316,8 @@ HDF5: epanet_eps_smoke.inp
     | }
   HDF5 inspector: /opt/homebrew/Cellar/hdf5/2.2.0/bin/h5dump
   Verified datasets: 15; chunk time dimension: 16
-RESULT: PASS (0.221 s)
-Persistent HDF5 result: /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T104550Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5
+RESULT: PASS (0.352 s)
+Persistent HDF5 result: /Users/hoscsaba/CLionProjects/staci/tests/test-results/hdf5/20260821T120909Z/hdf5-epanet_eps_smoke.inp/epanet_eps_smoke-hdf5.h5
 
 SUMMARY
 -------
@@ -2325,17 +2325,17 @@ Total test cases: 11
 Passed: 11
 Failed: 0
 
-[PASS] SPR   LOV-LOVOTV-2-input_mod.spr (8.437 s)
-[PASS] SPR   LOV-LOVOTV-2-input_mod2.spr (29.049 s)
-[PASS] SPR   VIZ-SOPTVR-2-660-input.spr (49.221 s)
-[PASS] SPR   anytown_1med.spr (0.122 s)
-[PASS] SPR   channel.spr (0.130 s)
-[PASS] SPR   tmp.spr (0.075 s)
-[PASS] INP   epanet_eps_smoke.inp (0.049 s)
-[PASS] INP   epanet_metadata_roundtrip.inp (0.035 s)
-[PASS] INP   epanet_smoke.inp (0.034 s)
-[PASS] INP   ky16.inp (11.270 s)
-[PASS] HDF5  epanet_eps_smoke.inp (0.221 s)
+[PASS] SPR   LOV-LOVOTV-2-input_mod.spr (4.344 s)
+[PASS] SPR   LOV-LOVOTV-2-input_mod2.spr (4.550 s)
+[PASS] SPR   VIZ-SOPTVR-2-660-input.spr (107.294 s)
+[PASS] SPR   anytown_1med.spr (0.492 s)
+[PASS] SPR   channel.spr (1.939 s)
+[PASS] SPR   tmp.spr (2.040 s)
+[PASS] INP   epanet_eps_smoke.inp (0.565 s)
+[PASS] INP   epanet_metadata_roundtrip.inp (0.388 s)
+[PASS] INP   epanet_smoke.inp (3.751 s)
+[PASS] INP   ky16.inp (21.193 s)
+[PASS] HDF5  epanet_eps_smoke.inp (0.352 s)
 
 OVERALL RESULT: PASS
-Finished UTC: 2026-08-21T10:47:28.937227+00:00
+Finished UTC: 2026-08-21T12:11:36.765002+00:00

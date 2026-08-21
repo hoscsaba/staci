@@ -41,7 +41,7 @@ Staci::Staci(int argc, char *argv[]) {
   debug_level = 1;
   // Initiate with command line arguments
   perform_demand_sensitivity_analysis = false;
-  opt = new AnyOption();
+  opt = std::make_unique<AnyOption>();
   get_command_line_options(argc, argv);
   SetInitialParameters();
 }
@@ -51,7 +51,7 @@ Staci::Staci(string spr_filename) {
   debug_level = 1;
   // Just to be able to delete in the destructor
   perform_demand_sensitivity_analysis = false;
-  opt = new AnyOption();
+  opt = std::make_unique<AnyOption>();
 
   // Initiate directly from file
   def_file = spr_filename;
@@ -90,7 +90,8 @@ void Staci::SetInitialParameters() {
     logfile_write(ss.str(), 1);
 
     data_io datta_io(def_file.c_str(), mode == 9);
-    datta_io.load_system(cspok, agelemek);
+    datta_io.load_system(owned_cspok, owned_agelemek);
+    rebuild_network_views();
     if (const EpanetDocument *document = datta_io.get_epanet_document()) {
       epanet_document = *document;
       has_epanet_document = true;
@@ -160,7 +161,19 @@ void Staci::SetInitialParameters() {
 }
 
 //--------------------------------------------------------------
-Staci::~Staci() { delete opt; }
+Staci::~Staci() = default;
+
+void Staci::rebuild_network_views() {
+  cspok.clear();
+  cspok.reserve(owned_cspok.size());
+  for (const auto &node : owned_cspok)
+    cspok.push_back(node.get());
+
+  agelemek.clear();
+  agelemek.reserve(owned_agelemek.size());
+  for (const auto &edge : owned_agelemek)
+    agelemek.push_back(edge.get());
+}
 
 //--------------------------------------------------------------
 void Staci::get_command_line_options(int argc, char *argv[]) {
@@ -867,7 +880,7 @@ void Staci::build_system() {
 
   // Surlodas beallitasa
   for (unsigned int i = 0; i < agelemek.size(); i++) {
-    if (agelemek[i]->Get_Tipus() == "Cso") {
+    if (agelemek[i]->GetType() == "Cso") {
       /*cout << endl << "friction_model:" << friction_model;
       cin.get();*/
       agelemek[i]->Set_friction_model(friction_model);
@@ -1883,12 +1896,12 @@ void Staci::set_up_transport() {
   for (i = 0; i < agelemek.size(); i++) {
     v.clear();
     // cout<<endl<<"Agelem: "<<agelemek.at(i)->Get_nev();
-    if (agelemek.at(i)->Get_Tipus() == "Csatorna") {
+    if (agelemek.at(i)->GetType() == "Csatorna") {
       v = agelemek.at(i)->Get_res("v");
       hossz = agelemek.at(i)->Get_dprop("L");
       agelemek.at(i)->set_up_grid(0.0, v, hossz);
     } else {
-      if (agelemek.at(i)->Get_Tipus() == "Cso") {
+      if (agelemek.at(i)->GetType() == "Cso") {
         for (int j = 0; j < 10; j++) {
           v.push_back(agelemek.at(i)->Get_v());
         }
@@ -1911,11 +1924,11 @@ void Staci::set_up_transport() {
   for (i = 0; i < agelemek.size(); i++) {
     bool kell_eloszlas = false;
 
-    if (agelemek.at(i)->Get_Tipus() == "Cso") {
+    if (agelemek.at(i)->GetType() == "Cso") {
       if (fabs(agelemek.at(i)->Get_dprop("erdesseg")) > 1e-5)
         kell_eloszlas = true;
     }
-    if (agelemek.at(i)->Get_Tipus() == "Csatorna") kell_eloszlas = true;
+    if (agelemek.at(i)->GetType() == "Csatorna") kell_eloszlas = true;
 
     if (kell_eloszlas) {
       // cout << ", dt=" << agelemek.at(i)->cdt;
@@ -2103,11 +2116,11 @@ void Staci::transport_step(double dt) {
     // Ha nulla az �rdess�g, akkor csak �sszek�t� cs� �s szkippelj�k
     bool kell_eloszlas = false;
 
-    if (agelemek.at(i)->Get_Tipus() == "Cso") {
+    if (agelemek.at(i)->GetType() == "Cso") {
       if ((fabs(agelemek.at(i)->Get_dprop("erdesseg"))) > 1e-5)
         kell_eloszlas = true;
     }
-    if (agelemek.at(i)->Get_Tipus() == "Csatorna") kell_eloszlas = true;
+    if (agelemek.at(i)->GetType() == "Csatorna") kell_eloszlas = true;
 
     //      cout<<endl<<agelemek.at(i)->Get_nev()<<",
     //      kell_eloszlas="<<kell_eloszlas;
@@ -2200,12 +2213,12 @@ double Staci::teta(double konc, const int i) {
     return 1.0;
   else {
     double Rh, cl_k, cl_w;
-    if (agelemek.at(i)->Get_Tipus() == "Csatorna") {
+    if (agelemek.at(i)->GetType() == "Csatorna") {
       Rh = agelemek.at(i)->Get_dprop("Rh");
       cl_k = agelemek.at(i)->Get_dprop("cl_k");
       cl_w = agelemek.at(i)->Get_dprop("cl_w");
     } else {
-      if (agelemek.at(i)->Get_Tipus() == "Cso") {
+      if (agelemek.at(i)->GetType() == "Cso") {
         Rh = agelemek.at(i)->Get_dprop("Rh");
         cl_k = agelemek.at(i)->Get_dprop("cl_k");
         cl_w = agelemek.at(i)->Get_dprop("cl_w");
@@ -2500,7 +2513,7 @@ void Staci::update_relax(double e_mp, double e_p, double & e_mp_r,
 void Staci::list_all_elements() {
   stringstream str;
   for (unsigned int i = 0; i < agelemek.size(); i++)
-    str << agelemek.at(i)->Get_Tipus() << ";\t" << agelemek.at(i)->Get_nev()
+    str << agelemek.at(i)->GetType() << ";\t" << agelemek.at(i)->Get_nev()
         << endl;
   for (unsigned int i = 0; i < cspok.size(); i++)
     str << "Node;\t" << cspok.at(i)->Get_nev() << endl;
@@ -2663,9 +2676,9 @@ void Staci::Print_dfdmu() {
 
 //--------------------------------------------------------------
 void Staci::Save_Sensitivity() {
-  /*! \todo Sensitivity is flushed to <concentration>
+  /*! \todo Sensitivity is flushed to the \c concentration property.
      *
-     *  A <tag> must be created to be used for sensitivity information in the
+     *  A dedicated data-file tag must be created for sensitivity information in the
    * data file.
      */
 
@@ -2720,9 +2733,8 @@ void Staci::Print_dxdmu() {
 //--------------------------------------------------------------
 /**
        * Builds sensitivity matrix
-       * @param <string> parameter : "diameter" | "friction_coeff" | "demand"
-       * @param <int> scale : if set to 1, the matrix is rescaled with the largest element
-       * @return <->
+       * @param parameter "diameter", "friction_coeff", or "demand"
+       * @param scale if set to 1, the matrix is rescaled with the largest element
        *
        * access results with wds->SM_MassFlowRates and/or wds->SM_Pressures
        *

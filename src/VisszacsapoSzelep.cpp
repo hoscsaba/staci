@@ -19,7 +19,6 @@ VisszacsapoSzelep::VisszacsapoSzelep(const string a_nev,
     Agelem(a_nev, Aref, a_mp, a_ro)
 {
     //Kotelezo adatok minden Agelemnel:
-    tipus = "VisszacsapoSzelep";
     csp_db = 2;
     cspe_nev = a_cspe_nev;
     cspv_nev = a_cspv_nev;
@@ -38,7 +37,6 @@ string VisszacsapoSzelep::Info()
 {
     ostringstream strstrm;
     strstrm << Agelem::Info();
-    strstrm << "\n     tipusa : " << tipus;
     strstrm << "\nkapcsolodas : " << cspv_nev << "(index:" << cspv_index << ")\n";
     strstrm << "\n\t átfolyási tényezõ folyásirányban : " << dzeta_e;
     strstrm << "\n\t átfolyási tényezõ zárás iráynyban: " << dzeta_v << "\n";

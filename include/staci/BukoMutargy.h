@@ -32,7 +32,7 @@ public:
     /// Inicializáció
     void Ini(int mode, double value);
     /// Keresztmetszeti jellemzok szamitasa
-    string GetType() {
+    string GetType() const override {
         return "BukoMutargy";
     }
     void Set_dprop(string mit, double mire);

@@ -179,7 +179,7 @@ public:
 	/// Figyelmeztetes
 	void warning(string fv, string msg);
 
-	string GetType() {
+	string GetType() const override {
 		return "Csatorna";
 	}
 

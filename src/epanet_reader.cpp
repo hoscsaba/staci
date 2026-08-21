@@ -291,8 +291,8 @@ double EpanetReader::first_pattern_multiplier(const std::string &pattern_id) con
     return found->second.front();
 }
 
-void EpanetReader::load_system(std::vector<Csomopont *> &nodes,
-                               std::vector<Agelem *> &edges) {
+void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
+                               std::vector<std::unique_ptr<Agelem> > &edges) {
     const double density = 1000.0 * specific_gravity_;
     std::set<std::string> node_ids;
     std::set<std::string> edge_ids;
@@ -340,11 +340,11 @@ void EpanetReader::load_system(std::vector<Csomopont *> &nodes,
         const auto quality = initial_quality.find(id);
         const double initial_age = quality_mode_ == "AGE" && quality != initial_quality.end()
             ? quality->second : 0.0;
-        Csomopont *node = new Csomopont(id, elevation, demand, 0.0, 0.0,
-                                       density, initial_age);
+        auto node = std::make_unique<Csomopont>(id, elevation, demand, 0.0, 0.0,
+                                                density, initial_age);
         if (quality_mode_ == "CHEMICAL" && quality != initial_quality.end())
             node->Set_dprop("concentration", quality->second);
-        nodes.push_back(node);
+        nodes.push_back(std::move(node));
     }
 
     double fixed_head_sum = 0.0;
@@ -365,14 +365,14 @@ void EpanetReader::load_system(std::vector<Csomopont *> &nodes,
         const auto quality = initial_quality.find(id);
         const double initial_age = quality_mode_ == "AGE" && quality != initial_quality.end()
             ? quality->second : 0.0;
-        Csomopont *node = new Csomopont(id, 0.0, 0.0, 0.0, head, density, initial_age);
+        auto node = std::make_unique<Csomopont>(id, 0.0, 0.0, 0.0, head, density, initial_age);
         if (quality_mode_ == "CHEMICAL" && quality != initial_quality.end())
             node->Set_dprop("concentration", quality->second);
-        nodes.push_back(node);
+        nodes.push_back(std::move(node));
         const std::string boundary_id = "EPANET_RESERVOIR_" + id;
         edge_ids.insert(boundary_id);
-        edges.push_back(new KonstNyomas(boundary_id, 1.0, id,
-                                       density, head * density * 9.81, 1.0, 0.0));
+        edges.push_back(std::make_unique<KonstNyomas>(
+            boundary_id, 1.0, id, density, head * density * 9.81, 1.0, 0.0));
         fixed_head_sum += head;
         ++fixed_head_count;
     }
@@ -393,15 +393,15 @@ void EpanetReader::load_system(std::vector<Csomopont *> &nodes,
         const auto quality = initial_quality.find(id);
         const double initial_age = quality_mode_ == "AGE" && quality != initial_quality.end()
             ? quality->second : 0.0;
-        Csomopont *node = new Csomopont(id, 0.0, 0.0, 0.0,
-                                       elevation + initial_level, density, initial_age);
+        auto node = std::make_unique<Csomopont>(id, 0.0, 0.0, 0.0,
+                                                elevation + initial_level, density, initial_age);
         if (quality_mode_ == "CHEMICAL" && quality != initial_quality.end())
             node->Set_dprop("concentration", quality->second);
-        nodes.push_back(node);
+        nodes.push_back(std::move(node));
         const std::string boundary_id = "EPANET_TANK_" + id;
         edge_ids.insert(boundary_id);
-        edges.push_back(new Vegakna(boundary_id, id, density, area,
-                                    elevation, initial_level, 1.0, 0.0));
+        edges.push_back(std::make_unique<Vegakna>(
+            boundary_id, id, density, area, elevation, initial_level, 1.0, 0.0));
         if (!extended_period_)
             add_warning("TANKS", id, record.line_number,
                         "Imported as a fixed boundary at its initial level; min/max level, "
@@ -443,8 +443,8 @@ void EpanetReader::load_system(std::vector<Csomopont *> &nodes,
             add_warning("PIPES", id, record.line_number,
                         "Initial status '" + record.fields[7] +
                         "' is not represented; pipe was imported open.");
-        edges.push_back(new Cso(id, from, to, density, length, diameter,
-                                roughness, 0.0, 0.0, 1.0));
+        edges.push_back(std::make_unique<Cso>(id, from, to, density, length, diameter,
+                                              roughness, 0.0, 0.0, 1.0));
     }
 
     for (const Record &record : records("PUMPS")) {
@@ -466,7 +466,7 @@ void EpanetReader::load_system(std::vector<Csomopont *> &nodes,
         const std::string type = upper(record.fields[3]);
         if (type == "POWER") {
             const double power = pump_power_to_watts(number(record, 4, "power", 0.0));
-            edges.push_back(new EpanetPowerPump(id, from, to, density, power, 1.0));
+            edges.push_back(std::make_unique<EpanetPowerPump>(id, from, to, density, power, 1.0));
         } else if (type == "HEAD") {
             const auto curve = curves_.find(record.fields[4]);
             if (curve == curves_.end() || curve->second.size() < 3) {
@@ -480,7 +480,7 @@ void EpanetReader::load_system(std::vector<Csomopont *> &nodes,
                 flow.push_back(flow_to_m3_per_hour(point.first));
                 head.push_back(length_to_metres(point.second));
             }
-            edges.push_back(new Szivattyu(id, from, to, density, 1.0, flow, head, 1.0));
+            edges.push_back(std::make_unique<Szivattyu>(id, from, to, density, 1.0, flow, head, 1.0));
         } else {
             add_warning("PUMPS", id, record.line_number,
                         "Unsupported pump parameter syntax; pump was not imported.");

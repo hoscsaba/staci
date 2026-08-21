@@ -25,10 +25,9 @@ public:
   void Ini(int mode, double value);
   void Set_dprop(string mit, double mire);
   double Get_dprop(string mit);
-  string GetType()
+  string GetType() const override
   {
     return "JelleggorbesFojtas";
   }
-  // VIGYAZAT! VALAMIERT VAN EGY Get_Tipus is, ami "Jelleggorbes fojtas"-t ad vissza!!!
 };
 

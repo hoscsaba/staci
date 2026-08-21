@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <map>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -15,8 +16,8 @@ class EpanetReader {
 public:
     explicit EpanetReader(const std::string &filename, bool extended_period = false);
 
-    void load_system(std::vector<Csomopont *> &nodes,
-                     std::vector<Agelem *> &edges);
+    void load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
+                     std::vector<std::unique_ptr<Agelem> > &edges);
     std::string read_setting(const std::string &name) const;
     const EpanetDocument &document() const { return document_; }
 

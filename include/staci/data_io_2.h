@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <memory>
 #include "Csomopont.h"
 #include "Agelem.h"
 #include "rapidxml.hpp"
@@ -14,7 +15,8 @@
 class data_io {
 public:
     data_io(const char* xml_file);
-    void load_system(std::vector<Csomopont*>& cspok, std::vector<Agelem*>& agelemek);
+    void load_system(std::vector<std::unique_ptr<Csomopont> >& cspok,
+                     std::vector<std::unique_ptr<Agelem> >& agelemek);
     void load_ini_values(std::vector<Csomopont*>& cspok, std::vector<Agelem*>& agelemek);
     void save_results(double FolyMenny, double sum_of_inflow, double sum_of_demand,
                       const std::vector<Csomopont*>& cspok,

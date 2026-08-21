@@ -18,7 +18,6 @@ BukoMutargy::BukoMutargy(const string a_nev, const string a_cspe_nev,
   Agelem(a_nev, Aref, a_mp, a_ro)
 {
   //Kotelezo adatok minden Agelemnel:
-  tipus = "BukoMutargy";
   csp_db = 2;
   cspe_nev = a_cspe_nev;
   cspv_nev = a_cspv_nev;
@@ -41,7 +40,6 @@ string BukoMutargy::Info()
 {
   ostringstream strstrm;
   strstrm << Agelem::Info();
-  strstrm << endl << "       tipusa : " << tipus;
   strstrm << endl << "  kapcsolodas : " << cspe_nev << "(index:" << cspe_index
           << ") ==> " << cspv_nev << "(index:" << cspv_index << ")";
   strstrm << "       adatok : nyitva a szelep?   : ";
