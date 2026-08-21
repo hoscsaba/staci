@@ -1,0 +1,109 @@
+name: Build platform binaries
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux x64
+            os: ubuntu-latest
+          - name: macOS
+            os: macos-latest
+          - name: Windows x64
+            os: windows-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+
+      - name: Install SuiteSparse and HDF5 on Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libsuitesparse-dev libhdf5-dev
+
+      - name: Install SuiteSparse and HDF5 on macOS
+        if: runner.os == 'macOS'
+        run: brew install suite-sparse hdf5
+
+      - name: Install SuiteSparse and HDF5 on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: vcpkg install suitesparse:x64-windows hdf5:x64-windows
+
+      - name: Configure on Linux or macOS
+        if: runner.os != 'Windows'
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Configure on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: >-
+          cmake -S . -B build
+          -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Test EPANET import
+        run: ctest --test-dir build -C Release --output-on-failure
+
+      - name: Install to package directory
+        run: cmake --install build --config Release --prefix package
+
+      - name: Include Windows runtime DLLs
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: >-
+          Copy-Item
+          "$env:VCPKG_INSTALLATION_ROOT/installed/x64-windows/bin/*.dll"
+          "package/bin/"
+
+      - name: Smoke-test executable on Linux or macOS
+        if: runner.os != 'Windows'
+        run: ./package/bin/staci -l tests/anytown_1med.spr
+
+      - name: Smoke-test executable on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: .\package\bin\staci.exe -l tests\anytown_1med.spr
+
+      - name: Include binary distribution notes
+        shell: bash
+        run: cp dist/README.md package/README.md
+
+      - name: Create Linux or macOS archive
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          artifact_file="staci-${RUNNER_OS}-${RUNNER_ARCH}.tar.gz"
+          tar -C package -czf "$artifact_file" .
+          echo "ARTIFACT_FILE=$artifact_file" >> "$GITHUB_ENV"
+
+      - name: Create Windows archive
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $artifactFile = "staci-$env:RUNNER_OS-$env:RUNNER_ARCH.zip"
+          Compress-Archive -Path package\* -DestinationPath $artifactFile
+          "ARTIFACT_FILE=$artifactFile" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Upload executable bundle
+        uses: actions/upload-artifact@v7
+        with:
+          name: staci-${{ runner.os }}-${{ runner.arch }}
+          path: ${{ env.ARTIFACT_FILE }}
+          if-no-files-found: error
+          archive: false

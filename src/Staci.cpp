@@ -1,13 +1,24 @@
 #include "Staci.h"
 #include <string.h>
+#include <cctype>
 #include <cmath>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <algorithm>
 #include "StaciException.h"
 #include "data_io.h"
+#include "epanet_writer.h"
+
+namespace {
+bool has_inp_extension(string filename) {
+  transform(filename.begin(), filename.end(), filename.begin(),
+            [](unsigned char c) { return static_cast<char>(tolower(c)); });
+  return filename.size() >= 4 && filename.substr(filename.size() - 4) == ".inp";
+}
+}
 
 // Wiley:
 //#include "/usr/include/suitesparse/umfpack.h"
@@ -49,6 +60,8 @@ Staci::Staci(string spr_filename) {
 
 void Staci::SetInitialParameters() {
 
+  has_epanet_document = false;
+
 
 // Add header
   m_ss.str("");
@@ -76,8 +89,12 @@ void Staci::SetInitialParameters() {
     ss << endl << " Loading system...";
     logfile_write(ss.str(), 1);
 
-    data_io datta_io(def_file.c_str());
+    data_io datta_io(def_file.c_str(), mode == 9);
     datta_io.load_system(cspok, agelemek);
+    if (const EpanetDocument *document = datta_io.get_epanet_document()) {
+      epanet_document = *document;
+      has_epanet_document = true;
+    }
 
     ss.str("");
     ss << " ready." << endl;
@@ -169,6 +186,8 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
   /// -r sensitivity         (mode=6)
   /// -d demand_sensitivity         (mode=0)
   /// -e export community structure (mode=7)
+  /// -y --export-epanet     (mode=8)
+  /// -z --epanet-eps        (mode=9)
 
   opt->addUsage("");
   opt->addUsage("staci hasznalata: ");
@@ -176,10 +195,12 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
   opt->addUsage("\t help:");
   opt->addUsage(
     "\t\t -h  --help                          Help nyomtatasa a kepernyore");
+  opt->addUsage(
+    "\t\t EPANET .inp files are accepted as read-only steady-state imports");
   opt->addUsage(" ");
   opt->addUsage("\t stacioner halozatszamitas: ");
   opt->addUsage(
-    "\t\t -s  (--stac) <halofile>.xml           Definicios file, kotelezo");
+    "\t\t -s  (--stac) <halofile>.spr|.inp      Definicios file, kotelezo");
   opt->addUsage(
     "\t\t -i  (--ini) <resfile>.xml             Inicializacios file, nem "
     "kotelezo");
@@ -196,17 +217,16 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
   opt->addUsage(" ");
   opt->addUsage("\t parameter megvaltoztatasa: ");
   opt->addUsage(
-    "\t\t -m  (--mod_prop) <halofile_regi>.spr -e (--element_ID) <ID_ag/csp> "
+    "\t\t -m  (--mod_prop) <network>.spr|.inp -e (--element_ID) <ID_ag/csp> "
     "-p (--property_ID) <ID_adat> -n (--newValue) <uj_ertek> -o (--outfile) "
-    "<halofajl_uj>.spr    Adatmodositas: halofajl_regi.xml -> "
-    "halofajl_uj.xml");
+    "<modified>.spr|.inp");
   opt->addUsage(" ");
   opt->addUsage("\t minden elem listazasa a kepernyora: ");
-  opt->addUsage("\t\t -l  (--list_all_elements) <halofile_regi>.spr");
+  opt->addUsage("\t\t -l  (--list_all_elements) <halofile_regi>.spr|.inp");
   opt->addUsage(" ");
   opt->addUsage("\t adat kiolvasasa: ");
   opt->addUsage(
-    "\t\t -g  (--get_data) <halofile_regi>.spr -e (--element_ID) <ID_ag/csp> "
+    "\t\t -g  (--get_data) <halofile_regi>.spr|.inp -e (--element_ID) <ID_ag/csp> "
     "-p (--property_ID) <ID_adat>");
   opt->addUsage(" ");
   
@@ -225,6 +245,16 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
   opt->addUsage("\t check for islands: ");
   opt->addUsage(
     "\t\t -x  (--export_to_connectivity_check) <halofile_regi>.spr");
+  opt->addUsage(" ");
+  opt->addUsage("\t EPANET export:");
+  opt->addUsage(
+    "\t\t -y  (--export-epanet) <network>.spr -o <network>.inp");
+  opt->addUsage(
+    "\t\t -m <network>.inp -e <ID> -p <property> -n <value> -o <modified>.inp");
+  opt->addUsage(" ");
+  opt->addUsage("\t EPANET extended-period simulation:");
+  opt->addUsage(
+    "\t\t -z  (--epanet-eps) <network>.inp -o <result-prefix>");
 
   opt->addUsage(" ");
   opt->addUsage(" ");
@@ -243,6 +273,10 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
   opt->setOption("sensitivity", 'r');
   opt->setOption("demand_sensitivity", 'd');
   opt->setOption("export_for_connectivity_check", 'x');
+  opt->setOption("export-epanet", 'y');
+  opt->setOption("export_epanet");
+  opt->setOption("epanet-eps", 'z');
+  opt->setOption("epanet_eps");
 
   opt->processCommandArgs(argc, argv);
 
@@ -376,6 +410,32 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
       def_file = opt->getValue('x');
     }
     // element_ID es property_ID fentAdatkiolvasas"<< endl ;*/
+
+    // Export to EPANET INP
+    //-----------------------------
+    if (opt->getValue('y') != NULL || opt->getValue("export-epanet") != NULL ||
+        opt->getValue("export_epanet") != NULL) {
+      mode = 8;
+      if (opt->getValue('y') != NULL)
+        def_file = opt->getValue('y');
+      else if (opt->getValue("export-epanet") != NULL)
+        def_file = opt->getValue("export-epanet");
+      else
+        def_file = opt->getValue("export_epanet");
+    }
+
+    // EPANET extended-period simulation
+    //-----------------------------
+    if (opt->getValue('z') != NULL || opt->getValue("epanet-eps") != NULL ||
+        opt->getValue("epanet_eps") != NULL) {
+      mode = 9;
+      if (opt->getValue('z') != NULL)
+        def_file = opt->getValue('z');
+      else if (opt->getValue("epanet-eps") != NULL)
+        def_file = opt->getValue("epanet-eps");
+      else
+        def_file = opt->getValue("epanet_eps");
+    }
   }
 }
 
@@ -1005,6 +1065,50 @@ void Staci::save_mod_prop(bool is_general_property) {
 void Staci::save_mod_prop_all_elements(string property_ID) {
   data_io datta_io(res_file.c_str());
   datta_io.save_mod_prop_all_elements(cspok, agelemek, property_ID);
+}
+
+//--------------------------------------------------------------
+void Staci::export_epanet(const string &filename) {
+  try {
+    if (filename.empty())
+      throw runtime_error("EPANET export requires -o <output.inp>.");
+    if (!has_inp_extension(filename))
+      throw runtime_error("EPANET export output must use the .inp extension.");
+    if (has_epanet_document)
+      EpanetWriter::write_document(filename, epanet_document);
+    else
+      EpanetWriter::write(filename, cspok, agelemek, friction_model);
+  } catch (const exception &error) {
+    cerr << "ERROR [EPANET][EXPORT]: " << error.what() << endl;
+    exit(-1);
+  }
+}
+
+//--------------------------------------------------------------
+void Staci::save_modified_network() {
+  try {
+    if (new_def_file.empty())
+      throw runtime_error("Network modification requires -o <output.spr|output.inp>.");
+    const bool input_is_inp = has_inp_extension(def_file);
+    const bool output_is_inp = has_inp_extension(new_def_file);
+    if (output_is_inp) {
+      if (input_is_inp)
+        EpanetWriter::write_modified_copy(def_file, new_def_file, element_ID,
+                                          property_ID, newValue);
+      else
+        EpanetWriter::write(new_def_file, cspok, agelemek, friction_model);
+      return;
+    }
+    if (input_is_inp)
+      throw runtime_error("Converting a modified .inp file to native .spr is not supported; "
+                          "use an .inp output path.");
+    copy_file(def_file, new_def_file);
+    set_res_file(new_def_file);
+    save_mod_prop(false);
+  } catch (const exception &error) {
+    cerr << "ERROR [NETWORK][MODIFY]: " << error.what() << endl;
+    exit(-1);
+  }
 }
 
 //--------------------------------------------------------------

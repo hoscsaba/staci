@@ -1,0 +1,78 @@
+[TITLE]
+Metadata preservation fixture
+Second title line; semicolon starts an EPANET comment
+
+; A full-line comment before the junction table
+[JUNCTIONS]
+;ID  Elevation  Demand
+ J1   10         1.5      ; junction demand comment
+
+[RESERVOIRS]
+ R1   35                  ; reservoir head comment
+
+[PIPES]
+;ID  Node1  Node2  Length  Diameter  Roughness  MinorLoss  Status
+ P1   R1     J1     120     150       0.1        0          Open ; pipe association comment
+
+[TAGS]
+ NODE J1 District-A
+ LINK P1 Trunk-main
+
+[COORDINATES]
+ R1 0.0 20.0
+ J1 100.5 20.25
+
+[VERTICES]
+ P1 25.0 30.0
+ P1 75.0 10.0
+
+[LABELS]
+ 50.0 35.0 "Metadata test network"
+
+[BACKDROP]
+ DIMENSIONS 0 0 110 50
+ UNITS METERS
+ FILE map-background.png
+ OFFSET 1.25 -2.5
+
+[TIMES]
+ DURATION 0
+ HYDRAULIC TIMESTEP 1:00
+ QUALITY TIMESTEP 0:05
+ PATTERN TIMESTEP 1:00
+ REPORT TIMESTEP 1:00
+ START CLOCKTIME 08:30 AM
+ STATISTIC NONE
+
+[REPORT]
+ STATUS YES
+ SUMMARY YES
+ ENERGY YES
+ NODES ALL
+ LINKS ALL
+
+[ENERGY]
+ GLOBAL PRICE 0.125
+ GLOBAL PATTERN PRICE-PATTERN
+ GLOBAL EFFIC 78
+ DEMAND CHARGE 4.5
+
+[PATTERNS]
+ PRICE-PATTERN 1.0 1.1 0.9
+
+[OPTIONS]
+ UNITS LPS
+ HEADLOSS D-W
+ SPECIFIC GRAVITY 1.0
+ VISCOSITY 1.0
+ TRIALS 40
+ ACCURACY 0.001
+ CHECKFREQ 2
+ MAXCHECK 10
+ DAMPLIMIT 0
+ UNBALANCED CONTINUE 10
+ QUALITY NONE
+ DEMAND MULTIPLIER 1.0
+ EMITTER EXPONENT 0.5
+
+[END]

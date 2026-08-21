@@ -4,6 +4,7 @@
 #include <sstream>
 #include <cmath>
 #include "Staci.h"
+#include "epanet_extended_simulation.h"
 #include "time.h"
 #include <numeric>
 
@@ -101,9 +102,7 @@ int main(int argc, char* argv[]) {
 		cout << endl << "uj ertek            : " << new_data << endl;
 		cout << endl << "modositott adatfajl : " << feladat.new_def_file << endl;
 
-		feladat.copy_file(feladat.get_def_file(), feladat.new_def_file);
-		feladat.set_res_file(feladat.new_def_file);
-		feladat.save_mod_prop(false);
+		feladat.save_modified_network();
 	}
 
 	// Minden elem listazasa
@@ -159,6 +158,24 @@ int main(int argc, char* argv[]) {
 		feladat.export_connected_nodes();
 		cout << " done.\n\nUse script connected_nodes.py to find isolated islands.";
 		cout << "\n============================================================\n\n";
+	}
+
+	// Export to EPANET INP
+	//----------------------------------------
+	if (feladat.get_mode() == 8) {
+		feladat.export_epanet(feladat.new_def_file);
+	}
+
+	// EPANET extended-period simulation
+	//----------------------------------------
+	if (feladat.get_mode() == 9) {
+		try {
+			EpanetExtendedSimulation simulation(feladat.get_def_file(), feladat.new_def_file);
+			simulation.run(feladat);
+		} catch (const exception &error) {
+			cerr << "ERROR [EPANET][EPS]: " << error.what() << endl;
+			return 1;
+		}
 	}
 
 	time_t stop;

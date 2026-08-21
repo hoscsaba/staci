@@ -1,0 +1,47 @@
+[TITLE]
+Small extended-period simulation test
+
+[JUNCTIONS]
+;ID  Elevation  Demand  Pattern
+J1   0          1       P1
+
+[RESERVOIRS]
+;ID  Head
+R1   30
+
+[TANKS]
+;ID  Elevation  InitLevel  MinLevel  MaxLevel  Diameter  MinVol
+T1   0          10         5         15        100       0
+
+[PIPES]
+;ID  Node1  Node2  Length  Diameter  Roughness  MinorLoss  Status
+P1   R1     J1     1000    200       120        0          Open
+P2   J1     T1     1000    200       120        0          Open
+
+[PUMPS]
+;ID    Node1  Node2  Parameters
+Pump1  R1     J1     POWER 1
+
+[PATTERNS]
+P1  1.0  2.0
+
+[CONTROLS]
+LINK Pump1 CLOSED IF NODE T1 ABOVE 9
+
+[TIMES]
+Duration             2:00
+Hydraulic Timestep   1:00
+Pattern Timestep     1:00
+Pattern Start        0:00
+Report Timestep      1:00
+Report Start         0:00
+
+[OPTIONS]
+Units               LPS
+Headloss            H-W
+Trials              50
+Accuracy            0.001
+Pattern             P1
+Demand Multiplier   1.0
+
+[END]

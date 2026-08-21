@@ -24,4 +24,12 @@ public:
 	double Get_PumpHeadAt(double q) {
 		return PumpCharCurve(q);
 	}
+	vector<double> GetCurveFlowM3PerHour() const {
+		vector<double> result = q;
+		for (double &value : result) value *= 3600.0;
+		return result;
+	}
+	vector<double> GetCurveHead() const {
+		return H;
+	}
 };

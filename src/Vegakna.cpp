@@ -49,6 +49,8 @@ string Vegakna::Info() {
 
 //--------------------------------------------------------------
 double Vegakna::f(vector<double> x) {
+    if (!enabled)
+        return mp;
     //    double pe=x[0]*ro*g;
     //    double pv=x[1]*ro*g;
     //    double he=x[2];
@@ -67,6 +69,13 @@ double Vegakna::f(vector<double> x) {
 //--------------------------------------------------------------
 vector<double> Vegakna::df(vector<double> x) {
     vector<double> ere;
+    if (!enabled) {
+        ere.push_back(0.0);
+        ere.push_back(0.0);
+        ere.push_back(1.0);
+        ere.push_back(0.0);
+        return ere;
+    }
     ere.push_back(1.0);
     ere.push_back(0.0);
     double L = 1;
@@ -94,9 +103,9 @@ vector<double> Vegakna::df(vector<double> x) {
 //--------------------------------------------------------------
 void Vegakna::Ini(int mode, double value) {
     if (mode == 0)
-        mp = 1;
+        mp = enabled ? 1.0 : 0.0;
     else
-        mp = value;
+        mp = enabled ? value : 0.0;
 }
 
 //--------------------------------------------------------------
@@ -138,4 +147,3 @@ double Vegakna::Get_dprop(string mit) {
     }
     return out;
 }
-

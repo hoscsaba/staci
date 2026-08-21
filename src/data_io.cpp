@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cctype>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -15,12 +16,20 @@
 #include "BukoMutargy.h"
 #include "VisszacsapoSzelep.h"
 #include "data_io.h"
+#include "epanet_reader.h"
 #include "xmlParser.h"
 
 using namespace std;
 
-data_io::data_io(const char *a_xml_fnev) {
+data_io::data_io(const char *a_xml_fnev, bool epanet_extended) {
     xml_fnev = a_xml_fnev;
+    debug = false;
+    string filename(a_xml_fnev);
+    string lowercase_filename(filename);
+    transform(lowercase_filename.begin(), lowercase_filename.end(), lowercase_filename.begin(),
+              [](unsigned char c) { return static_cast<char>(tolower(c)); });
+    is_epanet_input = lowercase_filename.size() >= 4 &&
+        lowercase_filename.substr(lowercase_filename.size() - 4) == ".inp";
 
     // Itt kenytelen vagyok kulon definialni a rednelkezesre allo elemeket
     // Jobb lenne valahol mashol letrehozni oket, de sajna csak itt megy.
@@ -39,6 +48,11 @@ data_io::data_io(const char *a_xml_fnev) {
     for (int i = 0; i < edge_type_number; i++)
         edge_type_occur.push_back(0);
 
+    if (is_epanet_input) {
+        epanet_reader.reset(new EpanetReader(filename, epanet_extended));
+        return;
+    }
+
     XMLNode xMainNode = XMLNode::openFileHelper(xml_fnev, "staci");
 
     string cpp_xml_debug = xMainNode.getChildNode("settings").getChildNode("cpp_xml_debug").getText();
@@ -49,8 +63,25 @@ data_io::data_io(const char *a_xml_fnev) {
 
 }
 
+data_io::~data_io() = default;
+
+const EpanetDocument *data_io::get_epanet_document() const {
+    return epanet_reader ? &epanet_reader->document() : nullptr;
+}
+
+void data_io::warn_epanet_write_unsupported(const string &operation) const {
+    cerr << "WARNING [EPANET][WRITE]: " << operation
+         << " is unavailable for .inp input; hydraulic results are not part of the "
+            "EPANET network format. The source file was not modified. Use -m with "
+            "an .inp output path to create a modified EPANET network." << endl;
+}
+
 //--------------------------------------------------------------------------------
 void data_io::load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek) {
+    if (is_epanet_input) {
+        epanet_reader->load_system(cspok, agelemek);
+        return;
+    }
     XMLNode xMainNode = XMLNode::openFileHelper(xml_fnev, "staci");
 
     XMLNode Node_settings = xMainNode.getChildNode("settings");
@@ -601,6 +632,11 @@ void data_io::replace_value4(XMLNode &root_node, string fieldname1, int i,
 void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of_demand, vector<Csomopont *> cspok,
                            vector<Agelem *> agelemek, bool conv_reached, int staci_debug_level) {
 
+    if (is_epanet_input) {
+        warn_epanet_write_unsupported("Saving hydraulic results");
+        return;
+    }
+
 
     XMLNode xMainNode = XMLNode::openFileHelper(xml_fnev, "staci");
 
@@ -986,6 +1022,11 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
 //--------------------------------------------------------------------------------
 void data_io::save_mod_prop_all_elements(vector<Csomopont*> cspok, vector<Agelem*> agelemek, string pID) {
 
+    if (is_epanet_input) {
+        warn_epanet_write_unsupported("Saving modified properties");
+        return;
+    }
+
     debug = false;
 
     XMLNode xMainNode = XMLNode::openFileHelper(xml_fnev, "staci");
@@ -1032,6 +1073,11 @@ replace_value2( Node_nodes, "node", j, pID, val , cspok.at(i)->Get_nev());
 //--------------------------------------------------------------------------------
 void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek, string eID, string pID,
                             bool is_property_general) {
+
+    if (is_epanet_input) {
+        warn_epanet_write_unsupported("Saving a modified property");
+        return;
+    }
 
     debug = false;
 
@@ -1193,6 +1239,12 @@ void data_io::save_mod_prop(vector<Csomopont *> cspok, vector<Agelem *> agelemek
 //--------------------------------------------------------------------------------
 void data_io::load_ini_values(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek) {
 
+    if (is_epanet_input) {
+        cerr << "WARNING [EPANET][INITIAL VALUES]: EPANET .inp files do not contain "
+                "STACI result fields; imported initial values remain in use." << endl;
+        return;
+    }
+
     XMLNode xMainNode = XMLNode::openFileHelper(xml_fnev, "staci");
 
     XMLNode Node_settings = xMainNode.getChildNode("settings");
@@ -1244,6 +1296,10 @@ void data_io::load_ini_values(vector<Csomopont *> &cspok, vector<Agelem *> &agel
 //--------------------------------------------------------------------------------
 void data_io::save_transport(int mode, vector<Csomopont *> cspok,
                              vector<Agelem *> agelemek) {
+    if (is_epanet_input) {
+        warn_epanet_write_unsupported("Saving transport results");
+        return;
+    }
     XMLNode xMainNode = XMLNode::openFileHelper(xml_fnev, "staci");
 
     XMLNode Node_settings = xMainNode.getChildNode("settings");
@@ -1331,6 +1387,9 @@ void data_io::save_transport(int mode, vector<Csomopont *> cspok,
 
 //--------------------------------------------------------------------------------
 string data_io::read_setting(string which) {
+    if (is_epanet_input)
+        return epanet_reader->read_setting(which);
+
     XMLNode xMainNode = XMLNode::openFileHelper(xml_fnev, "staci");
 
     XMLNode Node_settings = xMainNode.getChildNode("settings");

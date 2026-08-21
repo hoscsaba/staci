@@ -40,6 +40,7 @@ protected:
     double tt_end;
     /// custom data
     double user1, user2;
+    bool enabled;
 
 
 public:
@@ -168,6 +169,8 @@ public:
     {
     }
     virtual string GetType() = 0;
+    void Set_enabled(bool value) { enabled = value; }
+    bool Is_enabled() const { return enabled; }
     /// Eredmenyvektor visszaadasa (csak Csatorna eseten)
     virtual vector<double> Get_res(string which);
     /// Matlab-szeru linearis interpolacio

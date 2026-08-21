@@ -70,7 +70,9 @@ void KonstNyomas::Ini(int mode, double value) {
 //--------------------------------------------------------------
 void KonstNyomas::Set_dprop(string mit, double mire) {
 
-    if ((mit == "concentration") || (mit == "konc_atlag")) {
+    if (mit == "head") {
+        p = mire * ro * g;
+    } else if ((mit == "concentration") || (mit == "konc_atlag")) {
         konc_atlag = mire;
     } else {
         cout << endl << "HIBA! KonstNyomas::Set_dprop(mit), ismeretlen bemenet: mit="
@@ -80,7 +82,9 @@ void KonstNyomas::Set_dprop(string mit, double mire) {
 
 double KonstNyomas::Get_dprop(string mit) {
     double out = 0.0;
-    if (mit == "headloss")
+    if (mit == "head")
+        out = p / ro / g;
+    else if (mit == "headloss")
         out = 0.;
     else if (mit == "headloss_per_unit_length")
         out = 0.;

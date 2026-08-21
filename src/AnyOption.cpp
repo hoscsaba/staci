@@ -508,9 +508,7 @@ void AnyOption::processCommandArgs() {
 		max_legal_args = argc;
 	new_argv =( int*) malloc( (max_legal_args+1) * sizeof(int) );
 	for( int i = 1; i < argc; i++ ) {/* ignore first argv */
-		//if( argv[i][0] == long_opt_prefix[0] &&
-		//argv[i][1] == long_opt_prefix[1] ) { /* long GNU option */
-		    if( argv[i][0] == long_opt_prefix ) { /* long GNU option */
+		if( argv[i][0] == '-' && argv[i][1] == '-' ) { /* long GNU option */
 			int match_at = parseGNU( argv[i]+2 ); /* skip -- */
 			if( match_at >= 0 && i < argc-1 ) /* found match */
 			setValue( options[match_at] , argv[++i] );

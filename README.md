@@ -1,8 +1,9 @@
 # STACI
 
 STACI is a command-line simulator for steady-state hydraulic and transport
-calculations in pressurized and open-channel networks. Network definitions and
-results are stored in XML-based `.spr` files.
+calculations in pressurized and open-channel networks. Its native network and
+result format is XML-based `.spr`; EPANET `.inp` network files can also be
+imported, modified, exported, and used for extended-period simulations.
 
 The project is written in C++17 and built with CMake. It supports GCC and Clang
 on Linux and macOS, and MSVC on Windows. The numerical solver uses UMFPACK from
@@ -18,6 +19,10 @@ STACI can:
 - read and modify selected node or edge properties;
 - list all network elements;
 - export network connectivity for island detection;
+- import EPANET `.inp` files with unit conversion and compatibility warnings;
+- export native STACI networks to EPANET `.inp` files;
+- run EPANET extended-period hydraulic simulations with demand patterns,
+  changing tank levels, and tank-level pump controls;
 - model pipes, pumps, pressure boundaries, pools/reservoirs, valves, check
   valves, overflows, and several open-channel cross-sections;
 - write convergence markers, progress logs, and updated network/result files.
@@ -48,6 +53,8 @@ SuiteSparse runtime requirements can change between releases.
 - CMake 3.16 or newer;
 - a C++17 compiler;
 - SuiteSparse with UMFPACK, CHOLMOD, AMD, COLAMD, and SuiteSparseConfig.
+- HDF5 development files (optional for general STACI use, required for the
+  chunked EPS `.h5` output).
 
 CMake first uses SuiteSparse's official imported `SuiteSparse::UMFPACK` target.
 For older system packages without CMake metadata, it falls back to finding the
@@ -59,7 +66,7 @@ headers and libraries in standard installation prefixes.
 
 ```bash
 sudo apt update
-sudo apt install build-essential cmake libsuitesparse-dev
+sudo apt install build-essential cmake libsuitesparse-dev libhdf5-dev
 
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel
@@ -70,7 +77,7 @@ The executable is `build/staci`.
 ### Fedora
 
 ```bash
-sudo dnf install cmake gcc-c++ suitesparse-devel
+sudo dnf install cmake gcc-c++ suitesparse-devel hdf5-devel
 
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel
@@ -89,7 +96,7 @@ Install the command-line tools and dependencies:
 
 ```bash
 xcode-select --install
-brew install cmake suite-sparse
+brew install cmake suite-sparse hdf5
 ```
 
 Configure and build with Apple Clang:
@@ -117,7 +124,7 @@ with C++** workload, CMake, Git, and vcpkg.
 In PowerShell:
 
 ```powershell
-vcpkg install suitesparse:x64-windows
+vcpkg install suitesparse:x64-windows hdf5:x64-windows
 
 cmake -S . -B build `
   -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake"
@@ -155,11 +162,255 @@ cmake --install build --config Release --prefix install
 The installed executable is `install/bin/staci` on Unix-like systems and
 `install\bin\staci.exe` on Windows.
 
+## Run the integration tests
+
+The portable Python test runner recursively tests every `.spr` and `.inp` file
+under `tests/`. It uses temporary copies, so hydraulic calculations never
+overwrite the original test networks. On Linux and macOS:
+
+```bash
+python3 tests/run_tests.py --binary ./build/staci
+```
+
+On Windows:
+
+```powershell
+py tests\run_tests.py --binary build\Release\staci.exe
+```
+
+SPR files up to 1 MB receive a steady-state hydraulic test, convergence-marker
+check, EPANET export, and round-trip import. Larger SPR files receive the export
+and round-trip test by default, avoiding multi-minute hydraulic runs. To force
+hydraulics for every SPR file, add `--full-spr-hydraulics` and optionally raise
+the per-command limit with `--timeout SECONDS`.
+
+Every INP file receives a byte-for-byte metadata round-trip, import, and
+extended-period simulation test. The runner verifies the SI CSV schema, JSON
+metadata, and convergence counts. A
+separate HDF5 test generates an EPS result and verifies its file signature,
+required datasets, SI unit attributes, extendible time dimension, and
+16-frame chunking. This check requires either the Python `h5py` package or the
+`h5dump` command-line utility; use the `H5DUMP` environment variable if the
+utility is not on `PATH`. The HDF5 test output is always retained in a
+timestamped directory below `tests/test-results/hdf5/`, and its exact path is
+printed at the end of the run.
+
+The runner continues after individual failures and writes the full
+human-readable report to `tests/run_tests.log`. That report is recreated on
+every run, and old generated STACI sidecar logs (`.ros`, `.rps`, `.rrs`, and
+related variants) are removed at startup, so the report describes only the
+latest test run. Use `--keep-workdir` to retain the other generated files in a
+timestamped directory below `tests/test-results/runs/` for debugging. Retained
+HDF5 files are not deleted by later test runs.
+
 ## Quick start
 
 The commands below use the included `tests/anytown_1med.spr` network. From the
 repository root, use `./build/staci` on Linux or macOS and
 `.\build\Release\staci.exe` on Windows.
+
+### Import an EPANET network
+
+STACI recognizes the `.inp` extension automatically. For example:
+
+```bash
+./build/staci -l model.inp
+./build/staci -g model.inp -e J-1 -p demand
+./build/staci -s model.inp
+```
+
+The importer reads every EPANET section and reports a warning for data that
+does not have a STACI equivalent. It currently transfers:
+
+- junction elevations, demands, demand multipliers, initial quality, and the
+  first multiplier of demand patterns;
+- reservoir heads and tank initial levels as fixed hydraulic boundaries;
+- pipes, with EPANET-to-SI conversion for flow, length, diameter, and
+  Darcy-Weisbach roughness;
+- Hazen-Williams and Darcy-Weisbach head-loss selection;
+- pump head curves and constant-power pumps;
+- relevant solver settings such as trial count and accuracy (the latter is an
+  approximate mapping because the convergence criteria differ);
+- a lossless EPANET document containing the original text, section and record
+  order, line endings, inline comments and their record IDs, tags, map data,
+  and non-hydraulic run configuration.
+
+Extended-period patterns, dynamic tank storage, controls and rules, valves,
+emitters, and water-quality sources/reactions are parsed but not simulated.
+Descriptive metadata, map sections, and non-hydraulic run configuration do not
+affect the hydraulic snapshot, but they remain attached to the imported
+EPANET document for lossless export. Each incompatible calculation feature is
+identified on standard error with its section, element where available, and
+source line.
+
+Hydraulic results are not written into `.inp` files because EPANET input files
+describe network definitions rather than simulation results. Hydraulic runs
+can still create the normal `.ros`, `.rps`, and `.rrs` sidecar files. Network
+properties can be changed safely with `-m`; STACI writes a new `.inp` file and
+does not alter the source.
+
+### Export a STACI network to EPANET
+
+```bash
+./build/staci --export-epanet network.spr -o network.inp
+# Equivalent short form:
+./build/staci -y network.spr -o network.inp
+```
+
+The generated file uses metric `LPS` units. Junctions, fixed-head boundaries,
+tanks, pipes, pump curves, constant-power pumps, demands, initial chemical
+quality, and the selected pipe-friction model are exported. Tank operating
+limits are inferred because native STACI pools do not store all EPANET tank
+constraints. STACI-only elements are skipped with explicit warnings.
+
+When the source is an EPANET INP file, STACI exports its retained
+`EpanetDocument` representation. `[TITLE]`, inline and full-line comments,
+`[TAGS]`, `[COORDINATES]`, `[VERTICES]`, `[LABELS]`, `[BACKDROP]`, `[TIMES]`,
+`[REPORT]`, `[ENERGY]`, and all `[OPTIONS]` records retain their original text,
+association, order, whitespace, and line endings. An unchanged INP therefore
+round-trips byte-for-byte. The `-m` INP modification path changes only the
+requested field and preserves all other lines.
+
+### EPANET–STACI compatibility TODO (easiest first)
+
+The following work is ordered by expected implementation difficulty. It is
+limited to INP data coverage, lossless import/export, and the set of available
+network elements; changes to the hydraulic solution method are intentionally
+out of scope. Each completed item should include a minimal INP fixture and a
+field-level `INP -> STACI -> INP` round-trip assertion.
+
+1. [x] **Preserve descriptive metadata.** Store and re-export `[TITLE]`, inline
+   comments, and `[TAGS]` without changing their text or association with
+   nodes and links.
+2. [x] **Preserve map metadata.** Round-trip `[COORDINATES]`, `[VERTICES]`,
+   `[LABELS]`, and `[BACKDROP]`, including numeric values, backdrop declarations,
+   associations, and ordering.
+3. [x] **Preserve non-hydraulic run configuration.** Store and re-export all
+   recognized `[TIMES]`, `[REPORT]`, `[ENERGY]`, and currently unused
+   `[OPTIONS]` entries instead of reducing them to warnings.
+4. [ ] **Retain the source unit system.** When an INP network is imported and
+   exported again, preserve its original EPANET flow units and convert every
+   affected field back consistently; keep `LPS` as the default for native SPR
+   exports.
+5. [ ] **Complete pipe field coverage.** Import and export minor-loss
+   coefficients, `Open`/`Closed`/`CV` pipe status, and matching `[STATUS]`
+   overrides. Map `CV` to STACI's existing check-valve element where possible.
+6. [ ] **Round-trip all tank fields.** Retain minimum and maximum level,
+   minimum volume, diameter, initial level, and the referenced volume-curve ID
+   instead of inferring missing values during export.
+7. [ ] **Preserve multiple demand categories.** Keep every `[DEMANDS]` row,
+   category label, pattern reference, and junction base demand separately
+   instead of summing them into one STACI demand value.
+8. [ ] **Add a native pattern data model.** Store complete `[PATTERNS]` series,
+   the default pattern, and all object-to-pattern references so an
+   INP–SPR–INP round trip does not collapse a pattern to its first multiplier.
+9. [ ] **Complete pump data coverage.** Preserve pump curve IDs, `POWER`/`HEAD`
+   form, initial status, relative speed, speed-pattern reference, and associated
+   efficiency and energy records during import and export.
+10. [ ] **Classify and preserve every curve.** Distinguish pump, efficiency,
+    volume, and general-purpose curves, validate their references, and export
+    them with their original IDs and numeric data.
+11. [ ] **Represent emitters as network elements.** Add an import/export mapping
+    for `[EMITTERS]`, including the emitter coefficient and the relevant
+    pressure-exponent option, with an explicit placeholder representation when
+    no equivalent STACI element is available.
+12. [ ] **Map directly compatible valve types.** Implement data mappings for
+    check valves and for EPANET `TCV` and `GPV` records using existing STACI
+    throttling/check-valve elements where their stored parameters are
+    equivalent.
+13. [ ] **Represent regulated EPANET valves.** Add native element records and
+    lossless INP mappings for `PRV`, `PSV`, `PBV`, and `FCV`, including setting,
+    minor-loss coefficient, and initial status.
+14. [ ] **Preserve controls and rules structurally.** Parse `[CONTROLS]` and
+    `[RULES]` into typed objects that retain link/node references, thresholds,
+    clock times, priorities, and original order, then re-export them unchanged.
+    Executing these objects is a separate calculation task.
+15. [ ] **Preserve water-quality configuration.** Round-trip `[QUALITY]`,
+    `[SOURCES]`, `[REACTIONS]`, and `[MIXING]`, including units, source types,
+    coefficients, tank mixing models, and pattern references. Water-quality
+    calculation remains outside this item.
+16. [ ] **Introduce a lossless fallback for unknown sections.** Keep unknown or
+    newer EPANET sections and unsupported records as raw, ordered INP data so
+    STACI can modify known properties without silently discarding future
+    EPANET extensions.
+
+### Run an EPANET extended-period simulation
+
+```bash
+./build/staci --epanet-eps network.inp -o results/network
+# Equivalent short form:
+./build/staci -z network.inp -o results/network
+```
+
+EPS mode reads `Duration`, hydraulic/pattern/report timesteps, pattern start,
+junction demand patterns, demand multiplier, reservoir head patterns, tank
+geometry and operating levels, initial pump status, and simple tank-level pump
+controls from the EPANET file. Each hydraulic state is solved with the existing
+STACI steady-state solver. Tank levels are advanced from the solved boundary
+flow and tank area; flow is blocked in the prohibited direction when a tank is
+at its minimum or maximum level.
+
+The primary output is `PREFIX.h5` using the `STACI EPS OUTPUT v1` schema. A
+small `PREFIX.meta.json` sidecar contains run metadata and precomputed value
+ranges for plot color bars. Four analysis-friendly SI CSV files are retained
+for interoperability and manual inspection:
+
+- `PREFIX-nodes.csv`: pressure head, total head, elevation, and demand for each
+  node and report time;
+- `PREFIX-links.csv`: flow, head loss, endpoints, type, and enabled state for
+  each link;
+- `PREFIX-tanks.csv`: tank level, volume, inflow, and limits;
+- `PREFIX-summary.csv`: duration, timestep, state count, failed states, and
+  warning count.
+
+All physical quantities in the HDF5, JSON, and CSV outputs use SI units:
+seconds, metres, cubic metres, cubic metres per second, and metres per second.
+The CSV files use one observation per row and can be read directly by Excel,
+LibreOffice, pandas, R, MATLAB, or plotting tools.
+
+The HDF5 dynamic arrays use `[time, element]` order:
+
+```text
+/time                       int64   [T]    s
+/nodes/head                 float64 [T,N]  m
+/nodes/pressure_head        float64 [T,N]  m
+/nodes/demand               float64 [T,N]  m3/s
+/links/flow_rate            float64 [T,L]  m3/s
+/links/velocity             float64 [T,L]  m/s
+/links/headloss             float64 [T,L]  m
+/links/status               uint8   [T,L]
+/tanks/level                float64 [T,K]  m
+/tanks/volume               float64 [T,K]  m3
+/tanks/inflow               float64 [T,K]  m3/s
+/simulation/converged       uint8   [T]
+/simulation/iterations      uint32  [T]
+```
+
+Static `nodes`, `links`, and `tanks` datasets provide ID-to-index mapping,
+topology, elevations, coordinates, lengths, diameters, and operating limits.
+Coordinates from an EPANET file are converted using that network's length-unit
+family. Missing coordinates and non-applicable link dimensions are stored as
+`NaN`.
+
+Dynamic datasets are extensible along the time dimension and are written in
+16-frame chunks. For 10,000 nodes a `float64 [16,10000]` chunk is about 1.28 MB.
+Shuffle plus gzip level 1 is used when the linked HDF5 library provides the
+deflate filter. The file is flushed after every chunk and its `frames_written`
+and `simulation_status` attributes allow interrupted runs to be recognized.
+
+If HDF5 was not found while configuring the build, CMake prints a warning and
+the EPS command writes only the SI CSV and JSON files. Set `HDF5_ROOT` for a
+non-standard installation, for example:
+
+```bash
+cmake -S . -B build -DHDF5_ROOT=/path/to/hdf5
+```
+
+Tank volume curves are currently approximated using the tank diameter.
+Rule-based controls, valve controls, pump-speed patterns, water-quality EPS,
+and event interpolation inside a hydraulic timestep are not yet implemented;
+present occurrences emit warnings or use the documented hydraulic-step
+approximation.
 
 ### List network elements
 
@@ -214,6 +465,20 @@ Writable edge properties are `diameter`, `bottom_level`, `water_level`, and
 `position`. The writable node property is `demand`. The original file is copied
 to the path supplied with `-o`, then the requested value is saved there.
 
+The same command works directly with EPANET input files:
+
+```bash
+./build/staci -m network.inp \
+  -e PIPE74 -p diameter -n 0.8 -o network-modified.inp
+```
+
+Modification values use STACI SI units, so pipe diameter and tank levels are
+specified in metres and demand in m³/h. STACI converts values back to the units
+declared by the EPANET file. All other `.inp` sections—including controls,
+patterns, coordinates, and metadata—are preserved. Supported EPANET write-back
+properties are pipe `diameter`, junction `demand`, and tank
+`bottom_level`/`water_level` (using the imported `EPANET_TANK_ID` element ID).
+
 ### Transport calculations
 
 ```bash
@@ -257,6 +522,8 @@ This produces `nodelist.txt` and `connected_nodes.txt`. The scripts in
 | `-r`, `--sensitivity FILE` | Parameter sensitivity; also requires `-e` and `-p` |
 | `-d`, `--demand_sensitivity FILE` | Hydraulic, residence-time, and demand-sensitivity calculation |
 | `-x`, `--export_for_connectivity_check FILE` | Export node connectivity |
+| `-y`, `--export-epanet FILE` | Export a network to the `.inp` path supplied with `-o` |
+| `-z`, `--epanet-eps FILE` | Run EPANET extended-period hydraulics and write chunked HDF5, metadata JSON, and SI CSV files using the `-o` prefix |
 | `-e`, `--element_ID ID` | Select a node or edge |
 | `-p`, `--property_ID NAME` | Select a property |
 | `-n`, `--newValue VALUE` | New numeric property value |
@@ -277,6 +544,10 @@ input filename, depending on the command:
 | `element_list.txt` | Element list created by `-l` |
 | `tmp.dat` | Numeric value created by `-g` |
 | `nodelist.txt`, `connected_nodes.txt` | Connectivity exports created by `-x` |
+| `PREFIX-nodes.csv`, `PREFIX-links.csv` | EPS node and link time series |
+| `PREFIX-tanks.csv`, `PREFIX-summary.csv` | EPS tank time series and run summary |
+| `PREFIX.h5` | Chunked `STACI EPS OUTPUT v1` data for visualization |
+| `PREFIX.meta.json` | EPS run metadata, dimensions, status codes, warnings, and value ranges |
 
 ## Non-standard SuiteSparse installations
 

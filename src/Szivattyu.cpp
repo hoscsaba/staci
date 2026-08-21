@@ -118,6 +118,8 @@ The function evaluates the curve fit by the constructor \sa Szivattyu()
 \return (double) function error (should be zero)
 \sa PumpCharCurve()
 */double Szivattyu::f(vector<double> x) {
+    if (!enabled)
+        return mp;
     double ere;
     double pe = x[0] * ro * g;
     double pv = x[1] * ro * g;
@@ -163,6 +165,13 @@ double Szivattyu::PumpCharCurve(double qq) {
 //--------------------------------------------------------------
 vector<double> Szivattyu::df(vector<double> x) {
     vector<double> ere;
+    if (!enabled) {
+        ere.push_back(0.0);
+        ere.push_back(0.0);
+        ere.push_back(1.0);
+        ere.push_back(0.0);
+        return ere;
+    }
     ere.push_back(-1.0);
     ere.push_back(+1.0);
 
@@ -196,7 +205,7 @@ void Szivattyu::Ini(int mode, double value) {
     //mp=fabs(q.at(1)-q.at(q.size()-1))/2*ro;
     //else mp=value;
     if (mode != 0)
-        mp = value;
+        mp = enabled ? value : 0.0;
     //mp=fabs(q.at(1)-q.at(q.size()-1))/2*ro;
     //else
 }

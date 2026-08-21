@@ -1,0 +1,39 @@
+[TITLE]
+Small EPANET import smoke test
+
+[JUNCTIONS]
+;ID  Elevation  Demand  Pattern
+J1   10         2       P1
+J2   8          0
+
+[RESERVOIRS]
+;ID  Head
+R1   30
+
+[PIPES]
+;ID    Node1  Node2  Length  Diameter  Roughness  MinorLoss  Status
+Pipe1  J1     J2     100     100       120        0          Open
+
+[PUMPS]
+;ID    Node1  Node2  Parameters
+Pump1  R1     J1     POWER 10
+
+[PATTERNS]
+P1  0.5  1.0
+
+[CONTROLS]
+LINK Pump1 CLOSED IF NODE J2 BELOW 5
+
+[OPTIONS]
+UNITS LPS
+HEADLOSS H-W
+TRIALS 50
+ACCURACY 0.001
+VISCOSITY 1.0
+
+[COORDINATES]
+J1 0 0
+J2 1 0
+R1 0 1
+
+[END]

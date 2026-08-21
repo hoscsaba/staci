@@ -11,6 +11,7 @@
 #include "Csomopont.h"
 #include "Agelem.h"
 #include "nr.h"
+#include "epanet_document.h"
 #include <string>
 
 class Staci
@@ -44,6 +45,8 @@ public:
     void save_results(bool conv_reached);
     void save_mod_prop(bool is_general_property);
     void save_mod_prop_all_elements(string property_ID);
+    void save_modified_network();
+    void export_epanet(const string &filename);
     bool solve_system();
     void solve_residence_time();
     void compute_demand_sensitivity();
@@ -181,6 +184,8 @@ private:
     stringstream m_ss;
     string def_file, out_file, ini_file, aisee_file, res_file;
     AnyOption *opt;
+    EpanetDocument epanet_document;
+    bool has_epanet_document;
 
     double transp_dt, ido; //, transp_dt_ki;
     string progress_file;

@@ -1,16 +1,21 @@
 #include <string>
 #include <fstream>
+#include <memory>
 #include <vector>
 #include "Csomopont.h"
 #include "Agelem.h"
 #include "xmlParser.h"
+
+class EpanetReader;
+class EpanetDocument;
 
 class data_io
 {
 
 public:
     /// Konstruktor
-    data_io(const char *xml_fnev);
+    data_io(const char *xml_fnev, bool epanet_extended = false);
+    ~data_io();
     void load_system(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek);
     void load_ini_values(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek);
     void save_results(double FolyMenny, double sum_of_inflow, double sum_of_demand, vector<Csomopont *> cspok, vector<Agelem *> agelemek, bool conv_reached, int staci_debug_level);
@@ -18,10 +23,13 @@ public:
     void save_mod_prop_all_elements(vector<Csomopont *> cspok, vector<Agelem *> agelemek, string pID);
     void save_transport(int mode, vector<Csomopont *> cspok, vector<Agelem *> agelemek);
     string read_setting(string which);
+    const EpanetDocument *get_epanet_document() const;
 
 private:
     /// debug info a kepernyore
     const char *xml_fnev;
+    bool is_epanet_input;
+    std::unique_ptr<EpanetReader> epanet_reader;
     /// debug info a kepernyore
     bool debug;
     /// csomopontok es agak szama
@@ -39,5 +47,6 @@ private:
   //  void replace_value2(XMLNode &root_node, string fieldname1, int i, string fieldname2, string val, string msg);
     void replace_value4(XMLNode &root_node, string fieldname1, int i,
                              string fieldname2, string fieldname3, string fieldname4,  double val, string msg);
+    void warn_epanet_write_unsupported(const string &operation) const;
 
 };

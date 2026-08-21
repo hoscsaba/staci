@@ -37,6 +37,7 @@ Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const
     update_diameter = false;
     user1=0.;
     user2=0.;
+    enabled = true;
 }
 
 //--------------------------------------------------------------
@@ -62,6 +63,8 @@ Agelem::Agelem(const string a_nev, const double a_Aref, const double a_mp, const
 
     if (fabs(a_ro) < 1.0e-3)
         error("Agelem constructor", "Density (ro) is zero up to machine precision!");
+
+    enabled = true;
 
 }
 
