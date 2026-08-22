@@ -476,7 +476,13 @@ double Staci::m_get_dprop() {
       elem_megvan = true;
       if ((property_ID == "diameter") || (property_ID == "mass_flow_rate") ||
           (property_ID == "bottom_level") || (property_ID == "water_level") ||
-          (property_ID == "position")) {
+          (property_ID == "position") || (property_ID == "minor_loss") ||
+          (property_ID == "status") || (property_ID == "check_valve") ||
+          (property_ID == "power") || (property_ID == "effective_power") ||
+          (property_ID == "speed") || (property_ID == "base_speed") ||
+          (property_ID == "speed_pattern_length") ||
+          (property_ID == "efficiency_curve_points") ||
+          (property_ID == "head_curve_points")) {
         // prop_megvan = true;
         outdata = agelemek[i]->Get_dprop(property_ID);
         prop_megvan = true;
@@ -510,7 +516,7 @@ double Staci::m_get_dprop() {
            << endl
            << "ERROR!!! Staci::m_get_dprop(): node/edge: " << element_ID
            << ", property not found: " << property_ID << endl;
-      cout << "  edges: diameter|mass_flow_rate|bottom_level|water_level|position" << endl;
+      cout << "  edges: diameter|mass_flow_rate|bottom_level|water_level|position|minor_loss|status|check_valve|power|effective_power|speed|base_speed|speed_pattern_length|efficiency_curve_points|head_curve_points" << endl;
       cout << "  nodes: pressure|head|demand" << endl << endl;
       exit(-1);
     } else
@@ -529,6 +535,16 @@ void Staci::m_set_dprop() {
       /*cout<<endl<<"\t Megvan az agelem: "<<element_ID<<endl;*/
       elem_megvan = true;
       if (property_ID == "diameter") {
+        agelemek[i]->Set_dprop(property_ID, newValue);
+        prop_megvan = true;
+      }
+
+      if (property_ID == "minor_loss") {
+        agelemek[i]->Set_dprop(property_ID, newValue);
+        prop_megvan = true;
+      }
+
+      if (property_ID == "speed") {
         agelemek[i]->Set_dprop(property_ID, newValue);
         prop_megvan = true;
       }
@@ -623,7 +639,14 @@ double Staci::get_dprop(string in_element_ID, string in_property_ID) {
       if ((in_property_ID == "diameter") ||
           (in_property_ID == "mass_flow_rate") ||
           (in_property_ID == "bottom_level") ||
-          (in_property_ID == "water_level") || (in_property_ID == "position")) {
+          (in_property_ID == "water_level") || (in_property_ID == "position") ||
+          (in_property_ID == "minor_loss") || (in_property_ID == "status") ||
+          (in_property_ID == "check_valve") || (in_property_ID == "power") ||
+          (in_property_ID == "effective_power") || (in_property_ID == "speed") ||
+          (in_property_ID == "base_speed") ||
+          (in_property_ID == "speed_pattern_length") ||
+          (in_property_ID == "efficiency_curve_points") ||
+          (in_property_ID == "head_curve_points")) {
         // prop_megvan = true;
         outdata = agelemek[i]->Get_dprop(in_property_ID);
         prop_megvan = true;
@@ -675,6 +698,16 @@ void Staci::set_dprop(string in_element_ID, string in_property_ID,
       /*cout<<endl<<"\t Megvan az agelem: "<<in_element_ID<<endl;*/
       elem_megvan = true;
       if (in_property_ID == "diameter") {
+        agelemek[i]->Set_dprop(in_property_ID, in_newValue);
+        prop_megvan = true;
+      }
+
+      if (in_property_ID == "minor_loss") {
+        agelemek[i]->Set_dprop(in_property_ID, in_newValue);
+        prop_megvan = true;
+      }
+
+      if (in_property_ID == "speed") {
         agelemek[i]->Set_dprop(in_property_ID, in_newValue);
         prop_megvan = true;
       }

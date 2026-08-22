@@ -47,6 +47,9 @@ private:
     std::string headloss_model_;
     std::string default_pattern_;
     std::string quality_mode_;
+    std::string quality_chemical_name_;
+    std::string quality_units_;
+    std::string quality_trace_node_;
     double specific_gravity_;
     double demand_multiplier_;
     bool us_customary_units_;
@@ -58,7 +61,11 @@ private:
     void parse_curves();
     void configure_settings();
     void warn_for_unsupported_sections();
-    void print_report(std::size_t node_count, std::size_t edge_count) const;
+    void print_report(std::size_t node_count,
+                      std::size_t edge_count,
+                      std::size_t demand_component_count,
+                      std::size_t initial_quality_count,
+                      std::size_t reservoir_head_pattern_count) const;
 
     const std::vector<Record> &records(const std::string &section) const;
     bool has_records(const std::string &section) const;

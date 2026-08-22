@@ -44,6 +44,17 @@ std::vector<std::string> split_fields(const std::string &line) {
     return fields;
 }
 
+std::string join_fields(const std::vector<std::string> &fields,
+                        std::size_t begin) {
+    std::ostringstream output;
+    for (std::size_t i = begin; i < fields.size(); ++i) {
+        if (i != begin)
+            output << ' ';
+        output << fields[i];
+    }
+    return output.str();
+}
+
 bool starts_with(const std::vector<std::string> &fields,
                  const std::vector<std::string> &prefix) {
     if (fields.size() <= prefix.size())
@@ -120,18 +131,36 @@ void EpanetReader::parse_options() {
             settings_["e_p_max"] = record.fields[1];
         else if (key == "QUALITY") {
             quality_mode_ = upper(record.fields[1]);
-            if (quality_mode_ == "AGE")
+            quality_chemical_name_.clear();
+            quality_units_.clear();
+            quality_trace_node_.clear();
+            if (quality_mode_ == "AGE") {
+                quality_units_ = "h";
                 add_warning("OPTIONS", "QUALITY", record.line_number,
                             "Initial water age is transferred, but EPANET extended-period "
                             "quality simulation is not executed.");
-            else if (quality_mode_ == "CHEMICAL")
+            } else if (quality_mode_ == "CHEMICAL") {
+                if (record.fields.size() > 2)
+                    quality_chemical_name_ = record.fields[2];
+                if (record.fields.size() > 3)
+                    quality_units_ = record.fields[3];
                 add_warning("OPTIONS", "QUALITY", record.line_number,
                             "Initial chemical concentration is transferred; EPANET-specific "
                             "quality sources and reactions are not.");
-            else if (quality_mode_ != "NONE")
+            } else if (quality_mode_ == "TRACE") {
+                if (record.fields.size() > 2)
+                    quality_trace_node_ = record.fields[2];
+                quality_units_ = "%";
+                add_warning("OPTIONS", "QUALITY", record.line_number,
+                            "Trace initial values are retained as node metadata, but "
+                            "EPANET trace simulation is not executed.");
+            } else if (quality_mode_ != "NONE") {
+                quality_units_ = record.fields.size() > 2
+                    ? join_fields(record.fields, 2) : "";
                 add_warning("OPTIONS", "QUALITY", record.line_number,
                             "Quality mode '" + record.fields[1] +
-                            "' has no STACI equivalent and was not transferred.");
+                            "' is retained as node metadata but is not simulated.");
+            }
         }
         else if (starts_with(record.fields, {"SPECIFIC", "GRAVITY"}))
             specific_gravity_ = number(record, 2, "specific gravity", 1.0);
@@ -296,8 +325,64 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
     const double density = 1000.0 * specific_gravity_;
     std::set<std::string> node_ids;
     std::set<std::string> edge_ids;
-    std::map<std::string, double> extra_demands;
-    std::map<std::string, double> initial_quality;
+    std::map<std::string, std::string> status_overrides;
+    std::map<std::string, double> setting_overrides;
+    std::set<std::string> handled_status_ids;
+    EpanetPumpMetadata global_pump_energy;
+    std::map<std::string, EpanetPumpMetadata> pump_energy;
+    std::map<std::string, std::vector<EpanetDemandComponent> > additional_demands;
+    std::map<std::string, EpanetInitialQuality> initial_quality;
+
+    for (const Record &record : records("STATUS")) {
+        if (record.fields.size() < 2)
+            continue;
+        const std::string status = upper(record.fields[1]);
+        if (status == "OPEN" || status == "CLOSED")
+            status_overrides[record.fields[0]] = status;
+        else {
+            const double setting = number(record, 1, "link setting", -1.0);
+            if (setting >= 0.0)
+                setting_overrides[record.fields[0]] = setting;
+            else
+                add_warning("STATUS", record.fields[0], record.line_number,
+                            "Negative link setting was not applied.");
+        }
+    }
+
+    for (const Record &record : records("ENERGY")) {
+        if (record.fields.size() < 2)
+            continue;
+        const std::string scope = upper(record.fields[0]);
+        EpanetPumpMetadata *energy = nullptr;
+        std::size_t key_index = 1;
+        if (scope == "GLOBAL") {
+            energy = &global_pump_energy;
+        } else if (scope == "PUMP" && record.fields.size() >= 4) {
+            energy = &pump_energy[record.fields[1]];
+            key_index = 2;
+        } else if (scope == "DEMAND" && record.fields.size() >= 3 &&
+                   upper(record.fields[1]) == "CHARGE") {
+            global_pump_energy.demand_charge_specified = true;
+            global_pump_energy.demand_charge = number(record, 2, "demand charge", 0.0);
+            continue;
+        }
+        if (energy == nullptr || key_index + 1 >= record.fields.size())
+            continue;
+        const std::string key = upper(record.fields[key_index]);
+        const std::size_t value_index = key_index + 1;
+        const bool global = scope == "GLOBAL";
+        if (key == "PRICE") {
+            energy->energy_price_specified = true;
+            energy->energy_price_global = global;
+            energy->energy_price = number(record, value_index, "energy price", 0.0);
+        } else if (key == "PATTERN") {
+            energy->energy_pattern_id = record.fields[value_index];
+            energy->energy_pattern_global = global;
+        } else if (key == "EFFIC" || key == "EFFICIENCY") {
+            energy->efficiency_curve_id = record.fields[value_index];
+            energy->efficiency_curve_global = global;
+        }
+    }
 
     const auto has_fields = [this](const Record &record, std::size_t count,
                                    const std::string &section) {
@@ -312,14 +397,38 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
         if (!has_fields(record, 2, "DEMANDS"))
             continue;
         const std::string pattern = record.fields.size() > 2 ? record.fields[2] : default_pattern_;
-        extra_demands[record.fields[0]] +=
-            flow_to_m3_per_hour(number(record, 1, "demand", 0.0)) *
-            first_pattern_multiplier(pattern) * demand_multiplier_;
+        const auto values = patterns_.find(pattern);
+        additional_demands[record.fields[0]].push_back(EpanetDemandComponent{
+            flow_to_m3_per_hour(number(record, 1, "demand", 0.0)) / 3600.0,
+            pattern,
+            values == patterns_.end() ? std::vector<double>() : values->second,
+            record.fields.size() > 3 ? join_fields(record.fields, 3) : "",
+            false});
     }
 
     for (const Record &record : records("QUALITY"))
-        if (has_fields(record, 2, "QUALITY"))
-            initial_quality[record.fields[0]] = number(record, 1, "initial quality", 0.0);
+        if (has_fields(record, 2, "QUALITY")) {
+            EpanetInitialQuality quality;
+            quality.specified = true;
+            quality.source_value = number(record, 1, "initial quality", 0.0);
+            quality.mode = quality_mode_;
+            quality.chemical_name = quality_chemical_name_;
+            quality.units = quality_units_;
+            quality.trace_node = quality_trace_node_;
+            initial_quality[record.fields[0]] = quality;
+        }
+
+    const auto quality_for_node = [this, &initial_quality](const std::string &id) {
+        const auto found = initial_quality.find(id);
+        if (found != initial_quality.end())
+            return found->second;
+        EpanetInitialQuality quality;
+        quality.mode = quality_mode_;
+        quality.chemical_name = quality_chemical_name_;
+        quality.units = quality_units_;
+        quality.trace_node = quality_trace_node_;
+        return quality;
+    };
 
     for (const Record &record : records("JUNCTIONS")) {
         if (!has_fields(record, 2, "JUNCTIONS"))
@@ -335,20 +444,39 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
             ? number(record, 2, "base demand", 0.0) : 0.0;
         const std::string pattern = record.fields.size() > 3
             ? record.fields[3] : default_pattern_;
-        const double demand = flow_to_m3_per_hour(base_demand) *
-            first_pattern_multiplier(pattern) * demand_multiplier_ + extra_demands[id];
-        const auto quality = initial_quality.find(id);
-        const double initial_age = quality_mode_ == "AGE" && quality != initial_quality.end()
-            ? quality->second : 0.0;
+        const auto pattern_values = patterns_.find(pattern);
+        std::vector<EpanetDemandComponent> components;
+        components.push_back(EpanetDemandComponent{
+            flow_to_m3_per_hour(base_demand) / 3600.0,
+            pattern,
+            pattern_values == patterns_.end() ? std::vector<double>() : pattern_values->second,
+            "",
+            true});
+        const auto additional = additional_demands.find(id);
+        if (additional != additional_demands.end())
+            components.insert(components.end(), additional->second.begin(), additional->second.end());
+        double demand = 0.0;
+        for (const EpanetDemandComponent &component : components) {
+            const double pattern_multiplier = component.pattern_values.empty()
+                ? 1.0 : component.pattern_values.front();
+            demand += component.base_demand_m3s * 3600.0 * pattern_multiplier;
+        }
+        demand *= demand_multiplier_;
+        const EpanetInitialQuality quality = quality_for_node(id);
+        const double initial_age = quality_mode_ == "AGE" && quality.specified
+            ? quality.source_value : 0.0;
         auto node = std::make_unique<Csomopont>(id, elevation, demand, 0.0, 0.0,
                                                 density, initial_age);
-        if (quality_mode_ == "CHEMICAL" && quality != initial_quality.end())
-            node->Set_dprop("concentration", quality->second);
+        node->SetEpanetDemandComponents(components, demand_multiplier_);
+        node->SetEpanetInitialQuality(quality);
+        if (quality_mode_ == "CHEMICAL" && quality.specified)
+            node->Set_dprop("concentration", quality.source_value);
         nodes.push_back(std::move(node));
     }
 
     double fixed_head_sum = 0.0;
     std::size_t fixed_head_count = 0;
+    std::size_t reservoir_head_pattern_count = 0;
 
     for (const Record &record : records("RESERVOIRS")) {
         if (!has_fields(record, 2, "RESERVOIRS"))
@@ -360,19 +488,30 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
             continue;
         }
         const std::string pattern = record.fields.size() > 2 ? record.fields[2] : "";
-        const double head = length_to_metres(number(record, 1, "head", 0.0)) *
-            first_pattern_multiplier(pattern);
-        const auto quality = initial_quality.find(id);
-        const double initial_age = quality_mode_ == "AGE" && quality != initial_quality.end()
-            ? quality->second : 0.0;
+        const double base_head = length_to_metres(number(record, 1, "head", 0.0));
+        const double head = base_head * first_pattern_multiplier(pattern);
+        const EpanetInitialQuality quality = quality_for_node(id);
+        const double initial_age = quality_mode_ == "AGE" && quality.specified
+            ? quality.source_value : 0.0;
         auto node = std::make_unique<Csomopont>(id, 0.0, 0.0, 0.0, head, density, initial_age);
-        if (quality_mode_ == "CHEMICAL" && quality != initial_quality.end())
-            node->Set_dprop("concentration", quality->second);
+        node->SetEpanetInitialQuality(quality);
+        if (quality_mode_ == "CHEMICAL" && quality.specified)
+            node->Set_dprop("concentration", quality.source_value);
         nodes.push_back(std::move(node));
         const std::string boundary_id = "EPANET_RESERVOIR_" + id;
         edge_ids.insert(boundary_id);
-        edges.push_back(std::make_unique<KonstNyomas>(
-            boundary_id, 1.0, id, density, head * density * 9.81, 1.0, 0.0));
+        auto boundary = std::make_unique<KonstNyomas>(
+            boundary_id, 1.0, id, density, head * density * 9.81, 1.0, 0.0);
+        const auto pattern_values = patterns_.find(pattern);
+        boundary->SetEpanetHeadPattern(EpanetHeadPattern{
+            true,
+            base_head,
+            pattern,
+            pattern_values == patterns_.end()
+                ? std::vector<double>() : pattern_values->second});
+        if (!pattern.empty())
+            ++reservoir_head_pattern_count;
+        edges.push_back(std::move(boundary));
         fixed_head_sum += head;
         ++fixed_head_count;
     }
@@ -390,13 +529,14 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
         const double initial_level = length_to_metres(number(record, 2, "initial level", 0.0));
         const double diameter = tank_diameter_to_metres(number(record, 5, "diameter", 1.0));
         const double area = 3.14159265358979323846 * diameter * diameter / 4.0;
-        const auto quality = initial_quality.find(id);
-        const double initial_age = quality_mode_ == "AGE" && quality != initial_quality.end()
-            ? quality->second : 0.0;
+        const EpanetInitialQuality quality = quality_for_node(id);
+        const double initial_age = quality_mode_ == "AGE" && quality.specified
+            ? quality.source_value : 0.0;
         auto node = std::make_unique<Csomopont>(id, 0.0, 0.0, 0.0,
                                                 elevation + initial_level, density, initial_age);
-        if (quality_mode_ == "CHEMICAL" && quality != initial_quality.end())
-            node->Set_dprop("concentration", quality->second);
+        node->SetEpanetInitialQuality(quality);
+        if (quality_mode_ == "CHEMICAL" && quality.specified)
+            node->Set_dprop("concentration", quality.source_value);
         nodes.push_back(std::move(node));
         const std::string boundary_id = "EPANET_TANK_" + id;
         edge_ids.insert(boundary_id);
@@ -436,15 +576,35 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
         normalized.erase(std::remove(normalized.begin(), normalized.end(), '-'), normalized.end());
         if (normalized == "DW" && us_customary_units_)
             roughness *= 0.3048; // EPANET US D-W roughness is in 0.001 ft; STACI uses mm.
-        if (record.fields.size() > 6 && number(record, 6, "minor loss", 0.0) != 0.0)
+        double minor_loss = record.fields.size() > 6
+            ? number(record, 6, "minor loss", 0.0) : 0.0;
+        if (minor_loss < 0.0) {
             add_warning("PIPES", id, record.line_number,
-                        "Minor-loss coefficient is not represented and was ignored.");
-        if (record.fields.size() > 7 && upper(record.fields[7]) != "OPEN")
+                        "Negative minor-loss coefficient was replaced with zero.");
+            minor_loss = 0.0;
+        }
+        const std::string inline_status = record.fields.size() > 7
+            ? upper(record.fields[7]) : "OPEN";
+        const bool check_valve = inline_status == "CV";
+        bool enabled = inline_status != "CLOSED";
+        if (inline_status != "OPEN" && inline_status != "CLOSED" &&
+            inline_status != "CV") {
             add_warning("PIPES", id, record.line_number,
-                        "Initial status '" + record.fields[7] +
-                        "' is not represented; pipe was imported open.");
-        edges.push_back(std::make_unique<Cso>(id, from, to, density, length, diameter,
-                                              roughness, 0.0, 0.0, 1.0));
+                        "Unknown initial status '" + record.fields[7] +
+                        "'; pipe was imported open.");
+            enabled = true;
+        }
+        const auto status_override = status_overrides.find(id);
+        if (status_override != status_overrides.end()) {
+            enabled = status_override->second == "OPEN";
+            handled_status_ids.insert(id);
+        }
+        auto pipe = std::make_unique<Cso>(id, from, to, density, length, diameter,
+                                          roughness, 0.0, 0.0, 1.0);
+        pipe->Set_dprop("minor_loss", minor_loss);
+        pipe->SetCheckValve(check_valve);
+        pipe->Set_enabled(enabled);
+        edges.push_back(std::move(pipe));
     }
 
     for (const Record &record : records("PUMPS")) {
@@ -463,15 +623,70 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
                         "Duplicate link ID; pump was not imported.");
             continue;
         }
-        const std::string type = upper(record.fields[3]);
-        if (type == "POWER") {
-            const double power = pump_power_to_watts(number(record, 4, "power", 0.0));
-            edges.push_back(std::make_unique<EpanetPowerPump>(id, from, to, density, power, 1.0));
-        } else if (type == "HEAD") {
-            const auto curve = curves_.find(record.fields[4]);
-            if (curve == curves_.end() || curve->second.size() < 3) {
+        EpanetPumpMetadata metadata = global_pump_energy;
+        metadata.base_speed = 1.0;
+        const auto specific_energy = pump_energy.find(id);
+        if (specific_energy != pump_energy.end()) {
+            const EpanetPumpMetadata &specific = specific_energy->second;
+            if (specific.energy_price_specified) {
+                metadata.energy_price_specified = true;
+                metadata.energy_price_global = false;
+                metadata.energy_price = specific.energy_price;
+            }
+            if (!specific.energy_pattern_id.empty()) {
+                metadata.energy_pattern_id = specific.energy_pattern_id;
+                metadata.energy_pattern_global = false;
+            }
+            if (!specific.efficiency_curve_id.empty()) {
+                metadata.efficiency_curve_id = specific.efficiency_curve_id;
+                metadata.efficiency_curve_global = false;
+            }
+        }
+        std::string definition_value;
+        for (std::size_t field = 3; field + 1 < record.fields.size(); field += 2) {
+            const std::string keyword = upper(record.fields[field]);
+            if (keyword == "POWER" || keyword == "HEAD") {
+                if (!metadata.definition.empty())
+                    add_warning("PUMPS", id, record.line_number,
+                                "Multiple POWER/HEAD definitions; the last one was used.");
+                metadata.definition = keyword;
+                definition_value = record.fields[field + 1];
+            } else if (keyword == "SPEED") {
+                metadata.base_speed = number(record, field + 1, "pump speed", 1.0);
+                if (metadata.base_speed < 0.0) {
+                    add_warning("PUMPS", id, record.line_number,
+                                "Negative pump speed was replaced with zero.");
+                    metadata.base_speed = 0.0;
+                }
+            } else if (keyword == "PATTERN") {
+                metadata.speed_pattern_id = record.fields[field + 1];
+                const auto pattern = patterns_.find(metadata.speed_pattern_id);
+                if (pattern != patterns_.end())
+                    metadata.speed_pattern_values = pattern->second;
+                else
+                    add_warning("PUMPS", id, record.line_number,
+                                "Referenced pump speed pattern was not found; base speed was used.");
+            } else {
                 add_warning("PUMPS", id, record.line_number,
-                            "Pump curve is missing or has fewer than three points; pump was not imported.");
+                            "Unknown pump keyword '" + record.fields[field] + "' was retained only in the INP document.");
+            }
+        }
+        if ((record.fields.size() - 3) % 2 != 0)
+            add_warning("PUMPS", id, record.line_number,
+                        "Pump keyword without a value was ignored.");
+        const std::string type = metadata.definition;
+        std::unique_ptr<Agelem> pump;
+        if (type == "POWER") {
+            Record value_record = record;
+            value_record.fields = {id, definition_value};
+            const double power = pump_power_to_watts(number(value_record, 1, "power", 0.0));
+            pump = std::make_unique<EpanetPowerPump>(id, from, to, density, power, 1.0);
+        } else if (type == "HEAD") {
+            metadata.head_curve_id = definition_value;
+            const auto curve = curves_.find(metadata.head_curve_id);
+            if (curve == curves_.end() || curve->second.empty()) {
+                add_warning("PUMPS", id, record.line_number,
+                            "Pump curve is missing or empty; pump was not imported.");
                 continue;
             }
             std::vector<double> flow;
@@ -479,15 +694,57 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
             for (const auto &point : curve->second) {
                 flow.push_back(flow_to_m3_per_hour(point.first));
                 head.push_back(length_to_metres(point.second));
+                metadata.head_curve_points.push_back(std::make_pair(
+                    flow_to_m3_per_hour(point.first) / 3600.0,
+                    length_to_metres(point.second)));
             }
-            edges.push_back(std::make_unique<Szivattyu>(id, from, to, density, 1.0, flow, head, 1.0));
+            if (flow.size() == 1) {
+                const double design_flow = flow.front();
+                const double design_head = head.front();
+                flow = {0.0, design_flow, 2.0 * design_flow};
+                head = {4.0 * design_head / 3.0, design_head, 0.0};
+            } else if (flow.size() == 2) {
+                flow.push_back(2.0 * flow.back());
+                head.push_back(std::max(0.0, 2.0 * head.back() - head.front()));
+            }
+            pump = std::make_unique<Szivattyu>(id, from, to, density, 1.0, flow, head, 1.0);
         } else {
             add_warning("PUMPS", id, record.line_number,
                         "Unsupported pump parameter syntax; pump was not imported.");
         }
-        if (record.fields.size() > 5)
-            add_warning("PUMPS", id, record.line_number,
-                        "Additional pump speed/pattern parameters are not represented.");
+        if (pump != nullptr) {
+            if (!metadata.energy_pattern_id.empty()) {
+                const auto pattern = patterns_.find(metadata.energy_pattern_id);
+                if (pattern != patterns_.end())
+                    metadata.energy_pattern_values = pattern->second;
+            }
+            if (!metadata.efficiency_curve_id.empty()) {
+                const auto curve = curves_.find(metadata.efficiency_curve_id);
+                if (curve != curves_.end())
+                    for (const auto &point : curve->second)
+                        metadata.efficiency_curve_points.push_back(std::make_pair(
+                            flow_to_m3_per_hour(point.first) / 3600.0, point.second));
+            }
+            const auto setting_override = setting_overrides.find(id);
+            if (setting_override != setting_overrides.end()) {
+                metadata.initial_setting_specified = true;
+                metadata.initial_setting = setting_override->second;
+                pump->Set_enabled(setting_override->second > 0.0);
+                handled_status_ids.insert(id);
+            }
+            auto *configuration = dynamic_cast<EpanetPumpConfigurable *>(pump.get());
+            configuration->SetEpanetPumpMetadata(metadata);
+            if (!metadata.speed_pattern_values.empty())
+                configuration->SetOperatingSpeed(metadata.speed_pattern_values.front());
+            else if (metadata.initial_setting_specified)
+                configuration->SetOperatingSpeed(metadata.initial_setting);
+            const auto status_override = status_overrides.find(id);
+            if (status_override != status_overrides.end()) {
+                pump->Set_enabled(status_override->second == "OPEN");
+                handled_status_ids.insert(id);
+            }
+            edges.push_back(std::move(pump));
+        }
     }
 
     for (const Record &record : records("VALVES")) {
@@ -496,20 +753,36 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
                     "EPANET valve types/settings have no equivalent STACI element; valve was not imported.");
     }
 
+    for (const auto &status : status_overrides)
+        if (handled_status_ids.count(status.first) == 0)
+            add_warning("STATUS", status.first, 0,
+                        "The referenced imported link was not found or does not support status.");
+    for (const auto &setting : setting_overrides)
+        if (handled_status_ids.count(setting.first) == 0)
+            add_warning("STATUS", setting.first, 0,
+                        "Numeric settings are currently supported only for imported pumps.");
+
     if (!extended_period_)
         for (const Record &record : records("CONTROLS"))
             add_warning("CONTROLS", record.fields.size() > 1 ? record.fields[1] : "",
                         record.line_number,
                         "Dynamic link control was parsed but is not executed by steady-state STACI.");
 
+    std::size_t demand_component_count = 0;
+    std::size_t initial_quality_count = 0;
+    for (const std::unique_ptr<Csomopont> &node : nodes) {
+        demand_component_count += node->GetEpanetDemandComponents().size();
+        if (node->GetEpanetInitialQuality().specified)
+            ++initial_quality_count;
+    }
     warn_for_unsupported_sections();
-    print_report(nodes.size(), edges.size());
+    print_report(nodes.size(), edges.size(), demand_component_count,
+                 initial_quality_count, reservoir_head_pattern_count);
 }
 
 void EpanetReader::warn_for_unsupported_sections() {
     const std::vector<std::pair<std::string, std::string> > unsupported = {
         {"RULES", "Rule-based controls are not executed by STACI."},
-        {"STATUS", "Initial link status/settings are not represented by the steady-state importer."},
         {"EMITTERS", "Pressure-dependent emitters are not represented."},
         {"SOURCES", "EPANET water-quality sources are not represented."},
         {"REACTIONS", "EPANET reaction options are not transferred to STACI's transport model."},
@@ -524,20 +797,13 @@ void EpanetReader::warn_for_unsupported_sections() {
 
     if (has_records("PATTERNS") && !extended_period_)
         add_warning("PATTERNS", "", records("PATTERNS").front().line_number,
-                    "Only the first multiplier is applied to the imported steady-state snapshot.");
-
-    if (has_records("DEMANDS"))
-        for (const Record &record : records("DEMANDS"))
-            if (record.fields.size() > 3) {
-                add_warning("DEMANDS", "", record.line_number,
-                            "Demand category labels are not stored; their demands were summed.");
-                break;
-            }
+                    "All multipliers are retained; only the first is applied to the "
+                    "imported steady-state snapshot.");
 
     if (has_records("QUALITY") && quality_mode_ != "AGE" && quality_mode_ != "CHEMICAL")
         add_warning("QUALITY", "", records("QUALITY").front().line_number,
-                    "Initial quality values were parsed but cannot be represented for quality mode '" +
-                    quality_mode_ + "'.");
+                    "Initial quality values are retained as metadata for quality mode '" +
+                    quality_mode_ + "', but are not simulated.");
 
     static const std::set<std::string> known = {
         "TITLE", "JUNCTIONS", "RESERVOIRS", "TANKS", "PIPES", "PUMPS",
@@ -554,11 +820,18 @@ void EpanetReader::warn_for_unsupported_sections() {
 }
 
 void EpanetReader::print_report(std::size_t node_count,
-                                std::size_t edge_count) const {
+                                std::size_t edge_count,
+                                std::size_t demand_component_count,
+                                std::size_t initial_quality_count,
+                                std::size_t reservoir_head_pattern_count) const {
     std::cerr << "\nEPANET import: " << filename_ << "\n"
               << "  units: " << flow_units_ << "\n"
               << "  imported STACI nodes: " << node_count << "\n"
               << "  imported STACI elements: " << edge_count << "\n"
+              << "  preserved demand components: " << demand_component_count << "\n"
+              << "  preserved initial quality values: " << initial_quality_count << "\n"
+              << "  preserved reservoir head patterns: "
+              << reservoir_head_pattern_count << "\n"
               << "  compatibility warnings: " << warnings_.size() << "\n";
     for (const Warning &warning : warnings_) {
         std::cerr << "WARNING [EPANET][" << warning.section << "]";

@@ -1,11 +1,16 @@
 #include "Agelem.h"
+#include "EpanetPump.h"
 
-class Szivattyu: public Agelem {
+class Szivattyu: public Agelem, public EpanetPumpConfigurable {
 private:
 	vector<double> q, H, p;
 	double a, b, c;
 	int fokszam;
 	double mer_szorzo;
+	double operating_speed;
+	EpanetPumpMetadata metadata;
+	double BasePumpCharCurve(double flow_m3s);
+	double BasePumpCharCurveDerivative(double flow_m3s) const;
 public:
 	Szivattyu(const string &nev, const string &a_cspe_nev,
 			const string &a_cspv_nev, double a_ro, double Aref, const vector<double> &q,
@@ -32,4 +37,8 @@ public:
 	const vector<double> &GetCurveHead() const {
 		return H;
 	}
+	void SetEpanetPumpMetadata(const EpanetPumpMetadata &value) override;
+	const EpanetPumpMetadata &GetEpanetPumpMetadata() const override { return metadata; }
+	void SetOperatingSpeed(double value) override;
+	double GetOperatingSpeed() const override { return operating_speed; }
 };

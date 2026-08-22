@@ -1,8 +1,11 @@
 #include "epanet_writer.h"
 
 #include "Agelem.h"
+#include "Cso.h"
 #include "Csomopont.h"
 #include "EpanetPowerPump.h"
+#include "EpanetPump.h"
+#include "KonstNyomas.h"
 #include "Szivattyu.h"
 #include "epanet_document.h"
 
@@ -135,13 +138,42 @@ void EpanetWriter::write(const std::string &filename,
     }
 
     output << "[TITLE]\nSTACI EPANET export\n\n[JUNCTIONS]\n"
-           << ";ID\tElevation\tDemand\n";
+           << ";ID\tElevation\tDemand\tPattern\n";
     for (Csomopont *node : nodes) {
         const std::string name = node->Get_nev();
         if (reservoir_nodes.count(name) || tank_nodes.count(name))
             continue;
-        output << node_ids[name] << '\t' << node->Get_h() << '\t'
-               << node->Get_dprop("demand") / 3.6 << '\n';
+        const std::vector<EpanetDemandComponent> &components =
+            node->GetEpanetDemandComponents();
+        const auto primary = std::find_if(
+            components.begin(), components.end(),
+            [](const EpanetDemandComponent &component) { return component.primary; });
+        output << node_ids[name] << '\t' << node->Get_h() << '\t';
+        if (primary == components.end()) {
+            output << node->Get_dprop("demand") / 3.6;
+        } else {
+            output << primary->base_demand_m3s * 1000.0;
+            if (!primary->pattern_id.empty())
+                output << '\t' << primary->pattern_id;
+        }
+        output << '\n';
+    }
+
+    output << "\n[DEMANDS]\n;Junction\tDemand\tPattern\tCategory\n";
+    for (Csomopont *node : nodes) {
+        const std::string name = node->Get_nev();
+        if (reservoir_nodes.count(name) || tank_nodes.count(name))
+            continue;
+        for (const EpanetDemandComponent &component : node->GetEpanetDemandComponents()) {
+            if (component.primary)
+                continue;
+            output << node_ids[name] << '\t' << component.base_demand_m3s * 1000.0;
+            if (!component.pattern_id.empty() || !component.category.empty())
+                output << '\t' << component.pattern_id;
+            if (!component.category.empty())
+                output << '\t' << component.category;
+            output << '\n';
+        }
     }
 
     output << "\n[RESERVOIRS]\n;ID\tHead\n";
@@ -154,8 +186,18 @@ void EpanetWriter::write(const std::string &filename,
                       << "]: boundary node was not found; element skipped.\n";
             continue;
         }
-        output << node_ids[node_name] << '\t'
-               << edge->Get_dprop("head") + nodes_by_name[node_name]->Get_h() << '\n';
+        auto *boundary = dynamic_cast<KonstNyomas *>(edge);
+        const EpanetHeadPattern *head_pattern = boundary == nullptr
+            ? nullptr : &boundary->GetEpanetHeadPattern();
+        output << node_ids[node_name] << '\t';
+        if (head_pattern != nullptr && head_pattern->specified) {
+            output << head_pattern->base_head_m;
+            if (!head_pattern->pattern_id.empty())
+                output << '\t' << head_pattern->pattern_id;
+        } else {
+            output << edge->Get_dprop("head") + nodes_by_name[node_name]->Get_h();
+        }
+        output << '\n';
     }
 
     output << "\n[TANKS]\n;ID\tElevation\tInitLevel\tMinLevel\tMaxLevel\tDiameter\tMinVolume\n";
@@ -189,10 +231,23 @@ void EpanetWriter::write(const std::string &filename,
                << node_ids[from] << '\t' << node_ids[to] << '\t'
                << edge->Get_dprop("length") << '\t'
                << edge->Get_dprop("diameter") * 1000.0 << '\t'
-               << edge->Get_dprop("friction_coeff") << "\t0\tOpen\n";
+               << edge->Get_dprop("friction_coeff") << '\t'
+               << edge->Get_dprop("minor_loss") << '\t';
+        auto *pipe = dynamic_cast<Cso *>(edge);
+        if (pipe != nullptr && pipe->IsCheckValve())
+            output << "CV\n";
+        else
+            output << (edge->Is_enabled() ? "Open\n" : "Closed\n");
     }
 
-    std::vector<std::pair<std::string, Szivattyu *> > curve_pumps;
+    struct ExportedPump {
+        std::string id;
+        Agelem *edge;
+        EpanetPumpConfigurable *configuration;
+        Szivattyu *curve_pump;
+        std::string curve_id;
+    };
+    std::vector<ExportedPump> exported_pumps;
     output << "\n[PUMPS]\n;ID\tNode1\tNode2\tParameters\n";
     for (Agelem *edge : edges) {
         auto *power_pump = dynamic_cast<EpanetPowerPump *>(edge);
@@ -204,33 +259,171 @@ void EpanetWriter::write(const std::string &filename,
         if (node_ids.count(from) == 0 || node_ids.count(to) == 0)
             continue;
         const std::string link_id = safe_id(edge->Get_nev(), used_link_ids);
+        auto *configuration = dynamic_cast<EpanetPumpConfigurable *>(edge);
+        const EpanetPumpMetadata *metadata = configuration == nullptr
+            ? nullptr : &configuration->GetEpanetPumpMetadata();
         output << link_id << '\t' << node_ids[from] << '\t' << node_ids[to] << '\t';
+        std::string curve_id;
         if (power_pump != nullptr) {
-            output << "POWER\t" << power_pump->Get_dprop("power") / 1000.0 << '\n';
+            output << "POWER\t" << power_pump->Get_dprop("power") / 1000.0;
         } else {
-            const std::string curve_id = "STACI_CURVE_" + std::to_string(curve_pumps.size() + 1);
-            output << "HEAD\t" << curve_id << '\n';
-            curve_pumps.push_back(std::make_pair(curve_id, curve_pump));
+            curve_id = metadata != nullptr && !metadata->head_curve_id.empty()
+                ? metadata->head_curve_id
+                : "STACI_CURVE_" + std::to_string(exported_pumps.size() + 1);
+            output << "HEAD\t" << curve_id;
         }
+        if (metadata != nullptr && metadata->base_speed != 1.0)
+            output << "\tSPEED\t" << metadata->base_speed;
+        if (metadata != nullptr && !metadata->speed_pattern_id.empty())
+            output << "\tPATTERN\t" << metadata->speed_pattern_id;
+        output << '\n';
+        exported_pumps.push_back(
+            ExportedPump{link_id, edge, configuration, curve_pump, curve_id});
     }
 
     output << "\n[CURVES]\n;ID\tFlow\tHead\n";
-    for (const auto &entry : curve_pumps) {
-        const std::vector<double> flow = entry.second->GetCurveFlowM3PerHour();
-        const std::vector<double> &head = entry.second->GetCurveHead();
+    std::set<std::string> written_curve_ids;
+    for (const ExportedPump &pump : exported_pumps) {
+        if (pump.curve_pump == nullptr)
+            continue;
+        const EpanetPumpMetadata *metadata = pump.configuration == nullptr
+            ? nullptr : &pump.configuration->GetEpanetPumpMetadata();
+        if (!written_curve_ids.insert(pump.curve_id).second)
+            continue;
         std::vector<std::pair<double, double> > points;
-        for (std::size_t i = 0; i < flow.size() && i < head.size(); ++i)
-            points.push_back(std::make_pair(flow[i], head[i]));
-        std::sort(points.begin(), points.end());
+        const bool retained_points =
+            metadata != nullptr && !metadata->head_curve_points.empty();
+        if (retained_points) {
+            for (const auto &point : metadata->head_curve_points)
+                points.push_back(std::make_pair(point.first * 1000.0, point.second));
+        } else {
+            const std::vector<double> flow = pump.curve_pump->GetCurveFlowM3PerHour();
+            const std::vector<double> &head = pump.curve_pump->GetCurveHead();
+            for (std::size_t i = 0; i < flow.size() && i < head.size(); ++i)
+                points.push_back(std::make_pair(flow[i] / 3.6, head[i]));
+        }
+        if (!retained_points)
+            std::sort(points.begin(), points.end());
         for (const auto &point : points)
-            output << entry.first << '\t' << point.first / 3.6 << '\t' << point.second << '\n';
+            output << pump.curve_id << '\t' << point.first << '\t' << point.second << '\n';
+    }
+    for (const ExportedPump &pump : exported_pumps) {
+        if (pump.configuration == nullptr)
+            continue;
+        const EpanetPumpMetadata &metadata = pump.configuration->GetEpanetPumpMetadata();
+        if (metadata.efficiency_curve_id.empty() ||
+            metadata.efficiency_curve_points.empty() ||
+            !written_curve_ids.insert(metadata.efficiency_curve_id).second)
+            continue;
+        for (const auto &point : metadata.efficiency_curve_points)
+            output << metadata.efficiency_curve_id << '\t'
+                   << point.first * 1000.0 << '\t' << point.second << '\n';
+    }
+
+    std::map<std::string, std::vector<double> > demand_patterns;
+    for (Csomopont *node : nodes) {
+        for (const EpanetDemandComponent &component : node->GetEpanetDemandComponents()) {
+            if (component.pattern_id.empty() || component.pattern_values.empty())
+                continue;
+            const auto inserted = demand_patterns.emplace(
+                component.pattern_id, component.pattern_values);
+            if (!inserted.second && inserted.first->second != component.pattern_values)
+                std::cerr << "WARNING [EPANET][EXPORT][" << component.pattern_id
+                          << "]: conflicting retained demand patterns; the first was used.\n";
+        }
+    }
+    for (Agelem *edge : edges) {
+        auto *boundary = dynamic_cast<KonstNyomas *>(edge);
+        if (boundary == nullptr)
+            continue;
+        const EpanetHeadPattern &head_pattern = boundary->GetEpanetHeadPattern();
+        if (head_pattern.pattern_id.empty() || head_pattern.pattern_values.empty())
+            continue;
+        const auto inserted = demand_patterns.emplace(
+            head_pattern.pattern_id, head_pattern.pattern_values);
+        if (!inserted.second && inserted.first->second != head_pattern.pattern_values)
+            std::cerr << "WARNING [EPANET][EXPORT][" << head_pattern.pattern_id
+                      << "]: conflicting retained patterns; the first was used.\n";
+    }
+    for (const ExportedPump &pump : exported_pumps) {
+        if (pump.configuration == nullptr)
+            continue;
+        const EpanetPumpMetadata &metadata = pump.configuration->GetEpanetPumpMetadata();
+        if (!metadata.speed_pattern_id.empty() && !metadata.speed_pattern_values.empty())
+            demand_patterns.emplace(metadata.speed_pattern_id, metadata.speed_pattern_values);
+        if (!metadata.energy_pattern_id.empty() && !metadata.energy_pattern_values.empty())
+            demand_patterns.emplace(metadata.energy_pattern_id, metadata.energy_pattern_values);
+    }
+    output << "\n[PATTERNS]\n;ID\tMultipliers\n";
+    for (const auto &pattern : demand_patterns) {
+        output << pattern.first;
+        for (double multiplier : pattern.second)
+            output << '\t' << multiplier;
+        output << '\n';
+    }
+
+    output << "\n[STATUS]\n;ID\tStatus/Setting\n";
+    for (const ExportedPump &pump : exported_pumps) {
+        const EpanetPumpMetadata *metadata = pump.configuration == nullptr
+            ? nullptr : &pump.configuration->GetEpanetPumpMetadata();
+        if (!pump.edge->Is_enabled())
+            output << pump.id << "\tClosed\n";
+        else if (metadata != nullptr && metadata->initial_setting_specified)
+            output << pump.id << '\t' << metadata->initial_setting << '\n';
+    }
+
+    output << "\n[ENERGY]\n";
+    bool global_price_written = false;
+    bool global_pattern_written = false;
+    bool global_efficiency_written = false;
+    bool demand_charge_written = false;
+    for (const ExportedPump &pump : exported_pumps) {
+        if (pump.configuration == nullptr)
+            continue;
+        const EpanetPumpMetadata &metadata = pump.configuration->GetEpanetPumpMetadata();
+        if (metadata.energy_price_specified) {
+            if (metadata.energy_price_global && !global_price_written) {
+                output << "GLOBAL\tPRICE\t" << metadata.energy_price << '\n';
+                global_price_written = true;
+            } else if (!metadata.energy_price_global) {
+                output << "PUMP\t" << pump.id << "\tPRICE\t"
+                       << metadata.energy_price << '\n';
+            }
+        }
+        if (!metadata.energy_pattern_id.empty()) {
+            if (metadata.energy_pattern_global && !global_pattern_written) {
+                output << "GLOBAL\tPATTERN\t" << metadata.energy_pattern_id << '\n';
+                global_pattern_written = true;
+            } else if (!metadata.energy_pattern_global) {
+                output << "PUMP\t" << pump.id << "\tPATTERN\t"
+                       << metadata.energy_pattern_id << '\n';
+            }
+        }
+        if (!metadata.efficiency_curve_id.empty()) {
+            if (metadata.efficiency_curve_global && !global_efficiency_written) {
+                output << "GLOBAL\tEFFIC\t" << metadata.efficiency_curve_id << '\n';
+                global_efficiency_written = true;
+            } else if (!metadata.efficiency_curve_global) {
+                output << "PUMP\t" << pump.id << "\tEFFIC\t"
+                       << metadata.efficiency_curve_id << '\n';
+            }
+        }
+        if (metadata.demand_charge_specified && !demand_charge_written) {
+            output << "DEMAND\tCHARGE\t" << metadata.demand_charge << '\n';
+            demand_charge_written = true;
+        }
     }
 
     output << "\n[QUALITY]\n;Node\tInitQual\n";
     for (Csomopont *node : nodes) {
-        const double concentration = node->Get_dprop("concentration");
-        if (concentration != 0.0)
-            output << node_ids[node->Get_nev()] << '\t' << concentration << '\n';
+        const EpanetInitialQuality &quality = node->GetEpanetInitialQuality();
+        if (quality.specified) {
+            output << node_ids[node->Get_nev()] << '\t' << quality.source_value << '\n';
+        } else {
+            const double concentration = node->Get_dprop("concentration");
+            if (concentration != 0.0)
+                output << node_ids[node->Get_nev()] << '\t' << concentration << '\n';
+        }
     }
 
     for (Agelem *edge : edges) {
@@ -244,9 +437,34 @@ void EpanetWriter::write(const std::string &filename,
     std::string headloss = upper(friction_model);
     if (headloss != "HW" && headloss != "DW")
         headloss = "DW";
+    double demand_multiplier = 1.0;
+    const EpanetInitialQuality *quality_metadata = nullptr;
+    for (Csomopont *node : nodes) {
+        if (!node->GetEpanetDemandComponents().empty())
+            demand_multiplier = node->GetEpanetDemandMultiplier();
+        if (quality_metadata == nullptr &&
+            (node->GetEpanetInitialQuality().specified ||
+             node->GetEpanetInitialQuality().mode != "NONE"))
+            quality_metadata = &node->GetEpanetInitialQuality();
+    }
     output << "\n[OPTIONS]\nUNITS\tLPS\nHEADLOSS\t"
-           << (headloss == "HW" ? "H-W" : "D-W")
-           << "\nQUALITY\tCHEMICAL\tSTACI\tmg/L\n\n[TIMES]\nDURATION\t0\n\n[END]\n";
+           << (headloss == "HW" ? "H-W" : "D-W") << '\n';
+    if (quality_metadata == nullptr) {
+        output << "QUALITY\tCHEMICAL\tSTACI\tmg/L\n";
+    } else if (quality_metadata->mode == "CHEMICAL") {
+        output << "QUALITY\tCHEMICAL\t"
+               << (quality_metadata->chemical_name.empty()
+                       ? "STACI" : quality_metadata->chemical_name)
+               << '\t'
+               << (quality_metadata->units.empty() ? "mg/L" : quality_metadata->units)
+               << '\n';
+    } else if (quality_metadata->mode == "TRACE") {
+        output << "QUALITY\tTRACE\t" << quality_metadata->trace_node << '\n';
+    } else {
+        output << "QUALITY\t" << quality_metadata->mode << '\n';
+    }
+    output << "DEMAND MULTIPLIER\t" << demand_multiplier
+           << "\n\n[TIMES]\nDURATION\t0\n\n[END]\n";
 
     std::cerr << "EPANET export: wrote " << filename << " using metric LPS units.\n";
 }
@@ -312,6 +530,11 @@ void EpanetWriter::write_modified_copy(const std::string &input_filename,
         target_section = "PIPES";
         target_field = 4;
         output_value = pipe_diameter_from_metres(value_si, us_units);
+    } else if (property == "minor_loss") {
+        target_section = "PIPES";
+        target_field = 6;
+        if (value_si < 0.0)
+            throw std::runtime_error("Pipe minor-loss coefficient cannot be negative.");
     } else if (property == "demand") {
         target_section = "JUNCTIONS";
         target_field = 2;

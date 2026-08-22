@@ -34,6 +34,16 @@ KonstNyomas::~KonstNyomas() {
 }
 
 //--------------------------------------------------------------
+void KonstNyomas::SetEpanetHeadPattern(const EpanetHeadPattern &head_pattern) {
+    epanet_head_pattern = head_pattern;
+}
+
+//--------------------------------------------------------------
+const EpanetHeadPattern &KonstNyomas::GetEpanetHeadPattern() const {
+    return epanet_head_pattern;
+}
+
+//--------------------------------------------------------------
 string KonstNyomas::Info() {
     ostringstream strstrm;
     strstrm << Agelem::Info();

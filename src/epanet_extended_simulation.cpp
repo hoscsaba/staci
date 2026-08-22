@@ -2,6 +2,7 @@
 
 #include "Agelem.h"
 #include "Csomopont.h"
+#include "EpanetPump.h"
 #include "Staci.h"
 #include "eps_result_writer.h"
 
@@ -201,11 +202,18 @@ public:
 
         for (const auto &status : initial_status_) {
             const auto link = links.find(status.first);
-            if (link != links.end() && is_pump(link->second))
+            if (link != links.end())
                 link->second->Set_enabled(status.second);
-            else if (link != links.end())
-                warn("STATUS", status.first, 0,
-                     "EPS status switching is currently implemented only for pumps.");
+        }
+        for (const auto &setting : initial_settings_) {
+            const auto link = links.find(setting.first);
+            if (link == links.end())
+                continue;
+            auto *pump = dynamic_cast<EpanetPumpConfigurable *>(link->second);
+            if (pump != nullptr) {
+                pump->SetOperatingSpeed(setting.second);
+                link->second->Set_enabled(setting.second > 0.0);
+            }
         }
 
         std::vector<EpsNodeInfo> result_nodes;
@@ -327,6 +335,7 @@ public:
         while (time_s <= duration_s_) {
             apply_demands(nodes, time_s);
             apply_reservoir_heads(reservoirs, time_s);
+            apply_pump_speeds(links, time_s);
             for (TankState &tank : tanks) {
                 tank.boundary->Set_dprop("water_level", tank.level_m);
                 tank.boundary->Set_enabled(true);
@@ -400,6 +409,7 @@ private:
     std::vector<ReservoirState> reservoir_definitions_;
     std::vector<LevelControl> controls_;
     std::map<std::string, bool> initial_status_;
+    std::map<std::string, double> initial_settings_;
     std::vector<std::string> warnings_;
     std::set<std::string> warning_keys_;
     std::set<std::string> missing_patterns_;
@@ -569,9 +579,14 @@ private:
             const std::string status = upper(record.fields[1]);
             if (status == "OPEN" || status == "CLOSED")
                 initial_status_[record.fields[0]] = status == "OPEN";
-            else
-                warn("STATUS", record.fields[0], record.line_number,
-                     "Numeric link settings are not executed in EPS mode.");
+            else {
+                const double setting = parse_number(record.fields[1], "[STATUS]");
+                if (setting < 0.0)
+                    warn("STATUS", record.fields[0], record.line_number,
+                         "Negative link settings are not supported.");
+                else
+                    initial_settings_[record.fields[0]] = setting;
+            }
         }
     }
 
@@ -609,6 +624,21 @@ private:
         for (ReservoirState &reservoir : reservoirs)
             reservoir.boundary->Set_dprop(
                 "head", reservoir.base_head_m * pattern_value(reservoir.pattern_id, time_s));
+    }
+
+    void apply_pump_speeds(const std::map<std::string, Agelem *> &links,
+                           long long time_s) {
+        for (const auto &link : links) {
+            auto *pump = dynamic_cast<EpanetPumpConfigurable *>(link.second);
+            if (pump == nullptr)
+                continue;
+            const EpanetPumpMetadata &metadata = pump->GetEpanetPumpMetadata();
+            const double speed = !metadata.speed_pattern_id.empty()
+                ? pattern_value(metadata.speed_pattern_id, time_s)
+                : (metadata.initial_setting_specified
+                       ? metadata.initial_setting : metadata.base_speed);
+            pump->SetOperatingSpeed(speed);
+        }
     }
 
     void apply_controls(const std::map<std::string, Agelem *> &links,
@@ -688,7 +718,10 @@ private:
                 ? flow / area : std::numeric_limits<double>::quiet_NaN());
             frame.link_headloss_m.push_back(
                 total_head[link->Get_Cspe_Nev()] - total_head[link->Get_Cspv_Nev()]);
-            frame.link_status.push_back(link->Is_enabled() ? 1 : 0);
+            if (is_pump(link))
+                frame.link_status.push_back(link->Get_dprop("status") != 0.0 ? 1 : 0);
+            else
+                frame.link_status.push_back(link->Is_enabled() ? 1 : 0);
         }
         for (const TankState &tank : tanks) {
             frame.tank_level_m.push_back(tank.level_m);

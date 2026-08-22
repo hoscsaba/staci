@@ -4,6 +4,25 @@
 #include <string>
 #include <vector>
 
+struct EpanetDemandComponent
+{
+    double base_demand_m3s = 0.0;
+    std::string pattern_id;
+    std::vector<double> pattern_values;
+    std::string category;
+    bool primary = false;
+};
+
+struct EpanetInitialQuality
+{
+    bool specified = false;
+    double source_value = 0.0;
+    std::string mode = "NONE";
+    std::string chemical_name;
+    std::string units;
+    std::string trace_node;
+};
+
 class Csomopont
 {
 public:
@@ -35,6 +54,12 @@ private:
     int index;
     /// custom data
     double user1, user2;
+    /// Structured EPANET junction demands, retained separately from the
+    /// aggregate demand used by the steady-state hydraulic equations.
+    std::vector<EpanetDemandComponent> epanet_demand_components;
+    double epanet_demand_multiplier;
+    /// Original per-node EPANET initial-quality value and its interpretation.
+    EpanetInitialQuality epanet_initial_quality;
 
 
 public:
@@ -117,6 +142,15 @@ public:
     double Get_user2() {
         return user2;
     }
+
+    void SetEpanetDemandComponents(
+        const std::vector<EpanetDemandComponent> &components,
+        double demand_multiplier);
+    const std::vector<EpanetDemandComponent> &GetEpanetDemandComponents() const;
+    double GetEpanetDemandMultiplier() const;
+
+    void SetEpanetInitialQuality(const EpanetInitialQuality &quality);
+    const EpanetInitialQuality &GetEpanetInitialQuality() const;
 
 
     /// Inicializ�ci�

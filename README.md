@@ -9,6 +9,16 @@ The project is written in C++17 and built with CMake. It supports GCC and Clang
 on Linux and macOS, and MSVC on Windows. The numerical solver uses UMFPACK from
 SuiteSparse.
 
+Compared with EPANET's water-distribution focus, STACI additionally provides:
+
+- native stationary open-channel elements with rectangular, circular and
+  arbitrary cross-sections, plus overflow/weir elements;
+- hydraulic parameter and demand-sensitivity calculations;
+- pagmo2-based pipe calibration and graph-aware network partitioning for
+  sensor-placement studies;
+- chunked, incrementally written HDF5 EPS results with SI arrays and explicit
+  node/link index mappings.
+
 ## Capabilities
 
 STACI can:
@@ -298,21 +308,27 @@ STACI recognizes the `.inp` extension automatically. For example:
 The importer reads every EPANET section and reports a warning for data that
 does not have a STACI equivalent. It currently transfers:
 
-- junction elevations, demands, demand multipliers, initial quality, and the
-  first multiplier of demand patterns;
-- reservoir heads and tank initial levels as fixed hydraulic boundaries;
+- junction elevations, separate demand categories, category labels, pattern
+  references and complete demand-pattern series, demand multipliers, and
+  per-node initial-quality metadata; the steady snapshot applies the first
+  multiplier while retaining the remaining values;
+- reservoir base heads, complete head-pattern references and multiplier series,
+  and tank initial levels as fixed hydraulic boundaries;
 - pipes, with EPANET-to-SI conversion for flow, length, diameter, and
-  Darcy-Weisbach roughness;
+  Darcy-Weisbach roughness, dimensionless minor-loss coefficients,
+  `Open`/`Closed` status overrides, and one-way `CV` operation;
 - Hazen-Williams and Darcy-Weisbach head-loss selection;
-- pump head curves and constant-power pumps;
+- pump head curves and constant-power pumps, including initial status,
+  relative speed, speed patterns, original curve IDs, and retained energy and
+  efficiency references;
 - relevant solver settings such as trial count and accuracy (the latter is an
   approximate mapping because the convergence criteria differ);
 - a lossless EPANET document containing the original text, section and record
   order, line endings, inline comments and their record IDs, tags, map data,
   and non-hydraulic run configuration.
 
-Extended-period patterns, dynamic tank storage, controls and rules, valves,
-emitters, and water-quality sources/reactions are parsed but not simulated.
+Rule-based controls, most valve controls, emitters, and water-quality
+sources/reactions are parsed but not simulated.
 Descriptive metadata, map sections, and non-hydraulic run configuration do not
 affect the hydraulic snapshot, but they remain attached to the imported
 EPANET document for lossless export. Each incompatible calculation feature is
@@ -358,20 +374,19 @@ EPANET field is supported yet.
 
 | Order | EPANET element | Closest STACI representation | Current mapping | Work needed for complete compatibility |
 |---:|---|---|---|---|
-| 1 | Junction | `Csomopont` | **Direct, partial fields** | Preserve separate demand categories, pattern references and all initial-quality data instead of reducing them to the steady-state values used by the solver. |
-| 2 | Reservoir | `Csomopont` + `KonstNyomas` | **Direct, partial fields** | Preserve and apply the complete head-pattern reference; the fixed-head hydraulic representation already matches a steady EPANET reservoir. |
-| 3 | Pipe | `Cso` | **Direct, partial fields** | Add minor-loss coefficients, initial and `[STATUS]` state, and the `CV` variant. Length, diameter, roughness and the main friction model are already mapped. |
-| 4 | Pump, `POWER` form | `EpanetPowerPump` | **Direct, partial fields** | Preserve status, speed, speed pattern, efficiency and energy references. The constant-power definition is already imported and exported. |
-| 5 | Pump, `HEAD` curve form | `Szivattyu` | **Direct, partial fields** | Retain the original curve ID and all pump attributes. Import currently requires a referenced curve with at least three points and converts it to STACI's pump curve representation. |
+| 1 | Junction | `Csomopont` | **Direct; structured metadata retained** | |
+| 2 | Reservoir | `Csomopont` + `KonstNyomas` | **Direct; complete head pattern retained and applied** | |
+| 3 | Pipe | `Cso`, including one-way `CV` mode | **Direct; hydraulic and status fields retained and applied** | |
+| 4 | Pump, `POWER` form | `EpanetPowerPump` | **Direct; definition, status, speed, patterns and energy metadata retained** | |
+| 5 | Pump, `HEAD` curve form | `Szivattyu` | **Direct; original curve and all pump attributes retained** | |
 | 6 | Tank | `Csomopont` + `Vegakna` | **Approximate** | Represent minimum/maximum level, minimum volume, volume curve and mixing data. The importer currently uses initial level and tank area as a steady fixed boundary; native export must infer missing operating limits. |
-| 7 | Check-valve pipe (`CV`) | `VisszacsapoSzelep` | **STACI type exists; not connected to INP import/export** | Instantiate and export the check-valve type while retaining the pipe's length, diameter, roughness and minor-loss data. |
-| 8 | Throttle control valve (`TCV`) | `JelleggorbesFojtas` | **Similar STACI type exists; not mapped** | Define the exact conversion between the EPANET loss setting and STACI's opening/loss-curve parameters, including status and minor loss. |
-| 9 | General-purpose valve (`GPV`) | `JelleggorbesFojtas` | **Similar STACI type exists; not mapped** | Adapt the referenced GPV head-loss curve without losing its ID or points and validate that its sign and interpolation semantics match STACI. |
-| 10 | Emitter attached to a junction | None | **No equivalent** | Add a pressure-dependent outlet representation with emitter coefficient and pressure exponent, plus INP import/export support. |
-| 11 | Pressure breaker valve (`PBV`) | None | **No exact equivalent** | Add a valve with a prescribed pressure drop and open/closed state; an ordinary throttling curve is not an exact substitute. |
-| 12 | Flow control valve (`FCV`) | None | **No equivalent** | Add a flow-setpoint valve and its active/open/closed operating states. |
-| 13 | Pressure reducing valve (`PRV`) | None | **No equivalent** | Add downstream-pressure regulation and the EPANET active/open/closed state model. |
-| 14 | Pressure sustaining valve (`PSV`) | None | **No equivalent** | Add upstream-pressure regulation and the EPANET active/open/closed state model. |
+| 7 | Throttle control valve (`TCV`) | `JelleggorbesFojtas` | **Similar STACI type exists; not mapped** | Define the exact conversion between the EPANET loss setting and STACI's opening/loss-curve parameters, including status and minor loss. |
+| 8 | General-purpose valve (`GPV`) | `JelleggorbesFojtas` | **Similar STACI type exists; not mapped** | Adapt the referenced GPV head-loss curve without losing its ID or points and validate that its sign and interpolation semantics match STACI. |
+| 9 | Emitter attached to a junction | None | **No equivalent** | Add a pressure-dependent outlet representation with emitter coefficient and pressure exponent, plus INP import/export support. |
+| 10 | Pressure breaker valve (`PBV`) | None | **No exact equivalent** | Add a valve with a prescribed pressure drop and open/closed state; an ordinary throttling curve is not an exact substitute. |
+| 11 | Flow control valve (`FCV`) | None | **No equivalent** | Add a flow-setpoint valve and its active/open/closed operating states. |
+| 12 | Pressure reducing valve (`PRV`) | None | **No equivalent** | Add downstream-pressure regulation and the EPANET active/open/closed state model. |
+| 13 | Pressure sustaining valve (`PSV`) | None | **No equivalent** | Add upstream-pressure regulation and the EPANET active/open/closed state model. |
 
 EPANET also has data objects that are not standalone hydraulic elements. Their
 current STACI counterparts, ordered approximately from easier to harder to
@@ -379,9 +394,9 @@ represent structurally, are:
 
 | EPANET data object | STACI support |
 |---|---|
-| Base demands and `[DEMANDS]` categories | **Partial:** converted to one aggregate junction demand; category labels and independent pattern references are not part of the hydraulic model. |
-| Curves | **Partial:** pump curves are converted for `Szivattyu`; efficiency, tank-volume and GPV curve types have no general typed STACI representation. |
-| Patterns | **Partial:** read by the EPS path and retained in the source document, but not represented by a reusable native SPR object model. |
+| Base demands and `[DEMANDS]` categories | **Supported:** retained as separate typed node metadata with category labels, independent pattern references and complete multiplier series. The hydraulic snapshot receives their time-zero aggregate. |
+| Curves | **Partial:** HEAD pump curves and pump-efficiency curves are retained with their original IDs and SI points; tank-volume and GPV curve types have no general typed STACI representation. |
+| Patterns | **Partial:** complete demand, reservoir-head, pump-speed and pump energy-price patterns are retained by their corresponding STACI elements; hydraulic patterns are used by EPS. A reusable network-level model for other pattern types is still missing. |
 | Simple controls and rule-based controls | **No native control objects:** retained losslessly in an imported INP document; only a limited EPS subset is executed. |
 | Water-quality sources, reactions and tank mixing | **No calculation-model equivalent:** retained in the imported INP document but not represented or solved by STACI elements. |
 
@@ -415,19 +430,21 @@ field-level `INP -> STACI -> INP` round-trip assertion.
    exported again, preserve its original EPANET flow units and convert every
    affected field back consistently; keep `LPS` as the default for native SPR
    exports.
-5. [ ] **Complete pipe field coverage.** Import and export minor-loss
+5. [x] **Complete pipe field coverage.** Import and export minor-loss
    coefficients, `Open`/`Closed`/`CV` pipe status, and matching `[STATUS]`
-   overrides. Map `CV` to STACI's existing check-valve element where possible.
+   overrides. `CV` uses a one-way `Cso` mode so the original pipe geometry,
+   friction model, and minor-loss coefficient remain active.
 6. [ ] **Round-trip all tank fields.** Retain minimum and maximum level,
    minimum volume, diameter, initial level, and the referenced volume-curve ID
    instead of inferring missing values during export.
-7. [ ] **Preserve multiple demand categories.** Keep every `[DEMANDS]` row,
+7. [x] **Preserve multiple demand categories.** Keep every `[DEMANDS]` row,
    category label, pattern reference, and junction base demand separately
-   instead of summing them into one STACI demand value.
+   instead of storing only one summed STACI demand value. The solver-facing
+   aggregate remains available without replacing the retained components.
 8. [ ] **Add a native pattern data model.** Store complete `[PATTERNS]` series,
    the default pattern, and all object-to-pattern references so an
    INP–SPR–INP round trip does not collapse a pattern to its first multiplier.
-9. [ ] **Complete pump data coverage.** Preserve pump curve IDs, `POWER`/`HEAD`
+9. [x] **Complete pump data coverage.** Preserve pump curve IDs, `POWER`/`HEAD`
    form, initial status, relative speed, speed-pattern reference, and associated
    efficiency and energy records during import and export.
 10. [ ] **Classify and preserve every curve.** Distinguish pump, efficiency,
@@ -438,9 +455,9 @@ field-level `INP -> STACI -> INP` round-trip assertion.
     pressure-exponent option, with an explicit placeholder representation when
     no equivalent STACI element is available.
 12. [ ] **Map directly compatible valve types.** Implement data mappings for
-    check valves and for EPANET `TCV` and `GPV` records using existing STACI
-    throttling/check-valve elements where their stored parameters are
-    equivalent.
+    EPANET `TCV` and `GPV` records using existing STACI throttling elements
+    where their stored parameters are equivalent. EPANET check-valve pipes are
+    already covered by the completed pipe mapping above.
 13. [ ] **Represent regulated EPANET valves.** Add native element records and
     lossless INP mappings for `PRV`, `PSV`, `PBV`, and `FCV`, including setting,
     minor-loss coefficient, and initial status.
@@ -466,12 +483,13 @@ field-level `INP -> STACI -> INP` round-trip assertion.
 ```
 
 EPS mode reads `Duration`, hydraulic/pattern/report timesteps, pattern start,
-junction demand patterns, demand multiplier, reservoir head patterns, tank
-geometry and operating levels, initial pump status, and simple tank-level pump
-controls from the EPANET file. Each hydraulic state is solved with the existing
-STACI steady-state solver. Tank levels are advanced from the solved boundary
-flow and tank area; flow is blocked in the prohibited direction when a tank is
-at its minimum or maximum level.
+junction demand patterns, demand multiplier, reservoir head patterns, pump
+speed patterns, tank geometry and operating levels, initial pump status, and
+simple tank-level pump controls from the EPANET file. Pump affinity laws are
+applied at every hydraulic state. Each state is solved with the existing STACI
+steady-state solver. Tank levels are advanced from the solved boundary flow and
+tank area; flow is blocked in the prohibited direction when a tank is at its
+minimum or maximum level.
 
 The primary output is `PREFIX.h5` using the `STACI EPS OUTPUT v1` schema. A
 small `PREFIX.meta.json` sidecar contains run metadata and precomputed value
@@ -530,8 +548,8 @@ cmake -S . -B build -DHDF5_ROOT=/path/to/hdf5
 ```
 
 Tank volume curves are currently approximated using the tank diameter.
-Rule-based controls, valve controls, pump-speed patterns, water-quality EPS,
-and event interpolation inside a hydraulic timestep are not yet implemented;
+Rule-based controls, valve controls, water-quality EPS, and event interpolation
+inside a hydraulic timestep are not yet implemented;
 present occurrences emit warnings or use the documented hydraulic-step
 approximation.
 

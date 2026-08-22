@@ -263,6 +263,192 @@ if(BUILD_TESTING)
                 "${PROJECT_SOURCE_DIR}/tests/epanet_metadata_roundtrip.inp"
     )
 
+    add_executable(staci_epanet_node_metadata_test
+        "${PROJECT_SOURCE_DIR}/tests/test_epanet_node_metadata.cpp"
+        "${PROJECT_SOURCE_DIR}/src/Csomopont.cpp"
+        "${PROJECT_SOURCE_DIR}/src/Agelem.cpp"
+        "${PROJECT_SOURCE_DIR}/src/Cso.cpp"
+        "${PROJECT_SOURCE_DIR}/src/EpanetPowerPump.cpp"
+        "${PROJECT_SOURCE_DIR}/src/KonstNyomas.cpp"
+        "${PROJECT_SOURCE_DIR}/src/Szivattyu.cpp"
+        "${PROJECT_SOURCE_DIR}/src/lubksb.cpp"
+        "${PROJECT_SOURCE_DIR}/src/ludcmp.cpp"
+        "${PROJECT_SOURCE_DIR}/src/epanet_document.cpp"
+        "${PROJECT_SOURCE_DIR}/src/epanet_writer.cpp"
+    )
+    target_compile_features(staci_epanet_node_metadata_test PRIVATE cxx_std_17)
+    set_target_properties(staci_epanet_node_metadata_test PROPERTIES CXX_EXTENSIONS OFF)
+    target_include_directories(staci_epanet_node_metadata_test PRIVATE
+        "${PROJECT_SOURCE_DIR}/include/staci"
+    )
+
+    add_test(NAME epanet_node_metadata_storage_and_export
+        COMMAND $<TARGET_FILE:staci_epanet_node_metadata_test>
+                "${CMAKE_CURRENT_BINARY_DIR}/epanet-node-metadata-native.inp"
+    )
+
+    add_test(NAME epanet_demand_metadata_import
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_node_metadata.inp"
+                -e J1 -p demand
+    )
+    set_tests_properties(epanet_demand_metadata_import PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "preserved demand components: 3"
+    )
+
+    add_test(NAME epanet_initial_quality_metadata_import
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_node_metadata.inp"
+                -e J1 -p demand
+    )
+    set_tests_properties(epanet_initial_quality_metadata_import PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "preserved initial quality values: 2"
+    )
+
+    add_test(NAME epanet_demand_metadata_snapshot
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_node_metadata.inp"
+                -e J1 -p demand
+    )
+    set_tests_properties(epanet_demand_metadata_snapshot PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "value       : 41.04"
+    )
+
+    add_test(NAME epanet_reservoir_head_pattern_metadata
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_eps_smoke.inp"
+                -e EPANET_RESERVOIR_R1 -p head
+    )
+
+    add_test(NAME epanet_pipe_minor_loss_import
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_node_metadata.inp"
+                -e P1 -p minor_loss
+    )
+    set_tests_properties(epanet_pipe_minor_loss_import PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "value       : 2.5"
+    )
+
+    add_test(NAME epanet_pipe_status_override
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_node_metadata.inp"
+                -e P1 -p status
+    )
+    set_tests_properties(epanet_pipe_status_override PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "value       : 0"
+    )
+
+    add_test(NAME epanet_pipe_check_valve_import
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_node_metadata.inp"
+                -e P2 -p check_valve
+    )
+    set_tests_properties(epanet_pipe_check_valve_import PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "value       : 1"
+    )
+
+    add_test(NAME epanet_modify_pipe_minor_loss
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -m
+                "${PROJECT_SOURCE_DIR}/tests/epanet_node_metadata.inp"
+                -e P1 -p minor_loss -n 3.75
+                -o "${CMAKE_CURRENT_BINARY_DIR}/epanet-minor-loss-modified.inp"
+    )
+    set_tests_properties(epanet_modify_pipe_minor_loss PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "EPANET modification: wrote"
+    )
+
+    add_test(NAME epanet_modify_pipe_minor_loss_roundtrip
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${CMAKE_CURRENT_BINARY_DIR}/epanet-minor-loss-modified.inp"
+                -e P1 -p minor_loss
+    )
+    set_tests_properties(epanet_modify_pipe_minor_loss_roundtrip PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        DEPENDS epanet_modify_pipe_minor_loss
+        PASS_REGULAR_EXPRESSION "value       : 3.75"
+    )
+    set_tests_properties(epanet_reservoir_head_pattern_metadata PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "preserved reservoir head patterns: 1"
+    )
+
+    add_test(NAME epanet_power_pump_speed_import
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_pumps.inp"
+                -e PWR -p base_speed
+    )
+    set_tests_properties(epanet_power_pump_speed_import PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "value       : 0.8"
+    )
+
+    add_test(NAME epanet_head_pump_metadata_import
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_pumps.inp"
+                -e PHEAD -p speed_pattern_length
+    )
+    set_tests_properties(epanet_head_pump_metadata_import PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "value       : 3"
+    )
+
+    add_test(NAME epanet_one_point_head_pump_import
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_pumps.inp"
+                -e PONE -p head_curve_points
+    )
+    set_tests_properties(epanet_one_point_head_pump_import PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "value       : 1"
+    )
+
+    add_test(NAME epanet_numeric_pump_status_import
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_pumps.inp"
+                -e PONE -p speed
+    )
+    set_tests_properties(epanet_numeric_pump_status_import PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "value       : 0.9"
+    )
+
+    add_test(NAME epanet_power_pump_efficiency_import
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_pumps.inp"
+                -e PWR -p efficiency_curve_points
+    )
+    set_tests_properties(epanet_power_pump_efficiency_import PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "value       : 3"
+    )
+
+    set(STACI_PUMP_EPS_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/epanet-pump-eps")
+    add_test(NAME epanet_pump_speed_pattern_eps
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -z
+                "${PROJECT_SOURCE_DIR}/tests/epanet_pumps.inp"
+                -o "${STACI_PUMP_EPS_PREFIX}"
+    )
+    set_tests_properties(epanet_pump_speed_pattern_eps PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "3 hydraulic states, 0 failed states"
+    )
+
+    add_test(NAME epanet_pump_speed_pattern_results
+        COMMAND "${CMAKE_COMMAND}"
+                -DNODES_CSV=${STACI_PUMP_EPS_PREFIX}-nodes.csv
+                -P "${PROJECT_SOURCE_DIR}/tests/verify_epanet_pumps.cmake"
+    )
+    set_tests_properties(epanet_pump_speed_pattern_results PROPERTIES
+        DEPENDS epanet_pump_speed_pattern_eps
+    )
+
     add_test(NAME epanet_inp_import
         COMMAND $<TARGET_FILE:${PROJECT_NAME}> -l
                 "${PROJECT_SOURCE_DIR}/tests/epanet_smoke.inp"

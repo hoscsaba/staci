@@ -6,8 +6,8 @@ Small extended-period simulation test
 J1   0          1       P1
 
 [RESERVOIRS]
-;ID  Head
-R1   30
+;ID  Head  Pattern
+R1   30    P-HEAD
 
 [TANKS]
 ;ID  Elevation  InitLevel  MinLevel  MaxLevel  Diameter  MinVol
@@ -24,6 +24,7 @@ Pump1  R1     J1     POWER 1
 
 [PATTERNS]
 P1  1.0  2.0
+P-HEAD  1.0  1.1
 
 [CONTROLS]
 LINK Pump1 CLOSED IF NODE T1 ABOVE 9

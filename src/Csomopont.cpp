@@ -38,11 +38,45 @@ Csomopont::Csomopont(const std::string a_nev,
     rank = 0;
     user1 = 0.;
     user2 = 0.;
+    epanet_demand_multiplier = 1.0;
 }
 
 //--------------------------------------------------------------
 Csomopont::~Csomopont()
 {
+}
+
+//--------------------------------------------------------------
+void Csomopont::SetEpanetDemandComponents(
+    const vector<EpanetDemandComponent> &components,
+    double demand_multiplier)
+{
+    epanet_demand_components = components;
+    epanet_demand_multiplier = demand_multiplier;
+}
+
+//--------------------------------------------------------------
+const vector<EpanetDemandComponent> &Csomopont::GetEpanetDemandComponents() const
+{
+    return epanet_demand_components;
+}
+
+//--------------------------------------------------------------
+double Csomopont::GetEpanetDemandMultiplier() const
+{
+    return epanet_demand_multiplier;
+}
+
+//--------------------------------------------------------------
+void Csomopont::SetEpanetInitialQuality(const EpanetInitialQuality &quality)
+{
+    epanet_initial_quality = quality;
+}
+
+//--------------------------------------------------------------
+const EpanetInitialQuality &Csomopont::GetEpanetInitialQuality() const
+{
+    return epanet_initial_quality;
 }
 
 //--------------------------------------------------------------

@@ -1,0 +1,44 @@
+[TITLE]
+Structured junction metadata fixture
+
+[JUNCTIONS]
+;ID  Elevation  Demand  Pattern
+J1   10         1       P-BASE
+
+[RESERVOIRS]
+;ID  Head
+R1   35
+
+[PIPES]
+;ID  Node1  Node2  Length  Diameter  Roughness  MinorLoss  Status
+P1   R1     J1     100     150       120        2.5        Open
+P2   R1     J1     100     150       120        0.75       CV
+
+[STATUS]
+P1  Closed
+
+[DEMANDS]
+;Junction  Demand  Pattern  Category
+J1          2       P-DOM    Domestic users
+J1          3       P-IND    Industrial process
+
+[PATTERNS]
+P-BASE  0.5  1.0
+P-DOM   1.5  0.75
+P-IND   2.0  0.25
+
+[QUALITY]
+J1  0
+R1  1.25
+
+[OPTIONS]
+UNITS              LPS
+HEADLOSS           H-W
+PATTERN            P-BASE
+DEMAND MULTIPLIER  1.2
+QUALITY            CHEMICAL Chlorine mg/L
+
+[TIMES]
+DURATION 0
+
+[END]

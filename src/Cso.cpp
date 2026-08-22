@@ -1,6 +1,7 @@
 #include <cmath>
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 #include "Agelem.h"
@@ -11,7 +12,9 @@ using namespace std;
 Cso::Cso(const string &a_nev, const string &a_cspe_nev, const string &a_cspv_nev,
          const double a_ro, const double a_L, const double a_D,
          const double a_erdesseg, const double a_cl_k, const double a_cl_w,
-         const double a_mp) : Agelem(a_nev, a_D * a_D * M_PI / 4., a_mp, a_ro) {
+         const double a_mp) : Agelem(a_nev, a_D * a_D * M_PI / 4., a_mp, a_ro),
+                              minor_loss(0.0), friction_model_type(0),
+                              check_valve(false) {
   // Kotelezo adatok minden Agelemnel:
   csp_db = 2;
   cspe_nev = a_cspe_nev;
@@ -71,6 +74,8 @@ string Cso::Info() {
 
 //--------------------------------------------------------------
 double Cso::f(const vector<double> &x) {
+  if (!enabled || CheckValveClosed(x))
+    return mp;
   double ere, tag1;
   double pe = x[0] * ro * g;
   double pv = x[1] * ro * g;
@@ -91,6 +96,8 @@ double Cso::f(const vector<double> &x) {
 
 //--------------------------------------------------------------
 vector<double> Cso::df(const vector<double> &x) {
+  if (!enabled || CheckValveClosed(x))
+    return vector<double>{0.0, 0.0, 1.0, 0.0};
   // double pe=x[0]*ro*g;
   // double pv=x[1]*ro*g;
   double he = x[2];
@@ -107,7 +114,9 @@ vector<double> Cso::df(const vector<double> &x) {
 
 //--------------------------------------------------------------
 void Cso::Ini(int mode, double value) {
-  if (mode == 0)
+  if (!enabled)
+    Set_mp(0.0);
+  else if (mode == 0)
     Set_mp(1.);
   else
     Set_mp(value);
@@ -258,6 +267,12 @@ double Cso::Get_dprop(const string &mit) {
     out = cl_w;
   else if ((mit == "erdesseg") || (mit == "friction_coeff"))
     out = erdesseg;
+  else if (mit == "minor_loss")
+    out = minor_loss;
+  else if (mit == "status")
+    out = enabled ? 1.0 : 0.0;
+  else if (mit == "check_valve")
+    out = check_valve ? 1.0 : 0.0;
   else if (mit == "headloss")
     out = fabs(ComputeHeadloss() / ro / g);
   else if (mit == "headloss_per_unit_length")
@@ -321,6 +336,12 @@ void Cso::Set_dprop(const string &mit, double mire) {
   }
   else if ((mit == "erdesseg") || (mit == "friction_coeff")) {
     erdesseg = mire;
+  } else if (mit == "minor_loss") {
+    if (mire < 0.0)
+      throw invalid_argument("Pipe minor-loss coefficient cannot be negative.");
+    minor_loss = mire;
+  } else if (mit == "status") {
+    Set_enabled(mire != 0.0);
   } else {
     cout << endl
          << "HIBA! Cso::Set_dprop(mit), ismeretlen bemenet: mit = " << mit << endl
@@ -334,12 +355,9 @@ void Cso::Set_dprop(const string &mit, double mire) {
 dp'=lambda*L/D*ro/2*v*fabs(v)
 */
 double Cso::ComputeHeadloss() {
-  double headloss = 0.0;
   double v = mp / ro / Aref;
-
-  headloss = surlodas() * L / D * ro / 2. * v * fabs(v);
-
-  return headloss;
+  const double resistance = surlodas() * L / D + minor_loss;
+  return resistance * ro / 2. * v * fabs(v);
 }
 
 //--------------------------------------------------------------
@@ -350,8 +368,15 @@ d dp'/dmp=lambda*L/D*ro/2*1/(ro*A)^2*abs(v)
 */
 
 double Cso::ComputeHeadlossDerivative() {
-  double der;
-  der = surlodas() * L / pow(D, 5) * 8 / ro / pow(pi, 2) * 2 *
-        abs(mp);  // Pa/(kg/s)
-  return der;
+  const double resistance = surlodas() * L / D + minor_loss;
+  return resistance * abs(mp) / (ro * Aref * Aref);  // Pa/(kg/s)
+}
+
+//--------------------------------------------------------------
+bool Cso::CheckValveClosed(const vector<double> &x) const {
+  if (!check_valve)
+    return false;
+  const double upstream_total_head = x[0] + x[2];
+  const double downstream_total_head = x[1] + x[3];
+  return mp <= 0.0 && upstream_total_head <= downstream_total_head;
 }

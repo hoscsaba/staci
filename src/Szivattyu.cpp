@@ -10,7 +10,8 @@ using namespace std;
 Szivattyu::Szivattyu(const string &a_nev, const string &a_cspe_nev,
                      const string &a_cspv_nev, double a_ro, double Aref,
                      const vector<double> &a_q, const vector<double> &a_H,
-                     double a_mp) : Agelem(a_nev, Aref, a_mp, a_ro) {
+                     double a_mp) : Agelem(a_nev, Aref, a_mp, a_ro),
+                                    operating_speed(1.0) {
     //Kotelezo adatok minden Agelemnel:
     csp_db = 2;
     cspe_nev = a_cspe_nev;
@@ -114,7 +115,7 @@ and elevations in positions 0 through 3.
 \return (double) function error (should be zero)
 \sa PumpCharCurve()
 */double Szivattyu::f(const vector<double> &x) {
-    if (!enabled)
+    if (!enabled || operating_speed <= 0.0)
         return mp;
     double ere;
     double pe = x[0] * ro * g;
@@ -135,6 +136,13 @@ The function evaluates the curve fit by the constructor \sa Szivattyu()
 \sa Szivattyu() and f()
 */
 double Szivattyu::PumpCharCurve(double qq) {
+    if (operating_speed <= 0.0)
+        return 0.0;
+    return operating_speed * operating_speed *
+           BasePumpCharCurve(qq / operating_speed);
+}
+
+double Szivattyu::BasePumpCharCurve(double qq) {
 
     double He = 0.0;
     double qmax = q.at(q.size() - 1);
@@ -161,7 +169,7 @@ double Szivattyu::PumpCharCurve(double qq) {
 //--------------------------------------------------------------
 vector<double> Szivattyu::df(const vector<double> &x) {
     vector<double> ere;
-    if (!enabled) {
+    if (!enabled || operating_speed <= 0.0) {
         ere.push_back(0.0);
         ere.push_back(0.0);
         ere.push_back(1.0);
@@ -172,13 +180,8 @@ vector<double> Szivattyu::df(const vector<double> &x) {
     ere.push_back(+1.0);
 
     // Szep megoldas: analitikus derivalt (HCs. 2014.07.30.)
-    double der = 0.0;
-    double qmax = q.at(q.size() - 1);
-    if ((mp < 0) || (mp > qmax * ro))
-        der = -mer_szorzo * p[0] / qmax;
-    else
-        for (int i = 1; i < fokszam; i++) der += p[i] * i * pow(mp / ro, i - 1);
-    der /= -ro;
+    double der = -operating_speed *
+                 BasePumpCharCurveDerivative(mp / ro / operating_speed) / ro;
 
     //--------------------------------
     // HCs. 2014.07.30.
@@ -201,7 +204,7 @@ void Szivattyu::Ini(int mode, double value) {
     //mp=fabs(q.at(1)-q.at(q.size()-1))/2*ro;
     //else mp=value;
     if (mode != 0)
-        mp = enabled ? value : 0.0;
+        mp = enabled && operating_speed > 0.0 ? value : 0.0;
     //mp=fabs(q.at(1)-q.at(q.size()-1))/2*ro;
     //else
 }
@@ -210,6 +213,11 @@ void Szivattyu::Ini(int mode, double value) {
 void Szivattyu::Set_dprop(const string &mit, double mire) {
     if ((mit == "concentration") || (mit == "konc_atlag")) {
         konc_atlag = mire;
+    } else if (mit == "speed") {
+        SetOperatingSpeed(mire);
+        metadata.base_speed = mire;
+    } else if (mit == "status") {
+        Set_enabled(mire != 0.0);
     } else {
         cout << endl << "HIBA! Szivattyu::Set_dprop(mit), ismeretlen bemenet: mit="
              << mit << endl << endl;
@@ -224,6 +232,18 @@ double Szivattyu::Get_dprop(const string &mit) {
         out = Aref;
     else if (mit == "mass_flow_rate")
         out = mp;
+    else if (mit == "speed")
+        out = operating_speed;
+    else if (mit == "base_speed")
+        out = metadata.base_speed;
+    else if (mit == "speed_pattern_length")
+        out = static_cast<double>(metadata.speed_pattern_values.size());
+    else if (mit == "efficiency_curve_points")
+        out = static_cast<double>(metadata.efficiency_curve_points.size());
+    else if (mit == "head_curve_points")
+        out = static_cast<double>(metadata.head_curve_points.size());
+    else if (mit == "status")
+        out = enabled && operating_speed > 0.0 ? 1.0 : 0.0;
     else if ((mit == "concentration") || (mit == "konc_atlag"))
         out = konc_atlag;
     else if (mit == "headloss")
@@ -236,4 +256,26 @@ double Szivattyu::Get_dprop(const string &mit) {
         out = 0.0;
     }
     return out;
+}
+
+//--------------------------------------------------------------
+double Szivattyu::BasePumpCharCurveDerivative(double qq) const {
+    const double qmax = q.at(q.size() - 1);
+    if (qq < 0.0 || qq > qmax)
+        return -mer_szorzo * p[0] / qmax;
+    double derivative = 0.0;
+    for (int i = 1; i < fokszam; ++i)
+        derivative += p[i] * i * pow(qq, i - 1);
+    return derivative;
+}
+
+void Szivattyu::SetEpanetPumpMetadata(const EpanetPumpMetadata &value) {
+    metadata = value;
+    SetOperatingSpeed(metadata.base_speed);
+}
+
+void Szivattyu::SetOperatingSpeed(double value) {
+    if (value < 0.0)
+        throw invalid_argument("EPANET pump speed cannot be negative.");
+    operating_speed = value;
 }

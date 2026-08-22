@@ -1,9 +1,21 @@
+#ifndef KONSTNYOMAS_H
+#define KONSTNYOMAS_H
+
 #include "Agelem.h"
+
+struct EpanetHeadPattern
+{
+    bool specified = false;
+    double base_head_m = 0.0;
+    string pattern_id;
+    vector<double> pattern_values;
+};
 
 class KonstNyomas: public Agelem
 {
 private:
     double p;
+    EpanetHeadPattern epanet_head_pattern;
 public:
     KonstNyomas(const string &nev,
                 double Aref,
@@ -24,4 +36,8 @@ public:
         return "KonstNyomas";
     }
     double Get_dprop(const string &property) override;
+    void SetEpanetHeadPattern(const EpanetHeadPattern &head_pattern);
+    const EpanetHeadPattern &GetEpanetHeadPattern() const;
 };
+
+#endif

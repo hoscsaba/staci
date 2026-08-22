@@ -4,11 +4,14 @@ class Cso : public Agelem, public ParameterSensitivity, public FrictionModelConf
 {
 private:
     double L, D, lambda;
+    double minor_loss;
     double erdesseg; // csofal abszolut erdesseg
     int f_count;
     double cl_k, cl_w;
-    double headloss; // Megoszló, teljes hossz mentén és m-enként
+    double headloss; // MegoszlÃ³, teljes hossz mentÃ©n Ã©s m-enkÃ©nt
     int friction_model_type; // 0 - Darcy-Weisbach (DW az adatfajlban), 1 - Hazen-Williams (HW)
+    bool check_valve;
+    bool CheckValveClosed(const vector<double> &state) const;
 public:
     Cso(const string &nev, const string &a_cspe_nev, const string &a_cspv_nev, const double a_ro,
         const double L, const double D, const double lambda,
@@ -29,4 +32,6 @@ public:
     double ComputeHeadloss();
     double ComputeHeadlossDerivative();
     void Set_friction_model(const string &friction_model) override;
+    void SetCheckValve(bool value) { check_valve = value; }
+    bool IsCheckValve() const { return check_valve; }
 };
