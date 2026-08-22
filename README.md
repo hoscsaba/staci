@@ -239,6 +239,46 @@ checks this property and fails if any requested segment contains multiple graph
 components. Old generated STACI sidecar logs (`.ros`, `.rps`, `.rrs`, and
 related variants) are also removed at startup.
 
+### Channel-only hydraulic reference tests
+
+The circular open-channel element has a separate reference suite derived from
+`tests/channel.spr`. It compares STACI against independently implemented
+circular geometry, Manning normal depth, critical depth, gradually varied flow,
+and Darcy-Weisbach pressure-flow calculations. It covers both flow directions,
+open/full transitions, fully pressurized cases, hydrostatic equilibrium, and a
+momentum-matched hydraulic jump where a smooth GVF profile is impossible:
+
+```bash
+python3 tests/run_channel_tests.py --binary ./build/staci
+```
+
+On Windows with a Visual Studio Release build:
+
+```powershell
+py tests\run_channel_tests.py --binary build\Release\staci.exe
+```
+
+Results are retained in `tests/test-results/channel/`. All channel cases are
+mandatory and any reference discrepancy makes the command fail. See
+[tests/CHANNEL_TESTS.md](tests/CHANNEL_TESTS.md) for the case matrix, governing
+equations, and engineering references. The same suite is registered in CTest
+as `channel_reference_suite`.
+
+The standard suite also contains
+`tests/channel_network_merge_split.spr`, a stationary network of six
+open-surface channels. Two channels merge at the central manhole and two
+channels leave it, after which both branches continue through another channel.
+The dedicated test verifies the topology, convergence, nonzero channel flows,
+open water depths at every channel end, and mass conservation at the 2-in/2-out
+junction:
+
+```bash
+python3 tests/run_channel_network_test.py --binary ./build/staci
+```
+
+It is registered in CTest as `channel_network_merge_split` and is also executed
+by `tests/run_tests.py` as the `CHANNEL-NETWORK` case.
+
 ## Quick start
 
 The commands below use the included `tests/anytown_1med.spr` network. From the

@@ -21,6 +21,7 @@ add_executable(${PROJECT_NAME} ${MAIN_FILE} ${SRC_FILES})
 
 option(STACI_BUILD_OPTIMIZERS "Build the pagmo2-based calibrate and split tools" ON)
 set(STACI_EXECUTABLE_TARGETS ${PROJECT_NAME})
+
 if(STACI_BUILD_OPTIMIZERS)
     find_package(Pagmo CONFIG REQUIRED)
     find_package(Eigen3 CONFIG REQUIRED)
@@ -171,6 +172,33 @@ install(TARGETS ${STACI_EXECUTABLE_TARGETS}
 
 include(CTest)
 if(BUILD_TESTING)
+    find_package(Python3 COMPONENTS Interpreter QUIET)
+    if(Python3_Interpreter_FOUND)
+        add_test(NAME channel_reference_suite
+            COMMAND "${Python3_EXECUTABLE}"
+                    "${PROJECT_SOURCE_DIR}/tests/run_channel_tests.py"
+                    --binary $<TARGET_FILE:${PROJECT_NAME}>
+                    --results "${CMAKE_CURRENT_BINARY_DIR}/channel-reference-tests"
+        )
+        set_tests_properties(channel_reference_suite PROPERTIES
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+            TIMEOUT 180
+            LABELS "channel;hydraulics;reference"
+        )
+        add_test(NAME channel_network_merge_split
+            COMMAND "${Python3_EXECUTABLE}"
+                    "${PROJECT_SOURCE_DIR}/tests/run_channel_network_test.py"
+                    --binary $<TARGET_FILE:${PROJECT_NAME}>
+                    --network "${PROJECT_SOURCE_DIR}/tests/channel_network_merge_split.spr"
+                    --results "${CMAKE_CURRENT_BINARY_DIR}/channel-network-test"
+        )
+        set_tests_properties(channel_network_merge_split PROPERTIES
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+            TIMEOUT 120
+            LABELS "channel;hydraulics;network;reference"
+        )
+    endif()
+
     if(STACI_BUILD_OPTIMIZERS)
         set(STACI_CALIBRATE_TEST_DIR "${CMAKE_CURRENT_BINARY_DIR}/optimizer-tests/calibrate")
         set(STACI_SPLIT_TEST_DIR "${CMAKE_CURRENT_BINARY_DIR}/optimizer-tests/split")

@@ -44,6 +44,7 @@ private:
 
 	/// Az ode_megoldonak ez mondja meg, hogy az yres-be es a vres-be betegye-e az eredmenyeket (amikor Jacobit szamolunk, nem kell)
 	bool write_res;
+	bool integration_failed;
 
 	/// A vegso eloszlasok kimenet
 	vector<double> xfere, yfere, xere, yere, yereH, vere;
@@ -77,6 +78,13 @@ private:
 
 	double f_telt(const double ye, const double yv, const double mp);
 	double f_0(const double ye, const double yv, const double mp);
+	double f_gvf(const double ye, const double yv, const double mp);
+	double f_diffusive(const double ye, const double yv, const double mp);
+	double diffusive_flow_estimate(const double ye, const double yv);
+	double pressure_integral(const double depth);
+	double momentum_function(const double depth, const double flow_rate);
+	void build_hydraulic_jump_profile(const double ye, const double yv,
+	                                  const double flow_rate);
 	double f_1(const double ye, const double yv, const double mp);
 	double f_1_old(const double ye, const double yv, const double mp);
 	double f_2c(const double ye, const double yv, const double mp);
@@ -94,6 +102,8 @@ private:
 	bool is_reversed;
 
 	void which_case(const double ye, const double yv);
+	void which_case_legacy(const double ye, const double yv);
+	double froude_squared(const double depth, const double flow_rate);
 
 	double (Csatorna::*pt2fun)(double, double, double);
 

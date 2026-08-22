@@ -67,12 +67,15 @@ Csatorna::Csatorna(const string &a_nev, const string &a_cspe_nev,
 	erdesseg = a_erd;
 	geo_tipus = 1;
 	// Numerikus eredmenyek tarolasara:
-	db = 1000.;//a_int_steps * 10;
+	db = a_int_steps;
 
 	// Set debug level
 	debug_level = a_debugl;
 	if (debug_level > 4)
 		debug_level = 4;
+	if (db <= 0)
+		error("Konstruktor",
+		      "Az integral_steps ertekenek pozitiv egesz szamnak kell lennie!");
 
 	// debug_level = 2;
 
@@ -84,6 +87,7 @@ Csatorna::Csatorna(const string &a_nev, const string &a_cspe_nev,
 
 	res_ready = false;
 	write_res = false;
+	integration_failed = false;
 	cl_k = a_cl_k;
 	cl_w = a_cl_w;
 	is_reversed = a_is_reversed;
@@ -92,24 +96,21 @@ Csatorna::Csatorna(const string &a_nev, const string &a_cspe_nev,
 		error("Konstruktor",
 		      "A csatorna erdessege zerus, ez nem megengedett!!! Kerem javitsa az adatot!");
 
-	if (fabs(lejtes * 100.) < (0.01 / 100.))
+	const double slope_percent = fabs(lejtes) * 100.0;
+	if (slope_percent < 0.01)
 		warning("Konstruktor",
 		        "A csatorna lejtese kisebb, mint 0.1mm/m (0.01%), ez biztosan helyes adat?");
 
-	if (fabs(lejtes * 100.) < (10. / 100.))
+	if (slope_percent > 10.0)
 		warning("Konstruktor",
 		        "A csatorna lejtese nagyobb, mint 0.1m/m (10%), ez biztosan helyes adat?");
 
-
-	double (Csatorna::*pt2fun)(double, double, double) = NULL;
+	pt2fun = nullptr;
 
 	is_simplified = false;
 	is_switched = true;
 	force_more_iter = false;
 	vmean = 0.;
-
-	double y_crit;
-	vector<double> y_normal;
 
 	if (debug_level > 0)
 		Agelem::SetLogFile();
@@ -292,6 +293,7 @@ double Csatorna::f(const vector<double> &x) {
 		df = (*this.*pt2fun)(ye, yv, mp);
 		jac[2] = (df - ff) / dx;
 		mp = mdot_old;
+		which_case(ye, yv);
 	}
 
 	// konstans tag, csak linearizalas eseten van jelentosege
@@ -353,6 +355,37 @@ double Csatorna::f(const vector<double> &x) {
 
 
 void Csatorna::which_case(const double ye, const double yv) {
+	ostringstream message;
+	if (ye <= 0.0 || yv <= 0.0) {
+		eset = "dry";
+		pt2fun = &Csatorna::f_0;
+		message << "\n\n\t case dry: wetting/drying fallback, ye=" << ye
+		        << " m, yv=" << yv << " m";
+	} else if (ye >= dia && yv >= dia) {
+		eset = "teltszelveny";
+		pt2fun = &Csatorna::f_telt;
+		message << "\n\n\t case " << eset << ": both end depths are full";
+	} else {
+		const double Q = mp / ro;
+		const double eta_difference = (ze + ye) - (zv + yv);
+		if (fabs(Q) < 1.0e-12 && fabs(eta_difference) < 1.0e-10)
+			eset = "gvf-hydrostatic";
+		else {
+			const double upstream_depth = Q >= 0.0 ? ye : yv;
+			const bool supercritical = froude_squared(upstream_depth, Q) > 1.0;
+			eset = string("gvf-") + (supercritical ? "supercritical-" : "subcritical-")
+			       + (Q >= 0.0 ? "positive" : "reverse");
+		}
+		pt2fun = &Csatorna::f_gvf;
+		message << "\n\n\t case " << eset << ": signed gradually-varied-flow BVP, ye="
+		        << ye << " m, yv=" << yv << " m, Q=" << Q << " m3/s";
+	}
+	logfile_write(message.str(), 1);
+}
+
+// Kept temporarily for comparison with historical result files. New
+// calculations use the signed GVF boundary-value formulation above.
+void Csatorna::which_case_legacy(const double ye, const double yv) {
 	ostringstream strstrm;
 
 	strstrm.str("");
@@ -542,15 +575,11 @@ void Csatorna::Ini(int mode, double value) {
 
 void Csatorna::keresztmetszet(const double yy, double & A, double & B, double & Rh) {
 	double K = 0.0;
-	double y = yy;
-	if (y < 0) {
-		//ostringstream msg;
-		//msg.str("");
-		//msg<<"Negat�v szint, y="<<y;
-		//warning("keresztmetszet()", msg.str());
-		y = dia / 1000.;
-	} else {
-		switch (geo_tipus) {
+	// The dry-state model uses a small positive numerical depth.  Applying the
+	// same regularisation at and below zero keeps A, B and Rh finite and avoids
+	// both uninitialised outputs and the indeterminate ratio A/K = 0/0.
+	double y = yy <= 0.0 ? dia / 1000.0 : yy;
+	switch (geo_tipus) {
 		case 0:   // teglalap
 		{
 			A = B * y;
@@ -578,10 +607,9 @@ void Csatorna::keresztmetszet(const double yy, double & A, double & B, double & 
 			strstrm.str("");
 			strstrm << "Ismeretlen geometria tipus:" << geo_tipus;
 			error("keresztmetszet()", strstrm.str());
-		}
-
-		Rh = A / K;
 	}
+
+	Rh = A / K;
 }
 
 /// Kritikus szint sz�m�t�sa k�r keresztmetszet eset�n
@@ -842,6 +870,14 @@ vector<double> Csatorna::normal_szint(const double Q) {
  * @return dy/dx �rt�ke
  */
 
+double Csatorna::froude_squared(const double depth, const double flow_rate) {
+	if (depth >= dia)
+		return 0.0;
+	double area, top_width, hydraulic_radius;
+	keresztmetszet(depth, area, top_width, hydraulic_radius);
+	return flow_rate * flow_rate * top_width / (g * area * area * area);
+}
+
 double Csatorna::nyf_ode(const double x, const double y, const double mp) {
 	double Q, A, B, C, Rh, ere = 0.0;
 	Q = mp / ro;
@@ -873,6 +909,7 @@ double Csatorna::ode_megoldo(double y0, double dx0, double x0, double mp) {
 	ostringstream strstrm;
 	double A, B, Rh, y = y0, x = x0, dx = dx0, sumdx = 0, yy = y0;
 	int i = 0;
+	integration_failed = false;
 
 	// clear vectors and save initial point
 	if (write_res) {
@@ -970,14 +1007,11 @@ double Csatorna::ode_megoldo(double y0, double dx0, double x0, double mp) {
 				dxuj = dx / 2.;
 				logfile_write(" dx -> dx/2", 4);
 				if (fabs(dxuj) < dx_min) {
-					last_step = true;
-
-					strstrm << endl << "!!! Feladom, a " << nev
-					        << " csatornaban az eloirt dx_min=" << dx_min
-					        << " lepeskozzel sem tudom elerni a megadott "
-					        << hiba_max << " hibahatart!!! \nVizszintek: y0=" << y0 << ", y1=" << y1 << "m, tomegaram: " << mp << " kg/s" << endl;
-					// cout << strstrm.str();
-					error("ode_megoldo()", strstrm.str());
+					integration_failed = true;
+					strstrm << endl << "GVF integration stopped near a dry or critical state: dx="
+					        << dxuj << ", y=" << y << " m, mass flow=" << mp << " kg/s";
+					logfile_write(strstrm.str(), 1);
+					return y;
 				}
 				// if (y2 < TINY_WATER) {
 				// 	last_step = true;
@@ -1092,7 +1126,7 @@ void Csatorna::build_res() {
 		yres.push_back(yv);
 	}
 
-	if (!strcmp(eset.c_str(), "0.a.") || !strcmp(eset.c_str(), "0.b.i.")) {
+	if (eset == "dry" || !strcmp(eset.c_str(), "0.a.") || !strcmp(eset.c_str(), "0.b.i.")) {
 		// f_0
 		megvolt = true;
 		xres.push_back(0);
@@ -1137,15 +1171,28 @@ void Csatorna::build_res() {
 		double ff = f_2aii(ye, yv, mp);
 	}
 
-	if (!strcmp(eset.c_str(), "2.b.i.") || !strcmp(eset.c_str(), "2.b.iiii.") || !strcmp(eset.c_str(), "2.c.")) {
+	if (!strcmp(eset.c_str(), "2.b.i.") || !strcmp(eset.c_str(), "2.b.iii.") || !strcmp(eset.c_str(), "2.c.")) {
 		// f_2c
 		megvolt = true;
 		double ff = f_2c(ye, yv, mp);
 	}
 
+	if (eset.compare(0, 4, "gvf-") == 0) {
+		megvolt = true;
+		f_gvf(ye, yv, mp);
+	}
+
 	if (!megvolt) {
 		string msg = "Ismeretlen eset: " + eset;
 		error("build_res()", msg);
+	}
+
+	// Backward integration naturally produces decreasing x coordinates. Store
+	// all distributed results in the element's geometrical 0..L order.
+	if (xres.size() > 1 && xres.front() > xres.back()) {
+		reverse(xres.begin(), xres.end());
+		reverse(yf.begin(), yf.end());
+		reverse(yres.begin(), yres.end());
 	}
 
 	// Hmax korrekcio
@@ -1163,8 +1210,9 @@ void Csatorna::build_res() {
 	// Az eredm�nyek konzisztenci�ja miatt mindig utolag szamitjuk yres-bol.
 	double A, B, Rh;
 	vmean = 0.;
+	vres.clear();
 	for (unsigned int i = 0; i < yres.size(); i++) {
-		keresztmetszet(Hres.at(i), A, B, Rh);
+		keresztmetszet(yres.at(i), A, B, Rh);
 		vres.push_back(mp / ro / A);
 		vmean += mp / ro / A;
 	}
@@ -1213,7 +1261,7 @@ void Csatorna::build_res() {
 
 	double AA, BB, RRh;
 	for (unsigned int i = 0; i < yres.size(); i++) {
-		keresztmetszet(Hres.at(i), AA, BB, RRh);
+		keresztmetszet(yres.at(i), AA, BB, RRh);
 
 		// !!!!!!!!!!!!!!!!!!
 		// At kell allitani Aref-et, mert kulonben a sebesseg a teljes keresztmetszettel lesz szamolva es az hulyeseg.
@@ -1258,18 +1306,23 @@ const vector<double> &Csatorna::Get_res(const string &mit) {
 
 //--------------------------------------------------------------
 double Csatorna::surlodas() {
-	// surl: Manning-allando
+	// Positive roughness is absolute wall roughness in millimetres.  Negative
+	// values retain the legacy STACI convention of directly prescribing both
+	// coefficients with their absolute value.
 	if (erdesseg <= 0) {
 		lambda = -erdesseg;
 		surl = -erdesseg;
 	} else {
-		if (f_count >= 0) {
-			Hmax = dia;
-			double ize = 2.0 * log(14.8 * (Hmax / 2) / (erdesseg / 1000));
-			lambda = 1 / ize / ize;
-		} else
-			lambda = 0.02;
-		surl = pow(Hmax / 2., 1. / 6.) * sqrt(lambda / 8.0 / g);
+		const double hydraulic_radius_full = dia / 4.0;
+		const double roughness_m = erdesseg / 1000.0;
+		const double log_argument = 14.8 * hydraulic_radius_full / roughness_m;
+		if (log_argument <= 1.0)
+			error("surlodas()",
+			      "Az abszolut erdesseg tul nagy a Darcy-tenyezo kiszamitasahoz!");
+
+		const double inverse_sqrt_lambda = 2.0 * log10(log_argument);
+		lambda = 1.0 / (inverse_sqrt_lambda * inverse_sqrt_lambda);
+		surl = pow(hydraulic_radius_full, 1.0 / 6.0) * sqrt(lambda / (8.0 * g));
 	}
 	//cout<<endl<<nev<<": surl="<<surl<<" (lambda="<<lambda<<")";
 
@@ -1327,8 +1380,8 @@ double Csatorna::Get_FolyTerf() {
 		// cout<<"\n Hres.size()="<<Hres.size()<<endl;
 		// cout<<"\n xres.size()="<<xres.size()<<endl;
 		// cout<<"\n xere.size()="<<xere.size()<<endl;
-		for (unsigned int i = 1; i < Hres.size(); i++) {
-			keresztmetszet(Hres.at(i), A, B, Rh);
+		for (unsigned int i = 1; i < yres.size(); i++) {
+			keresztmetszet(yres.at(i), A, B, Rh);
 			szum += A * fabs(xres.at(i) - xres.at(i - 1));
 			// cout<<endl<<"\t\t i="<<i<<", x(i)="<<xres.at(i)<<", x(i-1)="<<xres.at(i
 			// -1) <<", dV="<<A*fabs(xres.at(i)-xres.at(i-1));
@@ -1358,7 +1411,7 @@ double Csatorna::f_telt(double ye, double yv, double mp) {
 
 	// D_fake=dia;
 	double v = mp / ro / (D_fake * D_fake * pi / 4.);
-	lambda = surlodas();
+	surlodas();
 	double dh = lambda * L / D_fake / 2. / 9.81 * v * fabs(v);
 	double f = ze + ye - (zv + yv) - dh;
 
@@ -1414,7 +1467,7 @@ double Csatorna::f_0(double ye, double yv, double mp) {
 	// strstrm << "\n\t\t  " << nev << " f_0: fake cso, D=" << D_fake;
 
 	double v = mp / ro / (D_fake * D_fake * pi / 4);
-	lambda = surlodas();
+	surlodas();
 	double dh = lambda * L / D_fake / 2 / 9.81 * v * fabs(v);
 	double f = ze + ye - (zv + yv) - dh;
 
@@ -1455,6 +1508,215 @@ double Csatorna::f_0(double ye, double yv, double mp) {
 
 	logfile_write(strstrm.str(), 2);
 	return f;
+}
+
+double Csatorna::diffusive_flow_estimate(double ye, double yv) {
+	const double eta_slope = ((ze + ye) - (zv + yv)) / L;
+	const double representative_depth = max(dia / 1000.0, min(dia, (ye + yv) / 2.0));
+	double area, top_width, hydraulic_radius;
+	keresztmetszet(representative_depth, area, top_width, hydraulic_radius);
+	const double n = surlodas();
+	const double magnitude = area * pow(hydraulic_radius, 2.0 / 3.0)
+	                         * sqrt(fabs(eta_slope)) / n;
+	return eta_slope >= 0.0 ? magnitude : -magnitude;
+}
+
+double Csatorna::pressure_integral(double depth) {
+	depth = max(0.0, min(depth, dia));
+	constexpr int intervals = 48;
+	const double dz = depth / intervals;
+	double sum = 0.0;
+	for (int i = 0; i <= intervals; ++i) {
+		const double z = i * dz;
+		const double width = 2.0 * sqrt(max(0.0, z * (dia - z)));
+		const double value = (depth - z) * width;
+		sum += (i == 0 || i == intervals) ? value : (i % 2 == 0 ? 2.0 : 4.0) * value;
+	}
+	return sum * dz / 3.0;
+}
+
+double Csatorna::momentum_function(double depth, double flow_rate) {
+	double area, top_width, hydraulic_radius;
+	keresztmetszet(depth, area, top_width, hydraulic_radius);
+	return flow_rate * flow_rate / (g * area) + pressure_integral(depth);
+}
+
+void Csatorna::build_hydraulic_jump_profile(double ye, double yv, double flow_rate) {
+	// The jump position minimises the momentum mismatch of the two independently
+	// integrated branches. Use a finer grid than the residual integration so
+	// the momentum match is not limited to the network element's coarse dx.
+	const int steps = max(1000, 5 * db);
+	const double dx = L / steps;
+	vector<double> from_e(steps + 1), from_v(steps + 1);
+	from_e[0] = ye;
+	from_v[steps] = yv;
+	auto rk4 = [this, flow_rate](double x, double depth, double step) {
+		const double mass_flow = flow_rate * ro;
+		const double k1 = nyf_ode(x, depth, mass_flow);
+		const double k2 = nyf_ode(x + step / 2.0, depth + step * k1 / 2.0, mass_flow);
+		const double k3 = nyf_ode(x + step / 2.0, depth + step * k2 / 2.0, mass_flow);
+		const double k4 = nyf_ode(x + step, depth + step * k3, mass_flow);
+		return max(dia / 10000.0,
+		           depth + step * (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0);
+	};
+	for (int i = 0; i < steps; ++i)
+		from_e[i + 1] = rk4(i * dx, from_e[i], dx);
+	for (int i = steps; i > 0; --i)
+		from_v[i - 1] = rk4(i * dx, from_v[i], -dx);
+
+	int jump_index = steps / 2;
+	double best_mismatch = 1.0e100;
+	for (int i = 1; i < steps; ++i) {
+		const double super_depth = flow_rate > 0.0 ? from_e[i] : from_v[i];
+		const double sub_depth = flow_rate > 0.0 ? from_v[i] : from_e[i];
+		if (super_depth <= 0.0 || sub_depth <= 0.0
+		    || super_depth >= dia || sub_depth >= dia)
+			continue;
+		// Reject the zero-height critical crossing: it satisfies equal momentum
+		// trivially but is not a hydraulic jump. Both sides must retain their
+		// physically distinct supercritical/subcritical character.
+		if (froude_squared(super_depth, flow_rate) <= 1.01
+		    || froude_squared(sub_depth, flow_rate) >= 0.99)
+			continue;
+		const double delta = momentum_function(super_depth, flow_rate)
+		                   - momentum_function(sub_depth, flow_rate);
+		const double mismatch = fabs(delta);
+		if (mismatch < best_mismatch) {
+			best_mismatch = mismatch;
+			jump_index = i;
+		}
+	}
+	const double jump_x = jump_index * dx;
+	const double jump_from_e = from_e[jump_index];
+	const double jump_from_v = from_v[jump_index];
+	const double super_depth = flow_rate > 0.0 ? jump_from_e : jump_from_v;
+	const double sub_depth = flow_rate > 0.0 ? jump_from_v : jump_from_e;
+	best_mismatch = fabs(momentum_function(super_depth, flow_rate)
+	                     - momentum_function(sub_depth, flow_rate));
+
+	xres.clear();
+	yf.clear();
+	yres.clear();
+	auto append = [this](double x, double depth) {
+		xres.push_back(x);
+		yf.push_back(ze - lejtes * x);
+		yres.push_back(depth);
+	};
+	for (int i = 0; i <= jump_index; ++i) append(i * dx, from_e[i]);
+	append(jump_x, jump_from_v);
+	for (int i = jump_index + 1; i <= steps; ++i) append(i * dx, from_v[i]);
+	ostringstream message;
+	message << "\n\t\t momentum-matched hydraulic jump: x=" << jump_x
+	        << " m, |Delta M|=" << best_mismatch;
+	logfile_write(message.str(), 1);
+}
+
+/// Diffusive-wave continuation used for remote or singular Newton trial states.
+double Csatorna::f_diffusive(double ye, double yv, double mp) {
+	const double estimated_flow = diffusive_flow_estimate(ye, yv);
+	const double residual = mp / ro - estimated_flow;
+
+	jac[2] = 1.0 / ro;
+	num_eval_jac[2] = false;
+	if (write_res) {
+		const bool jump = ye < dia && yv < dia &&
+			(estimated_flow > 0.0
+			 ? (froude_squared(ye, estimated_flow) > 1.0
+			    && froude_squared(yv, estimated_flow) < 1.0)
+			 : (froude_squared(yv, estimated_flow) > 1.0
+			    && froude_squared(ye, estimated_flow) < 1.0));
+		if (jump) {
+			eset = "hydraulic-jump-diffusive";
+			build_hydraulic_jump_profile(ye, yv, estimated_flow);
+		} else {
+			xres.assign({0.0, L});
+			yf.assign({ze, zv});
+			yres.assign({ye, yv});
+		}
+	}
+	ostringstream message;
+	message << "\n\t\t diffusive-wave continuation: Q=" << mp / ro
+	        << " m3/s, Q_DW=" << estimated_flow << " m3/s, residual=" << residual;
+	logfile_write(message.str(), 2);
+	return residual;
+}
+
+/// Signed steady gradually-varied-flow boundary-value residual.
+/**
+ * Subcritical profiles are integrated from the flow-direction downstream
+ * boundary towards upstream; supercritical profiles use the opposite
+ * direction.  Q keeps its sign, so reverse flow needs no separate friction
+ * formula.  At Q=0 the forward integration reproduces hydrostatic equilibrium
+ * (constant absolute water-surface elevation).
+ */
+double Csatorna::f_gvf(double ye, double yv, double mp) {
+	const double Q = mp / ro;
+	const double froude_e_squared = froude_squared(ye, Q);
+	const double froude_v_squared = froude_squared(yv, Q);
+	const double diffusive_flow = diffusive_flow_estimate(ye, yv);
+	const double diffusive_froude_e_squared = froude_squared(ye, diffusive_flow);
+	const double diffusive_froude_v_squared = froude_squared(yv, diffusive_flow);
+	const double max_endpoint_froude_squared = max(froude_e_squared, froude_v_squared);
+	if (max_endpoint_froude_squared > 100.0)
+		return f_diffusive(ye, yv, mp);
+	const bool hydraulic_jump_required =
+		Q > 0.0 ? (froude_e_squared > 1.0 && froude_v_squared < 1.0)
+		        : (froude_v_squared > 1.0 && froude_e_squared < 1.0);
+	const bool hydraulic_jump_at_diffusive_scale =
+		diffusive_flow > 0.0
+			? (diffusive_froude_e_squared > 1.0 && diffusive_froude_v_squared < 1.0)
+			: (diffusive_froude_v_squared > 1.0 && diffusive_froude_e_squared < 1.0);
+	if (ye < dia && yv < dia
+	    && (hydraulic_jump_required || hydraulic_jump_at_diffusive_scale)) {
+		logfile_write("\n\t\t incompatible smooth GVF end regimes: hydraulic-jump/control "
+		              "transition represented by diffusive-wave fallback", 1);
+		return f_diffusive(ye, yv, mp);
+	}
+
+	bool integrate_forward;
+	bool supercritical = false;
+
+	if ((ye < dia) != (yv < dia)) {
+		// The present mixed closure is continuous only when integrated from the
+		// open end towards the full end. This remains a model-consistency path;
+		// it is not a pressure-wave or hydraulic-jump model.
+		integrate_forward = ye < dia;
+		supercritical = froude_squared(ye < dia ? ye : yv, Q) > 1.0;
+	} else if (fabs(Q) < 1.0e-12) {
+		integrate_forward = true;
+	} else {
+		const double upstream_depth = Q > 0.0 ? ye : yv;
+		supercritical = froude_squared(upstream_depth, Q) > 1.0;
+		// Q>0: supercritical 0->L, subcritical L->0.
+		// Q<0: physical upstream/downstream swap geometrical ends.
+		integrate_forward = Q > 0.0 ? supercritical : !supercritical;
+	}
+
+	ostringstream message;
+	double residual;
+	if (integrate_forward) {
+		const double calculated_end = ode_megoldo(ye, L / db, 0.0, mp);
+		if (integration_failed)
+			return f_diffusive(ye, yv, mp);
+		residual = yv - calculated_end;
+		jac[1] = 1.0;
+		num_eval_jac[1] = false;
+		message << "\n\t\t GVF integration 0 -> L ("
+		        << (supercritical ? "supercritical" : "subcritical/hydrostatic")
+		        << "), residual=yv-y(L)=" << residual;
+	} else {
+		const double calculated_start = ode_megoldo(yv, -L / db, L, mp);
+		if (integration_failed)
+			return f_diffusive(ye, yv, mp);
+		residual = ye - calculated_start;
+		jac[0] = 1.0;
+		num_eval_jac[0] = false;
+		message << "\n\t\t GVF integration L -> 0 ("
+		        << (supercritical ? "supercritical" : "subcritical")
+		        << "), residual=ye-y(0)=" << residual;
+	}
+	logfile_write(message.str(), 2);
+	return residual;
 }
 
 /// �gegyenlet negat�v t�meg�ram eset�n

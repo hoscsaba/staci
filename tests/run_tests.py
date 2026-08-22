@@ -197,8 +197,8 @@ def resolve_companion_binary(primary: Path, requested: Optional[Path], stem: str
         if resolved.is_file():
             return resolved
     raise TestFailure(
-        f"{stem} was not found beside {primary}. Build optimizer targets or pass "
-        f"--{'calibrate' if stem == 'staci_calibrate' else 'split'}-binary explicitly."
+        f"{stem} was not found beside {primary}. Build that target or pass its "
+        "explicit --*-binary option."
     )
 
 
@@ -238,8 +238,18 @@ def recreate_results_root(tests_dir: Path) -> Path:
     if results_root.parent != tests_dir.resolve() or results_root.name != "test-results":
         raise TestFailure(f"Refusing to clean unexpected results directory: {results_root}")
     if results_root.exists():
-        shutil.rmtree(results_root)
-    for name in ("networks", "hdf5", "split", "calibration"):
+        # Finder/Spotlight may recreate .DS_Store while a directory tree is
+        # being removed on macOS. Retry the same tightly validated target so
+        # this harmless race cannot abort the whole regression suite.
+        for attempt in range(5):
+            try:
+                shutil.rmtree(results_root)
+                break
+            except OSError:
+                if attempt == 4:
+                    raise
+                time.sleep(0.05)
+    for name in ("networks", "hdf5", "split", "calibration", "channel", "channel-network"):
         (results_root / name).mkdir(parents=True, exist_ok=True)
     return results_root
 
@@ -810,6 +820,39 @@ def check_split(
     log.write(f"  Visualization: {png_path}")
 
 
+def check_channel_reference(binary: Path, tests_dir: Path,
+                            case_dir: Path, log: Log) -> None:
+    script = tests_dir / "run_channel_tests.py"
+    require_file(script, "channel reference test script")
+    output = run_command(
+        log,
+        (sys.executable, str(script), "--binary", str(binary),
+         "--results", str(case_dir)),
+        tests_dir,
+        "channel hydraulic reference suite",
+    )
+    if "0 failed" not in output:
+        raise TestFailure("Channel reference suite did not report zero failures")
+    require_file(case_dir / "run_channel_tests.log", "channel reference log")
+    require_file(case_dir / "results.csv", "channel reference CSV")
+
+
+def check_channel_network(binary: Path, tests_dir: Path,
+                          case_dir: Path, log: Log) -> None:
+    script = tests_dir / "run_channel_network_test.py"
+    network = tests_dir / "channel_network_merge_split.spr"
+    output = run_command(
+        log,
+        (sys.executable, str(script), "--binary", str(binary),
+         "--network", str(network), "--results", str(case_dir)),
+        tests_dir,
+        "stationary multi-channel merge/split network",
+    )
+    if "test PASS" not in output:
+        raise TestFailure("Multi-channel test did not report PASS")
+    require_file(case_dir / "run_channel_network_test.log", "multi-channel test log")
+
+
 def run_action(
     kind: str,
     label: str,
@@ -908,6 +951,8 @@ def main() -> int:
         hdf5_work_root = results_root / "hdf5"
         calibration_root = results_root / "calibration"
         split_root = results_root / "split"
+        channel_root = results_root / "channel"
+        channel_network_root = results_root / "channel-network"
 
         log.write("STACI integration test report")
         log.write("=============================")
@@ -962,6 +1007,25 @@ def main() -> int:
             log,
         )
         results.append(("CALIBRATION", Path("anytown_1med.spr"), passed, elapsed, reason))
+
+        passed, elapsed, reason = run_action(
+            "CHANNEL",
+            "steady hydraulic references",
+            lambda: check_channel_reference(binary, tests_dir, channel_root, log),
+            log,
+        )
+        results.append(("CHANNEL", Path("channel.spr references"), passed, elapsed, reason))
+
+        passed, elapsed, reason = run_action(
+            "CHANNEL-NETWORK",
+            "six stationary channels with a 2-in/2-out junction",
+            lambda: check_channel_network(binary, tests_dir, channel_network_root, log),
+            log,
+        )
+        results.append((
+            "CHANNEL-NETWORK", Path("channel_network_merge_split.spr"),
+            passed, elapsed, reason,
+        ))
 
         for segment_count in (2, 3):
             case_dir = split_root / f"{segment_count}-segments"
