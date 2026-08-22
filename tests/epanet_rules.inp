@@ -1,0 +1,132 @@
+[TITLE]
+EPANET rule-based controls regression test
+
+[JUNCTIONS]
+J1  0  1
+
+[RESERVOIRS]
+R1  30
+
+[TANKS]
+T1  0  10  5  15  100  0
+
+[PIPES]
+;ID            Node1  Node2  Length  Diameter  Roughness  MinorLoss  Status
+Base           R1     J1     1000    200       120        0          Open
+TimePipe       R1     J1     900     150       120        0          Open
+ClockPipe      R1     J1     950     150       120        0          Open
+PressurePipe   R1     J1     1050    150       120        0          Open
+FlowPipe       R1     J1     1100    150       120        0          Open
+LogicPipe      R1     J1     1150    150       120        0          Open
+ConflictPipe   R1     J1     1200    150       120        0          Closed
+EqualPipe      R1     J1     1250    150       120        0          Open
+TimeEqualPipe  R1     J1     1300    150       120        0          Open
+ClockEqualPipe R1     J1     1350    150       120        0          Open
+TankRulePipe   R1     J1     1400    150       120        0          Open
+FillTimePipe   R1     J1     1450    150       120        0          Open
+DrainTimePipe  R1     J1     1500    150       120        0          Open
+TankConnection J1     T1     1000    200       120        0          Open
+
+[PUMPS]
+PSet  R1  J1  POWER 1
+
+[RULES]
+RULE ELAPSED
+IF SYSTEM TIME >= 0:20
+THEN PIPE TimePipe STATUS IS CLOSED
+ELSE PIPE TimePipe STATUS IS OPEN
+PRIORITY 2
+
+RULE CLOCK_WINDOW
+IF SYSTEM CLOCKTIME >= 1:00 AM
+AND SYSTEM CLOCKTIME < 2:00 AM
+THEN PIPE ClockPipe STATUS IS CLOSED
+ELSE PIPE ClockPipe STATUS IS OPEN
+PRIORITY 2
+
+RULE PRESSURE_AND_DEMAND
+IF JUNCTION J1 PRESSURE ABOVE 300
+AND SYSTEM DEMAND > 0.5
+THEN PIPE PressurePipe STATUS IS CLOSED
+PRIORITY 3
+
+RULE FLOW_VALUE
+IF LINK Base FLOW ABOVE 0
+THEN PIPE FlowPipe STATUS IS CLOSED
+PRIORITY 3
+
+RULE OR_PRECEDENCE
+IF LINK TimePipe STATUS IS CLOSED
+OR LINK ClockPipe STATUS IS CLOSED
+AND SYSTEM TIME >= 1:00
+THEN PIPE LogicPipe STATUS IS CLOSED
+ELSE PIPE LogicPipe STATUS IS OPEN
+PRIORITY 3
+
+RULE LOW_PRIORITY
+IF SYSTEM TIME >= 0:10
+THEN PIPE ConflictPipe STATUS IS CLOSED
+PRIORITY 1
+
+RULE HIGH_PRIORITY
+IF SYSTEM TIME >= 0:10
+THEN PIPE ConflictPipe STATUS IS OPEN
+PRIORITY 5
+
+RULE EQUAL_FIRST
+IF SYSTEM TIME >= 0:10
+THEN PIPE EqualPipe STATUS IS CLOSED
+PRIORITY 4
+
+RULE EQUAL_SECOND
+IF SYSTEM TIME >= 0:10
+THEN PIPE EqualPipe STATUS IS OPEN
+PRIORITY 4
+
+RULE PUMP_SETTING
+IF SYSTEM TIME >= 0:20
+AND PUMP PSet SETTING > 0.9
+THEN PUMP PSet SETTING IS 0.5
+PRIORITY 6
+
+RULE TIME_EQUALITY
+IF SYSTEM TIME = 0:25
+THEN PIPE TimeEqualPipe STATUS IS CLOSED
+PRIORITY 7
+
+RULE CLOCK_EQUALITY
+IF SYSTEM CLOCKTIME = 1:05 AM
+THEN PIPE ClockEqualPipe STATUS IS CLOSED
+PRIORITY 7
+
+RULE TANK_LEVEL
+IF TANK T1 LEVEL ABOVE 9
+THEN PIPE TankRulePipe STATUS IS CLOSED
+PRIORITY 7
+
+RULE TANK_FILLTIME
+IF TANK T1 FILLTIME BELOW 200
+THEN PIPE FillTimePipe STATUS IS CLOSED
+PRIORITY 7
+
+RULE TANK_DRAINTIME
+IF TANK T1 DRAINTIME ABOVE 100
+THEN PIPE DrainTimePipe STATUS IS CLOSED
+PRIORITY 7
+
+[TIMES]
+Duration             3:00
+Hydraulic Timestep   1:00
+Pattern Timestep     1:00
+Report Timestep      0:30
+Rule Timestep        0:10
+Start ClockTime      12:30 AM
+
+[OPTIONS]
+Units       LPS
+Pressure    KPA
+Headloss    H-W
+Trials      100
+Accuracy    0.001
+
+[END]

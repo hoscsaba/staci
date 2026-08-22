@@ -11,6 +11,7 @@
 #include <cmath>
 #include <cstdlib>
 #include <filesystem>
+#include <functional>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -20,6 +21,7 @@
 #include <set>
 #include <sstream>
 #include <stdexcept>
+#include <utility>
 #include <vector>
 
 namespace {
@@ -51,13 +53,180 @@ struct ReservoirState {
     Agelem *boundary;
 };
 
-struct LevelControl {
+enum class ControlAction {
+    Open,
+    Closed,
+    Setting
+};
+
+enum class ControlTrigger {
+    NodeAbove,
+    NodeBelow,
+    ElapsedTime,
+    ClockTime
+};
+
+struct SimpleControl {
     std::string link_id;
-    bool enable;
-    std::string tank_id;
-    bool below;
-    double threshold_m;
+    ControlAction action;
+    double setting;
+    ControlTrigger trigger;
+    std::string node_id;
+    double threshold_si;
+    long long event_time_s;
     std::size_t line_number;
+};
+
+enum class RuleLogic { And, Or };
+enum class RuleRelation { Equal, NotEqual, Less, LessEqual, Greater, GreaterEqual };
+enum class RuleVariable {
+    Demand, Head, Pressure, Level, FillTime, DrainTime,
+    Flow, Status, Setting, Time, ClockTime
+};
+enum class RuleStatus { Open, Closed, Active };
+
+struct RulePremise {
+    RuleLogic logic;
+    std::string object;
+    std::string id;
+    RuleVariable variable;
+    RuleRelation relation;
+    double value;
+    double tolerance;
+    RuleStatus status;
+    bool status_value;
+    std::size_t line_number;
+};
+
+struct RuleAction {
+    std::string link_id;
+    ControlAction action;
+    double setting;
+    std::size_t line_number;
+};
+
+struct EpanetRule {
+    std::string id;
+    std::vector<RulePremise> premises;
+    std::vector<RuleAction> then_actions;
+    std::vector<RuleAction> else_actions;
+    double priority = 0.0;
+};
+
+class EpanetRuleEngine {
+public:
+    using NumericLookup = std::function<bool(const RulePremise &, double &)>;
+    using StatusLookup = std::function<bool(const RulePremise &, RuleStatus &)>;
+
+    void add(EpanetRule rule) { rules_.push_back(std::move(rule)); }
+    bool empty() const { return rules_.empty(); }
+    std::size_t size() const { return rules_.size(); }
+
+    std::vector<RuleAction> select_actions(const NumericLookup &numeric_lookup,
+                                           const StatusLookup &status_lookup,
+                                           long long interval_start_s,
+                                           long long time_s,
+                                           long long start_clock_s) const {
+        struct Selected { RuleAction action; double priority; };
+        std::map<std::string, Selected> selected;
+        for (const EpanetRule &rule : rules_) {
+            const bool condition = evaluate_rule(
+                rule, numeric_lookup, status_lookup,
+                interval_start_s, time_s, start_clock_s);
+            const std::vector<RuleAction> &actions = condition
+                ? rule.then_actions : rule.else_actions;
+            for (const RuleAction &action : actions) {
+                const auto existing = selected.find(action.link_id);
+                if (existing == selected.end())
+                    selected.emplace(action.link_id, Selected{action, rule.priority});
+                else if (rule.priority > existing->second.priority)
+                    existing->second = Selected{action, rule.priority};
+            }
+        }
+        std::vector<RuleAction> result;
+        for (const auto &entry : selected)
+            result.push_back(entry.second.action);
+        return result;
+    }
+
+private:
+    std::vector<EpanetRule> rules_;
+
+    static bool compare(double actual, RuleRelation relation, double expected,
+                        double tolerance = 0.0) {
+        switch (relation) {
+        case RuleRelation::Equal: return std::abs(actual - expected) <= tolerance;
+        case RuleRelation::NotEqual: return std::abs(actual - expected) > tolerance;
+        case RuleRelation::Less: return actual < expected;
+        case RuleRelation::LessEqual: return actual <= expected;
+        case RuleRelation::Greater: return actual > expected;
+        case RuleRelation::GreaterEqual: return actual >= expected;
+        }
+        return false;
+    }
+
+    static bool time_compare(const RulePremise &premise,
+                             long long interval_start_s, long long time_s,
+                             long long start_clock_s) {
+        long long first = interval_start_s;
+        long long last = time_s;
+        const long long expected = static_cast<long long>(std::llround(premise.value));
+        if (premise.variable == RuleVariable::ClockTime) {
+            const long long day = 24 * 3600;
+            first = (first + start_clock_s) % day;
+            last = (last + start_clock_s) % day;
+        }
+        if (premise.relation == RuleRelation::Equal ||
+            premise.relation == RuleRelation::NotEqual) {
+            const bool crossed = last < first
+                ? expected >= first || expected <= last
+                : expected >= first && expected <= last;
+            return premise.relation == RuleRelation::Equal ? crossed : !crossed;
+        }
+        return compare(static_cast<double>(last), premise.relation,
+                       static_cast<double>(expected), 0.0);
+    }
+
+    static bool evaluate_premise(const RulePremise &premise,
+                                 const NumericLookup &numeric_lookup,
+                                 const StatusLookup &status_lookup,
+                                 long long interval_start_s, long long time_s,
+                                 long long start_clock_s) {
+        if (premise.variable == RuleVariable::Time ||
+            premise.variable == RuleVariable::ClockTime)
+            return time_compare(premise, interval_start_s, time_s, start_clock_s);
+        if (premise.status_value) {
+            RuleStatus actual = RuleStatus::Closed;
+            if (!status_lookup(premise, actual))
+                return false;
+            const bool equal = actual == premise.status;
+            return premise.relation == RuleRelation::NotEqual ? !equal : equal;
+        }
+        double actual = 0.0;
+        return numeric_lookup(premise, actual) &&
+               compare(actual, premise.relation, premise.value, premise.tolerance);
+    }
+
+    static bool evaluate_rule(const EpanetRule &rule,
+                              const NumericLookup &numeric_lookup,
+                              const StatusLookup &status_lookup,
+                              long long interval_start_s, long long time_s,
+                              long long start_clock_s) {
+        bool result = true;
+        for (const RulePremise &premise : rule.premises) {
+            if (premise.logic == RuleLogic::Or) {
+                if (!result)
+                    result = evaluate_premise(premise, numeric_lookup, status_lookup,
+                                              interval_start_s, time_s, start_clock_s);
+            } else {
+                if (!result)
+                    return false;
+                result = evaluate_premise(premise, numeric_lookup, status_lookup,
+                                          interval_start_s, time_s, start_clock_s);
+            }
+        }
+        return result;
+    }
 };
 
 std::string trim(const std::string &value) {
@@ -99,6 +268,50 @@ long long parse_time_seconds(const std::string &value) {
     const double hours = parse_number(value.substr(0, colon), "[TIMES]");
     const double minutes = parse_number(value.substr(colon + 1), "[TIMES]");
     return static_cast<long long>(std::llround(hours * 3600.0 + minutes * 60.0));
+}
+
+long long parse_duration_seconds(const std::vector<std::string> &fields,
+                                 std::size_t value_index,
+                                 const std::string &context) {
+    if (value_index >= fields.size())
+        throw std::runtime_error("Missing time value in " + context + ".");
+    if (fields[value_index].find(':') != std::string::npos)
+        return parse_time_seconds(fields[value_index]);
+    double multiplier = 3600.0;
+    if (value_index + 1 < fields.size()) {
+        const std::string unit = upper(fields[value_index + 1]);
+        if (unit == "SEC" || unit == "SECOND" || unit == "SECONDS") multiplier = 1.0;
+        else if (unit == "MIN" || unit == "MINUTE" || unit == "MINUTES") multiplier = 60.0;
+        else if (unit == "HOUR" || unit == "HOURS") multiplier = 3600.0;
+        else if (unit == "DAY" || unit == "DAYS") multiplier = 86400.0;
+    }
+    return static_cast<long long>(std::llround(
+        parse_number(fields[value_index], context) * multiplier));
+}
+
+long long parse_clock_seconds(const std::vector<std::string> &fields,
+                              std::size_t value_index,
+                              const std::string &context) {
+    if (value_index >= fields.size())
+        throw std::runtime_error("Missing clock time in " + context + ".");
+    long long seconds = parse_time_seconds(fields[value_index]);
+    if (value_index + 1 < fields.size()) {
+        const std::string suffix = upper(fields[value_index + 1]);
+        if (suffix == "AM" || suffix == "PM") {
+            const long long minutes_and_seconds = seconds % 3600;
+            long long hour = seconds / 3600;
+            if (hour < 1 || hour > 12)
+                throw std::runtime_error("Invalid 12-hour clock value in " + context + ".");
+            if (hour == 12)
+                hour = 0;
+            if (suffix == "PM")
+                hour += 12;
+            seconds = hour * 3600 + minutes_and_seconds;
+        }
+    }
+    if (seconds < 0 || seconds >= 24 * 3600)
+        throw std::runtime_error("Clock time must be within one day in " + context + ".");
+    return seconds;
 }
 
 bool us_units(const std::string &flow_units) {
@@ -151,8 +364,10 @@ class SimulationModel {
 public:
     explicit SimulationModel(const std::string &filename)
         : filename_(filename), flow_units_("LPS"), demand_multiplier_(1.0),
+          pressure_units_(""), specific_gravity_(1.0), start_clock_s_(0),
           duration_s_(0), hydraulic_step_s_(3600), pattern_step_s_(3600),
-          pattern_start_s_(0), report_step_s_(3600), report_start_s_(0) {
+          pattern_start_s_(0), report_step_s_(3600), report_start_s_(0),
+          rule_step_s_(0) {
         parse_file();
         parse_options();
         parse_times();
@@ -160,6 +375,7 @@ public:
         parse_demands();
         parse_boundaries();
         parse_controls();
+        parse_rules();
         parse_status();
     }
 
@@ -340,9 +556,21 @@ public:
                 tank.boundary->Set_dprop("water_level", tank.level_m);
                 tank.boundary->Set_enabled(true);
             }
-            apply_controls(links, tanks);
+            apply_time_controls(links, time_s);
 
             bool converged = system.solve_system();
+            const std::size_t control_iterations =
+                std::max<std::size_t>(1, controls_.size() + 1);
+            std::size_t control_iteration = 0;
+            for (; control_iteration < control_iterations; ++control_iteration) {
+                if (!apply_node_controls(links, nodes, tanks))
+                    break;
+                converged = system.solve_system() && converged;
+            }
+            if (control_iteration == control_iterations)
+                warn("CONTROLS", "", 0,
+                     "Node-based controls did not reach a stable state; the last state was retained.");
+
             bool constrained_tank = false;
             for (TankState &tank : tanks) {
                 const double flow = tank.boundary->Get_Q();
@@ -369,7 +597,15 @@ public:
 
             if (time_s == duration_s_)
                 break;
-            const long long step_s = std::min(simulation_step_s, duration_s_ - time_s);
+            const long long next_grid_s =
+                (time_s / simulation_step_s + 1) * simulation_step_s;
+            long long next_state_s = std::min(next_grid_s, duration_s_);
+            const long long control_event_s = next_time_control_event(time_s);
+            if (control_event_s > time_s && control_event_s <= duration_s_)
+                next_state_s = std::min(next_state_s, control_event_s);
+            if (!rule_engine_.empty())
+                next_state_s = scan_rules(links, nodes, tanks, time_s, next_state_s);
+            const long long step_s = next_state_s - time_s;
             update_tanks(tanks, static_cast<double>(step_s));
             time_s += step_s;
         }
@@ -384,6 +620,9 @@ public:
                        << "effective_simulation_timestep_seconds," << simulation_step_s << "\n"
                        << "pattern_timestep_seconds," << pattern_step_s_ << "\n"
                        << "report_timestep_seconds," << report_step_s_ << "\n"
+                       << "simple_controls," << controls_.size() << "\n"
+                       << "rules," << rule_engine_.size() << "\n"
+                       << "rule_timestep_seconds," << rule_step_s_ << "\n"
                        << "hydraulic_states," << state_count << "\n"
                        << "failed_states," << failed_count << "\n"
                        << "warnings," << warnings_.size() << "\n";
@@ -407,21 +646,27 @@ private:
     std::map<std::string, std::vector<DemandComponent> > demands_;
     std::vector<TankState> tank_definitions_;
     std::vector<ReservoirState> reservoir_definitions_;
-    std::vector<LevelControl> controls_;
+    std::vector<SimpleControl> controls_;
+    EpanetRuleEngine rule_engine_;
     std::map<std::string, bool> initial_status_;
     std::map<std::string, double> initial_settings_;
+    std::map<std::string, double> controlled_pump_settings_;
     std::vector<std::string> warnings_;
     std::set<std::string> warning_keys_;
     std::set<std::string> missing_patterns_;
     std::string flow_units_;
     std::string default_pattern_;
     double demand_multiplier_;
+    std::string pressure_units_;
+    double specific_gravity_;
+    long long start_clock_s_;
     long long duration_s_;
     long long hydraulic_step_s_;
     long long pattern_step_s_;
     long long pattern_start_s_;
     long long report_step_s_;
     long long report_start_s_;
+    long long rule_step_s_;
 
     void parse_file() {
         std::ifstream input(filename_.c_str());
@@ -462,7 +707,16 @@ private:
             else if (record.fields.size() > 2 && key == "DEMAND" &&
                      upper(record.fields[1]) == "MULTIPLIER")
                 demand_multiplier_ = parse_number(record.fields[2], "DEMAND MULTIPLIER");
+            else if (key == "PRESSURE")
+                pressure_units_ = upper(record.fields[1]);
+            else if (record.fields.size() > 2 && key == "SPECIFIC" &&
+                     upper(record.fields[1]) == "GRAVITY")
+                specific_gravity_ = parse_number(record.fields[2], "SPECIFIC GRAVITY");
         }
+        if (pressure_units_.empty())
+            pressure_units_ = us_units(flow_units_) ? "PSI" : "METERS";
+        if (specific_gravity_ <= 0.0)
+            throw std::runtime_error("EPANET specific gravity must be positive.");
     }
 
     void parse_times() {
@@ -487,7 +741,15 @@ private:
             else if (record.fields.size() > 2 && first == "REPORT" &&
                      upper(record.fields[1]) == "START")
                 report_start_s_ = parse_time_seconds(record.fields[2]);
+            else if (record.fields.size() > 2 && first == "RULE" &&
+                     upper(record.fields[1]) == "TIMESTEP")
+                rule_step_s_ = parse_duration_seconds(record.fields, 2, "[TIMES] RULE TIMESTEP");
+            else if (record.fields.size() > 2 && first == "START" &&
+                     upper(record.fields[1]) == "CLOCKTIME")
+                start_clock_s_ = parse_clock_seconds(record.fields, 2, "[TIMES] START CLOCKTIME");
         }
+        if (rule_step_s_ <= 0)
+            rule_step_s_ = std::max(1LL, hydraulic_step_s_ / 10);
     }
 
     void parse_patterns() {
@@ -554,22 +816,283 @@ private:
 
     void parse_controls() {
         const bool is_us = us_units(flow_units_);
+        std::set<std::string> tank_ids;
+        for (const TankState &tank : tank_definitions_)
+            tank_ids.insert(tank.id);
         for (const Record &record : records("CONTROLS")) {
-            if (record.fields.size() >= 8 && upper(record.fields[0]) == "LINK" &&
-                (upper(record.fields[2]) == "OPEN" || upper(record.fields[2]) == "CLOSED") &&
-                upper(record.fields[3]) == "IF" && upper(record.fields[4]) == "NODE" &&
-                (upper(record.fields[6]) == "BELOW" || upper(record.fields[6]) == "ABOVE")) {
-                controls_.push_back(LevelControl{
-                    record.fields[1], upper(record.fields[2]) == "OPEN", record.fields[5],
-                    upper(record.fields[6]) == "BELOW",
-                    length_to_metres(parse_number(record.fields[7], "[CONTROLS]"), is_us),
+            if (record.fields.size() < 5 || upper(record.fields[0]) != "LINK") {
+                warn("CONTROLS", record.fields.size() > 1 ? record.fields[1] : "",
+                     record.line_number, "Invalid simple control syntax; control was ignored.");
+                continue;
+            }
+
+            ControlAction action = ControlAction::Setting;
+            double setting = 0.0;
+            const std::string action_text = upper(record.fields[2]);
+            if (action_text == "OPEN")
+                action = ControlAction::Open;
+            else if (action_text == "CLOSED")
+                action = ControlAction::Closed;
+            else {
+                setting = parse_number(record.fields[2], "[CONTROLS] link setting");
+                if (setting < 0.0) {
+                    warn("CONTROLS", record.fields[1], record.line_number,
+                         "Negative link setting was ignored.");
+                    continue;
+                }
+            }
+
+            const std::string trigger_keyword = upper(record.fields[3]);
+            if (trigger_keyword == "IF" && record.fields.size() >= 8 &&
+                upper(record.fields[4]) == "NODE" &&
+                (upper(record.fields[6]) == "ABOVE" || upper(record.fields[6]) == "BELOW")) {
+                const std::string node_id = record.fields[5];
+                double threshold = parse_number(record.fields[7], "[CONTROLS] node threshold");
+                if (tank_ids.count(node_id) != 0) {
+                    threshold = length_to_metres(threshold, is_us);
+                } else if (pressure_units_ == "KPA") {
+                    threshold *= 1000.0 / (1000.0 * specific_gravity_ * 9.81);
+                } else if (pressure_units_ == "PSI") {
+                    threshold *= 6894.757293168 / (1000.0 * specific_gravity_ * 9.81);
+                } else if (pressure_units_ == "FEET") {
+                    threshold *= 0.3048;
+                } else if (pressure_units_ != "METERS") {
+                    warn("CONTROLS", record.fields[1], record.line_number,
+                         "Unknown pressure unit; node threshold was interpreted as metres of head.");
+                }
+                controls_.push_back(SimpleControl{
+                    record.fields[1], action, setting,
+                    upper(record.fields[6]) == "ABOVE"
+                        ? ControlTrigger::NodeAbove : ControlTrigger::NodeBelow,
+                    node_id, threshold, 0, record.line_number});
+            } else if (trigger_keyword == "AT" && record.fields.size() >= 6 &&
+                       upper(record.fields[4]) == "TIME") {
+                const long long event_s = parse_time_seconds(record.fields[5]);
+                if (event_s < 0) {
+                    warn("CONTROLS", record.fields[1], record.line_number,
+                         "Negative elapsed control time was ignored.");
+                    continue;
+                }
+                controls_.push_back(SimpleControl{
+                    record.fields[1], action, setting, ControlTrigger::ElapsedTime,
+                    "", 0.0, event_s, record.line_number});
+            } else if (trigger_keyword == "AT" && record.fields.size() >= 6 &&
+                       upper(record.fields[4]) == "CLOCKTIME") {
+                controls_.push_back(SimpleControl{
+                    record.fields[1], action, setting, ControlTrigger::ClockTime,
+                    "", 0.0,
+                    parse_clock_seconds(record.fields, 5, "[CONTROLS] CLOCKTIME"),
                     record.line_number});
             } else {
-                warn("CONTROLS", record.fields.size() > 1 ? record.fields[1] : "",
-                     record.line_number,
-                     "Only OPEN/CLOSED pump controls based on tank levels are executed in EPS mode.");
+                warn("CONTROLS", record.fields[1], record.line_number,
+                     "Invalid simple control trigger; control was ignored.");
             }
         }
+    }
+
+    double pressure_to_head_m(double value) const {
+        if (pressure_units_ == "KPA")
+            return value * 1000.0 / (1000.0 * specific_gravity_ * 9.81);
+        if (pressure_units_ == "PSI")
+            return value * 6894.757293168 / (1000.0 * specific_gravity_ * 9.81);
+        if (pressure_units_ == "FEET")
+            return value * 0.3048;
+        return value;
+    }
+
+    static RuleRelation parse_rule_relation(const std::string &text) {
+        const std::string value = upper(text);
+        if (value == "=" || value == "IS") return RuleRelation::Equal;
+        if (value == "<>" || value == "NOT") return RuleRelation::NotEqual;
+        if (value == "<" || value == "BELOW") return RuleRelation::Less;
+        if (value == "<=") return RuleRelation::LessEqual;
+        if (value == ">" || value == "ABOVE") return RuleRelation::Greater;
+        if (value == ">=") return RuleRelation::GreaterEqual;
+        throw std::runtime_error("Unknown rule relation '" + text + "'.");
+    }
+
+    static RuleVariable parse_rule_variable(const std::string &text) {
+        const std::string value = upper(text);
+        if (value == "DEMAND") return RuleVariable::Demand;
+        if (value == "HEAD" || value == "GRADE") return RuleVariable::Head;
+        if (value == "PRESSURE") return RuleVariable::Pressure;
+        if (value == "LEVEL") return RuleVariable::Level;
+        if (value == "FILLTIME") return RuleVariable::FillTime;
+        if (value == "DRAINTIME") return RuleVariable::DrainTime;
+        if (value == "FLOW") return RuleVariable::Flow;
+        if (value == "STATUS") return RuleVariable::Status;
+        if (value == "SETTING") return RuleVariable::Setting;
+        if (value == "TIME") return RuleVariable::Time;
+        if (value == "CLOCKTIME") return RuleVariable::ClockTime;
+        throw std::runtime_error("Unknown rule variable '" + text + "'.");
+    }
+
+    RulePremise parse_rule_premise(const Record &record, RuleLogic logic) const {
+        if (record.fields.size() < 5)
+            throw std::runtime_error("Incomplete rule premise.");
+        const std::string object = upper(record.fields[1]);
+        const bool system = object == "SYSTEM";
+        const std::size_t variable_index = system ? 2 : 3;
+        const std::size_t relation_index = system ? 3 : 4;
+        const std::size_t value_index = system ? 4 : 5;
+        if (value_index >= record.fields.size())
+            throw std::runtime_error("Incomplete rule premise.");
+        static const std::set<std::string> valid_objects = {
+            "SYSTEM", "NODE", "JUNCTION", "RESERVOIR", "TANK",
+            "LINK", "PIPE", "PUMP", "VALVE"};
+        if (valid_objects.count(object) == 0)
+            throw std::runtime_error("Unknown rule object '" + object + "'.");
+
+        const RuleVariable variable = parse_rule_variable(record.fields[variable_index]);
+        const RuleRelation relation = parse_rule_relation(record.fields[relation_index]);
+        const bool node_object = object == "NODE" || object == "JUNCTION" ||
+            object == "RESERVOIR" || object == "TANK";
+        const bool link_object = object == "LINK" || object == "PIPE" ||
+            object == "PUMP" || object == "VALVE";
+        if (system && variable != RuleVariable::Demand && variable != RuleVariable::Time &&
+            variable != RuleVariable::ClockTime)
+            throw std::runtime_error("Invalid SYSTEM rule variable.");
+        if (node_object && variable != RuleVariable::Demand && variable != RuleVariable::Head &&
+            variable != RuleVariable::Pressure && variable != RuleVariable::Level &&
+            variable != RuleVariable::FillTime && variable != RuleVariable::DrainTime)
+            throw std::runtime_error("Invalid node rule variable.");
+        if (link_object && variable != RuleVariable::Flow && variable != RuleVariable::Status &&
+            variable != RuleVariable::Setting)
+            throw std::runtime_error("Invalid link rule variable.");
+
+        RulePremise premise{logic, object, system ? "" : record.fields[2], variable,
+                            relation, 0.0, 1.0e-3, RuleStatus::Closed, false,
+                            record.line_number};
+        const std::string raw_value = upper(record.fields[value_index]);
+        if (variable == RuleVariable::Status) {
+            if (relation != RuleRelation::Equal && relation != RuleRelation::NotEqual)
+                throw std::runtime_error("STATUS premises require IS, NOT, =, or <>.");
+            premise.status_value = true;
+            if (raw_value == "OPEN") premise.status = RuleStatus::Open;
+            else if (raw_value == "CLOSED") premise.status = RuleStatus::Closed;
+            else if (raw_value == "ACTIVE") premise.status = RuleStatus::Active;
+            else throw std::runtime_error("Unknown rule status '" + raw_value + "'.");
+            return premise;
+        }
+        if (variable == RuleVariable::ClockTime) {
+            premise.value = static_cast<double>(
+                parse_clock_seconds(record.fields, value_index, "[RULES] CLOCKTIME"));
+            return premise;
+        }
+        if (variable == RuleVariable::Time) {
+            premise.value = static_cast<double>(
+                parse_duration_seconds(record.fields, value_index, "[RULES] TIME"));
+            return premise;
+        }
+
+        double value = parse_number(record.fields[value_index], "[RULES]");
+        if (variable == RuleVariable::Demand) {
+            value = flow_to_m3_per_hour(value, flow_units_);
+            premise.tolerance = flow_to_m3_per_hour(1.0e-3, flow_units_);
+        } else if (variable == RuleVariable::Flow) {
+            value = flow_to_m3_per_hour(value, flow_units_) / 3600.0;
+            premise.tolerance = flow_to_m3_per_hour(1.0e-3, flow_units_) / 3600.0;
+        } else if (variable == RuleVariable::Head || variable == RuleVariable::Level) {
+            value = length_to_metres(value, us_units(flow_units_));
+            premise.tolerance = length_to_metres(1.0e-3, us_units(flow_units_));
+        } else if (variable == RuleVariable::Pressure) {
+            value = pressure_to_head_m(value);
+            premise.tolerance = pressure_to_head_m(1.0e-3);
+        } else if (variable == RuleVariable::FillTime || variable == RuleVariable::DrainTime) {
+            value *= 3600.0;
+            premise.tolerance = 3.6;
+        }
+        premise.value = value;
+        return premise;
+    }
+
+    RuleAction parse_rule_action(const Record &record) const {
+        if (record.fields.size() != 6 || upper(record.fields[4]) != "IS")
+            throw std::runtime_error("Invalid rule action syntax.");
+        const std::string object = upper(record.fields[1]);
+        if (object != "LINK" && object != "PIPE" && object != "PUMP" && object != "VALVE")
+            throw std::runtime_error("Rule action must target a link.");
+        const std::string attribute = upper(record.fields[3]);
+        if (attribute != "STATUS" && attribute != "SETTING")
+            throw std::runtime_error("Rule action requires STATUS or SETTING.");
+        const std::string value = upper(record.fields[5]);
+        if (value == "OPEN")
+            return RuleAction{record.fields[2], ControlAction::Open, 0.0, record.line_number};
+        if (value == "CLOSED")
+            return RuleAction{record.fields[2], ControlAction::Closed, 0.0, record.line_number};
+        if (value == "ACTIVE")
+            throw std::runtime_error("ACTIVE valve actions are not supported yet.");
+        const double setting = parse_number(record.fields[5], "[RULES] action setting");
+        if (setting < 0.0)
+            throw std::runtime_error("Negative rule settings are not supported.");
+        return RuleAction{record.fields[2], ControlAction::Setting, setting,
+                          record.line_number};
+    }
+
+    void parse_rules() {
+        enum class Phase { None, Premises, ThenActions, ElseActions };
+        EpanetRule current;
+        Phase phase = Phase::None;
+        std::size_t rule_line = 0;
+        auto finish_rule = [&]() {
+            if (current.id.empty())
+                return;
+            if (current.premises.empty() || current.then_actions.empty())
+                warn("RULES", current.id, rule_line,
+                     "Rule requires at least IF and THEN clauses; it was ignored.");
+            else
+                rule_engine_.add(std::move(current));
+            current = EpanetRule{};
+            phase = Phase::None;
+        };
+
+        for (const Record &record : records("RULES")) {
+            if (record.fields.empty())
+                continue;
+            const std::string keyword = upper(record.fields[0]);
+            try {
+                if (keyword == "RULE") {
+                    finish_rule();
+                    if (record.fields.size() < 2)
+                        throw std::runtime_error("RULE requires an ID.");
+                    current.id = record.fields[1];
+                    rule_line = record.line_number;
+                } else if (current.id.empty()) {
+                    throw std::runtime_error("Clause appears before RULE.");
+                } else if (keyword == "IF") {
+                    phase = Phase::Premises;
+                    current.premises.push_back(parse_rule_premise(record, RuleLogic::And));
+                } else if (keyword == "OR") {
+                    if (phase != Phase::Premises)
+                        throw std::runtime_error("OR is only valid between premises.");
+                    current.premises.push_back(parse_rule_premise(record, RuleLogic::Or));
+                } else if (keyword == "THEN") {
+                    phase = Phase::ThenActions;
+                    current.then_actions.push_back(parse_rule_action(record));
+                } else if (keyword == "ELSE") {
+                    phase = Phase::ElseActions;
+                    current.else_actions.push_back(parse_rule_action(record));
+                } else if (keyword == "AND") {
+                    if (phase == Phase::Premises)
+                        current.premises.push_back(parse_rule_premise(record, RuleLogic::And));
+                    else if (phase == Phase::ThenActions)
+                        current.then_actions.push_back(parse_rule_action(record));
+                    else if (phase == Phase::ElseActions)
+                        current.else_actions.push_back(parse_rule_action(record));
+                    else
+                        throw std::runtime_error("Misplaced AND clause.");
+                } else if (keyword == "PRIORITY") {
+                    if (record.fields.size() < 2)
+                        throw std::runtime_error("PRIORITY requires a value.");
+                    current.priority = parse_number(record.fields[1], "[RULES] PRIORITY");
+                } else {
+                    throw std::runtime_error("Unknown rule clause '" + keyword + "'.");
+                }
+            } catch (const std::exception &error) {
+                warn("RULES", current.id, record.line_number, error.what());
+            }
+        }
+        finish_rule();
     }
 
     void parse_status() {
@@ -633,35 +1156,262 @@ private:
             if (pump == nullptr)
                 continue;
             const EpanetPumpMetadata &metadata = pump->GetEpanetPumpMetadata();
-            const double speed = !metadata.speed_pattern_id.empty()
+            double speed = !metadata.speed_pattern_id.empty()
                 ? pattern_value(metadata.speed_pattern_id, time_s)
                 : (metadata.initial_setting_specified
                        ? metadata.initial_setting : metadata.base_speed);
+            const auto controlled = controlled_pump_settings_.find(link.first);
+            if (controlled != controlled_pump_settings_.end())
+                speed = controlled->second;
             pump->SetOperatingSpeed(speed);
         }
     }
 
-    void apply_controls(const std::map<std::string, Agelem *> &links,
-                        const std::vector<TankState> &tanks) {
+    bool apply_control_action(const SimpleControl &control,
+                              const std::map<std::string, Agelem *> &links,
+                              const std::string &section = "CONTROLS") {
+        const auto found = links.find(control.link_id);
+        if (found == links.end()) {
+            warn(section, control.link_id, control.line_number,
+                 "Controlled link was not found in the imported STACI system.");
+            return false;
+        }
+        Agelem *link = found->second;
+        const bool old_enabled = link->Is_enabled();
+        auto *pump = dynamic_cast<EpanetPumpConfigurable *>(link);
+        const double old_setting = pump == nullptr ? 0.0 : pump->GetOperatingSpeed();
+
+        if (control.action == ControlAction::Open) {
+            link->Set_enabled(true);
+        } else if (control.action == ControlAction::Closed) {
+            link->Set_enabled(false);
+        } else if (pump != nullptr) {
+            pump->SetOperatingSpeed(control.setting);
+            controlled_pump_settings_[control.link_id] = control.setting;
+            link->Set_enabled(control.setting > 0.0);
+        } else if (link->GetType() == "Cso") {
+            link->Set_enabled(control.setting > 0.0);
+        } else {
+            warn(section, control.link_id, control.line_number,
+                 "Numeric settings currently require a pipe or EPANET pump; the control was ignored.");
+            return false;
+        }
+
+        return link->Is_enabled() != old_enabled ||
+               (pump != nullptr &&
+                std::abs(pump->GetOperatingSpeed() - old_setting) > 1.0e-12);
+    }
+
+    bool time_control_is_active(const SimpleControl &control, long long time_s) const {
+        if (control.trigger == ControlTrigger::ElapsedTime)
+            return time_s == control.event_time_s;
+        if (control.trigger == ControlTrigger::ClockTime)
+            return (start_clock_s_ + time_s) % (24 * 3600) == control.event_time_s;
+        return false;
+    }
+
+    long long scan_rules(const std::map<std::string, Agelem *> &links,
+                         const std::map<std::string, Csomopont *> &nodes,
+                         const std::vector<TankState> &tanks,
+                         long long time_s, long long candidate_time_s) {
+        long long previous_check_s = time_s + 1;
+        long long check_s = std::min(
+            (time_s / rule_step_s_ + 1) * rule_step_s_, candidate_time_s);
+        while (check_s > time_s && check_s <= candidate_time_s) {
+            std::map<std::string, double> projected_levels;
+            for (const TankState &tank : tanks) {
+                const double projected = tank.level_m + tank.boundary->Get_Q() *
+                    static_cast<double>(check_s - time_s) / tank.area_m2;
+                projected_levels[tank.id] = std::max(
+                    tank.min_level_m, std::min(tank.max_level_m, projected));
+            }
+
+            const EpanetRuleEngine::NumericLookup numeric_lookup =
+                [&](const RulePremise &premise, double &value) -> bool {
+                    if (premise.object == "SYSTEM" && premise.variable == RuleVariable::Demand) {
+                        value = 0.0;
+                        for (const auto &node : nodes)
+                            value += node.second->Get_dprop("demand");
+                        return true;
+                    }
+                    if (premise.variable == RuleVariable::Demand ||
+                        premise.variable == RuleVariable::Head ||
+                        premise.variable == RuleVariable::Pressure ||
+                        premise.variable == RuleVariable::Level ||
+                        premise.variable == RuleVariable::FillTime ||
+                        premise.variable == RuleVariable::DrainTime) {
+                        const auto node = nodes.find(premise.id);
+                        if (node == nodes.end()) {
+                            warn("RULES", premise.id, premise.line_number,
+                                 "Referenced rule node was not found.");
+                            return false;
+                        }
+                        const auto level = projected_levels.find(premise.id);
+                        if (premise.variable == RuleVariable::Demand)
+                            value = node->second->Get_dprop("demand");
+                        else if (premise.variable == RuleVariable::Level)
+                            value = level == projected_levels.end() ? node->second->Get_p() : level->second;
+                        else if (premise.variable == RuleVariable::Head)
+                            value = node->second->Get_h() +
+                                (level == projected_levels.end() ? node->second->Get_p() : level->second);
+                        else if (premise.variable == RuleVariable::Pressure)
+                            value = level == projected_levels.end() ? node->second->Get_p() : level->second;
+                        else {
+                            const auto tank = std::find_if(tanks.begin(), tanks.end(),
+                                [&](const TankState &item) { return item.id == premise.id; });
+                            if (tank == tanks.end())
+                                return false;
+                            const double flow = tank->boundary->Get_Q();
+                            if (premise.variable == RuleVariable::FillTime)
+                                value = flow > 0.0
+                                    ? (tank->max_level_m - level->second) * tank->area_m2 / flow
+                                    : std::numeric_limits<double>::infinity();
+                            else
+                                value = flow < 0.0
+                                    ? (level->second - tank->min_level_m) * tank->area_m2 / -flow
+                                    : std::numeric_limits<double>::infinity();
+                        }
+                        return true;
+                    }
+                    const auto link = links.find(premise.id);
+                    if (link == links.end()) {
+                        warn("RULES", premise.id, premise.line_number,
+                             "Referenced rule link was not found.");
+                        return false;
+                    }
+                    if (premise.variable == RuleVariable::Flow) {
+                        value = std::abs(link->second->Get_Q());
+                        return true;
+                    }
+                    if (premise.variable == RuleVariable::Setting) {
+                        auto *pump = dynamic_cast<EpanetPumpConfigurable *>(link->second);
+                        if (pump == nullptr) {
+                            warn("RULES", premise.id, premise.line_number,
+                                 "SETTING premises currently require an EPANET pump.");
+                            return false;
+                        }
+                        value = pump->GetOperatingSpeed();
+                        return true;
+                    }
+                    return false;
+                };
+
+            const EpanetRuleEngine::StatusLookup status_lookup =
+                [&](const RulePremise &premise, RuleStatus &value) -> bool {
+                    if (premise.status == RuleStatus::Active) {
+                        warn("RULES", premise.id, premise.line_number,
+                             "ACTIVE status premises require an imported EPANET control valve.");
+                        return false;
+                    }
+                    const auto link = links.find(premise.id);
+                    if (link == links.end()) {
+                        warn("RULES", premise.id, premise.line_number,
+                             "Referenced rule link was not found.");
+                        return false;
+                    }
+                    value = link->second->Is_enabled() ? RuleStatus::Open : RuleStatus::Closed;
+                    return true;
+                };
+
+            const std::vector<RuleAction> actions = rule_engine_.select_actions(
+                numeric_lookup, status_lookup, previous_check_s, check_s, start_clock_s_);
+            bool changed = false;
+            for (const RuleAction &action : actions) {
+                const SimpleControl control{
+                    action.link_id, action.action, action.setting,
+                    ControlTrigger::ElapsedTime, "", 0.0, check_s,
+                    action.line_number};
+                changed = apply_control_action(control, links, "RULES") || changed;
+            }
+            if (changed)
+                return check_s;
+            if (check_s == candidate_time_s)
+                break;
+            previous_check_s = check_s + 1;
+            check_s = std::min(check_s + rule_step_s_, candidate_time_s);
+        }
+        return candidate_time_s;
+    }
+
+    void apply_time_controls(const std::map<std::string, Agelem *> &links,
+                             long long time_s) {
+        for (const SimpleControl &control : controls_)
+            if (time_control_is_active(control, time_s))
+                apply_control_action(control, links);
+    }
+
+    long long next_time_control_event(long long time_s) const {
+        long long next = duration_s_ + 1;
+        for (const SimpleControl &control : controls_) {
+            if (control.trigger == ControlTrigger::ElapsedTime) {
+                if (control.event_time_s > time_s)
+                    next = std::min(next, control.event_time_s);
+            } else if (control.trigger == ControlTrigger::ClockTime) {
+                const long long day_s = 24 * 3600;
+                const long long clock_now = (start_clock_s_ + time_s) % day_s;
+                long long delta = (control.event_time_s - clock_now + day_s) % day_s;
+                if (delta == 0)
+                    delta = day_s;
+                next = std::min(next, time_s + delta);
+            }
+        }
+        return next;
+    }
+
+    bool apply_node_controls(const std::map<std::string, Agelem *> &links,
+                             const std::map<std::string, Csomopont *> &nodes,
+                             const std::vector<TankState> &tanks) {
         std::map<std::string, double> levels;
         for (const TankState &tank : tanks)
             levels[tank.id] = tank.level_m;
-        for (const LevelControl &control : controls_) {
+
+        std::map<std::string, std::pair<bool, double> > state_before;
+        for (const SimpleControl &control : controls_) {
             const auto link = links.find(control.link_id);
-            const auto level = levels.find(control.tank_id);
-            if (link == links.end() || level == levels.end())
+            if (link == links.end())
                 continue;
-            if (!is_pump(link->second)) {
-                warn("CONTROLS", control.link_id, control.line_number,
-                     "Only pump OPEN/CLOSED controls are currently switchable.");
-                continue;
-            }
-            const bool condition = control.below
-                ? level->second < control.threshold_m
-                : level->second > control.threshold_m;
-            if (condition)
-                link->second->Set_enabled(control.enable);
+            auto *pump = dynamic_cast<EpanetPumpConfigurable *>(link->second);
+            state_before[control.link_id] = std::make_pair(
+                link->second->Is_enabled(),
+                pump == nullptr ? 0.0 : pump->GetOperatingSpeed());
         }
+
+        for (const SimpleControl &control : controls_) {
+            if (control.trigger != ControlTrigger::NodeAbove &&
+                control.trigger != ControlTrigger::NodeBelow)
+                continue;
+
+            double value = 0.0;
+            const auto level = levels.find(control.node_id);
+            if (level != levels.end()) {
+                value = level->second;
+            } else {
+                const auto node = nodes.find(control.node_id);
+                if (node == nodes.end()) {
+                    warn("CONTROLS", control.link_id, control.line_number,
+                         "Control node '" + control.node_id + "' was not found.");
+                    continue;
+                }
+                value = node->second->Get_p();
+            }
+
+            const bool condition = control.trigger == ControlTrigger::NodeBelow
+                ? value < control.threshold_si : value > control.threshold_si;
+            if (condition)
+                apply_control_action(control, links);
+        }
+
+        for (const auto &old_state : state_before) {
+            const auto link = links.find(old_state.first);
+            if (link == links.end())
+                continue;
+            auto *pump = dynamic_cast<EpanetPumpConfigurable *>(link->second);
+            const double setting = pump == nullptr ? 0.0 : pump->GetOperatingSpeed();
+            if (link->second->Is_enabled() != old_state.second.first ||
+                std::abs(setting - old_state.second.second) > 1.0e-12)
+                return true;
+        }
+        return false;
     }
 
     void update_tanks(std::vector<TankState> &tanks, double step_s) {

@@ -561,6 +561,44 @@ if(BUILD_TESTING)
     set_tests_properties(epanet_extended_period_results PROPERTIES
         DEPENDS epanet_extended_period_simulation
     )
+
+    add_test(NAME epanet_simple_controls_simulation
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> --epanet-eps
+                "${PROJECT_SOURCE_DIR}/tests/epanet_controls.inp"
+                -o "${CMAKE_CURRENT_BINARY_DIR}/epanet-controls-result"
+    )
+    set_tests_properties(epanet_simple_controls_simulation PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "EPANET EPS complete: 33 hydraulic states, 0 failed states"
+    )
+
+    add_test(NAME epanet_simple_controls_results
+        COMMAND "${CMAKE_COMMAND}"
+                -DRESULT_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/epanet-controls-result
+                -P "${PROJECT_SOURCE_DIR}/tests/verify_epanet_controls.cmake"
+    )
+    set_tests_properties(epanet_simple_controls_results PROPERTIES
+        DEPENDS epanet_simple_controls_simulation
+    )
+
+    add_test(NAME epanet_rule_controls_simulation
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> --epanet-eps
+                "${PROJECT_SOURCE_DIR}/tests/epanet_rules.inp"
+                -o "${CMAKE_CURRENT_BINARY_DIR}/epanet-rules-result"
+    )
+    set_tests_properties(epanet_rule_controls_simulation PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "EPANET EPS complete: 10 hydraulic states, 0 failed states"
+    )
+
+    add_test(NAME epanet_rule_controls_results
+        COMMAND "${CMAKE_COMMAND}"
+                -DRESULT_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/epanet-rules-result
+                -P "${PROJECT_SOURCE_DIR}/tests/verify_epanet_rules.cmake"
+    )
+    set_tests_properties(epanet_rule_controls_results PROPERTIES
+        DEPENDS epanet_rule_controls_simulation
+    )
 endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")

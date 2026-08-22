@@ -767,6 +767,9 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
             add_warning("CONTROLS", record.fields.size() > 1 ? record.fields[1] : "",
                         record.line_number,
                         "Dynamic link control was parsed but is not executed by steady-state STACI.");
+    if (!extended_period_ && has_records("RULES"))
+        add_warning("RULES", "", records("RULES").front().line_number,
+                    "Rule-based controls are retained but require EPANET EPS mode for execution.");
 
     std::size_t demand_component_count = 0;
     std::size_t initial_quality_count = 0;
@@ -782,7 +785,6 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
 
 void EpanetReader::warn_for_unsupported_sections() {
     const std::vector<std::pair<std::string, std::string> > unsupported = {
-        {"RULES", "Rule-based controls are not executed by STACI."},
         {"EMITTERS", "Pressure-dependent emitters are not represented."},
         {"SOURCES", "EPANET water-quality sources are not represented."},
         {"REACTIONS", "EPANET reaction options are not transferred to STACI's transport model."},

@@ -1,0 +1,48 @@
+[TITLE]
+EPANET simple controls regression test
+
+[JUNCTIONS]
+;ID  Elevation  Demand
+J1   0          1
+
+[RESERVOIRS]
+;ID  Head
+R1   30
+
+[PIPES]
+;ID       Node1  Node2  Length  Diameter  Roughness  MinorLoss  Status
+Base      R1     J1     1000    200       120        0          Open
+Timed     R1     J1     800     150       120        0          Open
+Clock     R1     J1     1200    150       120        0          Open
+Pressure  R1     J1     900     150       120        0          Open
+LowPress  R1     J1     1100    150       120        0          Open
+
+[PUMPS]
+;ID   Node1  Node2  Parameters
+PSet  R1     J1     POWER 1
+
+[CONTROLS]
+LINK Timed CLOSED AT TIME 0:20
+LINK Timed OPEN AT TIME 1:20
+LINK Clock CLOSED AT CLOCKTIME 1:00 AM
+LINK Clock OPEN AT CLOCKTIME 2:00 AM
+LINK Pressure CLOSED IF NODE J1 ABOVE 300
+LINK LowPress CLOSED IF NODE J1 BELOW 400
+LINK PSet 0.5 AT TIME 0:20
+LINK PSet 1.0 AT TIME 1:20
+
+[TIMES]
+Duration             26:00
+Hydraulic Timestep   1:00
+Pattern Timestep     1:00
+Report Timestep      1:00
+Start ClockTime      12:30 AM
+
+[OPTIONS]
+Units               LPS
+Pressure            KPA
+Headloss            H-W
+Trials              100
+Accuracy            0.001
+
+[END]

@@ -32,7 +32,8 @@ STACI can:
 - import EPANET `.inp` files with unit conversion and compatibility warnings;
 - export native STACI networks to EPANET `.inp` files;
 - run EPANET extended-period hydraulic simulations with demand patterns,
-  changing tank levels, and tank-level pump controls;
+  changing tank levels, and simple node-, elapsed-time-, and clock-time-based
+  controls plus prioritized rule-based controls for pipes and pumps;
 - model pipes, pumps, pressure boundaries, pools/reservoirs, valves, check
   valves, overflows, and several open-channel cross-sections;
 - write convergence markers, progress logs, and updated network/result files.
@@ -327,7 +328,8 @@ does not have a STACI equivalent. It currently transfers:
   order, line endings, inline comments and their record IDs, tags, map data,
   and non-hydraulic run configuration.
 
-Rule-based controls, most valve controls, emitters, and water-quality
+Rule-based controls are executed in EPANET EPS mode but do not affect a single
+steady-state import. Most valve controls, emitters, and water-quality
 sources/reactions are parsed but not simulated.
 Descriptive metadata, map sections, and non-hydraulic run configuration do not
 affect the hydraulic snapshot, but they remain attached to the imported
@@ -397,12 +399,21 @@ represent structurally, are:
 | Base demands and `[DEMANDS]` categories | **Supported:** retained as separate typed node metadata with category labels, independent pattern references and complete multiplier series. The hydraulic snapshot receives their time-zero aggregate. |
 | Curves | **Partial:** HEAD pump curves and pump-efficiency curves are retained with their original IDs and SI points; tank-volume and GPV curve types have no general typed STACI representation. |
 | Patterns | **Partial:** complete demand, reservoir-head, pump-speed and pump energy-price patterns are retained by their corresponding STACI elements; hydraulic patterns are used by EPS. A reusable network-level model for other pattern types is still missing. |
-| Simple controls and rule-based controls | **No native control objects:** retained losslessly in an imported INP document; only a limited EPS subset is executed. |
+| Simple controls and rule-based controls | **Supported in EPS:** simple controls execute `OPEN`, `CLOSED`, and numeric pump settings for node pressure/tank level, elapsed-time, and clock-time triggers. The EPS rule engine supports `IF`/`AND`/`OR`, `THEN`, multiple actions, `ELSE`, priorities, node/tank/link/system premises, and the separate rule timestep. Both sections remain losslessly retained in the imported INP document; neither yet has a network-level editable STACI object outside EPS. |
 | Water-quality sources, reactions and tank mixing | **No calculation-model equivalent:** retained in the imported INP document but not represented or solved by STACI elements. |
 
 STACI also contains `Csatorna` (open channel) and `BukoMutargy` (overflow/weir),
 for which EPANET has no native hydraulic element. These elements are therefore
 skipped with a warning when a native SPR network is exported to INP.
+
+Native `JelleggorbesFojtas` throttle valves are also currently omitted from an
+SPR-to-INP export. This is topologically significant: both the valve and its
+connection between the endpoint nodes are absent from the generated INP. The
+export warning reports the affected endpoints, current valve position, and
+current STACI loss parameter. An EPANET `TCV` can preserve a single current
+loss coefficient, but it cannot losslessly store STACI's complete
+position-dependent loss curve; implementing an explicitly documented TCV
+snapshot export remains compatibility work.
 
 The mapping status above describes the editable STACI calculation model. It is
 separate from lossless INP preservation: unsupported records and sections in an
@@ -461,10 +472,11 @@ field-level `INP -> STACI -> INP` round-trip assertion.
 13. [ ] **Represent regulated EPANET valves.** Add native element records and
     lossless INP mappings for `PRV`, `PSV`, `PBV`, and `FCV`, including setting,
     minor-loss coefficient, and initial status.
-14. [ ] **Preserve controls and rules structurally.** Parse `[CONTROLS]` and
-    `[RULES]` into typed objects that retain link/node references, thresholds,
-    clock times, priorities, and original order, then re-export them unchanged.
-    Executing these objects is a separate calculation task.
+14. [ ] **Expose controls and rules as editable network objects.** EPS now
+    parses and executes `[CONTROLS]` and `[RULES]` as typed runtime objects, and
+    imported INP text is re-exported losslessly. A reusable network-level API
+    is still needed to edit their references, thresholds, actions, priorities,
+    and ordering outside an EPS run.
 15. [ ] **Preserve water-quality configuration.** Round-trip `[QUALITY]`,
     `[SOURCES]`, `[REACTIONS]`, and `[MIXING]`, including units, source types,
     coefficients, tank mixing models, and pattern references. Water-quality
@@ -484,12 +496,32 @@ field-level `INP -> STACI -> INP` round-trip assertion.
 
 EPS mode reads `Duration`, hydraulic/pattern/report timesteps, pattern start,
 junction demand patterns, demand multiplier, reservoir head patterns, pump
-speed patterns, tank geometry and operating levels, initial pump status, and
-simple tank-level pump controls from the EPANET file. Pump affinity laws are
-applied at every hydraulic state. Each state is solved with the existing STACI
-steady-state solver. Tank levels are advanced from the solved boundary flow and
-tank area; flow is blocked in the prohibited direction when a tank is at its
-minimum or maximum level.
+speed patterns, tank geometry and operating levels, initial link status, and
+EPANET simple controls from the input file. Supported controls can open or close
+imported pipes and pumps, or assign a numeric relative speed to an imported
+`POWER` or `HEAD` pump. Their triggers can use tank level, junction pressure,
+elapsed simulation time (`AT TIME`), or time of day (`AT CLOCKTIME`), including
+`START CLOCKTIME` and daily clock-event recurrence. Pressure thresholds are
+converted from the declared EPANET pressure units to SI pressure head.
+
+Time-based events shorten the current hydraulic step so off-grid event times
+are solved exactly without shifting later pattern and report boundaries.
+Node-based controls are re-evaluated after the hydraulic solve and the state is
+resolved until the control settings stabilize. These runtime control records
+belong to the EPS orchestration layer; no new hydraulic `Agelem` subclass is
+needed. Pump affinity laws are applied at every hydraulic state. Tank levels
+are advanced from the solved boundary flow and tank area; flow is blocked in
+the prohibited direction when a tank is at its minimum or maximum level.
+
+The `[RULES]` engine uses the separately configurable `RULE TIMESTEP` (default:
+one tenth of the hydraulic timestep). It supports node demand/head/pressure,
+tank level/fill time/drain time, absolute link flow/status/setting, total system
+demand, elapsed time, and clock time. EPANET's OR-before-AND grouping,
+interval-aware time equality, `THEN`/`ELSE` action lists, strict priority
+replacement, and first-rule precedence for equal priorities are retained.
+Tank levels are projected with the last solved flow while the rule interval is
+scanned; the first rule check that causes a real link change becomes the next
+hydraulic event.
 
 The primary output is `PREFIX.h5` using the `STACI EPS OUTPUT v1` schema. A
 small `PREFIX.meta.json` sidecar contains run metadata and precomputed value
@@ -548,10 +580,11 @@ cmake -S . -B build -DHDF5_ROOT=/path/to/hdf5
 ```
 
 Tank volume curves are currently approximated using the tank diameter.
-Rule-based controls, valve controls, water-quality EPS, and event interpolation
-inside a hydraulic timestep are not yet implemented;
-present occurrences emit warnings or use the documented hydraulic-step
-approximation.
+`ACTIVE` valve actions, numeric valve settings, water-quality EPS, and exact
+interpolation of a simple node-pressure or tank-level threshold crossing inside
+a hydraulic timestep are not yet implemented. Rule conditions are sampled at
+`RULE TIMESTEP` instants, matching EPANET's discrete rule-engine model;
+unsupported valve operations emit warnings.
 
 ### List network elements
 

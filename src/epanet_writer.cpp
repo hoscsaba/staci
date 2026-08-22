@@ -428,10 +428,22 @@ void EpanetWriter::write(const std::string &filename,
 
     for (Agelem *edge : edges) {
         const std::string_view type = edge->GetType();
-        if (type != "Cso" && type != "Szivattyu" && type != "EpanetPowerPump" &&
-            type != "KonstNyomas" && type != "Vegakna")
+        if (type == "JelleggorbesFojtas") {
+            std::cerr << "WARNING [EPANET][EXPORT][" << edge->Get_nev()
+                      << "]: STACI throttle valve was omitted from [VALVES], so the connection "
+                      << edge->Get_Cspe_Nev() << " -> " << edge->Get_Cspv_Nev()
+                      << " is absent from the exported INP. EPANET TCV stores one loss "
+                      << "coefficient, but this STACI element stores a position-dependent loss "
+                      << "curve (current position=" << edge->Get_dprop("position")
+                      << ", current STACI loss parameter=" << edge->Get_dprop("veszt")
+                      << "). A future TCV snapshot export can preserve the current hydraulic "
+                      << "state, but not the complete valve curve.\n";
+        } else if (type != "Cso" && type != "Szivattyu" &&
+                   type != "EpanetPowerPump" && type != "KonstNyomas" &&
+                   type != "Vegakna") {
             std::cerr << "WARNING [EPANET][EXPORT][" << edge->Get_nev() << "]: STACI type '"
                       << type << "' has no lossless EPANET mapping and was skipped.\n";
+        }
     }
 
     std::string headloss = upper(friction_model);
