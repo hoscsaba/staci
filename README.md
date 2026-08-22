@@ -347,6 +347,53 @@ association, order, whitespace, and line endings. An unchanged INP therefore
 round-trips byte-for-byte. The `-m` INP modification path changes only the
 requested field and preserves all other lines.
 
+### EPANET–STACI element mapping (easiest first)
+
+The table below compares the hydraulic node and link types in EPANET with the
+current STACI model. The order estimates the effort required to achieve a
+complete, editable and hydraulically meaningful mapping, starting with the
+closest matches. `Direct` means that a corresponding STACI type exists and is
+already created by the INP importer; it does not imply that every auxiliary
+EPANET field is supported yet.
+
+| Order | EPANET element | Closest STACI representation | Current mapping | Work needed for complete compatibility |
+|---:|---|---|---|---|
+| 1 | Junction | `Csomopont` | **Direct, partial fields** | Preserve separate demand categories, pattern references and all initial-quality data instead of reducing them to the steady-state values used by the solver. |
+| 2 | Reservoir | `Csomopont` + `KonstNyomas` | **Direct, partial fields** | Preserve and apply the complete head-pattern reference; the fixed-head hydraulic representation already matches a steady EPANET reservoir. |
+| 3 | Pipe | `Cso` | **Direct, partial fields** | Add minor-loss coefficients, initial and `[STATUS]` state, and the `CV` variant. Length, diameter, roughness and the main friction model are already mapped. |
+| 4 | Pump, `POWER` form | `EpanetPowerPump` | **Direct, partial fields** | Preserve status, speed, speed pattern, efficiency and energy references. The constant-power definition is already imported and exported. |
+| 5 | Pump, `HEAD` curve form | `Szivattyu` | **Direct, partial fields** | Retain the original curve ID and all pump attributes. Import currently requires a referenced curve with at least three points and converts it to STACI's pump curve representation. |
+| 6 | Tank | `Csomopont` + `Vegakna` | **Approximate** | Represent minimum/maximum level, minimum volume, volume curve and mixing data. The importer currently uses initial level and tank area as a steady fixed boundary; native export must infer missing operating limits. |
+| 7 | Check-valve pipe (`CV`) | `VisszacsapoSzelep` | **STACI type exists; not connected to INP import/export** | Instantiate and export the check-valve type while retaining the pipe's length, diameter, roughness and minor-loss data. |
+| 8 | Throttle control valve (`TCV`) | `JelleggorbesFojtas` | **Similar STACI type exists; not mapped** | Define the exact conversion between the EPANET loss setting and STACI's opening/loss-curve parameters, including status and minor loss. |
+| 9 | General-purpose valve (`GPV`) | `JelleggorbesFojtas` | **Similar STACI type exists; not mapped** | Adapt the referenced GPV head-loss curve without losing its ID or points and validate that its sign and interpolation semantics match STACI. |
+| 10 | Emitter attached to a junction | None | **No equivalent** | Add a pressure-dependent outlet representation with emitter coefficient and pressure exponent, plus INP import/export support. |
+| 11 | Pressure breaker valve (`PBV`) | None | **No exact equivalent** | Add a valve with a prescribed pressure drop and open/closed state; an ordinary throttling curve is not an exact substitute. |
+| 12 | Flow control valve (`FCV`) | None | **No equivalent** | Add a flow-setpoint valve and its active/open/closed operating states. |
+| 13 | Pressure reducing valve (`PRV`) | None | **No equivalent** | Add downstream-pressure regulation and the EPANET active/open/closed state model. |
+| 14 | Pressure sustaining valve (`PSV`) | None | **No equivalent** | Add upstream-pressure regulation and the EPANET active/open/closed state model. |
+
+EPANET also has data objects that are not standalone hydraulic elements. Their
+current STACI counterparts, ordered approximately from easier to harder to
+represent structurally, are:
+
+| EPANET data object | STACI support |
+|---|---|
+| Base demands and `[DEMANDS]` categories | **Partial:** converted to one aggregate junction demand; category labels and independent pattern references are not part of the hydraulic model. |
+| Curves | **Partial:** pump curves are converted for `Szivattyu`; efficiency, tank-volume and GPV curve types have no general typed STACI representation. |
+| Patterns | **Partial:** read by the EPS path and retained in the source document, but not represented by a reusable native SPR object model. |
+| Simple controls and rule-based controls | **No native control objects:** retained losslessly in an imported INP document; only a limited EPS subset is executed. |
+| Water-quality sources, reactions and tank mixing | **No calculation-model equivalent:** retained in the imported INP document but not represented or solved by STACI elements. |
+
+STACI also contains `Csatorna` (open channel) and `BukoMutargy` (overflow/weir),
+for which EPANET has no native hydraulic element. These elements are therefore
+skipped with a warning when a native SPR network is exported to INP.
+
+The mapping status above describes the editable STACI calculation model. It is
+separate from lossless INP preservation: unsupported records and sections in an
+imported `EpanetDocument` can still be re-exported unchanged even when STACI
+cannot simulate them.
+
 ### EPANET–STACI compatibility TODO (easiest first)
 
 The following work is ordered by expected implementation difficulty. It is
