@@ -5,6 +5,7 @@
 #include "Csomopont.h"
 #include "EpanetPowerPump.h"
 #include "EpanetPump.h"
+#include "JelleggorbesFojtas.h"
 #include "KonstNyomas.h"
 #include "Szivattyu.h"
 #include "epanet_document.h"
@@ -281,6 +282,33 @@ void EpanetWriter::write(const std::string &filename,
             ExportedPump{link_id, edge, configuration, curve_pump, curve_id});
     }
 
+    struct ExportedTcv {
+        std::string id;
+        JelleggorbesFojtas *valve;
+    };
+    std::vector<ExportedTcv> exported_tcvs;
+    output << "\n[VALVES]\n;ID\tNode1\tNode2\tDiameter\tType\tSetting\tMinorLoss\n";
+    for (Agelem *edge : edges) {
+        auto *valve = dynamic_cast<JelleggorbesFojtas *>(edge);
+        if (valve == nullptr || !valve->CanExportAsEpanetTcv())
+            continue;
+        const std::string from = edge->Get_Cspe_Nev();
+        const std::string to = edge->Get_Cspv_Nev();
+        if (node_ids.count(from) == 0 || node_ids.count(to) == 0) {
+            std::cerr << "WARNING [EPANET][EXPORT][" << edge->Get_nev()
+                      << "]: TCV endpoint was not found; element skipped.\n";
+            continue;
+        }
+        const std::string link_id = safe_id(edge->Get_nev(), used_link_ids);
+        const double diameter_mm =
+            std::sqrt(4.0 * edge->Get_Aref() / 3.14159265358979323846) * 1000.0;
+        output << link_id << '\t' << node_ids[from] << '\t' << node_ids[to]
+               << '\t' << diameter_mm << "\tTCV\t"
+               << valve->GetEpanetTcvSetting() << '\t'
+               << valve->GetEpanetTcvMinorLoss() << '\n';
+        exported_tcvs.push_back(ExportedTcv{link_id, valve});
+    }
+
     output << "\n[CURVES]\n;ID\tFlow\tHead\n";
     std::set<std::string> written_curve_ids;
     for (const ExportedPump &pump : exported_pumps) {
@@ -371,6 +399,13 @@ void EpanetWriter::write(const std::string &filename,
         else if (metadata != nullptr && metadata->initial_setting_specified)
             output << pump.id << '\t' << metadata->initial_setting << '\n';
     }
+    for (const ExportedTcv &tcv : exported_tcvs) {
+        const EpanetTcvStatus status = tcv.valve->GetEpanetTcvStatus();
+        if (status == EpanetTcvStatus::Closed)
+            output << tcv.id << "\tClosed\n";
+        else if (status == EpanetTcvStatus::Open)
+            output << tcv.id << "\tOpen\n";
+    }
 
     output << "\n[ENERGY]\n";
     bool global_price_written = false;
@@ -429,15 +464,16 @@ void EpanetWriter::write(const std::string &filename,
     for (Agelem *edge : edges) {
         const std::string_view type = edge->GetType();
         if (type == "JelleggorbesFojtas") {
-            std::cerr << "WARNING [EPANET][EXPORT][" << edge->Get_nev()
-                      << "]: STACI throttle valve was omitted from [VALVES], so the connection "
-                      << edge->Get_Cspe_Nev() << " -> " << edge->Get_Cspv_Nev()
-                      << " is absent from the exported INP. EPANET TCV stores one loss "
-                      << "coefficient, but this STACI element stores a position-dependent loss "
-                      << "curve (current position=" << edge->Get_dprop("position")
-                      << ", current STACI loss parameter=" << edge->Get_dprop("veszt")
-                      << "). A future TCV snapshot export can preserve the current hydraulic "
-                      << "state, but not the complete valve curve.\n";
+            if (!static_cast<JelleggorbesFojtas *>(edge)->CanExportAsEpanetTcv())
+                std::cerr << "WARNING [EPANET][EXPORT][" << edge->Get_nev()
+                          << "]: STACI throttle valve was omitted from [VALVES], so the connection "
+                          << edge->Get_Cspe_Nev() << " -> " << edge->Get_Cspv_Nev()
+                          << " is absent from the exported INP. EPANET TCV stores one loss "
+                          << "coefficient, but this STACI element stores a position-dependent loss "
+                          << "curve (current position=" << edge->Get_dprop("position")
+                          << ", current STACI loss parameter=" << edge->Get_dprop("veszt")
+                          << "). Only a constant non-negative STACI loss curve can be exported "
+                          << "losslessly as an EPANET TCV.\n";
         } else if (type != "Cso" && type != "Szivattyu" &&
                    type != "EpanetPowerPump" && type != "KonstNyomas" &&
                    type != "Vegakna") {
@@ -547,6 +583,16 @@ void EpanetWriter::write_modified_copy(const std::string &input_filename,
         target_field = 6;
         if (value_si < 0.0)
             throw std::runtime_error("Pipe minor-loss coefficient cannot be negative.");
+    } else if (property == "tcv_setting") {
+        target_section = "VALVES";
+        target_field = 5;
+        if (value_si < 0.0)
+            throw std::runtime_error("TCV setting cannot be negative.");
+    } else if (property == "tcv_minor_loss") {
+        target_section = "VALVES";
+        target_field = 6;
+        if (value_si < 0.0)
+            throw std::runtime_error("TCV minor-loss coefficient cannot be negative.");
     } else if (property == "demand") {
         target_section = "JUNCTIONS";
         target_field = 2;

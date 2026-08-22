@@ -33,7 +33,7 @@ STACI can:
 - export native STACI networks to EPANET `.inp` files;
 - run EPANET extended-period hydraulic simulations with demand patterns,
   changing tank levels, and simple node-, elapsed-time-, and clock-time-based
-  controls plus prioritized rule-based controls for pipes and pumps;
+  controls plus prioritized rule-based controls for pipes, pumps, and TCVs;
 - model pipes, pumps, pressure boundaries, pools/reservoirs, valves, check
   valves, overflows, and several open-channel cross-sections;
 - write convergence markers, progress logs, and updated network/result files.
@@ -322,6 +322,11 @@ does not have a STACI equivalent. It currently transfers:
 - pump head curves and constant-power pumps, including initial status,
   relative speed, speed patterns, original curve IDs, and retained energy and
   efficiency references;
+- throttle control valves (`TCV`) as constant, 50%-position
+  `JelleggorbesFojtas` elements. The importer retains the dimensionless TCV
+  setting, diameter, separate minor-loss coefficient, and
+  `ACTIVE`/`OPEN`/`CLOSED` state while converting the active hydraulic
+  coefficient to STACI's SI mass-flow form;
 - relevant solver settings such as trial count and accuracy (the latter is an
   approximate mapping because the convergence criteria differ);
 - a lossless EPANET document containing the original text, section and record
@@ -329,8 +334,9 @@ does not have a STACI equivalent. It currently transfers:
   and non-hydraulic run configuration.
 
 Rule-based controls are executed in EPANET EPS mode but do not affect a single
-steady-state import. Most valve controls, emitters, and water-quality
-sources/reactions are parsed but not simulated.
+steady-state import. TCV settings and states are supported; other regulated
+valve types, emitters, and water-quality sources/reactions are parsed but not
+simulated.
 Descriptive metadata, map sections, and non-hydraulic run configuration do not
 affect the hydraulic snapshot, but they remain attached to the imported
 EPANET document for lossless export. Each incompatible calculation feature is
@@ -352,10 +358,12 @@ does not alter the source.
 ```
 
 The generated file uses metric `LPS` units. Junctions, fixed-head boundaries,
-tanks, pipes, pump curves, constant-power pumps, demands, initial chemical
-quality, and the selected pipe-friction model are exported. Tank operating
-limits are inferred because native STACI pools do not store all EPANET tank
-constraints. STACI-only elements are skipped with explicit warnings.
+tanks, pipes, pump curves, constant-power pumps, constant non-negative throttle
+valve curves, demands, initial chemical quality, and the selected pipe-friction
+model are exported. A compatible throttle curve is written as an EPANET `TCV`.
+Tank operating limits are inferred because native STACI pools do not store all
+EPANET tank constraints. STACI-only elements are skipped with explicit
+warnings.
 
 When the source is an EPANET INP file, STACI exports its retained
 `EpanetDocument` representation. `[TITLE]`, inline and full-line comments,
@@ -382,7 +390,7 @@ EPANET field is supported yet.
 | 4 | Pump, `POWER` form | `EpanetPowerPump` | **Direct; definition, status, speed, patterns and energy metadata retained** | |
 | 5 | Pump, `HEAD` curve form | `Szivattyu` | **Direct; original curve and all pump attributes retained** | |
 | 6 | Tank | `Csomopont` + `Vegakna` | **Approximate** | Represent minimum/maximum level, minimum volume, volume curve and mixing data. The importer currently uses initial level and tank area as a steady fixed boundary; native export must infer missing operating limits. |
-| 7 | Throttle control valve (`TCV`) | `JelleggorbesFojtas` | **Similar STACI type exists; not mapped** | Define the exact conversion between the EPANET loss setting and STACI's opening/loss-curve parameters, including status and minor loss. |
+| 7 | Throttle control valve (`TCV`) | `JelleggorbesFojtas` | **Direct; constant curve, setting, minor loss and status retained and applied** | |
 | 8 | General-purpose valve (`GPV`) | `JelleggorbesFojtas` | **Similar STACI type exists; not mapped** | Adapt the referenced GPV head-loss curve without losing its ID or points and validate that its sign and interpolation semantics match STACI. |
 | 9 | Emitter attached to a junction | None | **No equivalent** | Add a pressure-dependent outlet representation with emitter coefficient and pressure exponent, plus INP import/export support. |
 | 10 | Pressure breaker valve (`PBV`) | None | **No exact equivalent** | Add a valve with a prescribed pressure drop and open/closed state; an ordinary throttling curve is not an exact substitute. |
@@ -399,21 +407,26 @@ represent structurally, are:
 | Base demands and `[DEMANDS]` categories | **Supported:** retained as separate typed node metadata with category labels, independent pattern references and complete multiplier series. The hydraulic snapshot receives their time-zero aggregate. |
 | Curves | **Partial:** HEAD pump curves and pump-efficiency curves are retained with their original IDs and SI points; tank-volume and GPV curve types have no general typed STACI representation. |
 | Patterns | **Partial:** complete demand, reservoir-head, pump-speed and pump energy-price patterns are retained by their corresponding STACI elements; hydraulic patterns are used by EPS. A reusable network-level model for other pattern types is still missing. |
-| Simple controls and rule-based controls | **Supported in EPS:** simple controls execute `OPEN`, `CLOSED`, and numeric pump settings for node pressure/tank level, elapsed-time, and clock-time triggers. The EPS rule engine supports `IF`/`AND`/`OR`, `THEN`, multiple actions, `ELSE`, priorities, node/tank/link/system premises, and the separate rule timestep. Both sections remain losslessly retained in the imported INP document; neither yet has a network-level editable STACI object outside EPS. |
+| Simple controls and rule-based controls | **Supported in EPS:** simple controls execute `OPEN`, `CLOSED`, `ACTIVE`, numeric pump speeds and numeric TCV loss settings for node pressure/tank level, elapsed-time, and clock-time triggers. The EPS rule engine supports `IF`/`AND`/`OR`, `THEN`, multiple actions, `ELSE`, priorities, node/tank/link/system premises, TCV setting/status premises, and the separate rule timestep. Both sections remain losslessly retained in the imported INP document; neither yet has a network-level editable STACI object outside EPS. |
 | Water-quality sources, reactions and tank mixing | **No calculation-model equivalent:** retained in the imported INP document but not represented or solved by STACI elements. |
 
 STACI also contains `Csatorna` (open channel) and `BukoMutargy` (overflow/weir),
 for which EPANET has no native hydraulic element. These elements are therefore
 skipped with a warning when a native SPR network is exported to INP.
 
-Native `JelleggorbesFojtas` throttle valves are also currently omitted from an
-SPR-to-INP export. This is topologically significant: both the valve and its
-connection between the endpoint nodes are absent from the generated INP. The
-export warning reports the affected endpoints, current valve position, and
-current STACI loss parameter. An EPANET `TCV` can preserve a single current
-loss coefficient, but it cannot losslessly store STACI's complete
-position-dependent loss curve; implementing an explicitly documented TCV
-snapshot export remains compatibility work.
+An imported TCV and any native `JelleggorbesFojtas` with a constant,
+non-negative loss curve are exported as EPANET `TCV` links without a warning.
+The TCV setting is converted through `h_L = K v^2/(2g)` rather than copied into
+STACI's mass-flow coefficient. A genuinely position-dependent native STACI
+curve still cannot fit into one TCV setting; it is omitted with a warning that
+identifies the missing connection.
+
+TCV properties can be inspected or changed explicitly:
+
+```bash
+./build/staci -g model.inp -e TCV1 -p tcv_setting
+./build/staci -m model.inp -e TCV1 -p tcv_setting -n 8 -o modified.inp
+```
 
 The mapping status above describes the editable STACI calculation model. It is
 separate from lossless INP preservation: unsupported records and sections in an
@@ -465,10 +478,10 @@ field-level `INP -> STACI -> INP` round-trip assertion.
     for `[EMITTERS]`, including the emitter coefficient and the relevant
     pressure-exponent option, with an explicit placeholder representation when
     no equivalent STACI element is available.
-12. [ ] **Map directly compatible valve types.** Implement data mappings for
-    EPANET `TCV` and `GPV` records using existing STACI throttling elements
-    where their stored parameters are equivalent. EPANET check-valve pipes are
-    already covered by the completed pipe mapping above.
+12. [ ] **Map general-purpose valves.** TCV records are now mapped to constant
+    `JelleggorbesFojtas` curves with unit-correct setting, minor-loss and status
+    handling. Implement the remaining EPANET `GPV` mapping using its referenced
+    head-loss curve without changing its interpolation semantics.
 13. [ ] **Represent regulated EPANET valves.** Add native element records and
     lossless INP mappings for `PRV`, `PSV`, `PBV`, and `FCV`, including setting,
     minor-loss coefficient, and initial status.
@@ -579,12 +592,13 @@ non-standard installation, for example:
 cmake -S . -B build -DHDF5_ROOT=/path/to/hdf5
 ```
 
-Tank volume curves are currently approximated using the tank diameter.
-`ACTIVE` valve actions, numeric valve settings, water-quality EPS, and exact
-interpolation of a simple node-pressure or tank-level threshold crossing inside
-a hydraulic timestep are not yet implemented. Rule conditions are sampled at
-`RULE TIMESTEP` instants, matching EPANET's discrete rule-engine model;
-unsupported valve operations emit warnings.
+Tank volume curves are currently approximated using the tank diameter. TCV
+`ACTIVE`/`OPEN`/`CLOSED` actions and numeric loss settings are supported;
+regulated non-TCV valve types, water-quality EPS, and exact interpolation of a
+simple node-pressure or tank-level threshold crossing inside a hydraulic
+timestep are not yet implemented. Rule conditions are sampled at `RULE
+TIMESTEP` instants, matching EPANET's discrete rule-engine model; unsupported
+valve operations emit warnings.
 
 ### List network elements
 

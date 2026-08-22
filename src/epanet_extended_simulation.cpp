@@ -3,6 +3,7 @@
 #include "Agelem.h"
 #include "Csomopont.h"
 #include "EpanetPump.h"
+#include "JelleggorbesFojtas.h"
 #include "Staci.h"
 #include "eps_result_writer.h"
 
@@ -21,6 +22,7 @@
 #include <set>
 #include <sstream>
 #include <stdexcept>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -56,6 +58,7 @@ struct ReservoirState {
 enum class ControlAction {
     Open,
     Closed,
+    Active,
     Setting
 };
 
@@ -418,18 +421,31 @@ public:
 
         for (const auto &status : initial_status_) {
             const auto link = links.find(status.first);
-            if (link != links.end())
-                link->second->Set_enabled(status.second);
+            if (link == links.end())
+                continue;
+            auto *valve = dynamic_cast<JelleggorbesFojtas *>(link->second);
+            if (valve != nullptr) {
+                if (status.second == RuleStatus::Active)
+                    valve->SetEpanetTcvStatus(EpanetTcvStatus::Active);
+                else if (status.second == RuleStatus::Open)
+                    valve->SetEpanetTcvStatus(EpanetTcvStatus::Open);
+                else
+                    valve->SetEpanetTcvStatus(EpanetTcvStatus::Closed);
+            } else {
+                link->second->Set_enabled(status.second != RuleStatus::Closed);
+            }
         }
         for (const auto &setting : initial_settings_) {
             const auto link = links.find(setting.first);
             if (link == links.end())
                 continue;
             auto *pump = dynamic_cast<EpanetPumpConfigurable *>(link->second);
+            auto *valve = dynamic_cast<JelleggorbesFojtas *>(link->second);
             if (pump != nullptr) {
                 pump->SetOperatingSpeed(setting.second);
                 link->second->Set_enabled(setting.second > 0.0);
-            }
+            } else if (valve != nullptr)
+                valve->SetEpanetTcvSetting(setting.second);
         }
 
         std::vector<EpsNodeInfo> result_nodes;
@@ -488,16 +504,21 @@ public:
             if (from == node_indices.end() || to == node_indices.end())
                 continue;
             const bool pipe = link->GetType() == "Cso";
+            const bool tcv = link->GetType() == "JelleggorbesFojtas";
             std::string output_type = upper(std::string(link->GetType()));
             if (pipe)
                 output_type = "PIPE";
             else if (is_pump(link))
                 output_type = "PUMP";
+            else if (tcv)
+                output_type = "VALVE";
             result_link_objects.push_back(link);
             result_links.push_back(EpsLinkInfo{
                 link->Get_nev(), output_type, from->second, to->second,
                 pipe ? link->Get_dprop("length") : missing,
-                pipe ? link->Get_dprop("diameter") : missing});
+                pipe ? link->Get_dprop("diameter")
+                     : (tcv ? std::sqrt(4.0 * link->Get_Aref() /
+                                       3.14159265358979323846) : missing)});
         }
 
         std::vector<EpsTankInfo> result_tanks;
@@ -648,7 +669,7 @@ private:
     std::vector<ReservoirState> reservoir_definitions_;
     std::vector<SimpleControl> controls_;
     EpanetRuleEngine rule_engine_;
-    std::map<std::string, bool> initial_status_;
+    std::map<std::string, RuleStatus> initial_status_;
     std::map<std::string, double> initial_settings_;
     std::map<std::string, double> controlled_pump_settings_;
     std::vector<std::string> warnings_;
@@ -833,6 +854,8 @@ private:
                 action = ControlAction::Open;
             else if (action_text == "CLOSED")
                 action = ControlAction::Closed;
+            else if (action_text == "ACTIVE")
+                action = ControlAction::Active;
             else {
                 setting = parse_number(record.fields[2], "[CONTROLS] link setting");
                 if (setting < 0.0) {
@@ -1021,7 +1044,7 @@ private:
         if (value == "CLOSED")
             return RuleAction{record.fields[2], ControlAction::Closed, 0.0, record.line_number};
         if (value == "ACTIVE")
-            throw std::runtime_error("ACTIVE valve actions are not supported yet.");
+            return RuleAction{record.fields[2], ControlAction::Active, 0.0, record.line_number};
         const double setting = parse_number(record.fields[5], "[RULES] action setting");
         if (setting < 0.0)
             throw std::runtime_error("Negative rule settings are not supported.");
@@ -1100,8 +1123,12 @@ private:
             if (record.fields.size() < 2)
                 continue;
             const std::string status = upper(record.fields[1]);
-            if (status == "OPEN" || status == "CLOSED")
-                initial_status_[record.fields[0]] = status == "OPEN";
+            if (status == "OPEN")
+                initial_status_[record.fields[0]] = RuleStatus::Open;
+            else if (status == "CLOSED")
+                initial_status_[record.fields[0]] = RuleStatus::Closed;
+            else if (status == "ACTIVE")
+                initial_status_[record.fields[0]] = RuleStatus::Active;
             else {
                 const double setting = parse_number(record.fields[1], "[STATUS]");
                 if (setting < 0.0)
@@ -1179,27 +1206,49 @@ private:
         Agelem *link = found->second;
         const bool old_enabled = link->Is_enabled();
         auto *pump = dynamic_cast<EpanetPumpConfigurable *>(link);
-        const double old_setting = pump == nullptr ? 0.0 : pump->GetOperatingSpeed();
+        auto *valve = dynamic_cast<JelleggorbesFojtas *>(link);
+        const double old_setting = pump != nullptr ? pump->GetOperatingSpeed()
+            : (valve != nullptr ? valve->GetEpanetTcvSetting() : 0.0);
+        const EpanetTcvStatus old_valve_status = valve == nullptr
+            ? EpanetTcvStatus::Closed : valve->GetEpanetTcvStatus();
 
         if (control.action == ControlAction::Open) {
-            link->Set_enabled(true);
+            if (valve != nullptr)
+                valve->SetEpanetTcvStatus(EpanetTcvStatus::Open);
+            else
+                link->Set_enabled(true);
         } else if (control.action == ControlAction::Closed) {
-            link->Set_enabled(false);
+            if (valve != nullptr)
+                valve->SetEpanetTcvStatus(EpanetTcvStatus::Closed);
+            else
+                link->Set_enabled(false);
+        } else if (control.action == ControlAction::Active) {
+            if (valve == nullptr) {
+                warn(section, control.link_id, control.line_number,
+                     "ACTIVE status requires an imported EPANET TCV; the control was ignored.");
+                return false;
+            }
+            valve->SetEpanetTcvStatus(EpanetTcvStatus::Active);
         } else if (pump != nullptr) {
             pump->SetOperatingSpeed(control.setting);
             controlled_pump_settings_[control.link_id] = control.setting;
             link->Set_enabled(control.setting > 0.0);
+        } else if (valve != nullptr) {
+            valve->SetEpanetTcvSetting(control.setting);
         } else if (link->GetType() == "Cso") {
             link->Set_enabled(control.setting > 0.0);
         } else {
             warn(section, control.link_id, control.line_number,
-                 "Numeric settings currently require a pipe or EPANET pump; the control was ignored.");
+                 "Numeric settings currently require a pipe, EPANET pump, or TCV; the control was ignored.");
             return false;
         }
 
         return link->Is_enabled() != old_enabled ||
                (pump != nullptr &&
-                std::abs(pump->GetOperatingSpeed() - old_setting) > 1.0e-12);
+                std::abs(pump->GetOperatingSpeed() - old_setting) > 1.0e-12) ||
+               (valve != nullptr &&
+                (std::abs(valve->GetEpanetTcvSetting() - old_setting) > 1.0e-12 ||
+                 valve->GetEpanetTcvStatus() != old_valve_status));
     }
 
     bool time_control_is_active(const SimpleControl &control, long long time_s) const {
@@ -1285,12 +1334,14 @@ private:
                     }
                     if (premise.variable == RuleVariable::Setting) {
                         auto *pump = dynamic_cast<EpanetPumpConfigurable *>(link->second);
-                        if (pump == nullptr) {
+                        auto *valve = dynamic_cast<JelleggorbesFojtas *>(link->second);
+                        if (pump == nullptr && valve == nullptr) {
                             warn("RULES", premise.id, premise.line_number,
-                                 "SETTING premises currently require an EPANET pump.");
+                                 "SETTING premises currently require an EPANET pump or TCV.");
                             return false;
                         }
-                        value = pump->GetOperatingSpeed();
+                        value = pump != nullptr ? pump->GetOperatingSpeed()
+                                                : valve->GetEpanetTcvSetting();
                         return true;
                     }
                     return false;
@@ -1298,18 +1349,22 @@ private:
 
             const EpanetRuleEngine::StatusLookup status_lookup =
                 [&](const RulePremise &premise, RuleStatus &value) -> bool {
-                    if (premise.status == RuleStatus::Active) {
-                        warn("RULES", premise.id, premise.line_number,
-                             "ACTIVE status premises require an imported EPANET control valve.");
-                        return false;
-                    }
                     const auto link = links.find(premise.id);
                     if (link == links.end()) {
                         warn("RULES", premise.id, premise.line_number,
                              "Referenced rule link was not found.");
                         return false;
                     }
-                    value = link->second->Is_enabled() ? RuleStatus::Open : RuleStatus::Closed;
+                    auto *valve = dynamic_cast<JelleggorbesFojtas *>(link->second);
+                    if (valve != nullptr) {
+                        const EpanetTcvStatus status = valve->GetEpanetTcvStatus();
+                        value = status == EpanetTcvStatus::Active ? RuleStatus::Active
+                            : (status == EpanetTcvStatus::Open ? RuleStatus::Open
+                                                               : RuleStatus::Closed);
+                    } else {
+                        value = link->second->Is_enabled() ? RuleStatus::Open
+                                                           : RuleStatus::Closed;
+                    }
                     return true;
                 };
 
@@ -1365,15 +1420,20 @@ private:
         for (const TankState &tank : tanks)
             levels[tank.id] = tank.level_m;
 
-        std::map<std::string, std::pair<bool, double> > state_before;
+        std::map<std::string, std::tuple<bool, double, int> > state_before;
         for (const SimpleControl &control : controls_) {
             const auto link = links.find(control.link_id);
             if (link == links.end())
                 continue;
             auto *pump = dynamic_cast<EpanetPumpConfigurable *>(link->second);
-            state_before[control.link_id] = std::make_pair(
+            auto *valve = dynamic_cast<JelleggorbesFojtas *>(link->second);
+            const double setting = pump != nullptr ? pump->GetOperatingSpeed()
+                : (valve != nullptr ? valve->GetEpanetTcvSetting() : 0.0);
+            const int valve_status = valve == nullptr
+                ? -1 : static_cast<int>(valve->GetEpanetTcvStatus());
+            state_before[control.link_id] = std::make_tuple(
                 link->second->Is_enabled(),
-                pump == nullptr ? 0.0 : pump->GetOperatingSpeed());
+                setting, valve_status);
         }
 
         for (const SimpleControl &control : controls_) {
@@ -1406,9 +1466,14 @@ private:
             if (link == links.end())
                 continue;
             auto *pump = dynamic_cast<EpanetPumpConfigurable *>(link->second);
-            const double setting = pump == nullptr ? 0.0 : pump->GetOperatingSpeed();
-            if (link->second->Is_enabled() != old_state.second.first ||
-                std::abs(setting - old_state.second.second) > 1.0e-12)
+            auto *valve = dynamic_cast<JelleggorbesFojtas *>(link->second);
+            const double setting = pump != nullptr ? pump->GetOperatingSpeed()
+                : (valve != nullptr ? valve->GetEpanetTcvSetting() : 0.0);
+            const int valve_status = valve == nullptr
+                ? -1 : static_cast<int>(valve->GetEpanetTcvStatus());
+            if (link->second->Is_enabled() != std::get<0>(old_state.second) ||
+                std::abs(setting - std::get<1>(old_state.second)) > 1.0e-12 ||
+                valve_status != std::get<2>(old_state.second))
                 return true;
         }
         return false;

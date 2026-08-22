@@ -3,6 +3,7 @@
 #include "EpanetPowerPump.h"
 #include "EpanetPump.h"
 #include "KonstNyomas.h"
+#include "JelleggorbesFojtas.h"
 #include "Szivattyu.h"
 #include "epanet_writer.h"
 
@@ -98,6 +99,30 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    JelleggorbesFojtas tcv(
+        "TCV-1", "R1", "J1", 1000.0, area,
+        std::vector<double>{0.0, 100.0},
+        std::vector<double>{0.0, 0.0}, 50.0, 1.0);
+    tcv.SetEpanetTcvMetadata(8.0, 1.5, EpanetTcvStatus::Active);
+    const double expected_active_coefficient =
+        8.0 / (2.0 * 9.81 * 1000.0 * 1000.0 * area * area);
+    if (std::fabs(tcv.Get_dprop("position") - 50.0) > 1.0e-12 ||
+        std::fabs(tcv.Get_dprop("veszt") - expected_active_coefficient) > 1.0e-12 ||
+        tcv.GetEpanetTcvSetting() != 8.0 ||
+        tcv.GetEpanetTcvMinorLoss() != 1.5 ||
+        !tcv.CanExportAsEpanetTcv()) {
+        std::cerr << "TCV metadata or K*v^2/(2g) conversion is incorrect\n";
+        return 1;
+    }
+    tcv.SetEpanetTcvStatus(EpanetTcvStatus::Open);
+    const double expected_open_coefficient =
+        1.5 / (2.0 * 9.81 * 1000.0 * 1000.0 * area * area);
+    if (std::fabs(tcv.Get_dprop("veszt") - expected_open_coefficient) > 1.0e-12) {
+        std::cerr << "OPEN TCV does not use its minor-loss coefficient\n";
+        return 1;
+    }
+    tcv.SetEpanetTcvStatus(EpanetTcvStatus::Active);
+
     EpanetPowerPump power_pump("P-POWER", "R1", "J1", 1000.0, 10000.0, 1.0);
     EpanetPumpMetadata power_metadata;
     power_metadata.definition = "POWER";
@@ -159,7 +184,7 @@ int main(int argc, char *argv[]) {
     std::vector<Csomopont *> nodes = {&node, &reservoir};
     std::vector<Agelem *> edges = {
         &reservoir_boundary, &check_valve_pipe, &closed_pipe,
-        &power_pump, &head_pump};
+        &power_pump, &head_pump, &tcv};
     EpanetWriter::write(argv[1], nodes, edges, "HW");
 
     std::ifstream input(argv[1], std::ios::binary);
@@ -172,6 +197,7 @@ int main(int argc, char *argv[]) {
         contains(exported, "R1\t30\tP-HEAD") &&
         contains(exported, "P-CV\tR1\tJ1\t100\t150\t120\t2.5\tCV") &&
         contains(exported, "P-CLOSED\tR1\tJ1\t50\t100\t120\t1.25\tClosed") &&
+        contains(exported, "TCV-1\tR1\tJ1\t100\tTCV\t8\t1.5") &&
         contains(exported, "P-POWER\tR1\tJ1\tPOWER\t10\tSPEED\t0.5\tPATTERN\tP-SPEED") &&
         contains(exported, "P-HEAD-PUMP\tR1\tJ1\tHEAD\tORIGINAL-HEAD\tSPEED\t0.5") &&
         contains(exported, "ORIGINAL-HEAD\t10\t30") &&

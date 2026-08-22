@@ -4,6 +4,7 @@
 #include "Csomopont.h"
 #include "EpanetPowerPump.h"
 #include "KonstNyomas.h"
+#include "JelleggorbesFojtas.h"
 #include "Szivattyu.h"
 #include "Vegakna.h"
 
@@ -337,7 +338,7 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
         if (record.fields.size() < 2)
             continue;
         const std::string status = upper(record.fields[1]);
-        if (status == "OPEN" || status == "CLOSED")
+        if (status == "OPEN" || status == "CLOSED" || status == "ACTIVE")
             status_overrides[record.fields[0]] = status;
         else {
             const double setting = number(record, 1, "link setting", -1.0);
@@ -749,8 +750,67 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
 
     for (const Record &record : records("VALVES")) {
         const std::string id = record.fields.empty() ? "" : record.fields[0];
-        add_warning("VALVES", id, record.line_number,
-                    "EPANET valve types/settings have no equivalent STACI element; valve was not imported.");
+        if (!has_fields(record, 6, "VALVES"))
+            continue;
+        const std::string &from = record.fields[1];
+        const std::string &to = record.fields[2];
+        const std::string valve_type = upper(record.fields[4]);
+        if (valve_type != "TCV") {
+            add_warning("VALVES", id, record.line_number,
+                        "EPANET valve type '" + record.fields[4] +
+                        "' has no equivalent STACI element; valve was not imported.");
+            continue;
+        }
+        if (node_ids.count(from) == 0 || node_ids.count(to) == 0) {
+            add_warning("VALVES", id, record.line_number,
+                        "Unknown endpoint; TCV was not imported.");
+            continue;
+        }
+        if (!edge_ids.insert(id).second) {
+            add_warning("VALVES", id, record.line_number,
+                        "Duplicate link ID; TCV was not imported.");
+            continue;
+        }
+
+        const double diameter = pipe_diameter_to_metres(
+            number(record, 3, "valve diameter", 0.1));
+        if (diameter <= 0.0) {
+            add_warning("VALVES", id, record.line_number,
+                        "Non-positive TCV diameter; valve was not imported.");
+            continue;
+        }
+        double setting = number(record, 5, "TCV loss coefficient", 0.0);
+        double minor_loss = record.fields.size() > 6
+            ? number(record, 6, "valve minor loss", 0.0) : 0.0;
+        if (setting < 0.0 || minor_loss < 0.0) {
+            add_warning("VALVES", id, record.line_number,
+                        "Negative TCV loss coefficients were replaced with zero.");
+            setting = std::max(0.0, setting);
+            minor_loss = std::max(0.0, minor_loss);
+        }
+
+        const auto setting_override = setting_overrides.find(id);
+        if (setting_override != setting_overrides.end()) {
+            setting = setting_override->second;
+            handled_status_ids.insert(id);
+        }
+        EpanetTcvStatus status = EpanetTcvStatus::Active;
+        const auto status_override = status_overrides.find(id);
+        if (status_override != status_overrides.end()) {
+            if (status_override->second == "OPEN")
+                status = EpanetTcvStatus::Open;
+            else if (status_override->second == "CLOSED")
+                status = EpanetTcvStatus::Closed;
+            handled_status_ids.insert(id);
+        }
+
+        const double area = 3.14159265358979323846 * diameter * diameter / 4.0;
+        auto valve = std::make_unique<JelleggorbesFojtas>(
+            id, from, to, density, area,
+            std::vector<double>{0.0, 100.0},
+            std::vector<double>{0.0, 0.0}, 50.0, 1.0);
+        valve->SetEpanetTcvMetadata(setting, minor_loss, status);
+        edges.push_back(std::move(valve));
     }
 
     for (const auto &status : status_overrides)
@@ -760,7 +820,7 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
     for (const auto &setting : setting_overrides)
         if (handled_status_ids.count(setting.first) == 0)
             add_warning("STATUS", setting.first, 0,
-                        "Numeric settings are currently supported only for imported pumps.");
+                        "Numeric settings are currently supported only for imported pumps and TCVs.");
 
     if (!extended_period_)
         for (const Record &record : records("CONTROLS"))

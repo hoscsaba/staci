@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <algorithm>
 #include "Agelem.h"
 #include "JelleggorbesFojtas.h"
 
@@ -50,6 +51,79 @@ void JelleggorbesFojtas::Update_zeta() {
 // << "%-os allasnal a vesztesegtenyezo: zeta=" << veszt << endl;
 // cout << setprecision(3);
 // cout<<strstrm.str();
+}
+
+//--------------------------------------------------------------
+void JelleggorbesFojtas::SetConstantEpanetLoss(double loss_coefficient) {
+    const double denominator = 2.0 * g * ro * ro * Aref * Aref;
+    const double staci_coefficient = denominator > 0.0
+        ? loss_coefficient / denominator : 0.0;
+    e = {0.0, 100.0};
+    zeta = {staci_coefficient, staci_coefficient};
+    allas = 50.0;
+    Update_zeta();
+}
+
+//--------------------------------------------------------------
+void JelleggorbesFojtas::SetEpanetTcvMetadata(double setting,
+                                              double minor_loss,
+                                              EpanetTcvStatus status) {
+    epanet_tcv = true;
+    epanet_tcv_setting = std::max(0.0, setting);
+    epanet_tcv_minor_loss = std::max(0.0, minor_loss);
+    SetEpanetTcvStatus(status);
+}
+
+//--------------------------------------------------------------
+void JelleggorbesFojtas::SetEpanetTcvSetting(double setting) {
+    epanet_tcv = true;
+    epanet_tcv_setting = std::max(0.0, setting);
+    SetEpanetTcvStatus(EpanetTcvStatus::Active);
+}
+
+//--------------------------------------------------------------
+void JelleggorbesFojtas::SetEpanetTcvStatus(EpanetTcvStatus status) {
+    epanet_tcv_status = status;
+    if (status == EpanetTcvStatus::Closed) {
+        Set_enabled(false);
+        return;
+    }
+    Set_enabled(true);
+    SetConstantEpanetLoss(status == EpanetTcvStatus::Open
+                              ? epanet_tcv_minor_loss
+                              : epanet_tcv_setting);
+}
+
+//--------------------------------------------------------------
+bool JelleggorbesFojtas::CanExportAsEpanetTcv() const noexcept {
+    if (epanet_tcv)
+        return true;
+    if (zeta.empty() || zeta.front() < 0.0 || !std::isfinite(zeta.front()))
+        return false;
+    const double scale = std::max(1.0, std::fabs(zeta.front()));
+    return std::all_of(zeta.begin(), zeta.end(), [&](double value) {
+        return std::isfinite(value) && value >= 0.0 &&
+               std::fabs(value - zeta.front()) <= 1.0e-12 * scale;
+    });
+}
+
+//--------------------------------------------------------------
+double JelleggorbesFojtas::GetEpanetTcvSetting() const noexcept {
+    if (epanet_tcv)
+        return epanet_tcv_setting;
+    return veszt * 2.0 * g * ro * ro * Aref * Aref;
+}
+
+//--------------------------------------------------------------
+double JelleggorbesFojtas::GetEpanetTcvMinorLoss() const noexcept {
+    return epanet_tcv ? epanet_tcv_minor_loss : 0.0;
+}
+
+//--------------------------------------------------------------
+EpanetTcvStatus JelleggorbesFojtas::GetEpanetTcvStatus() const noexcept {
+    if (!Is_enabled())
+        return EpanetTcvStatus::Closed;
+    return epanet_tcv ? epanet_tcv_status : EpanetTcvStatus::Active;
 }
 
 
@@ -142,6 +216,13 @@ void JelleggorbesFojtas::Set_dprop(const string &mit, double mire) {
     if (mit == "position") {
         allas = mire;
         Update_zeta();
+    } else if (mit == "tcv_setting") {
+        SetEpanetTcvSetting(mire);
+    } else if (mit == "tcv_minor_loss" || mit == "minor_loss") {
+        epanet_tcv = true;
+        epanet_tcv_minor_loss = std::max(0.0, mire);
+        if (epanet_tcv_status == EpanetTcvStatus::Open)
+            SetConstantEpanetLoss(epanet_tcv_minor_loss);
     } else if ((mit == "concentration") || (mit == "konc_atlag")) {
         konc_atlag = mire;
     } else {
@@ -160,6 +241,12 @@ double JelleggorbesFojtas::Get_dprop(const string &mit) {
         out = veszt;
     else if (mit == "adzeta")
         out = veszt;
+    else if (mit == "tcv_setting")
+        out = GetEpanetTcvSetting();
+    else if (mit == "tcv_minor_loss" || mit == "minor_loss")
+        out = GetEpanetTcvMinorLoss();
+    else if (mit == "status")
+        out = Is_enabled() ? 1.0 : 0.0;
     else if (mit == "mass_flow_rate")
         out = mp;
     else if (mit == "headloss")

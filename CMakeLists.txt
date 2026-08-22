@@ -269,6 +269,7 @@ if(BUILD_TESTING)
         "${PROJECT_SOURCE_DIR}/src/Agelem.cpp"
         "${PROJECT_SOURCE_DIR}/src/Cso.cpp"
         "${PROJECT_SOURCE_DIR}/src/EpanetPowerPump.cpp"
+        "${PROJECT_SOURCE_DIR}/src/JelleggorbesFojtas.cpp"
         "${PROJECT_SOURCE_DIR}/src/KonstNyomas.cpp"
         "${PROJECT_SOURCE_DIR}/src/Szivattyu.cpp"
         "${PROJECT_SOURCE_DIR}/src/lubksb.cpp"
@@ -285,6 +286,9 @@ if(BUILD_TESTING)
     add_test(NAME epanet_node_metadata_storage_and_export
         COMMAND $<TARGET_FILE:staci_epanet_node_metadata_test>
                 "${CMAKE_CURRENT_BINARY_DIR}/epanet-node-metadata-native.inp"
+    )
+    set_tests_properties(epanet_node_metadata_storage_and_export PROPERTIES
+        FAIL_REGULAR_EXPRESSION "TCV-1.*omitted;TCV-1.*no lossless EPANET mapping"
     )
 
     add_test(NAME epanet_demand_metadata_import
@@ -351,6 +355,59 @@ if(BUILD_TESTING)
     set_tests_properties(epanet_pipe_check_valve_import PROPERTIES
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
         PASS_REGULAR_EXPRESSION "value       : 1"
+    )
+
+    add_test(NAME epanet_tcv_setting_import
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_tcv.inp"
+                -e TCV1 -p tcv_setting
+    )
+    set_tests_properties(epanet_tcv_setting_import PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "value       : 2"
+        FAIL_REGULAR_EXPRESSION "TCV was not imported;EPANET valve type.*has no equivalent"
+    )
+
+    add_test(NAME epanet_tcv_position_import
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_tcv.inp"
+                -e TCV1 -p position
+    )
+    set_tests_properties(epanet_tcv_position_import PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "value       : 50"
+    )
+
+    add_test(NAME epanet_tcv_minor_loss_import
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${PROJECT_SOURCE_DIR}/tests/epanet_tcv.inp"
+                -e TCV1 -p tcv_minor_loss
+    )
+    set_tests_properties(epanet_tcv_minor_loss_import PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "value       : 0.5"
+    )
+
+    add_test(NAME epanet_modify_tcv_setting
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -m
+                "${PROJECT_SOURCE_DIR}/tests/epanet_tcv.inp"
+                -e TCV1 -p tcv_setting -n 12
+                -o "${CMAKE_CURRENT_BINARY_DIR}/epanet-tcv-modified.inp"
+    )
+    set_tests_properties(epanet_modify_tcv_setting PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "EPANET modification: wrote"
+    )
+
+    add_test(NAME epanet_modify_tcv_setting_roundtrip
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> -g
+                "${CMAKE_CURRENT_BINARY_DIR}/epanet-tcv-modified.inp"
+                -e TCV1 -p tcv_setting
+    )
+    set_tests_properties(epanet_modify_tcv_setting_roundtrip PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        DEPENDS epanet_modify_tcv_setting
+        PASS_REGULAR_EXPRESSION "value       : 12"
     )
 
     add_test(NAME epanet_modify_pipe_minor_loss
@@ -598,6 +655,25 @@ if(BUILD_TESTING)
     )
     set_tests_properties(epanet_rule_controls_results PROPERTIES
         DEPENDS epanet_rule_controls_simulation
+    )
+
+    add_test(NAME epanet_tcv_controls_simulation
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> --epanet-eps
+                "${PROJECT_SOURCE_DIR}/tests/epanet_tcv.inp"
+                -o "${CMAKE_CURRENT_BINARY_DIR}/epanet-tcv-result"
+    )
+    set_tests_properties(epanet_tcv_controls_simulation PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "EPANET EPS complete: 4 hydraulic states, 0 failed states"
+    )
+
+    add_test(NAME epanet_tcv_controls_results
+        COMMAND "${CMAKE_COMMAND}"
+                -DRESULT_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/epanet-tcv-result
+                -P "${PROJECT_SOURCE_DIR}/tests/verify_epanet_tcv.cmake"
+    )
+    set_tests_properties(epanet_tcv_controls_results PROPERTIES
+        DEPENDS epanet_tcv_controls_simulation
     )
 endif()
 
