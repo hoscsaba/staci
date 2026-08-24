@@ -286,15 +286,48 @@ python3 tests/run_tests.py --binary ./build/staci \
   --require-epanet-reference
 ```
 
-Three fixtures are validated: a two-pipe steady network, pipe minor loss plus
-a TCV, and a three-state EPS demand pattern. At every report time the test
-compares SI node head, junction pressure and demand, plus link flow, velocity,
-and total head loss. The absolute tolerances are 0.002 m for head quantities,
-`1e-9 m3/s` for flow, and `5e-6 m/s` for velocity. These limits allow the small
-expected difference between the independently implemented Hazen-Williams
-equations while still detecting hydraulic or unit-conversion regressions.
-CTest marks these cases skipped if `runepanet` has not been built; the rest of
-the suite remains usable offline.
+Eleven targeted fixtures validate every EPANET hydraulic element that currently
+has a calculation-model counterpart in STACI, together with the supported
+simple-control and rule paths:
+
+| Fixture | Direct EPANET comparison coverage |
+|---|---|
+| `epanet_reference_pipe.inp` | Junction, reservoir, and two Hazen-Williams pipes |
+| `epanet_reference_tcv.inp` | Pipe minor loss and an active TCV |
+| `epanet_reference_pattern.inp` | Multi-state junction demand pattern |
+| `epanet_reference_anytown.inp` | 21 junctions, two reservoirs, 41 Darcy-Weisbach pipes, one HEAD pump, and seven EPS states |
+| `epanet_node_metadata.inp` | Separate demand categories, demand multiplier, initially closed pipe, minor loss, and CV pipe |
+| `epanet_pumps.inp` | POWER pump, multi-point HEAD pump, one-point HEAD pump, initial speed, and speed patterns |
+| `epanet_eps_smoke.inp` | Tank storage and level, reservoir head pattern, demand pattern, POWER pump, and tank-level simple control |
+| `epanet_controls.inp` | Elapsed-time, clock-time, junction-pressure, OPEN/CLOSED, and numeric pump-setting controls |
+| `epanet_rules.inp` | Time, clock, demand, pressure, flow, link status, tank level/fill/drain time, AND/OR/ELSE, equality, priority conflicts, and pump setting |
+| `epanet_reference_tcv_controls.inp` | Numeric and OPEN TCV simple controls |
+| `epanet_reference_tcv_rules.inp` | TCV setting/status premises and actions plus multiple-action THEN/ELSE branches |
+
+At every report time the tests compare SI node head, junction pressure and
+demand, link flow, velocity magnitude, signed total head loss, and convergence.
+For control and rule fixtures, STACI's enabled/closed link state is also checked
+exactly against EPANET's `STATUS FULL` event history. The comparison JSON stores
+maximum errors both globally and separately for every node and link, so a
+regression is localized to its element and result quantity.
+
+The three original small fixtures retain strict absolute tolerances: 0.002 m
+for head and head loss, `1e-9 m3/s` for flow, and `5e-6 m/s` for velocity.
+Element, pump, tank, control, and rule fixtures have explicit case-level limits
+based on their current observed solver differences; exact demand, convergence,
+and enabled/closed state checks remain independent of those numeric limits.
+Anytown uses large-network acceptance limits of 1% for head, 0.016 m3/s or 3%
+for flow, 0.08 m/s or 3% for velocity, and 0.4 m or 5% for link head loss. Its
+current observed maxima are 0.566 m, 0.0153 m3/s, 0.073 m/s, and 0.377 m,
+respectively. These separate limits document the larger difference between
+STACI's and EPANET's independently implemented Darcy-Weisbach and pump models
+while still detecting hydraulic, EPS-pattern, control/rule, status, or
+unit-conversion regressions. CTest marks these cases skipped if `runepanet` has
+not been built; the rest of the suite remains usable offline.
+
+The command `ctest --test-dir build -L epanet --output-on-failure` runs only
+these targeted compatibility checks. It does not run the complete STACI
+regression suite.
 
 ### Channel-only hydraulic reference tests
 

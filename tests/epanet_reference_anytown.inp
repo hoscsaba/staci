@@ -1,0 +1,118 @@
+[TITLE]
+STACI versus EPANET reference: Anytown demand-pattern EPS
+
+[JUNCTIONS]
+;ID       Elevation  Demand             Pattern
+NODE64    6.096      0                  ANYTOWN-DEMAND
+NODE73    6.096      31.5416666666667   ANYTOWN-DEMAND
+NODE76    15.24      12.6166666666667   ANYTOWN-DEMAND
+NODE82    15.24      31.5416666666667   ANYTOWN-DEMAND
+NODE85    15.24      12.6166666666667   ANYTOWN-DEMAND
+NODE88    15.24      37.85              ANYTOWN-DEMAND
+NODE94    15.24      31.5416666666667   ANYTOWN-DEMAND
+NODE100   24.384     37.85              ANYTOWN-DEMAND
+NODE106   15.24      31.5416666666667   ANYTOWN-DEMAND
+NODE109   24.384     37.85              ANYTOWN-DEMAND
+NODE112   24.384     37.85              ANYTOWN-DEMAND
+NODE115   24.384     25.2333333333333   ANYTOWN-DEMAND
+NODE121   36.576     25.2333333333333   ANYTOWN-DEMAND
+NODE133   36.576     25.2333333333333   ANYTOWN-DEMAND
+NODE139   36.576     25.2333333333333   ANYTOWN-DEMAND
+NODE142   36.576     25.2333333333333   ANYTOWN-DEMAND
+NODE148   15.24      31.5416666666667   ANYTOWN-DEMAND
+NODE169   15.24      63.0833333333333   ANYTOWN-DEMAND
+NODE184   36.576     63.0833333333333   ANYTOWN-DEMAND
+NODE198   15.24      0                  ANYTOWN-DEMAND
+NODE217   15.24      31.5416666666667   ANYTOWN-DEMAND
+
+[RESERVOIRS]
+;ID       Head
+NODE210   3.048
+NODE204   60
+
+[PIPES]
+;ID      Node1    Node2    Length  Diameter  Roughness  MinorLoss  Status
+PIPE74   NODE64   NODE73   30.48   1005.5    0.13       0          Open
+PIPE77   NODE73   NODE76   3657.6  304.8     0.12       0          Open
+PIPE80   NODE73   NODE148  3657.6  650.6     0.07       0          Open
+PIPE83   NODE73   NODE82   3657.6  406.4     0.07       0          Open
+PIPE86   NODE76   NODE85   1828.8  254       0.12       0          Open
+PIPE89   NODE76   NODE88   2743.2  254       0.12       0          Open
+PIPE92   NODE82   NODE76   2743.2  304.8     0.07       0          Open
+PIPE95   NODE76   NODE94   1828.8  254       0.12       0          Open
+PIPE98   NODE85   NODE88   1828.8  254       0.12       0          Open
+PIPE101  NODE88   NODE100  1828.8  304.8     0.13       0          Open
+PIPE104  NODE88   NODE115  3657.6  203.2     0.12       0          Open
+PIPE107  NODE88   NODE106  1828.8  254       0.12       0          Open
+PIPE110  NODE100  NODE109  1828.8  254       0.13       0          Open
+PIPE113  NODE109  NODE112  1828.8  203.2     0.13       0          Open
+PIPE116  NODE109  NODE115  1828.8  152.4     0.13       0          Open
+PIPE119  NODE112  NODE115  1828.8  355.6     0.13       0          Open
+PIPE122  NODE115  NODE121  3657.6  203.2     0.12       0          Open
+PIPE131  NODE106  NODE115  1828.8  254       0.12       0          Open
+PIPE134  NODE133  NODE115  1828.8  203.2     0.12       0          Open
+PIPE137  NODE115  NODE184  1828.8  528       0.12       0          Open
+PIPE140  NODE121  NODE139  1828.8  345       0.12       0          Open
+PIPE143  NODE142  NODE139  1828.8  203.2     0.12       0          Open
+PIPE146  NODE139  NODE184  1828.8  452.6     0.12       0          Open
+PIPE149  NODE148  NODE142  1828.8  203.2     0.12       0          Open
+PIPE152  NODE142  NODE184  2743.2  152.4     0.13       0          Open
+PIPE155  NODE148  NODE184  1828.8  542.2     0.12       0          Open
+PIPE158  NODE148  NODE217  1828.8  203.2     0.07       0          Open
+PIPE164  NODE82   NODE94   1828.8  304.8     0.07       0          Open
+PIPE167  NODE82   NODE217  1828.8  304.8     0.07       0          Open
+PIPE170  NODE82   NODE169  1828.8  254       0.07       0          Open
+PIPE173  NODE106  NODE94   1828.8  304.8     0.07       0          Open
+PIPE176  NODE169  NODE94   1828.8  254       0.07       0          Open
+PIPE179  NODE133  NODE106  1828.8  254       0.07       0          Open
+PIPE182  NODE169  NODE106  1828.8  254       0.07       0          Open
+PIPE185  NODE133  NODE184  1828.8  345       0.12       0          Open
+PIPE188  NODE217  NODE133  1828.8  304.8     0.07       0          Open
+PIPE191  NODE169  NODE133  1828.8  254       0.07       0          Open
+PIPE194  NODE217  NODE184  1828.8  304.4     0.12       0          Open
+PIPE197  NODE217  NODE169  1828.8  254       0.07       0          Open
+PIPE203  NODE94   NODE198  30.48   345       0.12       0          Open
+PIPE209  NODE184  NODE204  30.48   517.5     0.12       0          Open
+
+[PUMPS]
+;ID      Node1    Node2    Parameters
+PUMP71   NODE210  NODE64   HEAD  ANYTOWN-PUMP
+
+[CURVES]
+;ID             Flow              Head
+ANYTOWN-PUMP    0                 91.44
+ANYTOWN-PUMP    252.222222222222  89.0016
+ANYTOWN-PUMP    504.444444444444  82.296
+ANYTOWN-PUMP    756.944444444444  70.104
+ANYTOWN-PUMP    1009.16666666667  55.1688
+ANYTOWN-PUMP    1296.11111111111  0
+
+[PATTERNS]
+;ID               Multipliers
+ANYTOWN-DEMAND     0.80  1.00  1.20  1.10  0.90  0.70  0.80
+
+[OPTIONS]
+Units       LPS
+Headloss    D-W
+Trials      100
+Accuracy    0.000001
+
+[TIMES]
+Duration            6:00
+Hydraulic Timestep  1:00
+Pattern Timestep    1:00
+Report Timestep     1:00
+
+[REPORT]
+Status      No
+Summary     No
+Nodes       All
+Links       All
+Demand      Precision 6
+Head        Precision 6
+Pressure    Precision 6
+Flow        Precision 6
+Velocity    Precision 6
+Headloss    Precision 6
+
+[END]

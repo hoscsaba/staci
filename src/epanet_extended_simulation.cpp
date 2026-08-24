@@ -784,6 +784,10 @@ private:
     }
 
     void parse_demands() {
+        std::set<std::string> overridden_junctions;
+        for (const Record &record : records("DEMANDS"))
+            if (record.fields.size() >= 2)
+                overridden_junctions.insert(record.fields[0]);
         for (const Record &record : records("JUNCTIONS")) {
             if (record.fields.size() < 2)
                 continue;
@@ -791,8 +795,9 @@ private:
                 ? parse_number(record.fields[2], "[JUNCTIONS]") : 0.0;
             const std::string pattern = record.fields.size() > 3
                 ? record.fields[3] : default_pattern_;
-            demands_[record.fields[0]].push_back(
-                DemandComponent{flow_to_m3_per_hour(base, flow_units_), pattern});
+            if (overridden_junctions.count(record.fields[0]) == 0)
+                demands_[record.fields[0]].push_back(
+                    DemandComponent{flow_to_m3_per_hour(base, flow_units_), pattern});
         }
         for (const Record &record : records("DEMANDS")) {
             if (record.fields.size() < 2)
@@ -1311,14 +1316,22 @@ private:
                             if (tank == tanks.end())
                                 return false;
                             const double flow = tank->boundary->Get_Q();
-                            if (premise.variable == RuleVariable::FillTime)
-                                value = flow > 0.0
-                                    ? (tank->max_level_m - level->second) * tank->area_m2 / flow
-                                    : std::numeric_limits<double>::infinity();
-                            else
-                                value = flow < 0.0
-                                    ? (level->second - tank->min_level_m) * tank->area_m2 / -flow
-                                    : std::numeric_limits<double>::infinity();
+                            if (premise.variable == RuleVariable::FillTime) {
+                                // EPANET treats FILLTIME as an inapplicable
+                                // (false) premise unless the tank is filling.
+                                if (flow <= 1.0e-12)
+                                    return false;
+                                value = (tank->max_level_m - level->second) *
+                                    tank->area_m2 / flow;
+                            } else {
+                                // Likewise DRAINTIME is false while a tank is
+                                // stationary or filling; infinity would make
+                                // an ABOVE comparison incorrectly true.
+                                if (flow >= -1.0e-12)
+                                    return false;
+                                value = (level->second - tank->min_level_m) *
+                                    tank->area_m2 / -flow;
+                            }
                         }
                         return true;
                     }
@@ -1372,6 +1385,15 @@ private:
                 numeric_lookup, status_lookup, previous_check_s, check_s, start_clock_s_);
             bool changed = false;
             for (const RuleAction &action : actions) {
+                const auto target = links.find(action.link_id);
+                auto *tcv = target == links.end()
+                    ? nullptr : dynamic_cast<JelleggorbesFojtas *>(target->second);
+                // EPANET's rule executor applies OPEN only when a link is
+                // currently closed. Unlike a simple control, OPEN does not
+                // change an already ACTIVE TCV into its fully open state.
+                if (action.action == ControlAction::Open && tcv != nullptr &&
+                    tcv->GetEpanetTcvStatus() == EpanetTcvStatus::Active)
+                    continue;
                 const SimpleControl control{
                     action.link_id, action.action, action.setting,
                     ControlTrigger::ElapsedTime, "", 0.0, check_s,

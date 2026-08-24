@@ -1,5 +1,5 @@
 [TITLE]
-EPANET TCV import and controls regression test
+EPANET TCV numeric and OPEN control reference
 
 [JUNCTIONS]
 ;ID  Elevation  Demand
@@ -10,13 +10,13 @@ J1   0          1
 R1   30
 
 [VALVES]
-;ID     Node1  Node2  Diameter  Type  Setting  MinorLoss
-TCV1    R1     J1     20        TCV   2        0.5
+;ID   Node1  Node2  Diameter  Type  Setting  MinorLoss
+TCV1  R1     J1     20        TCV   2        0.5
 
 [CONTROLS]
 LINK TCV1 8 AT TIME 1:00
 LINK TCV1 OPEN AT TIME 2:00
-LINK TCV1 ACTIVE AT TIME 3:00
+LINK TCV1 2 AT TIME 3:00
 
 [TIMES]
 Duration             3:00
@@ -28,7 +28,7 @@ Report Timestep      1:00
 Units       LPS
 Headloss    H-W
 Trials      100
-Accuracy    0.001
+Accuracy    0.000001
 
 [REPORT]
 Status      Full

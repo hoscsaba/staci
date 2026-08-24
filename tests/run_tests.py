@@ -889,14 +889,15 @@ def check_channel_network(binary: Path, tests_dir: Path,
 
 
 def check_epanet_reference(binary: Path, epanet: Path, source: Path,
-                           case_dir: Path, tests_dir: Path, log: Log) -> None:
+                           case_dir: Path, tests_dir: Path, log: Log,
+                           comparison_options: Sequence[str] = ()) -> None:
     script = tests_dir / "compare_epanet_reference.py"
     require_file(script, "EPANET comparison script")
     output = run_command(
         log,
         (sys.executable, str(script), "--staci", str(binary),
          "--epanet", str(epanet), "--input", str(source),
-         "--work-dir", str(case_dir)),
+         "--work-dir", str(case_dir), *comparison_options),
         tests_dir,
         f"official EPANET hydraulic reference: {source.name}",
     )
@@ -1050,10 +1051,58 @@ def main() -> int:
             if hdf5_result.is_file():
                 log.write(f"Persistent HDF5 result: {hdf5_result}")
 
-        reference_inputs = [
-            tests_dir / "epanet_reference_pipe.inp",
-            tests_dir / "epanet_reference_tcv.inp",
-            tests_dir / "epanet_reference_pattern.inp",
+        reference_inputs: List[Tuple[Path, Tuple[str, ...]]] = [
+            (tests_dir / "epanet_reference_pipe.inp", ()),
+            (tests_dir / "epanet_reference_tcv.inp", ()),
+            (tests_dir / "epanet_reference_pattern.inp", ()),
+            (
+                tests_dir / "epanet_reference_anytown.inp",
+                (
+                    "--head-rel", "0.01",
+                    "--flow-abs", "0.016", "--flow-rel", "0.03",
+                    "--velocity-abs", "0.08", "--velocity-rel", "0.03",
+                    "--headloss-abs", "0.4", "--headloss-rel", "0.05",
+                ),
+            ),
+            (
+                tests_dir / "epanet_node_metadata.inp",
+                ("--head-abs", "0.006", "--flow-abs", "0.000000002",
+                 "--headloss-abs", "0.006", "--check-status"),
+            ),
+            (
+                tests_dir / "epanet_pumps.inp",
+                ("--head-abs", "0.5", "--headloss-abs", "0.5", "--check-status"),
+            ),
+            (
+                tests_dir / "epanet_eps_smoke.inp",
+                ("--head-abs", "0.003", "--flow-abs", "0.0003",
+                 "--velocity-abs", "0.01", "--headloss-abs", "0.003",
+                 "--check-status"),
+            ),
+            (
+                tests_dir / "epanet_controls.inp",
+                ("--head-abs", "0.015", "--flow-abs", "0.00025",
+                 "--velocity-abs", "0.004", "--headloss-abs", "0.015",
+                 "--check-status"),
+            ),
+            (
+                tests_dir / "epanet_rules.inp",
+                ("--head-abs", "0.008", "--flow-abs", "0.001",
+                 "--velocity-abs", "0.015", "--headloss-abs", "0.008",
+                 "--check-status"),
+            ),
+            (
+                tests_dir / "epanet_reference_tcv_controls.inp",
+                ("--head-abs", "0.003", "--flow-abs", "0.0000002",
+                 "--velocity-abs", "0.00002",
+                 "--headloss-abs", "0.003", "--check-status"),
+            ),
+            (
+                tests_dir / "epanet_reference_tcv_rules.inp",
+                ("--head-abs", "0.003", "--flow-abs", "0.0000002",
+                 "--velocity-abs", "0.00002",
+                 "--headloss-abs", "0.003", "--check-status"),
+            ),
         ]
         if epanet_binary is None:
             message = (
@@ -1067,14 +1116,14 @@ def main() -> int:
             if arguments.require_epanet_reference:
                 results.append(("EPANET-REFERENCE", Path("runepanet"), False, 0.0, message))
         else:
-            for source in reference_inputs:
+            for source, comparison_options in reference_inputs:
                 case_dir = epanet_reference_root / source.stem
                 case_dir.mkdir(parents=True, exist_ok=True)
                 passed, elapsed, reason = run_action(
                     "EPANET-REFERENCE",
                     source.name,
-                    lambda network=source, directory=case_dir: check_epanet_reference(
-                        binary, epanet_binary, network, directory, tests_dir, log
+                    lambda network=source, directory=case_dir, options=comparison_options: check_epanet_reference(
+                        binary, epanet_binary, network, directory, tests_dir, log, options
                     ),
                     log,
                 )

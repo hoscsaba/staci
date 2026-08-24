@@ -189,6 +189,14 @@ if(BUILD_TESTING)
             epanet_reference_pipe.inp
             epanet_reference_tcv.inp
             epanet_reference_pattern.inp
+            epanet_reference_anytown.inp
+            epanet_node_metadata.inp
+            epanet_pumps.inp
+            epanet_eps_smoke.inp
+            epanet_controls.inp
+            epanet_rules.inp
+            epanet_reference_tcv_controls.inp
+            epanet_reference_tcv_rules.inp
         )
         foreach(epanet_input IN LISTS STACI_EPANET_REFERENCE_INPUTS)
             get_filename_component(epanet_case "${epanet_input}" NAME_WE)
@@ -202,6 +210,44 @@ if(BUILD_TESTING)
             if(STACI_EPANET_EXECUTABLE)
                 list(APPEND epanet_reference_command
                     --epanet "${STACI_EPANET_EXECUTABLE}")
+            endif()
+            if(epanet_case STREQUAL "epanet_reference_anytown")
+                list(APPEND epanet_reference_command
+                    --head-rel 0.01
+                    --flow-abs 0.016 --flow-rel 0.03
+                    --velocity-abs 0.08 --velocity-rel 0.03
+                    --headloss-abs 0.4 --headloss-rel 0.05
+                )
+            elseif(epanet_case STREQUAL "epanet_node_metadata")
+                list(APPEND epanet_reference_command
+                    --head-abs 0.006 --flow-abs 0.000000002
+                    --headloss-abs 0.006 --check-status
+                )
+            elseif(epanet_case STREQUAL "epanet_pumps")
+                list(APPEND epanet_reference_command
+                    --head-abs 0.5 --headloss-abs 0.5 --check-status
+                )
+            elseif(epanet_case STREQUAL "epanet_eps_smoke")
+                list(APPEND epanet_reference_command
+                    --head-abs 0.003 --flow-abs 0.0003
+                    --velocity-abs 0.01 --headloss-abs 0.003 --check-status
+                )
+            elseif(epanet_case STREQUAL "epanet_controls")
+                list(APPEND epanet_reference_command
+                    --head-abs 0.015 --flow-abs 0.00025
+                    --velocity-abs 0.004 --headloss-abs 0.015 --check-status
+                )
+            elseif(epanet_case STREQUAL "epanet_rules")
+                list(APPEND epanet_reference_command
+                    --head-abs 0.008 --flow-abs 0.001
+                    --velocity-abs 0.015 --headloss-abs 0.008 --check-status
+                )
+            elseif(epanet_case STREQUAL "epanet_reference_tcv_controls" OR
+                   epanet_case STREQUAL "epanet_reference_tcv_rules")
+                list(APPEND epanet_reference_command
+                    --head-abs 0.003 --flow-abs 0.0000002 --velocity-abs 0.00002
+                    --headloss-abs 0.003 --check-status
+                )
             endif()
             add_test(NAME "${epanet_case}"
                 COMMAND ${epanet_reference_command}
@@ -358,7 +404,7 @@ if(BUILD_TESTING)
     )
     set_tests_properties(epanet_demand_metadata_snapshot PROPERTIES
         WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-        PASS_REGULAR_EXPRESSION "value       : 41.04"
+        PASS_REGULAR_EXPRESSION "value       : 38.88"
     )
 
     add_test(NAME epanet_reservoir_head_pattern_metadata

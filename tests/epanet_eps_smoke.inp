@@ -45,4 +45,16 @@ Accuracy            0.001
 Pattern             P1
 Demand Multiplier   1.0
 
+[REPORT]
+Status              Full
+Summary             No
+Nodes               All
+Links               All
+Demand              Precision 6
+Head                Precision 6
+Pressure            Precision 6
+Flow                Precision 6
+Velocity            Precision 6
+Headloss            Precision 6
+
 [END]

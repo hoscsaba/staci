@@ -129,4 +129,16 @@ Headloss    H-W
 Trials      100
 Accuracy    0.001
 
+[REPORT]
+Status      Full
+Summary     No
+Nodes       All
+Links       All
+Demand      Precision 6
+Head        Precision 6
+Pressure    Precision 6
+Flow        Precision 6
+Velocity    Precision 6
+Headloss    Precision 6
+
 [END]

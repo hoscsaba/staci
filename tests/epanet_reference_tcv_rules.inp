@@ -1,0 +1,85 @@
+[TITLE]
+EPANET TCV rule actions, premises, and multiple-action branches
+
+[JUNCTIONS]
+;ID  Elevation  Demand
+J1   0          1.0
+M1   0          0.1
+M2   0          0.1
+M3   0          0.1
+M4   0          0.1
+
+[RESERVOIRS]
+;ID  Head
+R1   30
+
+[PIPES]
+;ID          Node1  Node2  Length  Diameter  Roughness  MinorLoss  Status
+BaseM1       R1     M1     200     100       120        0          Open
+BaseM2       R1     M2     200     100       120        0          Open
+BaseM3       R1     M3     200     100       120        0          Open
+BaseM4       R1     M4     200     100       120        0          Open
+Branch1      R1     M1     100     100       120        0          Open
+Branch2      R1     M2     100     100       120        0          Open
+SettingSeen  R1     M3     100     100       120        0          Open
+OpenSeen     R1     M4     100     100       120        0          Open
+
+[VALVES]
+;ID   Node1  Node2  Diameter  Type  Setting  MinorLoss
+TCV1  R1     J1     20        TCV   2        0.5
+
+[RULES]
+RULE TCV_SETTING_WINDOW
+IF SYSTEM TIME >= 1:00
+AND SYSTEM TIME < 2:00
+THEN VALVE TCV1 SETTING IS 8
+AND PIPE Branch1 STATUS IS CLOSED
+ELSE VALVE TCV1 SETTING IS 2
+AND PIPE Branch1 STATUS IS OPEN
+PRIORITY 5
+
+RULE TCV_OPEN_AFTER_TWO_HOURS
+IF SYSTEM TIME >= 2:00
+THEN VALVE TCV1 STATUS IS OPEN
+AND PIPE Branch2 STATUS IS CLOSED
+ELSE PIPE Branch2 STATUS IS OPEN
+PRIORITY 6
+
+RULE TCV_SETTING_PREMISE
+IF VALVE TCV1 SETTING > 7
+THEN PIPE SettingSeen STATUS IS CLOSED
+ELSE PIPE SettingSeen STATUS IS OPEN
+PRIORITY 4
+
+RULE TCV_STATUS_PREMISE
+IF VALVE TCV1 STATUS IS OPEN
+THEN PIPE OpenSeen STATUS IS CLOSED
+ELSE PIPE OpenSeen STATUS IS OPEN
+PRIORITY 4
+
+[TIMES]
+Duration             3:00
+Hydraulic Timestep   1:00
+Pattern Timestep     1:00
+Report Timestep      1:00
+Rule Timestep        0:10
+
+[OPTIONS]
+Units       LPS
+Headloss    H-W
+Trials      100
+Accuracy    0.000001
+
+[REPORT]
+Status      Full
+Summary     No
+Nodes       All
+Links       All
+Demand      Precision 6
+Head        Precision 6
+Pressure    Precision 6
+Flow        Precision 6
+Velocity    Precision 6
+Headloss    Precision 6
+
+[END]

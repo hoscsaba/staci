@@ -461,8 +461,15 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
         const auto additional = additional_demands.find(id);
         if (additional != additional_demands.end())
             components.insert(components.end(), additional->second.begin(), additional->second.end());
+        const bool demand_section_overrides_primary =
+            additional != additional_demands.end() && !additional->second.empty();
         double demand = 0.0;
         for (const EpanetDemandComponent &component : components) {
+            // In EPANET, one or more [DEMANDS] records for a junction replace
+            // the primary demand from [JUNCTIONS]. Preserve that primary
+            // record as metadata for lossless export, but do not solve it.
+            if (demand_section_overrides_primary && component.primary)
+                continue;
             const double pattern_multiplier = component.pattern_values.empty()
                 ? 1.0 : component.pattern_values.front();
             demand += component.base_demand_m3s * 3600.0 * pattern_multiplier;
