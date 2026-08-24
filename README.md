@@ -369,7 +369,9 @@ mandatory and any reference discrepancy makes the command fail. See
 [tests/CHANNEL_TESTS.md](tests/CHANNEL_TESTS.md) for the case matrix, governing
 equations, and engineering references. The same suite is registered in CTest
 as `channel_reference_suite`. Each case also produces two longitudinal-section
-files, `channel-profile.svg` and `channel-profile.pdf`. The diagrams use absolute SI
+files, `channel-profile.svg` and `channel-profile.pdf`. Each visualization
+starts with a labeled topology sketch and calculated flow arrows; the
+longitudinal diagrams use absolute SI
 elevations, shows the channel invert, crown and calculated water surface, and
 always orients the horizontal axis in the calculated flow direction.
 
@@ -377,9 +379,19 @@ The standard suite also contains
 `tests/channel_network_merge_split.spr`, a stationary network of six
 open-surface channels. Two channels merge at the central manhole and two
 channels leave it, after which both branches continue through another channel.
+The two source channels deliberately have different bed slopes: `CHANNEL_1`
+is a mild 0.5% reach and `CHANNEL_2` is a steep 1.5% reach. Their source water
+levels preserve the same 0.5 m inlet depth, isolating the effect of slope.
+One parallel branch is adverse: the `CHANNEL_5` invert rises from 1.00 m to
+1.05 m along the actual `BRANCH_A` to `SINK_A` flow direction, corresponding
+to a -0.05% bed slope. `CHANNEL_6` retains a conventional falling bed and the
+branch discharges become asymmetric.
 The dedicated test verifies the topology, convergence, nonzero channel flows,
 open water depths at every channel end, and mass conservation at the 2-in/2-out
-junction:
+junction. It also verifies the actual flow orientation and negative
+flow-direction bed slope in `CHANNEL_5`, and checks that its calculated profile
+remains finite, open and positive-depth. The inlet slope values and their
+minimum ratio are checked explicitly as well:
 
 ```bash
 python3 tests/run_channel_network_test.py --binary ./build/staci
@@ -388,7 +400,8 @@ python3 tests/run_channel_network_test.py --binary ./build/staci
 It is registered in CTest as `channel_network_merge_split` and is also executed
 by `tests/run_tests.py` as the `CHANNEL-NETWORK` case. Its retained
 `channel-network-longitudinal-profile.svg` and the multi-page
-`channel-network-longitudinal-profile.pdf` contain one elevation-correct panel
+`channel-network-longitudinal-profile.pdf` begin with a topology overview that
+labels every channel and junction. They then contain one elevation-correct panel
 for every source-to-outlet route, so the channels are shown consecutively even
 through the merge and split. The standalone renderer can be used for any solved
 SPR network containing `channel1` elements:

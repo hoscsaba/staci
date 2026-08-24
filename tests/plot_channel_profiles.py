@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 from html import escape
+import math
 from pathlib import Path
 from typing import Iterable
 import xml.etree.ElementTree as ET
@@ -103,6 +104,25 @@ def _read_channels(network: Path) -> list[Channel]:
             if node_from not in heads or node_to not in heads:
                 raise PlotError(f"No calculated water profile in {_text(edge, 'id')}")
             profile = ((0.0, heads[node_from] - start), (length, heads[node_to] - end))
+        else:
+            # Some legacy STACI save paths swap a negative-flow edge's nodes
+            # and invert elevations but retain curve_p in its original (now
+            # opposite) orientation.  Normalize the curve to the stored edge
+            # direction by matching its end depths to the solved node heads.
+            stored_start_depth = heads[node_from] - start
+            stored_end_depth = heads[node_to] - end
+            direct_error = (
+                abs(profile[0][1] - stored_start_depth)
+                + abs(profile[-1][1] - stored_end_depth)
+            )
+            reverse_error = (
+                abs(profile[0][1] - stored_end_depth)
+                + abs(profile[-1][1] - stored_start_depth)
+            )
+            if reverse_error + 1.0e-6 < direct_error:
+                profile = tuple(
+                    (length - x, depth) for x, depth in reversed(profile)
+                )
         channels.append(Channel(
             _text(edge, "id"), node_from, node_to, length, start, end,
             _number(edge, "./edge_spec/channel1/diameter"),
@@ -142,6 +162,80 @@ def _flow_paths(channels: list[Channel]) -> list[list[Channel]]:
     return paths
 
 
+def _topology_coordinates(network: Path, channels: list[Channel]) -> dict[str, tuple[float, float]]:
+    channel_nodes = {
+        node_id
+        for channel in channels
+        for node_id in (channel.node_from, channel.node_to)
+    }
+    root = ET.parse(network).getroot()
+    coordinates: dict[str, tuple[float, float]] = {}
+    for node in root.findall("./nodes/node"):
+        node_id = (node.findtext("id") or "").strip()
+        if node_id not in channel_nodes:
+            continue
+        try:
+            coordinates[node_id] = (_number(node, "xcoord"), _number(node, "ycoord"))
+        except (PlotError, ValueError):
+            continue
+    if len(coordinates) == len(channel_nodes):
+        xs = {point[0] for point in coordinates.values()}
+        ys = {point[1] for point in coordinates.values()}
+        if len(xs) > 1 or len(ys) > 1:
+            return coordinates
+
+    # Fallback for SPR files without drawing coordinates: arrange the nodes in
+    # flow-direction layers and spread each layer vertically.
+    outgoing: dict[str, list[str]] = {}
+    indegree = {node_id: 0 for node_id in channel_nodes}
+    for channel in channels:
+        outgoing.setdefault(channel.flow_from, []).append(channel.flow_to)
+        indegree[channel.flow_to] = indegree.get(channel.flow_to, 0) + 1
+    levels = {node_id: 0 for node_id, degree in indegree.items() if degree == 0}
+    queue = sorted(levels)
+    while queue:
+        node_id = queue.pop(0)
+        for target in outgoing.get(node_id, ()):
+            if target not in levels:
+                levels[target] = levels[node_id] + 1
+                queue.append(target)
+    for node_id in channel_nodes:
+        levels.setdefault(node_id, 0)
+    by_level: dict[int, list[str]] = {}
+    for node_id, level in levels.items():
+        by_level.setdefault(level, []).append(node_id)
+    return {
+        node_id: (float(level), float(index))
+        for level, node_ids in by_level.items()
+        for index, node_id in enumerate(sorted(node_ids))
+    }
+
+
+def _scaled_topology_positions(
+    coordinates: dict[str, tuple[float, float]],
+    left: float,
+    bottom: float,
+    width: float,
+    height: float,
+) -> dict[str, tuple[float, float]]:
+    xs = [point[0] for point in coordinates.values()]
+    ys = [point[1] for point in coordinates.values()]
+    x_span = max(max(xs) - min(xs), 1.0)
+    y_span = max(max(ys) - min(ys), 1.0)
+    scale = min(width / x_span, height / y_span)
+    used_width = (max(xs) - min(xs)) * scale
+    used_height = (max(ys) - min(ys)) * scale
+    x_offset = left + (width - used_width) / 2.0
+    y_offset = bottom + (height - used_height) / 2.0
+    return {
+        node_id: (
+            x_offset + (x - min(xs)) * scale,
+            y_offset + (max(ys) - y) * scale,
+        )
+        for node_id, (x, y) in coordinates.items()
+    }
+
+
 def _polyline(points: Iterable[tuple[float, float]]) -> str:
     return " ".join(f"{x:.2f},{y:.2f}" for x, y in points)
 
@@ -177,23 +271,46 @@ def render_channel_profiles(network: Path, output: Path, title: str | None = Non
     channels = _read_channels(network)
     paths, path_profiles, z_min, z_max = _prepared_paths(channels)
     width, panel_height = 1500, 310
-    header, footer, left, right = 95, 55, 105, 35
-    height = header + panel_height * len(paths) + footer
+    header, topology_height, footer, left, right = 95, 350, 55, 105, 35
+    height = header + topology_height + panel_height * len(paths) + footer
     plot_width = width - left - right
     plot_height = panel_height - 82
     document_title = title or f"STACI channel profiles — {network.name}"
     svg: list[str] = [
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
         '<rect width="100%" height="100%" fill="#ffffff"/>',
-        '<style>text{font-family:Arial,sans-serif;fill:#24303a}.axis{stroke:#4d5963;stroke-width:1}.grid{stroke:#dce3e8;stroke-width:1}.bed{stroke:#72502b;stroke-width:4;fill:none}.crown{stroke:#8d969d;stroke-width:1.5;stroke-dasharray:7 5;fill:none}.water{fill:#82c9ee;fill-opacity:.62;stroke:none}.surface{stroke:#087fbd;stroke-width:3;fill:none}.arrow{fill:#075f91}.small{font-size:13px}.label{font-size:15px;font-weight:bold}.title{font-size:24px;font-weight:bold}</style>',
+        '<defs><marker id="flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#075f91"/></marker></defs>',
+        '<style>text{font-family:Arial,sans-serif;fill:#24303a}.axis{stroke:#4d5963;stroke-width:1}.grid{stroke:#dce3e8;stroke-width:1}.bed{stroke:#72502b;stroke-width:4;fill:none}.crown{stroke:#8d969d;stroke-width:1.5;stroke-dasharray:7 5;fill:none}.water{fill:#82c9ee;fill-opacity:.62;stroke:none}.surface{stroke:#087fbd;stroke-width:3;fill:none}.arrow{fill:#075f91}.small{font-size:13px}.label{font-size:15px;font-weight:bold}.title{font-size:24px;font-weight:bold}.topology-edge{stroke:#087fbd;stroke-width:4;fill:none;marker-end:url(#flow-arrow)}.topology-node{fill:#f4a742;stroke:#59431f;stroke-width:2}.topology-label{font-size:15px;font-weight:bold;paint-order:stroke;stroke:#fff;stroke-width:6px;stroke-linejoin:round}</style>',
         f'<text class="title" x="{left}" y="38">{escape(document_title)}</text>',
         f'<text class="small" x="{left}" y="64">Flow is left to right. Elevations and water levels are read from the solved SPR file in SI units.</text>',
         '<rect x="1080" y="27" width="34" height="14" fill="#82c9ee" fill-opacity=".62"/><text class="small" x="1122" y="39">water</text>',
         '<line x1="1210" y1="35" x2="1250" y2="35" class="bed"/><text class="small" x="1260" y="39">channel invert</text>',
     ]
 
+    topology_top = header
+    topology_positions = _scaled_topology_positions(
+        _topology_coordinates(network, channels),
+        left + 85,
+        topology_top + 62,
+        plot_width - 170,
+        topology_height - 135,
+    )
+    svg.extend([
+        f'<rect x="{left}" y="{topology_top}" width="{plot_width}" height="{topology_height-25}" rx="12" fill="#f7fafc" stroke="#cbd5dc"/>',
+        f'<text class="label" x="{left+22}" y="{topology_top+32}">Network topology and calculated flow directions</text>',
+    ])
+    for channel in channels:
+        x0, y0 = topology_positions[channel.flow_from]
+        x1, y1 = topology_positions[channel.flow_to]
+        svg.append(f'<line class="topology-edge" x1="{x0:.2f}" y1="{y0:.2f}" x2="{x1:.2f}" y2="{y1:.2f}"/>')
+        mx, my = (x0 + x1) / 2.0, (y0 + y1) / 2.0
+        svg.append(f'<text class="topology-label" text-anchor="middle" x="{mx:.2f}" y="{my-10:.2f}">{escape(channel.identifier)}</text>')
+    for node_id, (x, y) in topology_positions.items():
+        svg.append(f'<circle class="topology-node" cx="{x:.2f}" cy="{y:.2f}" r="9"/>')
+        svg.append(f'<text class="topology-label" text-anchor="middle" x="{x:.2f}" y="{y+29:.2f}">{escape(node_id)}</text>')
+
     for panel, (path, prepared) in enumerate(zip(paths, path_profiles)):
-        top = header + panel * panel_height
+        top = header + topology_height + panel * panel_height
         bottom = top + plot_height
         total_length = sum(edge.length for edge in path)
         x_scale = plot_width / max(total_length, 1.0)
@@ -234,7 +351,8 @@ def render_channel_profiles(network: Path, output: Path, title: str | None = Non
         svg.append(f'<line class="grid" x1="{sx(total_length):.2f}" y1="{top}" x2="{sx(total_length):.2f}" y2="{bottom}"/>')
         svg.append(f'<text class="small" text-anchor="middle" x="{(left+width-right)/2:.2f}" y="{bottom+47}">Distance along flow direction [m] · total {total_length:.3g} m</text>')
 
-    svg.append(f'<text class="small" transform="translate(25 {height/2:.2f}) rotate(-90)" text-anchor="middle">Elevation [m]</text>')
+    profile_center = header + topology_height + panel_height * len(paths) / 2.0
+    svg.append(f'<text class="small" transform="translate(25 {profile_center:.2f}) rotate(-90)" text-anchor="middle">Elevation [m]</text>')
     svg.append('</svg>')
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text("\n".join(svg) + "\n", encoding="utf-8")
@@ -259,6 +377,77 @@ def _pdf_path(points: Iterable[tuple[float, float]], close: bool = False) -> str
     if close:
         commands.append("h")
     return " ".join(commands)
+
+
+def _pdf_topology_page(
+    network: Path,
+    channels: list[Channel],
+    document_title: str,
+    total_pages: int,
+) -> str:
+    positions = _scaled_topology_positions(
+        _topology_coordinates(network, channels), 105.0, 150.0, 632.0, 285.0
+    )
+    commands = [
+        "1 1 1 rg 0 0 842 595 re f",
+        "0.14 0.19 0.23 rg",
+        _pdf_text(72, 558, 17, document_title, True),
+        _pdf_text(72, 530, 13, "Network topology and calculated flow directions", True),
+        _pdf_text(72, 512, 8.5, "Only channel1 elements are shown. Arrows follow the solved mass-flow signs."),
+        _pdf_text(682, 558, 8.5, f"Source: {network.name}"),
+        "0.97 0.98 0.99 rg 72 105 698 375 re f",
+        "0.80 0.84 0.87 RG 0.8 w 72 105 698 375 re S",
+    ]
+    for channel in channels:
+        x0, y0 = positions[channel.flow_from]
+        x1, y1 = positions[channel.flow_to]
+        dx, dy = x1 - x0, y1 - y0
+        distance = max(math.hypot(dx, dy), 1.0)
+        ux, uy = dx / distance, dy / distance
+        start = (x0 + 10.0 * ux, y0 + 10.0 * uy)
+        end = (x1 - 12.0 * ux, y1 - 12.0 * uy)
+        commands.extend([
+            "0.03 0.50 0.74 RG 2.6 w",
+            f"{start[0]:.2f} {start[1]:.2f} m {end[0]:.2f} {end[1]:.2f} l S",
+        ])
+        arrow_x = x0 + 0.68 * dx
+        arrow_y = y0 + 0.68 * dy
+        px, py = -uy, ux
+        arrow = [
+            (arrow_x + 9.0 * ux, arrow_y + 9.0 * uy),
+            (arrow_x - 7.0 * ux + 5.0 * px, arrow_y - 7.0 * uy + 5.0 * py),
+            (arrow_x - 7.0 * ux - 5.0 * px, arrow_y - 7.0 * uy - 5.0 * py),
+        ]
+        commands.extend(["0.03 0.37 0.57 rg", _pdf_path(arrow, close=True) + " f"])
+        mx, my = (x0 + x1) / 2.0, (y0 + y1) / 2.0
+        label_width = max(43.0, 4.8 * len(channel.identifier))
+        commands.extend([
+            f"1 1 1 rg {mx-label_width/2:.2f} {my+5:.2f} {label_width:.2f} 15 re f",
+            "0.14 0.19 0.23 rg",
+            _pdf_text(mx - 2.4 * len(channel.identifier), my + 9, 8.5, channel.identifier, True),
+        ])
+    for node_id, (x, y) in positions.items():
+        commands.extend([
+            "0.96 0.65 0.26 rg",
+            f"{x-7:.2f} {y-7:.2f} 14 14 re f",
+            "0.35 0.26 0.12 RG 1.2 w",
+            f"{x-7:.2f} {y-7:.2f} 14 14 re S",
+            "0.14 0.19 0.23 rg",
+            _pdf_text(x - 2.7 * len(node_id), y - 26, 9, node_id, True),
+        ])
+    commands.extend([
+        "0.03 0.50 0.74 RG 2.6 w 92 72 m 128 72 l S",
+        "0.03 0.37 0.57 rg",
+        _pdf_path([(128, 72), (118, 77), (118, 67)], close=True) + " f",
+        "0.14 0.19 0.23 rg",
+        _pdf_text(139, 68, 8.5, "calculated flow direction"),
+        "0.96 0.65 0.26 rg 315 65 14 14 re f",
+        "0.35 0.26 0.12 RG 1.2 w 315 65 14 14 re S",
+        "0.14 0.19 0.23 rg",
+        _pdf_text(339, 68, 8.5, "junction / boundary node"),
+        _pdf_text(735, 12, 7.5, f"Page 1 of {total_pages}"),
+    ])
+    return "\n".join(command for command in commands if command)
 
 
 def _write_pdf(output: Path, pages: list[str], title: str) -> None:
@@ -321,7 +510,10 @@ def render_channel_profiles_pdf(network: Path, output: Path, title: str | None =
     page_width, page_height = 842.0, 595.0
     left, right, bottom, top = 72.0, 28.0, 105.0, 470.0
     plot_width, plot_height = page_width - left - right, top - bottom
-    pages: list[str] = []
+    total_pages = len(paths) + 1
+    pages: list[str] = [
+        _pdf_topology_page(network, channels, document_title, total_pages)
+    ]
 
     for page_index, (path, prepared) in enumerate(zip(paths, path_profiles)):
         total_length = sum(channel.length for channel in path)
@@ -398,7 +590,7 @@ def render_channel_profiles_pdf(network: Path, output: Path, title: str | None =
             "0.45 0.31 0.17 RG 2.2 w 675 35 m 705 35 l S",
             "0.14 0.19 0.23 rg",
             _pdf_text(712, 31, 8, "channel invert"),
-            _pdf_text(735, 12, 7.5, f"Page {page_index + 1} of {len(paths)}"),
+            _pdf_text(735, 12, 7.5, f"Page {page_index + 2} of {total_pages}"),
         ])
         pages.append("\n".join(command for command in commands if command))
     _write_pdf(output, pages, document_title)

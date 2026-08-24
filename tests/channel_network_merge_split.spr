@@ -2,7 +2,7 @@
 <staci>
 	<settings>
 		<id>channel_network</id>
-		<name>six_channel_merge_split</name>
+		<name>six_channel_merge_split_with_adverse_slope</name>
 		<color />
 		<counter>1</counter>
 		<cpp_xml_debug>false</cpp_xml_debug>
@@ -60,8 +60,8 @@
 			<demand>0</demand>
 			<density>1000.0</density>
 			<cl_input>0.0</cl_input>
-			<pressure>19620.0</pressure>
-			<head>2.0</head>
+			<pressure>29430.0</pressure>
+			<head>3.0</head>
 			<endnode>false</endnode>
 			<travel_time>0.00000e+00</travel_time>
 			<concentration>0,0000</concentration>
@@ -92,8 +92,8 @@
 			<demand>0</demand>
 			<density>1000.0</density>
 			<cl_input>0.0</cl_input>
-			<pressure>19620.0</pressure>
-			<head>2.0</head>
+			<pressure>39240.0</pressure>
+			<head>4.0</head>
 			<endnode>false</endnode>
 			<travel_time>0.00000e+00</travel_time>
 			<concentration>0,0000</concentration>
@@ -421,7 +421,7 @@
 			<edge_spec>
 				<channel1>
 					<length>100.0</length>
-					<start_height>3.0</start_height>
+					<start_height>2.5</start_height>
 					<end_height>2.0</end_height>
 					<inclination>1,0000</inclination>
 					<roughness>5</roughness>
@@ -491,7 +491,7 @@
 			<edge_spec>
 				<channel1>
 					<length>100.0</length>
-					<start_height>3.0</start_height>
+					<start_height>3.5</start_height>
 					<end_height>2.0</end_height>
 					<inclination>1,0000</inclination>
 					<roughness>5</roughness>
@@ -702,7 +702,7 @@
 				<channel1>
 					<length>100.0</length>
 					<start_height>1.0</start_height>
-					<end_height>0.0</end_height>
+					<end_height>1.05</end_height>
 					<inclination>1,0000</inclination>
 					<roughness>5</roughness>
 					<friction_coeff>0,0077</friction_coeff>
@@ -840,7 +840,7 @@
 			<concentration>0,0000</concentration>
 			<edge_spec>
 				<pool>
-					<water_level>3.5</water_level>
+					<water_level>3.0</water_level>
 					<bottom_level>0.0</bottom_level>
 				</pool>
 			</edge_spec>
@@ -866,7 +866,7 @@
 			<concentration>0,0000</concentration>
 			<edge_spec>
 				<pool>
-					<water_level>3.5</water_level>
+					<water_level>4.0</water_level>
 					<bottom_level>0.0</bottom_level>
 				</pool>
 			</edge_spec>
@@ -892,7 +892,7 @@
 			<concentration>0,0000</concentration>
 			<edge_spec>
 				<pool>
-					<water_level>0.5</water_level>
+					<water_level>1.4</water_level>
 					<bottom_level>0.0</bottom_level>
 				</pool>
 			</edge_spec>

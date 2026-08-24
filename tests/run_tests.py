@@ -913,10 +913,14 @@ def check_channel_network(binary: Path, tests_dir: Path,
         (sys.executable, str(script), "--binary", str(binary),
          "--network", str(network), "--results", str(case_dir)),
         tests_dir,
-        "stationary multi-channel merge/split network",
+        "stationary multi-channel merge/split network with adverse-slope reach",
     )
     if "test PASS" not in output:
         raise TestFailure("Multi-channel test did not report PASS")
+    if "Adverse slope PASS" not in output:
+        raise TestFailure("Multi-channel test did not verify its adverse-slope reach")
+    if "Source slopes PASS" not in output:
+        raise TestFailure("Multi-channel test did not verify its unequal source slopes")
     require_file(case_dir / "run_channel_network_test.log", "multi-channel test log")
     require_file(
         case_dir / "channel-network-longitudinal-profile.svg",
@@ -1206,7 +1210,7 @@ def main() -> int:
 
         passed, elapsed, reason = run_action(
             "CHANNEL-NETWORK",
-            "six stationary channels with a 2-in/2-out junction",
+            "six stationary channels with a 2-in/2-out junction and adverse slope",
             lambda: check_channel_network(binary, tests_dir, channel_network_root, log),
             log,
         )

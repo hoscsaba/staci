@@ -72,7 +72,8 @@ Results are retained in `tests/test-results/channel/`. The human-readable
 for automated comparison. Every case directory also contains two longitudinal
 sections, `channel-profile.svg` and `channel-profile.pdf`, with the calculated water surface,
 channel invert and crown in absolute SI elevation. Reverse-flow cases are
-automatically plotted in their actual flow direction.
+automatically plotted in their actual flow direction. A labeled topology
+overview precedes the profiles and uses the calculated flow signs for its arrows.
 
 All cases are mandatory reference checks; any flow or profile discrepancy above
 the documented tolerance makes the command fail. After configuring CMake, the
@@ -88,12 +89,21 @@ ctest --test-dir build -R channel_reference_suite --output-on-failure
 At `JUNCTION`, two channels arrive and two channels leave; the two downstream
 branches then continue through one additional channel each. Four pool elements
 prescribe the outer water levels, while STACI solves the three internal water
-levels and all channel flows.
+levels and all channel flows. The two inlet reaches have deliberately unequal
+bed slopes: 0.5% in `CHANNEL_1` and 1.5% in `CHANNEL_2`; their source pools keep
+the same 0.5 m inlet depth. The `CHANNEL_5` invert rises from 1.00 m to 1.05 m
+along the actual `BRANCH_A` to `SINK_A` flow direction, giving a -0.05%
+adverse slope; the parallel `CHANNEL_6` retains a conventional falling bed.
 
 `run_channel_network_test.py` requires at least five channel elements, locates
 the 2-in/2-out junction from the SPR topology, runs the stationary solver, and
 checks convergence, nonzero finite flows, open depths at both ends of every
-channel, and the junction mass balance. Run it directly or through CTest:
+channel, and the junction mass balance. It additionally verifies that
+`CHANNEL_5` carries flow from `BRANCH_A` to `SINK_A` while its bed rises, and
+checks that the calculated adverse-slope profile is finite and positive. It
+also asserts a low positive slope in `CHANNEL_1`, a steep
+slope in `CHANNEL_2`, and at least a 2.5:1 slope ratio. Run it directly or
+through CTest:
 
 ```bash
 python3 tests/run_channel_network_test.py --binary build/staci
@@ -101,7 +111,9 @@ ctest --test-dir build -R channel_network_merge_split --output-on-failure
 ```
 
 The network test retains `channel-network-longitudinal-profile.svg` and a
-multi-page `channel-network-longitudinal-profile.pdf`. Since the
+multi-page `channel-network-longitudinal-profile.pdf`. Both start with a
+topology sketch naming all `CHANNEL_*` elements and junctions; the test verifies
+that every expected identifier is present. Since the
 network branches, the drawing contains a separate panel for each complete
 source-to-outlet flow path; shared reaches are repeated so every panel remains
 a continuous longitudinal section. The renderer has no third-party Python
