@@ -11,6 +11,10 @@ import subprocess
 import sys
 import xml.etree.ElementTree as ET
 
+from plot_channel_profiles import (
+    PlotError, render_channel_profiles, render_channel_profiles_pdf,
+)
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPOSITORY_DIR = SCRIPT_DIR.parent
@@ -138,6 +142,18 @@ def main() -> int:
             raise TestFailure(f"STACI did not converge (exit={completed.returncode})")
 
         count, junction, total_flow, residual = validate_stationary_result(network)
+        profile_path = results / "channel-network-longitudinal-profile.svg"
+        render_channel_profiles(
+            network,
+            profile_path,
+            "STACI six-channel merge/split network — longitudinal profiles",
+        )
+        pdf_profile_path = profile_path.with_suffix(".pdf")
+        render_channel_profiles_pdf(
+            network,
+            pdf_profile_path,
+            "STACI six-channel merge/split network - longitudinal profiles",
+        )
         report = (
             "STACI STATIONARY MULTI-CHANNEL NETWORK TEST\n"
             "============================================\n"
@@ -147,12 +163,19 @@ def main() -> int:
             f"Incoming and outgoing mass flow: {total_flow:.12g} kg/s\n"
             f"Mass-balance residual: {residual:.12g} kg/s\n"
             "All channel end depths are between zero and the diameter.\n"
+            f"Longitudinal profile: {profile_path.name}\n"
+            f"Longitudinal profile PDF: {pdf_profile_path.name}\n"
         )
         (results / "run_channel_network_test.log").write_text(report, encoding="utf-8")
         print(f"Stationary multi-channel test PASS: {count} channels, junction={junction}")
         print(f"Log: {results / 'run_channel_network_test.log'}")
+        print(f"Profile: {profile_path}")
+        print(f"Profile PDF: {pdf_profile_path}")
         return 0
-    except (TestFailure, OSError, ValueError, ET.ParseError, subprocess.TimeoutExpired) as error:
+    except (
+        TestFailure, PlotError, OSError, ValueError, ET.ParseError,
+        subprocess.TimeoutExpired,
+    ) as error:
         print(f"Stationary multi-channel test FAIL: {error}", file=sys.stderr)
         return 1
 

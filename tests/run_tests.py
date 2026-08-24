@@ -884,7 +884,24 @@ def check_channel_reference(binary: Path, tests_dir: Path,
     if "0 failed" not in output:
         raise TestFailure("Channel reference suite did not report zero failures")
     require_file(case_dir / "run_channel_tests.log", "channel reference log")
-    require_file(case_dir / "results.csv", "channel reference CSV")
+    results_csv = case_dir / "results.csv"
+    require_file(results_csv, "channel reference CSV")
+    with results_csv.open(newline="", encoding="utf-8") as stream:
+        expected_profiles = sum(1 for _ in csv.DictReader(stream))
+    profile_images = sorted(case_dir.glob("*/channel-profile.svg"))
+    profile_pdfs = sorted(case_dir.glob("*/channel-profile.pdf"))
+    if len(profile_images) != expected_profiles:
+        raise TestFailure(
+            f"Expected {expected_profiles} channel reference profile images, "
+            f"found {len(profile_images)}"
+        )
+    log.write(f"  Visualizations: {len(profile_images)} longitudinal SVG profiles")
+    if len(profile_pdfs) != expected_profiles:
+        raise TestFailure(
+            f"Expected {expected_profiles} channel reference PDF profiles, "
+            f"found {len(profile_pdfs)}"
+        )
+    log.write(f"  PDF visualizations: {len(profile_pdfs)} longitudinal profiles")
 
 
 def check_channel_network(binary: Path, tests_dir: Path,
@@ -901,6 +918,14 @@ def check_channel_network(binary: Path, tests_dir: Path,
     if "test PASS" not in output:
         raise TestFailure("Multi-channel test did not report PASS")
     require_file(case_dir / "run_channel_network_test.log", "multi-channel test log")
+    require_file(
+        case_dir / "channel-network-longitudinal-profile.svg",
+        "multi-channel longitudinal profile",
+    )
+    require_file(
+        case_dir / "channel-network-longitudinal-profile.pdf",
+        "multi-channel longitudinal profile PDF",
+    )
 
 
 def check_epanet_reference(binary: Path, epanet: Path, source: Path,

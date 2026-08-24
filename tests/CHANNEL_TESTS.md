@@ -69,7 +69,10 @@ python3 tests/run_channel_tests.py --binary build/staci
 
 Results are retained in `tests/test-results/channel/`. The human-readable
 `run_channel_tests.log` explains every case, while `results.csv` is convenient
-for automated comparison.
+for automated comparison. Every case directory also contains two longitudinal
+sections, `channel-profile.svg` and `channel-profile.pdf`, with the calculated water surface,
+channel invert and crown in absolute SI elevation. Reverse-flow cases are
+automatically plotted in their actual flow direction.
 
 All cases are mandatory reference checks; any flow or profile discrepancy above
 the documented tolerance makes the command fail. After configuring CMake, the
@@ -95,4 +98,16 @@ channel, and the junction mass balance. Run it directly or through CTest:
 ```bash
 python3 tests/run_channel_network_test.py --binary build/staci
 ctest --test-dir build -R channel_network_merge_split --output-on-failure
+```
+
+The network test retains `channel-network-longitudinal-profile.svg` and a
+multi-page `channel-network-longitudinal-profile.pdf`. Since the
+network branches, the drawing contains a separate panel for each complete
+source-to-outlet flow path; shared reaches are repeated so every panel remains
+a continuous longitudinal section. The renderer has no third-party Python
+dependencies and can also be invoked directly:
+
+```bash
+python3 tests/plot_channel_profiles.py --network solved-network.spr \
+  --output profile.svg --pdf-output profile.pdf
 ```

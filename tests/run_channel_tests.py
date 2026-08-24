@@ -22,6 +22,10 @@ import time
 from typing import Callable, List, Optional, Sequence, Tuple
 import xml.etree.ElementTree as ET
 
+from plot_channel_profiles import (
+    PlotError, render_channel_profiles, render_channel_profiles_pdf,
+)
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPOSITORY_DIR = SCRIPT_DIR.parent
@@ -515,6 +519,16 @@ def run_case(binary: Path, template: Path, root: Path, case: Case, timeout: floa
         if completed.returncode != 0 or not marker.is_file() or marker.read_text().strip().upper() != "OK":
             raise ReferenceError(f"STACI did not converge (exit={completed.returncode})")
         actual_flow, actual_profile = read_channel_result(network)
+        render_channel_profiles(
+            network,
+            case_dir / "channel-profile.svg",
+            f"STACI channel reference — {case.name}",
+        )
+        render_channel_profiles_pdf(
+            network,
+            case_dir / "channel-profile.pdf",
+            f"STACI channel reference - {case.name}",
+        )
         flow_error = abs(actual_flow - case.expected_flow)
         # The network Newton solver stops on its own pressure/flow tolerances;
         # 1e-3 m3/s is still below 0.2% for the smallest non-zero reference Q.
@@ -543,7 +557,10 @@ def run_case(binary: Path, template: Path, root: Path, case: Case, timeout: floa
             case, status, actual_flow, flow_error, profile_error, momentum_error,
             parse_branch(case_dir / "CHANNEL10.out"), elapsed, message,
         )
-    except (ReferenceError, subprocess.TimeoutExpired, ET.ParseError, OSError, ValueError) as error:
+    except (
+        ReferenceError, PlotError, subprocess.TimeoutExpired, ET.ParseError,
+        OSError, ValueError,
+    ) as error:
         elapsed = time.monotonic() - started
         return Result(case, "FAIL", None, None, None, None, "unknown", elapsed, str(error))
 
