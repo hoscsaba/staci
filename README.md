@@ -370,10 +370,14 @@ mandatory and any reference discrepancy makes the command fail. See
 equations, and engineering references. The same suite is registered in CTest
 as `channel_reference_suite`. Each case also produces two longitudinal-section
 files, `channel-profile.svg` and `channel-profile.pdf`. Each visualization
-starts with a labeled topology sketch and calculated flow arrows; the
-longitudinal diagrams use absolute SI
-elevations, shows the channel invert, crown and calculated water surface, and
-always orients the horizontal axis in the calculated flow direction.
+starts with a labeled topology sketch and calculated flow arrows. Channel
+labels include the calculated SI discharge, while node labels show the
+flow-oriented channel-end invert elevations and water depths (`z_e`, `h_e`,
+`z_v`, `h_v`). The longitudinal diagrams use absolute SI elevations, show the
+channel invert, crown, calculated water surface and red dashed energy grade
+line, and always orient the horizontal axis in the calculated flow direction.
+Red endpoint markers identify the upstream rest level
+`z_e + h_e + v_e^2/(2g)` and downstream rest level `z_v + h_v`.
 
 The standard suite also contains
 `tests/channel_network_merge_split.spr`, a stationary network of six
@@ -401,10 +405,13 @@ It is registered in CTest as `channel_network_merge_split` and is also executed
 by `tests/run_tests.py` as the `CHANNEL-NETWORK` case. Its retained
 `channel-network-longitudinal-profile.svg` and the multi-page
 `channel-network-longitudinal-profile.pdf` begin with a topology overview that
-labels every channel and junction. They then contain one elevation-correct panel
-for every source-to-outlet route, so the channels are shown consecutively even
-through the merge and split. The standalone renderer can be used for any solved
-SPR network containing `channel1` elements:
+labels every channel and junction, includes every calculated channel discharge,
+and lists the applicable `z_e`, `h_e`, `z_v`, `h_v` endpoint data at each node.
+Nodes shared by incoming and outgoing channels show both endpoint roles. The
+following elevation-correct panels contain the red dashed energy grade line and
+rest-level markers for every source-to-outlet route, so the channels are shown
+consecutively even through the merge and split. The standalone renderer can be
+used for any solved SPR network containing `channel1` elements:
 
 ```bash
 python3 tests/plot_channel_profiles.py \

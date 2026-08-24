@@ -519,16 +519,39 @@ def run_case(binary: Path, template: Path, root: Path, case: Case, timeout: floa
         if completed.returncode != 0 or not marker.is_file() or marker.read_text().strip().upper() != "OK":
             raise ReferenceError(f"STACI did not converge (exit={completed.returncode})")
         actual_flow, actual_profile = read_channel_result(network)
+        show_energy_line = True
+        show_boundary_levels = True
+        svg_output = case_dir / "channel-profile.svg"
+        pdf_output = case_dir / "channel-profile.pdf"
         render_channel_profiles(
             network,
-            case_dir / "channel-profile.svg",
+            svg_output,
             f"STACI channel reference — {case.name}",
+            show_energy_line=show_energy_line,
+            show_boundary_levels=show_boundary_levels,
+            show_topology_hydraulics=True,
         )
         render_channel_profiles_pdf(
             network,
-            case_dir / "channel-profile.pdf",
+            pdf_output,
             f"STACI channel reference - {case.name}",
+            show_energy_line=show_energy_line,
+            show_boundary_levels=show_boundary_levels,
+            show_topology_hydraulics=True,
         )
+        energy_polyline = '<polyline class="energy"'
+        svg_has_energy_line = energy_polyline in svg_output.read_text(encoding="utf-8")
+        if not svg_has_energy_line:
+            raise ReferenceError("energy grade line is missing from the channel plot")
+        boundary_marker = '<g class="boundary-level">'
+        boundary_marker_count = svg_output.read_text(encoding="utf-8").count(boundary_marker)
+        if boundary_marker_count != 2:
+            raise ReferenceError("channel plot does not contain two rest-level markers")
+        topology_has_boundary_data = "z_e=" in svg_output.read_text(encoding="utf-8")
+        if not topology_has_boundary_data or "z_v=" not in svg_output.read_text(encoding="utf-8"):
+            raise ReferenceError("topology is missing channel-end elevations and depths")
+        if "Q=" not in svg_output.read_text(encoding="utf-8"):
+            raise ReferenceError("topology is missing the calculated channel discharge")
         flow_error = abs(actual_flow - case.expected_flow)
         # The network Newton solver stops on its own pressure/flow tolerances;
         # 1e-3 m3/s is still below 0.2% for the smallest non-zero reference Q.

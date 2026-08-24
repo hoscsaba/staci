@@ -220,12 +220,18 @@ def main() -> int:
             network,
             profile_path,
             "STACI channel network with adverse slope — longitudinal profiles",
+            show_energy_line=True,
+            show_boundary_levels=True,
+            show_topology_hydraulics=True,
         )
         pdf_profile_path = profile_path.with_suffix(".pdf")
         render_channel_profiles_pdf(
             network,
             pdf_profile_path,
             "STACI channel network with adverse slope - longitudinal profiles",
+            show_energy_line=True,
+            show_boundary_levels=True,
+            show_topology_hydraulics=True,
         )
         solved_channels = channel_edges(ET.parse(network).getroot())
         expected_topology_labels = {text(edge, "id") for edge in solved_channels}
@@ -236,6 +242,16 @@ def main() -> int:
         for label in expected_topology_labels:
             if label not in svg_document or label not in pdf_document:
                 raise TestFailure(f"Topology visualization is missing label: {label}")
+        for edge in solved_channels:
+            channel_id = text(edge, "id")
+            if f"{channel_id} · Q=" not in svg_document:
+                raise TestFailure(f"Topology visualization is missing flow for {channel_id}")
+        if "z_e=" not in svg_document or "z_v=" not in svg_document:
+            raise TestFailure("Topology visualization is missing endpoint elevations and depths")
+        if '<polyline class="energy"' not in svg_document:
+            raise TestFailure("Longitudinal visualization is missing energy grade lines")
+        if svg_document.count('<g class="boundary-level">') < 2:
+            raise TestFailure("Longitudinal visualization is missing rest-level markers")
         report = (
             "STACI STATIONARY MULTI-CHANNEL NETWORK TEST\n"
             "============================================\n"

@@ -74,6 +74,11 @@ sections, `channel-profile.svg` and `channel-profile.pdf`, with the calculated w
 channel invert and crown in absolute SI elevation. Reverse-flow cases are
 automatically plotted in their actual flow direction. A labeled topology
 overview precedes the profiles and uses the calculated flow signs for its arrows.
+Every channel label contains the calculated SI discharge, and node labels list
+the flow-oriented endpoint invert elevation and water depth (`z_e`, `h_e`,
+`z_v`, `h_v`). Every profile includes a red dashed energy grade line and red
+markers for the upstream `z_e+h_e+v_e^2/(2g)` and downstream `z_v+h_v` rest
+levels.
 
 All cases are mandatory reference checks; any flow or profile discrepancy above
 the documented tolerance makes the command fail. After configuring CMake, the
@@ -113,10 +118,12 @@ ctest --test-dir build -R channel_network_merge_split --output-on-failure
 The network test retains `channel-network-longitudinal-profile.svg` and a
 multi-page `channel-network-longitudinal-profile.pdf`. Both start with a
 topology sketch naming all `CHANNEL_*` elements and junctions; the test verifies
-that every expected identifier is present. Since the
+that every expected identifier is present. It also reports `Q` on every channel
+and all distinct `e`/`v` endpoint elevation-depth pairs at each node. Since the
 network branches, the drawing contains a separate panel for each complete
 source-to-outlet flow path; shared reaches are repeated so every panel remains
-a continuous longitudinal section. The renderer has no third-party Python
+a continuous longitudinal section. Each panel uses the same water-surface,
+energy-line and rest-level conventions as the one-channel plots. The renderer has no third-party Python
 dependencies and can also be invoked directly:
 
 ```bash
