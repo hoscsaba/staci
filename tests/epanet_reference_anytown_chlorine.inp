@@ -1,5 +1,5 @@
 [TITLE]
-STACI versus EPANET reference: Anytown demand-pattern EPS
+STACI versus EPANET reference: Anytown chlorine EPS benchmark
 
 [JUNCTIONS]
 ;ID       Elevation  Demand             Pattern
@@ -96,13 +96,27 @@ Units       LPS
 Headloss    D-W
 Trials      100
 Accuracy    0.000001
-Quality     AGE
+Quality     CHEMICAL Chlorine mg/L
+
+[QUALITY]
+; All initial network concentrations are zero.
+NODE210  0.0
+
+[SOURCES]
+; Constant concentration source at the supply reservoir.
+NODE210  CONCEN  1.0
+
+[REACTIONS]
+Order Bulk  1
+Order Wall  1
+Global Bulk -0.50
+Global Wall  0.0
 
 [TIMES]
 Duration            6:00
 Hydraulic Timestep  1:00
 Pattern Timestep    1:00
-Quality Timestep    0:05
+Quality Timestep    0:01
 Report Timestep     1:00
 
 [REPORT]

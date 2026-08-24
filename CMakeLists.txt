@@ -172,6 +172,19 @@ install(TARGETS ${STACI_EXECUTABLE_TARGETS}
 
 include(CTest)
 if(BUILD_TESTING)
+    add_executable(staci_epanet_water_age_test
+        "${PROJECT_SOURCE_DIR}/tests/test_epanet_water_age.cpp"
+        "${PROJECT_SOURCE_DIR}/src/epanet_water_age.cpp"
+    )
+    target_compile_features(staci_epanet_water_age_test PRIVATE cxx_std_17)
+    set_target_properties(staci_epanet_water_age_test PROPERTIES CXX_EXTENSIONS OFF)
+    target_include_directories(staci_epanet_water_age_test PRIVATE
+        "${PROJECT_SOURCE_DIR}/include/staci")
+    add_test(NAME epanet_water_age_model
+        COMMAND $<TARGET_FILE:staci_epanet_water_age_test>)
+    set_tests_properties(epanet_water_age_model PROPERTIES
+        LABELS "epanet;quality;water_age;unit")
+
     set(STACI_EPANET_EXECUTABLE "" CACHE FILEPATH
         "Optional path to the official runepanet executable used by reference tests")
     find_package(Python3 COMPONENTS Interpreter QUIET)
@@ -190,6 +203,7 @@ if(BUILD_TESTING)
             epanet_reference_tcv.inp
             epanet_reference_pattern.inp
             epanet_reference_anytown.inp
+            epanet_reference_anytown_chlorine.inp
             epanet_node_metadata.inp
             epanet_pumps.inp
             epanet_eps_smoke.inp
@@ -217,6 +231,15 @@ if(BUILD_TESTING)
                     --flow-abs 0.016 --flow-rel 0.03
                     --velocity-abs 0.08 --velocity-rel 0.03
                     --headloss-abs 0.4 --headloss-rel 0.05
+                    --check-age --age-abs 600
+                )
+            elseif(epanet_case STREQUAL "epanet_reference_anytown_chlorine")
+                list(APPEND epanet_reference_command
+                    --head-rel 0.01
+                    --flow-abs 0.016 --flow-rel 0.03
+                    --velocity-abs 0.08 --velocity-rel 0.03
+                    --headloss-abs 0.4 --headloss-rel 0.05
+                    --check-chlorine --chlorine-abs 0.00008
                 )
             elseif(epanet_case STREQUAL "epanet_node_metadata")
                 list(APPEND epanet_reference_command

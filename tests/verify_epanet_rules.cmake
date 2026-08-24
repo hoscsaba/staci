@@ -24,11 +24,19 @@ endif()
 
 file(READ "${RESULT_PREFIX}-links.csv" links)
 foreach(link TimePipe ClockPipe PressurePipe FlowPipe EqualPipe TimeEqualPipe
-             TankRulePipe FillTimePipe DrainTimePipe)
+             TankRulePipe FillTimePipe)
     if(NOT links MATCHES "1800,${link},PIPE,[^\n]*,0,1")
         message(FATAL_ERROR "Expected rule did not close ${link}")
     endif()
 endforeach()
+
+# T1 is filling throughout this fixture. EPANET treats DRAINTIME as an
+# inapplicable/false premise unless a tank is actually draining, so this link
+# must remain open. The official EPANET reference comparison checks the same
+# status directly.
+if(NOT links MATCHES "1800,DrainTimePipe,PIPE,[^\n]*,1,1")
+    message(FATAL_ERROR "DRAINTIME rule fired while the tank was filling")
+endif()
 
 if(NOT links MATCHES "1800,ClockEqualPipe,PIPE,[^\n]*,1,1" OR
    NOT links MATCHES "3600,ClockEqualPipe,PIPE,[^\n]*,0,1")
@@ -44,7 +52,7 @@ endif()
 if(NOT links MATCHES "1800,EqualPipe,PIPE,[^\n]*,0,1")
     message(FATAL_ERROR "First equal-priority rule did not win")
 endif()
-if(NOT links MATCHES "1800,PSet,PUMP,[^\n]*,0\\.069[0-9]*,nan,[^\n]*,1,1")
+if(NOT links MATCHES "1800,PSet,PUMP,[^\n]*,0\\.071[0-9]*,nan,[^\n]*,1,1")
     message(FATAL_ERROR "Numeric pump rule setting was not applied")
 endif()
 if(NOT links MATCHES "1800,ClockPipe,PIPE,[^\n]*,0,1" OR

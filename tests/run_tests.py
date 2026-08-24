@@ -46,26 +46,39 @@ HDF5_REQUIRED_DATASETS = (
     "/nodes/head",
     "/nodes/pressure_head",
     "/nodes/demand",
+    "/nodes/water_age",
+    "/nodes/chlorine",
     "/links/id",
     "/links/flow_rate",
     "/links/velocity",
     "/links/headloss",
     "/links/status",
+    "/links/water_age",
+    "/links/chlorine",
     "/tanks/id",
     "/tanks/level",
     "/tanks/volume",
     "/tanks/inflow",
     "/simulation/converged",
 )
-HDF5_DYNAMIC_DATASETS = HDF5_REQUIRED_DATASETS[2:5] + HDF5_REQUIRED_DATASETS[6:10] + HDF5_REQUIRED_DATASETS[11:]
+HDF5_DYNAMIC_DATASETS = (
+    "/nodes/head", "/nodes/pressure_head", "/nodes/demand", "/nodes/water_age", "/nodes/chlorine",
+    "/links/flow_rate", "/links/velocity", "/links/headloss", "/links/status",
+    "/links/water_age", "/links/chlorine", "/tanks/level", "/tanks/volume", "/tanks/inflow",
+    "/simulation/converged",
+)
 HDF5_EXPECTED_UNITS = {
     "/time": "s",
     "/nodes/head": "m",
     "/nodes/pressure_head": "m",
     "/nodes/demand": "m3/s",
+    "/nodes/water_age": "s",
+    "/nodes/chlorine": "kg/m3",
     "/links/flow_rate": "m3/s",
     "/links/velocity": "m/s",
     "/links/headloss": "m",
+    "/links/water_age": "s",
+    "/links/chlorine": "kg/m3",
     "/tanks/level": "m",
     "/tanks/volume": "m3",
     "/tanks/inflow": "m3/s",
@@ -457,12 +470,14 @@ def check_inp(binary: Path, source: Path, case_dir: Path, log: Log) -> None:
     validate_si_csv(
         Path(str(prefix) + "-nodes.csv"),
         ("time_seconds", "node_id", "elevation_m", "pressure_head_m",
-         "total_head_m", "demand_m3s", "converged"),
+         "total_head_m", "demand_m3s", "converged", "water_age_s",
+         "chlorine_kgm3"),
     )
     validate_si_csv(
         Path(str(prefix) + "-links.csv"),
         ("time_seconds", "link_id", "type", "node_from", "node_to",
-         "flow_m3s", "velocity_mps", "headloss_m", "status", "converged"),
+         "flow_m3s", "velocity_mps", "headloss_m", "status", "converged",
+         "water_age_s", "chlorine_kgm3"),
     )
     validate_si_csv(
         Path(str(prefix) + "-tanks.csv"),
@@ -1062,6 +1077,17 @@ def main() -> int:
                     "--flow-abs", "0.016", "--flow-rel", "0.03",
                     "--velocity-abs", "0.08", "--velocity-rel", "0.03",
                     "--headloss-abs", "0.4", "--headloss-rel", "0.05",
+                    "--check-age", "--age-abs", "600",
+                ),
+            ),
+            (
+                tests_dir / "epanet_reference_anytown_chlorine.inp",
+                (
+                    "--head-rel", "0.01",
+                    "--flow-abs", "0.016", "--flow-rel", "0.03",
+                    "--velocity-abs", "0.08", "--velocity-rel", "0.03",
+                    "--headloss-abs", "0.4", "--headloss-rel", "0.05",
+                    "--check-chlorine", "--chlorine-abs", "0.00008",
                 ),
             ),
             (

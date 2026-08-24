@@ -39,6 +39,10 @@ struct EpsOutputMetadata {
     std::int64_t effective_timestep_s;
     std::int64_t pattern_timestep_s;
     std::int64_t report_timestep_s;
+    std::int64_t quality_timestep_s;
+    bool water_age_enabled;
+    bool chemical_enabled;
+    std::string chemical_name;
 };
 
 struct EpsResultFrame {
@@ -46,10 +50,14 @@ struct EpsResultFrame {
     std::vector<double> node_head_m;
     std::vector<double> node_pressure_head_m;
     std::vector<double> node_demand_m3s;
+    std::vector<double> node_water_age_s;
+    std::vector<double> node_chlorine_kgm3;
     std::vector<double> link_flow_rate_m3s;
     std::vector<double> link_velocity_ms;
     std::vector<double> link_headloss_m;
     std::vector<std::uint8_t> link_status;
+    std::vector<double> link_water_age_s;
+    std::vector<double> link_chlorine_kgm3;
     std::vector<double> tank_level_m;
     std::vector<double> tank_volume_m3;
     std::vector<double> tank_inflow_m3s;

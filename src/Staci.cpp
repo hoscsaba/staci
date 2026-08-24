@@ -1999,19 +1999,19 @@ void Staci::set_up_transport() {
     if (auto *distributed = dynamic_cast<DistributedResults *>(agelemek.at(i))) {
       v = distributed->Get_res("v");
       hossz = agelemek.at(i)->Get_dprop("L");
-      agelemek.at(i)->set_up_grid(0.0, v, hossz);
+      agelemek.at(i)->set_up_grid(agelemek.at(i)->Get_dprop("concentration"), v, hossz);
     } else {
       if (agelemek.at(i)->GetType() == "Cso") {
         for (int j = 0; j < 10; j++) {
           v.push_back(agelemek.at(i)->Get_v());
         }
         hossz = agelemek.at(i)->Get_dprop("L");
-        agelemek.at(i)->set_up_grid(0.0, v, hossz);
+        agelemek.at(i)->set_up_grid(agelemek.at(i)->Get_dprop("concentration"), v, hossz);
       } else {
         v.push_back(agelemek.at(i)->Get_v());
         v.push_back(agelemek.at(i)->Get_v());
         hossz = 10.0;
-        agelemek.at(i)->set_up_grid(0.0, v, hossz);
+        agelemek.at(i)->set_up_grid(agelemek.at(i)->Get_dprop("concentration"), v, hossz);
         agelemek.at(i)->Set_cdt(10 * 60);
       }
     }
@@ -2022,27 +2022,26 @@ void Staci::set_up_transport() {
   }
   transp_dt = 1e100;
   for (i = 0; i < agelemek.size(); i++) {
-    bool kell_eloszlas = false;
-
-    if (agelemek.at(i)->GetType() == "Cso") {
-      if (fabs(agelemek.at(i)->Get_dprop("erdesseg")) > 1e-5)
-        kell_eloszlas = true;
-    }
-    if (agelemek.at(i)->GetType() == "Csatorna") kell_eloszlas = true;
-
-    if (kell_eloszlas) {
-      // cout << ", dt=" << agelemek.at(i)->cdt;
-      if (transp_dt > agelemek.at(i)->cdt) {
-        transp_dt = agelemek.at(i)->cdt;
-        // cout << "*";
+    const bool distributed = agelemek.at(i)->GetType() == "Cso" ||
+                             agelemek.at(i)->GetType() == "Csatorna";
+    if (distributed && !agelemek.at(i)->vel.empty()) {
+      double maximum_velocity = 0.0;
+      for (double velocity : agelemek.at(i)->vel)
+        maximum_velocity = std::max(maximum_velocity, std::abs(velocity));
+      if (maximum_velocity > 1.0e-12) {
+        const double dx = agelemek.at(i)->cL / agelemek.at(i)->vel.size();
+        transp_dt = std::min(transp_dt, 0.8 * dx / maximum_velocity);
       }
     }
   }
+  if (!std::isfinite(transp_dt) || transp_dt <= 0.0)
+    transp_dt = 60.0;
   // double transp_dt_min=1; // s
   // if (transp_dt<transp_dt_min)
   //    transp_dt=transp_dt_min;
 
-  tt_length = atof(datta_io.read_setting("tt_length").c_str());
+  const char *duration_setting = mode == 2 ? "cl_length" : "tt_length";
+  tt_length = atof(datta_io.read_setting(duration_setting).c_str());
 
   ostringstream strstrm;
   strstrm << endl
@@ -2056,6 +2055,7 @@ void Staci::set_up_transport() {
 
 //--------------------------------------------------------------
 void Staci::solve_transport(int mode) {
+  this->mode = mode;
   ostringstream strstrm;
   strstrm << "Starting computation..." << endl;
   logfile_write(strstrm.str(), 2);
@@ -2073,8 +2073,9 @@ void Staci::solve_transport(int mode) {
       cout << "h, oldest fluid particle: " << (get_oldest() / 3600.) << "h";
       counter += 1;
     }
-    transport_step(transp_dt);
-    ido += transp_dt;
+    const double dt = std::min(transp_dt, tt_length * 3600.0 - ido);
+    transport_step(dt);
+    ido += dt;
   }
 }
 
@@ -2164,7 +2165,10 @@ void Staci::transport_step(double dt) {
         }
       }
       double c, fogy, cl_be;
-      fogy = cspok.at(i)->Get_dprop("fogy");
+      // Csomopont::Get_dprop("demand") returns m3/h while link mass flows
+      // are kg/s. Convert the external node flow to kg/s before mixing.
+      fogy = cspok.at(i)->Get_dprop("demand") / 3600.0 *
+             cspok.at(i)->Get_dprop("ro");
       cl_be = cspok.at(i)->Get_dprop("cl_be");
       // Ha "kifele" megy a viz, attol a csomopontban nem higul
       if (fogy > 0) {
@@ -2172,27 +2176,17 @@ void Staci::transport_step(double dt) {
         cl_be = 0.0;
       }
 
-      if (mode == 1) {
-        // if (fabs(nevezo - fogy) > 1.e-10)
-        c = (szaml) / (nevezo - fogy);
-        // else
-        //{
-        // TODO: logfile_write-ba!
-        // cout << endl << "ERROR!!!! Staci::transport_step():
-        // fabs(nevezo-fogy)=" << fabs(nevezo - fogy) << "<1.e-10" << endl <<
-        // endl;
-        // exit(-1);
-        //}
+      const double previous = cspok.at(i)->Get_dprop("konc_atlag");
+      const double denominator = mode == 1
+        ? nevezo - fogy : nevezo + fabs(fogy);
+      if (denominator > 1.0e-12) {
+        c = mode == 1
+          ? szaml / denominator
+          : (szaml + cl_be * fabs(fogy)) / denominator;
       } else {
-        // if (nevezo + fabs(fogy) > 1.e-10)
-        c = (szaml + cl_be * fabs(fogy)) / (nevezo + fabs(fogy));
-        // else
-        //{
-        // TODO: logfile_write-ba!
-        //    cout << endl << "ERROR!!!! Staci::transport_step(): nevezo +
-        //    fabs(fogy)" << (nevezo + fabs(fogy)) << "<1.e-10" << endl << endl;
-        // exit(-1);
-        //}
+        // A stagnant node has no mixing flux. Its water still ages, while a
+        // chemical concentration remains unchanged.
+        c = previous + (mode == 1 ? dt : 0.0);
       }
 
       cspok.at(i)->Set_dprop("konc_atlag", c);
@@ -2216,10 +2210,7 @@ void Staci::transport_step(double dt) {
     // Ha nulla az �rdess�g, akkor csak �sszek�t� cs� �s szkippelj�k
     bool kell_eloszlas = false;
 
-    if (agelemek.at(i)->GetType() == "Cso") {
-      if ((fabs(agelemek.at(i)->Get_dprop("erdesseg"))) > 1e-5)
-        kell_eloszlas = true;
-    }
+    if (agelemek.at(i)->GetType() == "Cso") kell_eloszlas = true;
     if (agelemek.at(i)->GetType() == "Csatorna") kell_eloszlas = true;
 
     //      cout<<endl<<agelemek.at(i)->Get_nev()<<",
@@ -2243,7 +2234,11 @@ void Staci::transport_step(double dt) {
             vel_e = agelemek.at(i)->vel.at(j - 1);
             konc = agelemek.at(i)->konc.at(j);
             agelemek.at(i)->konc.at(j) =
-              konc - dt / dx * vel_e * (konc - konc_e) + dt * teta(konc_e, i);
+              konc - dt / dx * vel_e * (konc - konc_e);
+            if (mode == 1)
+              agelemek.at(i)->konc.at(j) += dt;
+            else
+              agelemek.at(i)->konc.at(j) *= std::exp(dt * teta(1.0, i));
 
             /*if (agelemek.at(i)->Get_nev()=="PIPE116") {
               cout<<endl<<"i="<<i<<", konc="<<konc<<", konc_e="
@@ -2261,8 +2256,8 @@ void Staci::transport_step(double dt) {
         if (agelemek.at(i)->Get_Csp_db() == 1) {
           konc_vege = cspok.at((unsigned long)agelemek.at(i)->Get_Cspv_Index())
                       ->Get_dprop("konc_atlag");
-          agelemek.at(i)->konc.at(0) = konc_vege;
-          agelemek.at(i)->konc.at(1) = konc_vege;
+            agelemek.at(i)->konc.at(0) = 0.0;
+            agelemek.at(i)->konc.at(1) = 0.0;
         } else {
           konc_vege = cspok.at((unsigned long)agelemek.at(i)->Get_Cspv_Index())
                       ->Get_dprop("konc_atlag");
@@ -2271,7 +2266,11 @@ void Staci::transport_step(double dt) {
             vel_u = agelemek.at(i)->vel.at(j + 1);
             konc = agelemek.at(i)->konc.at(j);
             agelemek.at(i)->konc.at(j) =
-              konc - dt / dx * vel_u * (konc_u - konc) + dt * teta(konc_u, i);
+              konc - dt / dx * vel_u * (konc_u - konc);
+            if (mode == 1)
+              agelemek.at(i)->konc.at(j) += dt;
+            else
+              agelemek.at(i)->konc.at(j) *= std::exp(dt * teta(1.0, i));
             if (agelemek.at(i)->konc.at(j) < 0)
               agelemek.at(i)->konc.at(j) = 0.0;
           }
@@ -2279,13 +2278,13 @@ void Staci::transport_step(double dt) {
         }
       }
     } else {
-      double konc =
-        cspok.at(agelemek.at(i)->Get_Cspe_Index())->Get_dprop("konc_atlag");
-
+      double konc = 0.0;
       if (agelemek.at(i)->Get_Csp_db() == 2) {
-        double konc_vege =
-          cspok.at(agelemek.at(i)->Get_Cspv_Index())->Get_dprop("konc_atlag");
-        konc = (konc + konc_vege) / 2;
+        const bool forward = agelemek.at(i)->Get_Q() >= 0.0;
+        const int upstream = forward ? agelemek.at(i)->Get_Cspe_Index()
+                                     : agelemek.at(i)->Get_Cspv_Index();
+        konc = cspok.at(static_cast<std::size_t>(upstream))
+                   ->Get_dprop("konc_atlag");
       }
 
       // cout << endl << "dt=" << dt << ", " << agelemek.at(i)->show_grid(0.0)
@@ -2319,7 +2318,9 @@ double Staci::teta(double konc, const int i) {
       cl_w = agelemek.at(i)->Get_dprop("cl_w");
     } else {
       if (agelemek.at(i)->GetType() == "Cso") {
-        Rh = agelemek.at(i)->Get_dprop("Rh");
+        // Full circular-pipe hydraulic radius is D/4. The legacy Cso "Rh"
+        // property is used elsewhere with a different geometric convention.
+        Rh = agelemek.at(i)->Get_dprop("diameter") / 4.0;
         cl_k = agelemek.at(i)->Get_dprop("cl_k");
         cl_w = agelemek.at(i)->Get_dprop("cl_w");
       } else {
@@ -2328,11 +2329,12 @@ double Staci::teta(double konc, const int i) {
         cl_w = 0.0;
       }
     }
-    double Sh = 3.65;
-    double kf = Sh;
     double tag1 = -cl_k * konc;
-    double tag2 = -kf / Rh * (konc - cl_w);
-    return (tag1 + 0 * tag2);
+    // Native SPR coefficients are SI: cl_k [1/s] is the bulk coefficient and
+    // cl_w [m/s] is the first-order wall coefficient. A/Rh relation gives
+    // wall area per water volume as 1/Rh.
+    double tag2 = Rh > 1.0e-12 ? -cl_w / Rh * konc : 0.0;
+    return tag1 + tag2;
   }
 }
 
@@ -3117,10 +3119,10 @@ void Staci::residence_time_step(string & max_ID, double & max_VAL,
               cout << " mp= " << m << " t=" << (c / 60)
                    << " min (tt_start = " << (ce / 60) << "min)";
 
-            // 0 tomegaram eseten 0-val szorozzuk a szamlalot
-            if (fabs(m) < TINY_MASS_FLOW_RATE) m = TINY_MASS_FLOW_RATE;
-            szaml += fabs(m) * c;
-            nevezo += fabs(m);
+            if (fabs(m) >= TINY_MASS_FLOW_RATE) {
+              szaml += fabs(m) * c;
+              nevezo += fabs(m);
+            }
           }
         }
       }
@@ -3142,18 +3144,18 @@ void Staci::residence_time_step(string & max_ID, double & max_VAL,
               cout << " mp= " << m << " t=" << (c / 60)
                    << " min (tt_end = " << (ce / 60) << "min)";
 
-            // 0 tomegaram eseten 0-val szorozzuk a szamlalot
-            if (fabs(m) < TINY_MASS_FLOW_RATE) m = TINY_MASS_FLOW_RATE;
-            szaml += fabs(m) * c;
-            nevezo += fabs(m);
+            if (fabs(m) >= TINY_MASS_FLOW_RATE) {
+              szaml += fabs(m) * c;
+              nevezo += fabs(m);
+            }
           }
         }
       }
-      // A virtualics csomopontokban siman lehet nevezo=0
-      if (fabs(nevezo) < TINY_MASS_FLOW_RATE) nevezo = TINY_MASS_FLOW_RATE;
-
-      cspok.at(i)->Set_dprop("tt", szaml / nevezo);
-      sum = sum + szaml / nevezo;
+      // A zero-flow node must not be diluted by an invented pseudo-flow.
+      const double node_age = nevezo >= TINY_MASS_FLOW_RATE
+        ? szaml / nevezo : cspok.at(i)->Get_dprop("tt");
+      cspok.at(i)->Set_dprop("tt", node_age);
+      sum += node_age;
 
       if (transp_debug)
         cout << "\n\t atlagos vizkor= " << cspok.at(i)->Get_dprop("tt") / 60

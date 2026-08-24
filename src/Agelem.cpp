@@ -5,6 +5,8 @@
 #include <vector>
 #include <cmath>
 #include <ctime>
+#include <limits>
+#include <stdexcept>
 #include <stdlib.h>
 #include "Agelem.h"
 
@@ -126,15 +128,24 @@ vector<double> Agelem::interp(const vector<double> &x, const vector<double> &y,
 
 //--------------------------------------------------------------
 void Agelem::set_up_grid(double a_konc, const vector<double> &a_vel, double a_cL) {
-    //konc.clear(); vel.clear();
+    if (a_vel.empty())
+        throw std::invalid_argument("Agelem::set_up_grid requires at least one velocity value.");
+    konc.clear();
+    vel.clear();
     // Vizminoseg adatok:
     for (unsigned int i = 0; i < a_vel.size(); i++)
         konc.push_back(a_konc);
     for (unsigned int i = 0; i < a_vel.size(); i++)
         vel.push_back(a_vel.at(i));
     cL = a_cL;
-    cT = cL / fabs(mean(vel));
-    cdt = cT / vel.size();
+    const double mean_velocity = fabs(mean(vel));
+    if (mean_velocity <= 1.0e-12) {
+        cT = std::numeric_limits<double>::infinity();
+        cdt = std::numeric_limits<double>::infinity();
+    } else {
+        cT = cL / mean_velocity;
+        cdt = cT / vel.size();
+    }
 }
 
 //--------------------------------------------------------------

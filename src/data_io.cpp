@@ -1276,6 +1276,11 @@ void data_io::load_ini_values(vector<Csomopont *> &cspok, vector<Agelem *> &agel
             if (cspok.at(j)->Get_nev() == id) {
                 pressure = atof(Node_nodes.getChildNode("node", i).getChildNode("pressure").getText()) / 1000 / 9.81;
                 cspok.at(j)->Ini(1, pressure);
+                XMLNode source_node = Node_nodes.getChildNode("node", i);
+                if (source_node.nChildNode("concentration") == 1)
+                    cspok.at(j)->Set_dprop(
+                        "concentration",
+                        atof(source_node.getChildNode("concentration").getText()));
                 if (debug)
                     cout << endl << "\t id: " << id << " =>  p=" << (pressure * 1000 * 9.81)
                          << "Pa = " << pressure << "vom";
@@ -1293,6 +1298,11 @@ void data_io::load_ini_values(vector<Csomopont *> &cspok, vector<Agelem *> &agel
                     cout << endl << "\t id: " << id << " => mp=" << mass_flow_rate
                          << " kg/s";
                 agelemek.at(j)->Ini(1, mass_flow_rate);
+                XMLNode source_edge = Node_edges.getChildNode("edge", i);
+                if (source_edge.nChildNode("concentration") == 1)
+                    agelemek.at(j)->Set_dprop(
+                        "concentration",
+                        atof(source_edge.getChildNode("concentration").getText()));
             }
         }
     }
@@ -1364,7 +1374,6 @@ void data_io::save_transport(int mode, const vector<Csomopont *> &cspok,
         }
     }
 
-    double mp;
     for (int i = 0; i < ag_db; i++) {
         id = Node_edges.getChildNode("edge", i).getChildNode("id").getText();
         megvan = false;
@@ -1372,7 +1381,6 @@ void data_io::save_transport(int mode, const vector<Csomopont *> &cspok,
             cout << endl << "\tag id : " << id << "  ";
         for (unsigned int j = 0; j < agelemek.size(); j++) {
             if (id == (agelemek.at(j)->Get_nev())) {
-                mp = agelemek.at(i)->Get_mp();
                 Node_edges.getChildNode("edge", i).getChildNode(tagname.c_str()).deleteText();
                 ostringstream os;
                 double konc = agelemek.at(j)->mean(agelemek.at(j)->konc);

@@ -137,17 +137,15 @@ void EpanetReader::parse_options() {
             quality_trace_node_.clear();
             if (quality_mode_ == "AGE") {
                 quality_units_ = "h";
-                add_warning("OPTIONS", "QUALITY", record.line_number,
-                            "Initial water age is transferred, but EPANET extended-period "
-                            "quality simulation is not executed.");
             } else if (quality_mode_ == "CHEMICAL") {
                 if (record.fields.size() > 2)
                     quality_chemical_name_ = record.fields[2];
                 if (record.fields.size() > 3)
                     quality_units_ = record.fields[3];
-                add_warning("OPTIONS", "QUALITY", record.line_number,
-                            "Initial chemical concentration is transferred; EPANET-specific "
-                            "quality sources and reactions are not.");
+                if (!extended_period_)
+                    add_warning("OPTIONS", "QUALITY", record.line_number,
+                                "Chemical configuration is retained; execute EPANET EPS mode "
+                                "to apply sources and first-order reactions.");
             } else if (quality_mode_ == "TRACE") {
                 if (record.fields.size() > 2)
                     quality_trace_node_ = record.fields[2];
@@ -864,6 +862,9 @@ void EpanetReader::warn_for_unsupported_sections() {
     };
     for (const auto &entry : unsupported)
         if (has_records(entry.first) &&
+            !(extended_period_ && quality_mode_ == "CHEMICAL" &&
+              (entry.first == "SOURCES" || entry.first == "REACTIONS" ||
+               entry.first == "MIXING")) &&
             !(extended_period_ && (entry.first == "TIMES" || entry.first == "STATUS" ||
                                    entry.first == "COORDINATES")))
             add_warning(entry.first, "", records(entry.first).front().line_number,

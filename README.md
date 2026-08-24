@@ -286,7 +286,7 @@ python3 tests/run_tests.py --binary ./build/staci \
   --require-epanet-reference
 ```
 
-Eleven targeted fixtures validate every EPANET hydraulic element that currently
+Twelve targeted fixtures validate every EPANET hydraulic element that currently
 has a calculation-model counterpart in STACI, together with the supported
 simple-control and rule paths:
 
@@ -295,7 +295,8 @@ simple-control and rule paths:
 | `epanet_reference_pipe.inp` | Junction, reservoir, and two Hazen-Williams pipes |
 | `epanet_reference_tcv.inp` | Pipe minor loss and an active TCV |
 | `epanet_reference_pattern.inp` | Multi-state junction demand pattern |
-| `epanet_reference_anytown.inp` | 21 junctions, two reservoirs, 41 Darcy-Weisbach pipes, one HEAD pump, and seven EPS states |
+| `epanet_reference_anytown.inp` | 21 junctions, two reservoirs, 41 Darcy-Weisbach pipes, one HEAD pump, seven EPS states, and direct `QUALITY AGE` comparison |
+| `epanet_reference_anytown_chlorine.inp` | The same AnyTown EPS hydraulics with a 1 mg/L reservoir boundary, first-order bulk chlorine decay, and direct SI chemical-quality comparison |
 | `epanet_node_metadata.inp` | Separate demand categories, demand multiplier, initially closed pipe, minor loss, and CV pipe |
 | `epanet_pumps.inp` | POWER pump, multi-point HEAD pump, one-point HEAD pump, initial speed, and speed patterns |
 | `epanet_eps_smoke.inp` | Tank storage and level, reservoir head pattern, demand pattern, POWER pump, and tank-level simple control |
@@ -310,6 +311,21 @@ For control and rule fixtures, STACI's enabled/closed link state is also checked
 exactly against EPANET's `STATUS FULL` event history. The comparison JSON stores
 maximum errors both globally and separately for every node and link, so a
 regression is localized to its element and result quantity.
+
+The Anytown reference also runs the official EPANET 2.2 water-quality solver in
+`AGE` mode. STACI advances plug-flow pipe parcels with perfect instantaneous
+junction mixing and zero-age reservoir boundaries using the EPS hydraulic state
+from each interval. Node ages are compared in SI seconds with a 600 s absolute
+acceptance limit; the current maximum difference is about 525 s over the
+six-hour simulation. This tolerance includes the effect of the independently
+computed hydraulic flows, whose largest Anytown difference is about 5%.
+
+The separate AnyTown chlorine benchmark starts with zero concentration in the
+network, applies a 1 mg/L `CONCEN` source at reservoir `NODE210`, and uses a global first-order
+bulk coefficient of -0.50/day. EPANET report values in mg/L are converted before
+comparison with STACI's SI `kg/m3` output. With a shared 60 s quality timestep,
+the current maximum node-concentration difference is `6.15e-5 kg/m3` over six
+hours; the automated acceptance limit is `8e-5 kg/m3`.
 
 The three original small fixtures retain strict absolute tolerances: 0.002 m
 for head and head loss, `1e-9 m3/s` for flow, and `5e-6 m/s` for velocity.
@@ -414,8 +430,10 @@ does not have a STACI equivalent. It currently transfers:
 
 Rule-based controls are executed in EPANET EPS mode but do not affect a single
 steady-state import. TCV settings and states are supported; other regulated
-valve types, emitters, and water-quality sources/reactions are parsed but not
-simulated.
+valve types and emitters are not simulated. Chemical EPS applies initial
+quality, all four EPANET source types and their patterns, plus first-order global
+and pipe-specific bulk and wall reactions. Tank chemical storage/mixing and
+non-first-order reactions remain unsupported and produce explicit warnings.
 Descriptive metadata, map sections, and non-hydraulic run configuration do not
 affect the hydraulic snapshot, but they remain attached to the imported
 EPANET document for lossless export. Each incompatible calculation feature is
@@ -487,7 +505,7 @@ represent structurally, are:
 | Curves | **Partial:** HEAD pump curves and pump-efficiency curves are retained with their original IDs and SI points; tank-volume and GPV curve types have no general typed STACI representation. |
 | Patterns | **Partial:** complete demand, reservoir-head, pump-speed and pump energy-price patterns are retained by their corresponding STACI elements; hydraulic patterns are used by EPS. A reusable network-level model for other pattern types is still missing. |
 | Simple controls and rule-based controls | **Supported in EPS:** simple controls execute `OPEN`, `CLOSED`, `ACTIVE`, numeric pump speeds and numeric TCV loss settings for node pressure/tank level, elapsed-time, and clock-time triggers. The EPS rule engine supports `IF`/`AND`/`OR`, `THEN`, multiple actions, `ELSE`, priorities, node/tank/link/system premises, TCV setting/status premises, and the separate rule timestep. Both sections remain losslessly retained in the imported INP document; neither yet has a network-level editable STACI object outside EPS. |
-| Water-quality sources, reactions and tank mixing | **No calculation-model equivalent:** retained in the imported INP document but not represented or solved by STACI elements. |
+| Water age, chemical sources, reactions and tank mixing | **Partial:** EPS solves `QUALITY AGE` and `QUALITY CHEMICAL` with segment-based plug flow, timestep-volume node mixing, reservoirs, pumps and valves. Initial quality, `CONCEN`/`MASS`/`SETPOINT`/`FLOWPACED` sources with patterns, and first-order global or pipe-specific bulk/wall coefficients are applied. Tank storage/mixing, trace mode, and non-first-order kinetics remain. |
 
 STACI also contains `Csatorna` (open channel) and `BukoMutargy` (overflow/weir),
 for which EPANET has no native hydraulic element. These elements are therefore
@@ -569,10 +587,11 @@ field-level `INP -> STACI -> INP` round-trip assertion.
     imported INP text is re-exported losslessly. A reusable network-level API
     is still needed to edit their references, thresholds, actions, priorities,
     and ordering outside an EPS run.
-15. [ ] **Preserve water-quality configuration.** Round-trip `[QUALITY]`,
+15. [x] **Preserve water-quality configuration.** Round-trip `[QUALITY]`,
     `[SOURCES]`, `[REACTIONS]`, and `[MIXING]`, including units, source types,
-    coefficients, tank mixing models, and pattern references. Water-quality
-    calculation remains outside this item.
+    coefficients, tank mixing models, and pattern references. EPS now applies
+    chemical initial quality, sources and first-order reactions; unsupported
+    tank mixing and reaction orders remain losslessly preserved and warned.
 16. [ ] **Introduce a lossless fallback for unknown sections.** Keep unknown or
     newer EPANET sections and unsupported records as raw, ordered INP data so
     STACI can modify known properties without silently discarding future
@@ -620,10 +639,10 @@ small `PREFIX.meta.json` sidecar contains run metadata and precomputed value
 ranges for plot color bars. Four analysis-friendly SI CSV files are retained
 for interoperability and manual inspection:
 
-- `PREFIX-nodes.csv`: pressure head, total head, elevation, and demand for each
-  node and report time;
-- `PREFIX-links.csv`: flow, head loss, endpoints, type, and enabled state for
-  each link;
+- `PREFIX-nodes.csv`: pressure head, total head, elevation, demand, water age
+  in seconds, and chemical concentration in `kg/m3` for each node and report time;
+- `PREFIX-links.csv`: flow, head loss, endpoints, type, enabled state,
+  volume-averaged water age, and chemical concentration for each link;
 - `PREFIX-tanks.csv`: tank level, volume, inflow, and limits;
 - `PREFIX-summary.csv`: duration, timestep, state count, failed states, and
   warning count.
@@ -640,10 +659,14 @@ The HDF5 dynamic arrays use `[time, element]` order:
 /nodes/head                 float64 [T,N]  m
 /nodes/pressure_head        float64 [T,N]  m
 /nodes/demand               float64 [T,N]  m3/s
+/nodes/water_age            float64 [T,N]  s
+/nodes/chlorine             float64 [T,N]  kg/m3
 /links/flow_rate            float64 [T,L]  m3/s
 /links/velocity             float64 [T,L]  m/s
 /links/headloss             float64 [T,L]  m
 /links/status               uint8   [T,L]
+/links/water_age            float64 [T,L]  s
+/links/chlorine             float64 [T,L]  kg/m3
 /tanks/level                float64 [T,K]  m
 /tanks/volume               float64 [T,K]  m3
 /tanks/inflow               float64 [T,K]  m3/s
@@ -671,9 +694,15 @@ non-standard installation, for example:
 cmake -S . -B build -DHDF5_ROOT=/path/to/hdf5
 ```
 
-Tank volume curves are currently approximated using the tank diameter. TCV
+Tank volume curves are currently approximated using the tank diameter. `QUALITY
+AGE` and `QUALITY CHEMICAL` are supported for EPS pipe networks with node
+mixing, reservoir boundaries, zero-volume pumps/valves, and plug-flow pipe
+storage. Chemical concentrations are converted from the INP declaration and
+written as SI `kg/m3`; bulk coefficients are converted from 1/day to 1/s and
+wall coefficients from length/day to m/s. Tank quality storage/mixing,
+non-first-order kinetics, and trace simulation are not yet represented. TCV
 `ACTIVE`/`OPEN`/`CLOSED` actions and numeric loss settings are supported;
-regulated non-TCV valve types, water-quality EPS, and exact interpolation of a
+regulated non-TCV valve types and exact interpolation of a
 simple node-pressure or tank-level threshold crossing inside a hydraulic
 timestep are not yet implemented. Rule conditions are sampled at `RULE
 TIMESTEP` instants, matching EPANET's discrete rule-engine model; unsupported
@@ -755,6 +784,21 @@ properties are pipe `diameter`, junction `demand`, and tank
 # Concentration distribution
 ./build/staci -c network.spr
 ```
+
+For native SPR chemical calculations, `cl_input` and stored concentrations use
+`kg/m3`, `cl_k` is a bulk first-order coefficient in `1/s`, and `cl_w` is a
+first-order wall coefficient in `m/s`. `cl_length` is the chemical simulation
+duration in hours. The legacy SPR command holds the solved hydraulic state
+constant; use EPANET EPS mode when demands or operating states vary with time.
+
+The `-t` command is the legacy fixed-hydraulic-state SPR transport calculation.
+For an EPANET extended-period water-age simulation, set `QUALITY AGE` in the
+INP `[OPTIONS]` section and run `--epanet-eps`; node and link ages are then
+written to CSV and HDF5 in SI seconds.
+
+For chlorine, set `QUALITY CHEMICAL Chlorine mg/L` and use `[QUALITY]`,
+`[SOURCES]`, and `[REACTIONS]` normally. The same EPS command writes node and
+link concentrations to CSV and HDF5 as SI `kg/m3`.
 
 ### Sensitivity calculations
 

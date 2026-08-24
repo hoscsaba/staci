@@ -5,6 +5,7 @@
 #include "EpanetPump.h"
 #include "JelleggorbesFojtas.h"
 #include "Staci.h"
+#include "epanet_water_age.h"
 #include "eps_result_writer.h"
 
 #include <algorithm>
@@ -17,6 +18,7 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <limits>
 #include <numeric>
 #include <set>
@@ -35,6 +37,12 @@ struct Record {
 
 struct DemandComponent {
     double base_m3_per_hour;
+    std::string pattern_id;
+};
+
+struct ChemicalSourceDefinition {
+    EpanetChemicalSourceType type = EpanetChemicalSourceType::None;
+    double strength_si = 0.0;
     std::string pattern_id;
 };
 
@@ -370,12 +378,16 @@ public:
           pressure_units_(""), specific_gravity_(1.0), start_clock_s_(0),
           duration_s_(0), hydraulic_step_s_(3600), pattern_step_s_(3600),
           pattern_start_s_(0), report_step_s_(3600), report_start_s_(0),
-          rule_step_s_(0) {
+          rule_step_s_(0), quality_timestep_s_(300), quality_age_(false),
+          quality_chemical_(false), chemical_units_("mg/L"),
+          bulk_order_(1.0), wall_order_(1.0),
+          global_bulk_per_s_(0.0), global_wall_mps_(0.0) {
         parse_file();
         parse_options();
         parse_times();
         parse_patterns();
         parse_demands();
+        parse_quality();
         parse_boundaries();
         parse_controls();
         parse_rules();
@@ -530,6 +542,77 @@ public:
                     std::sqrt(4.0 * tank.area_m2 / 3.14159265358979323846)});
         }
 
+        std::unique_ptr<EpanetWaterAgeModel> water_age;
+        if (quality_age_) {
+            std::vector<EpanetWaterAgeNode> age_nodes;
+            age_nodes.reserve(result_nodes.size());
+            for (const EpsNodeInfo &node : result_nodes)
+                age_nodes.push_back(EpanetWaterAgeNode{node.type == "RESERVOIR"});
+            std::vector<EpanetWaterAgeLink> age_links;
+            age_links.reserve(result_links.size());
+            for (const EpsLinkInfo &link : result_links) {
+                double volume = 0.0;
+                if (link.type == "PIPE" && std::isfinite(link.length_m) &&
+                    std::isfinite(link.diameter_m) && link.length_m > 0.0 &&
+                    link.diameter_m > 0.0) {
+                    const double area = 3.14159265358979323846 *
+                        link.diameter_m * link.diameter_m / 4.0;
+                    volume = area * link.length_m;
+                }
+                age_links.push_back(EpanetWaterAgeLink{
+                    link.from_node, link.to_node, volume});
+            }
+            water_age = std::make_unique<EpanetWaterAgeModel>(
+                std::move(age_nodes), std::move(age_links),
+                static_cast<double>(quality_timestep_s_));
+            if (!tanks.empty())
+                warn("QUALITY", "AGE", 0,
+                     "Tank mixing is not yet represented by the EPS water-age model; tank nodes use junction mixing.");
+        }
+
+        std::unique_ptr<EpanetChemicalModel> chemical;
+        if (quality_chemical_) {
+            std::vector<EpanetChemicalNode> chemical_nodes;
+            chemical_nodes.reserve(result_nodes.size());
+            for (const EpsNodeInfo &node : result_nodes) {
+                const auto initial = initial_quality_kgm3_.find(node.id);
+                chemical_nodes.push_back(EpanetChemicalNode{
+                    initial == initial_quality_kgm3_.end() ? 0.0 : initial->second,
+                    node.type == "RESERVOIR"});
+            }
+            std::vector<EpanetChemicalLink> chemical_links;
+            chemical_links.reserve(result_links.size());
+            for (const EpsLinkInfo &link : result_links) {
+                double volume = 0.0;
+                double reaction = 0.0;
+                if (link.type == "PIPE" && std::isfinite(link.length_m) &&
+                    std::isfinite(link.diameter_m) && link.length_m > 0.0 &&
+                    link.diameter_m > 0.0) {
+                    const double area = 3.14159265358979323846 *
+                        link.diameter_m * link.diameter_m / 4.0;
+                    volume = area * link.length_m;
+                    const auto bulk = pipe_bulk_per_s_.find(link.id);
+                    const auto wall = pipe_wall_mps_.find(link.id);
+                    reaction = bulk == pipe_bulk_per_s_.end()
+                        ? global_bulk_per_s_ : bulk->second;
+                    const double wall_mps = wall == pipe_wall_mps_.end()
+                        ? global_wall_mps_ : wall->second;
+                    reaction += 4.0 * wall_mps / link.diameter_m;
+                }
+                const double from = chemical_nodes[link.from_node].initial_concentration_kgm3;
+                const double to = chemical_nodes[link.to_node].initial_concentration_kgm3;
+                chemical_links.push_back(EpanetChemicalLink{
+                    link.from_node, link.to_node, volume, reaction,
+                    0.5 * (from + to)});
+            }
+            chemical = std::make_unique<EpanetChemicalModel>(
+                std::move(chemical_nodes), std::move(chemical_links),
+                static_cast<double>(quality_timestep_s_));
+            if (!tanks.empty())
+                warn("QUALITY", chemical_name_, 0,
+                     "Tank chemical storage is not yet represented; tank nodes use instantaneous junction mixing.");
+        }
+
         std::ofstream node_output((prefix + "-nodes.csv").c_str(), std::ios::trunc);
         std::ofstream link_output((prefix + "-links.csv").c_str(), std::ios::trunc);
         std::ofstream tank_output((prefix + "-tanks.csv").c_str(), std::ios::trunc);
@@ -537,8 +620,8 @@ public:
         if (!node_output || !link_output || !tank_output || !summary_output)
             throw std::runtime_error("Cannot create EPS CSV output files with prefix: " + prefix);
 
-        node_output << "time_seconds,node_id,elevation_m,pressure_head_m,total_head_m,demand_m3s,converged\n";
-        link_output << "time_seconds,link_id,type,node_from,node_to,flow_m3s,velocity_mps,headloss_m,status,converged\n";
+        node_output << "time_seconds,node_id,elevation_m,pressure_head_m,total_head_m,demand_m3s,converged,water_age_s,chlorine_kgm3\n";
+        link_output << "time_seconds,link_id,type,node_from,node_to,flow_m3s,velocity_mps,headloss_m,status,converged,water_age_s,chlorine_kgm3\n";
         tank_output << "time_seconds,tank_id,level_m,volume_m3,inflow_m3s,min_level_m,max_level_m,converged\n";
         node_output << std::setprecision(15);
         link_output << std::setprecision(15);
@@ -559,7 +642,8 @@ public:
 
         EpsOutputMetadata output_metadata{
             filename_, duration_s_, hydraulic_step_s_, simulation_step_s,
-            pattern_step_s_, report_step_s_};
+            pattern_step_s_, report_step_s_, quality_timestep_s_, quality_age_,
+            quality_chemical_, chemical_name_};
         EpsResultWriter result_writer(prefix, result_nodes, result_links,
                                       result_tanks, output_metadata, 16);
         if (!result_writer.hdf5_enabled())
@@ -608,9 +692,43 @@ public:
                 ++failed_count;
 
             if (should_report(time_s)) {
+                std::vector<double> node_age;
+                std::vector<double> link_age;
+                std::vector<double> node_chlorine;
+                std::vector<double> link_chlorine;
+                std::vector<double> flows;
+                flows.reserve(result_link_objects.size());
+                for (Agelem *link : result_link_objects)
+                    flows.push_back(link->Get_Q());
+                if (water_age) {
+                    node_age = water_age->node_age_s();
+                    link_age = water_age->link_average_age_s(flows);
+                }
+                if (chemical) {
+                    std::vector<double> external(result_nodes.size(), 0.0);
+                    std::vector<EpanetChemicalSource> sources(result_nodes.size());
+                    for (std::size_t index = 0; index < system.cspok.size(); ++index)
+                        external[index] = std::max(
+                            0.0, -system.cspok[index]->Get_dprop("demand") / 3600.0);
+                    for (const auto &entry : chemical_sources_) {
+                        const auto node = node_indices.find(entry.first);
+                        if (node == node_indices.end())
+                            continue;
+                        sources[node->second] = EpanetChemicalSource{
+                            entry.second.type,
+                            entry.second.strength_si *
+                                pattern_value(entry.second.pattern_id, time_s)};
+                    }
+                    // duration=0 updates instantaneous zero-volume links and
+                    // applies boundary/source concentrations before reporting.
+                    chemical->advance(0.0, flows, external, sources);
+                    node_chlorine = chemical->node_concentration_kgm3();
+                    link_chlorine = chemical->link_average_concentration_kgm3(flows);
+                }
                 const EpsResultFrame frame = collect_frame(
                     system, result_nodes, result_links, result_link_objects,
-                    tanks, time_s, converged);
+                    tanks, time_s, converged, node_age, link_age,
+                    node_chlorine, link_chlorine);
                 result_writer.append(frame);
                 write_state(node_output, link_output, tank_output, result_nodes,
                             result_links, result_tanks, frame);
@@ -627,6 +745,34 @@ public:
             if (!rule_engine_.empty())
                 next_state_s = scan_rules(links, nodes, tanks, time_s, next_state_s);
             const long long step_s = next_state_s - time_s;
+            if (water_age) {
+                std::vector<double> flows;
+                flows.reserve(result_link_objects.size());
+                for (Agelem *link : result_link_objects)
+                    flows.push_back(link->Get_Q());
+                water_age->advance(static_cast<double>(step_s), flows);
+            }
+            if (chemical) {
+                std::vector<double> flows;
+                flows.reserve(result_link_objects.size());
+                for (Agelem *link : result_link_objects)
+                    flows.push_back(link->Get_Q());
+                std::vector<double> external(result_nodes.size(), 0.0);
+                std::vector<EpanetChemicalSource> sources(result_nodes.size());
+                for (std::size_t index = 0; index < system.cspok.size(); ++index)
+                    external[index] = std::max(
+                        0.0, -system.cspok[index]->Get_dprop("demand") / 3600.0);
+                for (const auto &entry : chemical_sources_) {
+                    const auto node = node_indices.find(entry.first);
+                    if (node == node_indices.end())
+                        continue;
+                    sources[node->second] = EpanetChemicalSource{
+                        entry.second.type,
+                        entry.second.strength_si *
+                            pattern_value(entry.second.pattern_id, time_s)};
+                }
+                chemical->advance(static_cast<double>(step_s), flows, external, sources);
+            }
             update_tanks(tanks, static_cast<double>(step_s));
             time_s += step_s;
         }
@@ -641,6 +787,9 @@ public:
                        << "effective_simulation_timestep_seconds," << simulation_step_s << "\n"
                        << "pattern_timestep_seconds," << pattern_step_s_ << "\n"
                        << "report_timestep_seconds," << report_step_s_ << "\n"
+                       << "quality_mode," << (quality_age_ ? "AGE" :
+                           (quality_chemical_ ? "CHEMICAL" : "NONE")) << "\n"
+                       << "quality_timestep_seconds," << quality_timestep_s_ << "\n"
                        << "simple_controls," << controls_.size() << "\n"
                        << "rules," << rule_engine_.size() << "\n"
                        << "rule_timestep_seconds," << rule_step_s_ << "\n"
@@ -665,6 +814,10 @@ private:
     std::map<std::string, std::vector<Record> > sections_;
     std::map<std::string, std::vector<double> > patterns_;
     std::map<std::string, std::vector<DemandComponent> > demands_;
+    std::map<std::string, double> initial_quality_kgm3_;
+    std::map<std::string, ChemicalSourceDefinition> chemical_sources_;
+    std::map<std::string, double> pipe_bulk_per_s_;
+    std::map<std::string, double> pipe_wall_mps_;
     std::vector<TankState> tank_definitions_;
     std::vector<ReservoirState> reservoir_definitions_;
     std::vector<SimpleControl> controls_;
@@ -688,6 +841,15 @@ private:
     long long report_step_s_;
     long long report_start_s_;
     long long rule_step_s_;
+    long long quality_timestep_s_;
+    bool quality_age_;
+    bool quality_chemical_;
+    std::string chemical_name_;
+    std::string chemical_units_;
+    double bulk_order_;
+    double wall_order_;
+    double global_bulk_per_s_;
+    double global_wall_mps_;
 
     void parse_file() {
         std::ifstream input(filename_.c_str());
@@ -730,6 +892,17 @@ private:
                 demand_multiplier_ = parse_number(record.fields[2], "DEMAND MULTIPLIER");
             else if (key == "PRESSURE")
                 pressure_units_ = upper(record.fields[1]);
+            else if (key == "QUALITY") {
+                const std::string mode = upper(record.fields[1]);
+                quality_age_ = mode == "AGE";
+                quality_chemical_ = mode == "CHEMICAL";
+                if (quality_chemical_) {
+                    chemical_name_ = record.fields.size() > 2
+                        ? record.fields[2] : "CHEMICAL";
+                    chemical_units_ = record.fields.size() > 3
+                        ? record.fields[3] : "mg/L";
+                }
+            }
             else if (record.fields.size() > 2 && key == "SPECIFIC" &&
                      upper(record.fields[1]) == "GRAVITY")
                 specific_gravity_ = parse_number(record.fields[2], "SPECIFIC GRAVITY");
@@ -762,6 +935,9 @@ private:
             else if (record.fields.size() > 2 && first == "REPORT" &&
                      upper(record.fields[1]) == "START")
                 report_start_s_ = parse_time_seconds(record.fields[2]);
+            else if (record.fields.size() > 2 && first == "QUALITY" &&
+                     upper(record.fields[1]) == "TIMESTEP")
+                quality_timestep_s_ = parse_time_seconds(record.fields[2]);
             else if (record.fields.size() > 2 && first == "RULE" &&
                      upper(record.fields[1]) == "TIMESTEP")
                 rule_step_s_ = parse_duration_seconds(record.fields, 2, "[TIMES] RULE TIMESTEP");
@@ -808,6 +984,98 @@ private:
                 DemandComponent{flow_to_m3_per_hour(
                     parse_number(record.fields[1], "[DEMANDS]"), flow_units_), pattern});
         }
+    }
+
+    double concentration_to_si(double value) {
+        const std::string unit = upper(chemical_units_);
+        if (unit == "MG/L" || unit == "MG/LITER" || unit == "MG/LITRE")
+            return value * 1.0e-3;
+        if (unit == "UG/L" || unit == "UG/LITER" || unit == "UG/LITRE")
+            return value * 1.0e-6;
+        if (unit == "KG/M3" || unit == "KG/M^3")
+            return value;
+        warn("OPTIONS", "QUALITY", 0,
+             "Unknown chemical concentration unit '" + chemical_units_ +
+             "'; values were interpreted as mg/L and converted to SI kg/m3.");
+        return value * 1.0e-3;
+    }
+
+    double mass_source_to_si(double value) {
+        const std::string unit = upper(chemical_units_);
+        if (unit == "UG/L" || unit == "UG/LITER" || unit == "UG/LITRE")
+            return value * 1.0e-9 / 60.0;
+        if (unit == "KG/M3" || unit == "KG/M^3")
+            return value / 60.0;
+        // EPANET MASS sources use mass/minute; mg/min is paired with the
+        // conventional mg/L chemical concentration declaration.
+        return value * 1.0e-6 / 60.0;
+    }
+
+    void parse_quality() {
+        if (!quality_chemical_)
+            return;
+        for (const Record &record : records("QUALITY")) {
+            if (record.fields.size() >= 2)
+                initial_quality_kgm3_[record.fields[0]] = concentration_to_si(
+                    parse_number(record.fields[1], "[QUALITY]"));
+        }
+        for (const Record &record : records("SOURCES")) {
+            if (record.fields.size() < 3) {
+                warn("SOURCES", record.fields.empty() ? "" : record.fields[0],
+                     record.line_number, "Incomplete chemical source was ignored.");
+                continue;
+            }
+            const std::string type = upper(record.fields[1]);
+            ChemicalSourceDefinition source;
+            if (type == "CONCEN")
+                source.type = EpanetChemicalSourceType::Concentration;
+            else if (type == "MASS")
+                source.type = EpanetChemicalSourceType::Mass;
+            else if (type == "SETPOINT")
+                source.type = EpanetChemicalSourceType::Setpoint;
+            else if (type == "FLOWPACED")
+                source.type = EpanetChemicalSourceType::FlowPaced;
+            else {
+                warn("SOURCES", record.fields[0], record.line_number,
+                     "Unknown source type '" + record.fields[1] + "' was ignored.");
+                continue;
+            }
+            const double raw = parse_number(record.fields[2], "[SOURCES]");
+            // EPANET MASS source strength is mass/minute; the other source
+            // strengths use the configured concentration unit.
+            source.strength_si = source.type == EpanetChemicalSourceType::Mass
+                ? mass_source_to_si(raw) : concentration_to_si(raw);
+            if (record.fields.size() > 3)
+                source.pattern_id = record.fields[3];
+            chemical_sources_[record.fields[0]] = source;
+        }
+        for (const Record &record : records("REACTIONS")) {
+            if (record.fields.size() < 3)
+                continue;
+            const std::string first = upper(record.fields[0]);
+            const std::string second = upper(record.fields[1]);
+            const double value = parse_number(record.fields[2], "[REACTIONS]");
+            if (first == "ORDER" && second == "BULK")
+                bulk_order_ = value;
+            else if (first == "ORDER" && second == "WALL")
+                wall_order_ = value;
+            else if (first == "GLOBAL" && second == "BULK")
+                global_bulk_per_s_ = value / 86400.0;
+            else if (first == "GLOBAL" && second == "WALL")
+                global_wall_mps_ = length_to_metres(value, us_units(flow_units_)) / 86400.0;
+            else if (first == "BULK")
+                pipe_bulk_per_s_[record.fields[1]] = value / 86400.0;
+            else if (first == "WALL")
+                pipe_wall_mps_[record.fields[1]] =
+                    length_to_metres(value, us_units(flow_units_)) / 86400.0;
+        }
+        if (std::abs(bulk_order_ - 1.0) > 1.0e-12 ||
+            std::abs(wall_order_ - 1.0) > 1.0e-12)
+            warn("REACTIONS", "ORDER", 0,
+                 "STACI chemical EPS currently applies first-order bulk and wall reactions.");
+        if (!records("MIXING").empty())
+            warn("MIXING", "", records("MIXING").front().line_number,
+                 "Tank chemical mixing is not yet supported; junction-style instantaneous mixing is used.");
     }
 
     void parse_boundaries() {
@@ -1530,11 +1798,16 @@ private:
                                  const std::vector<EpsLinkInfo> &link_info,
                                  const std::vector<Agelem *> &links,
                                  const std::vector<TankState> &tanks,
-                                 long long time_s, bool converged) {
+                                 long long time_s, bool converged,
+                                 const std::vector<double> &node_age_s,
+                                 const std::vector<double> &link_age_s,
+                                 const std::vector<double> &node_chlorine_kgm3,
+                                 const std::vector<double> &link_chlorine_kgm3) {
         EpsResultFrame frame;
         frame.time_s = time_s;
         frame.converged = converged;
         frame.iterations = 0; // The legacy solver does not expose this counter yet.
+        const double missing = std::numeric_limits<double>::quiet_NaN();
         std::map<std::string, double> total_head;
         for (std::size_t index = 0; index < system.cspok.size(); ++index) {
             Csomopont *node = system.cspok[index];
@@ -1543,6 +1816,11 @@ private:
             frame.node_head_m.push_back(head);
             frame.node_pressure_head_m.push_back(head - node_info[index].elevation_m);
             frame.node_demand_m3s.push_back(node->Get_dprop("demand") / 3600.0);
+            frame.node_water_age_s.push_back(
+                node_age_s.size() == system.cspok.size() ? node_age_s[index] : missing);
+            frame.node_chlorine_kgm3.push_back(
+                node_chlorine_kgm3.size() == system.cspok.size()
+                    ? node_chlorine_kgm3[index] : missing);
         }
         for (std::size_t index = 0; index < links.size(); ++index) {
             Agelem *link = links[index];
@@ -1559,6 +1837,11 @@ private:
                 frame.link_status.push_back(link->Get_dprop("status") != 0.0 ? 1 : 0);
             else
                 frame.link_status.push_back(link->Is_enabled() ? 1 : 0);
+            frame.link_water_age_s.push_back(
+                link_age_s.size() == links.size() ? link_age_s[index] : missing);
+            frame.link_chlorine_kgm3.push_back(
+                link_chlorine_kgm3.size() == links.size()
+                    ? link_chlorine_kgm3[index] : missing);
         }
         for (const TankState &tank : tanks) {
             frame.tank_level_m.push_back(tank.level_m);
@@ -1581,7 +1864,9 @@ private:
                         << frame.node_pressure_head_m[index] << ','
                         << frame.node_head_m[index] << ','
                         << frame.node_demand_m3s[index] << ','
-                        << (frame.converged ? 1 : 0) << '\n';
+                        << (frame.converged ? 1 : 0) << ','
+                        << frame.node_water_age_s[index] << ','
+                        << frame.node_chlorine_kgm3[index] << '\n';
         for (std::size_t index = 0; index < links.size(); ++index)
             link_output << frame.time_s << ',' << csv(links[index].id) << ','
                         << csv(links[index].type) << ','
@@ -1591,7 +1876,9 @@ private:
                         << frame.link_velocity_ms[index] << ','
                         << frame.link_headloss_m[index] << ','
                         << static_cast<unsigned int>(frame.link_status[index]) << ','
-                        << (frame.converged ? 1 : 0) << '\n';
+                        << (frame.converged ? 1 : 0) << ','
+                        << frame.link_water_age_s[index] << ','
+                        << frame.link_chlorine_kgm3[index] << '\n';
         for (std::size_t index = 0; index < tanks.size(); ++index)
             tank_output << frame.time_s << ',' << csv(tanks[index].id) << ','
                         << frame.tank_level_m[index] << ','

@@ -26,7 +26,9 @@ STATUS_EVENT = re.compile(
     r"(?:changed from \S+ to )?(open|closed|active)\s*$",
     re.IGNORECASE,
 )
-NODE_ROW = re.compile(rf"^\s*(\S+)\s+({FLOAT})\s+({FLOAT})\s+({FLOAT})(?:\s+.*)?$")
+NODE_ROW = re.compile(
+    rf"^\s*(\S+)\s+({FLOAT})\s+({FLOAT})\s+({FLOAT})(?:\s+({FLOAT}))?(?:\s+.*)?$"
+)
 LINK_ROW = re.compile(rf"^\s*(\S+)\s+({FLOAT})\s+({FLOAT})\s+({FLOAT})(?:\s+.*)?$")
 
 
@@ -45,6 +47,14 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--velocity-rel", type=float, default=0.0)
     parser.add_argument("--headloss-abs", type=float)
     parser.add_argument("--headloss-rel", type=float, default=0.0)
+    parser.add_argument("--age-abs", type=float, default=120.0,
+                        help="Absolute node water-age tolerance in SI seconds.")
+    parser.add_argument("--check-age", action="store_true",
+                        help="Compare QUALITY AGE node results with STACI water_age_s.")
+    parser.add_argument("--chlorine-abs", type=float, default=5.0e-5,
+                        help="Absolute chlorine tolerance in SI kg/m3.")
+    parser.add_argument("--check-chlorine", action="store_true",
+                        help="Compare EPANET chemical quality with STACI chlorine_kgm3.")
     parser.add_argument(
         "--check-status", action="store_true",
         help="Compare STACI enabled states with EPANET Status Full events.",
@@ -165,19 +175,24 @@ def parse_epanet_report(path: Path) -> Tuple[Dict[Tuple[int, str], dict], Dict[T
                 time_seconds = 0
             continue
         identifier = ""
-        values: Tuple[float, float, float]
+        values: Tuple[float, ...]
         try:
             # EPANET's text report uses a 15-character ID column followed by
             # three adjacent 10-character numeric fields. At high precision
             # large values can touch, so whitespace tokenization is unsafe.
             identifier = line[2:17].strip()
-            values = tuple(float(line[start:start + 10]) for start in (17, 27, 37))  # type: ignore[assignment]
+            values = tuple(float(line[start:start + 10]) for start in (17, 27, 37))
+            quality_field = line[47:57].strip()
+            if mode == "node" and quality_field:
+                values += (float(quality_field),)
         except (ValueError, IndexError):
             match = NODE_ROW.match(line) if mode == "node" else LINK_ROW.match(line) if mode == "link" else None
             if not match:
                 continue
             identifier = match.group(1)
-            values = tuple(float(match.group(index)) for index in range(2, 5))  # type: ignore[assignment]
+            values = tuple(float(match.group(index)) for index in range(2, 5))
+            if mode == "node" and match.lastindex is not None and match.lastindex >= 5 and match.group(5):
+                values += (float(match.group(5)),)
         if not identifier:
             continue
         if mode == "node":
@@ -186,6 +201,8 @@ def parse_epanet_report(path: Path) -> Tuple[Dict[Tuple[int, str], dict], Dict[T
                 "head_m": values[1],
                 "pressure_m": values[2],
             }
+            if len(values) > 3:
+                nodes[(time_seconds, identifier)]["reported_quality"] = values[3]
         else:
             links[(time_seconds, identifier)] = {
                 "flow_m3s": values[0] / 1000.0,
@@ -239,7 +256,7 @@ def main() -> int:
 
     maxima = {"head_m": 0.0, "pressure_m": 0.0, "demand_m3s": 0.0,
               "flow_m3s": 0.0, "velocity_mps": 0.0, "headloss_m": 0.0,
-              "status": 0.0}
+              "water_age_s": 0.0, "chlorine_kgm3": 0.0, "status": 0.0}
     element_maxima: Dict[str, Dict[str, float]] = {}
     comparisons = 0
     failures: list[str] = []
@@ -277,6 +294,27 @@ def main() -> int:
             reference_pressure_m = reference["head_m"] - junction_elevations[identifier]
             compare(f"node/{time_seconds}/{identifier}/pressure_m", float(row["pressure_head_m"]), reference_pressure_m, args.head_abs, args.head_rel)
             compare(f"node/{time_seconds}/{identifier}/demand_m3s", float(row["demand_m3s"]), reference["demand_m3s"], args.demand_abs)
+        if args.check_age:
+            if "reported_quality" not in reference:
+                failures.append(f"missing EPANET AGE result {key}")
+            elif "water_age_s" not in row:
+                failures.append(f"missing STACI water_age_s result {key}")
+            else:
+                compare(f"node/{time_seconds}/{identifier}/water_age_s",
+                        float(row["water_age_s"]), reference["reported_quality"] * 3600.0,
+                        args.age_abs)
+        if args.check_chlorine:
+            if "reported_quality" not in reference:
+                failures.append(f"missing EPANET chemical result {key}")
+            elif "chlorine_kgm3" not in row:
+                failures.append(f"missing STACI chlorine_kgm3 result {key}")
+            else:
+                # The benchmark declares mg/L. Convert the EPANET report value
+                # to the SI kg/m3 used by every STACI result file.
+                compare(f"node/{time_seconds}/{identifier}/chlorine_kgm3",
+                        float(row["chlorine_kgm3"]),
+                        reference["reported_quality"] * 1.0e-3,
+                        args.chlorine_abs)
         if row.get("converged") != "1":
             failures.append(f"STACI did not converge for node result {key}")
 
@@ -327,6 +365,10 @@ def main() -> int:
                 "absolute_m": args.headloss_abs if args.headloss_abs is not None else args.head_abs,
                 "relative": args.headloss_rel,
             },
+            "water_age_absolute_s": args.age_abs,
+            "water_age_checked": args.check_age,
+            "chlorine_absolute_kgm3": args.chlorine_abs,
+            "chlorine_checked": args.check_chlorine,
             "status_exact": args.check_status,
         },
         "comparison_count": comparisons,

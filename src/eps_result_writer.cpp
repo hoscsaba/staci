@@ -302,9 +302,13 @@ public:
             ranges_["head"].include(frame.node_head_m);
             ranges_["pressure_head"].include(frame.node_pressure_head_m);
             ranges_["demand"].include(frame.node_demand_m3s);
+            ranges_["node_water_age"].include(frame.node_water_age_s);
+            ranges_["node_chlorine"].include(frame.node_chlorine_kgm3);
             ranges_["flow_rate"].include(frame.link_flow_rate_m3s);
             ranges_["velocity"].include(frame.link_velocity_ms);
             ranges_["headloss"].include(frame.link_headloss_m);
+            ranges_["link_water_age"].include(frame.link_water_age_s);
+            ranges_["link_chlorine"].include(frame.link_chlorine_kgm3);
             ranges_["tank_level"].include(frame.tank_level_m);
             ranges_["tank_volume"].include(frame.tank_volume_m3);
             ranges_["tank_inflow"].include(frame.tank_inflow_m3s);
@@ -362,10 +366,14 @@ private:
     hid_t node_head_dataset_ = -1;
     hid_t node_pressure_dataset_ = -1;
     hid_t node_demand_dataset_ = -1;
+    hid_t node_water_age_dataset_ = -1;
+    hid_t node_chlorine_dataset_ = -1;
     hid_t link_flow_dataset_ = -1;
     hid_t link_velocity_dataset_ = -1;
     hid_t link_headloss_dataset_ = -1;
     hid_t link_status_dataset_ = -1;
+    hid_t link_water_age_dataset_ = -1;
+    hid_t link_chlorine_dataset_ = -1;
     hid_t tank_level_dataset_ = -1;
     hid_t tank_volume_dataset_ = -1;
     hid_t tank_inflow_dataset_ = -1;
@@ -413,6 +421,12 @@ private:
         node_demand_dataset_ = create_dynamic_2d(nodes_group_, "demand", H5T_IEEE_F64LE,
                                                  nodes_.size(), chunk, "m3/s",
                                                  "Node demand; positive means withdrawal");
+        node_water_age_dataset_ = create_dynamic_2d(
+            nodes_group_, "water_age", H5T_IEEE_F64LE, nodes_.size(), chunk,
+            "s", "Water residence time; NaN unless EPANET QUALITY AGE is enabled");
+        node_chlorine_dataset_ = create_dynamic_2d(
+            nodes_group_, "chlorine", H5T_IEEE_F64LE, nodes_.size(), chunk,
+            "kg/m3", "Chemical concentration in SI; NaN unless EPANET QUALITY CHEMICAL is enabled");
         link_flow_dataset_ = create_dynamic_2d(links_group_, "flow_rate", H5T_IEEE_F64LE,
                                                links_.size(), chunk, "m3/s",
                                                "Signed flow from from_node to to_node");
@@ -425,6 +439,12 @@ private:
         link_status_dataset_ = create_dynamic_2d(links_group_, "status", H5T_STD_U8LE,
                                                  links_.size(), chunk, "1",
                                                  "0=CLOSED, 1=OPEN, 2=ACTIVE, 255=UNKNOWN");
+        link_water_age_dataset_ = create_dynamic_2d(
+            links_group_, "water_age", H5T_IEEE_F64LE, links_.size(), chunk,
+            "s", "Volume-averaged link water residence time");
+        link_chlorine_dataset_ = create_dynamic_2d(
+            links_group_, "chlorine", H5T_IEEE_F64LE, links_.size(), chunk,
+            "kg/m3", "Volume-averaged chemical concentration in SI");
         tank_level_dataset_ = create_dynamic_2d(tanks_group_, "level", H5T_IEEE_F64LE,
                                                 tanks_.size(), chunk, "m",
                                                 "Water level above tank bottom");
@@ -513,14 +533,21 @@ private:
                                static_cast<long long>(metadata_.pattern_timestep_s));
         write_scalar_attribute(simulation_group_, "report_timestep_seconds", H5T_NATIVE_LLONG,
                                static_cast<long long>(metadata_.report_timestep_s));
+        write_scalar_attribute(simulation_group_, "quality_timestep_seconds", H5T_NATIVE_LLONG,
+                               static_cast<long long>(metadata_.quality_timestep_s));
+        write_scalar_attribute(simulation_group_, "water_age_enabled", H5T_NATIVE_UCHAR,
+                               static_cast<unsigned char>(metadata_.water_age_enabled ? 1 : 0));
+        write_scalar_attribute(simulation_group_, "chemical_enabled", H5T_NATIVE_UCHAR,
+                               static_cast<unsigned char>(metadata_.chemical_enabled ? 1 : 0));
+        write_string_attribute(simulation_group_, "chemical_name", metadata_.chemical_name);
     }
 
     void flush() {
         if (pending_.empty())
             return;
         std::vector<std::int64_t> time;
-        std::vector<double> node_head, node_pressure, node_demand;
-        std::vector<double> link_flow, link_velocity, link_headloss;
+        std::vector<double> node_head, node_pressure, node_demand, node_water_age, node_chlorine;
+        std::vector<double> link_flow, link_velocity, link_headloss, link_water_age, link_chlorine;
         std::vector<std::uint8_t> link_status, converged;
         std::vector<double> tank_level, tank_volume, tank_inflow;
         std::vector<std::uint32_t> iterations;
@@ -531,6 +558,10 @@ private:
                                  frame.node_pressure_head_m.end());
             node_demand.insert(node_demand.end(), frame.node_demand_m3s.begin(),
                                frame.node_demand_m3s.end());
+            node_water_age.insert(node_water_age.end(), frame.node_water_age_s.begin(),
+                                  frame.node_water_age_s.end());
+            node_chlorine.insert(node_chlorine.end(), frame.node_chlorine_kgm3.begin(),
+                                 frame.node_chlorine_kgm3.end());
             link_flow.insert(link_flow.end(), frame.link_flow_rate_m3s.begin(),
                              frame.link_flow_rate_m3s.end());
             link_velocity.insert(link_velocity.end(), frame.link_velocity_ms.begin(),
@@ -538,6 +569,10 @@ private:
             link_headloss.insert(link_headloss.end(), frame.link_headloss_m.begin(),
                                  frame.link_headloss_m.end());
             link_status.insert(link_status.end(), frame.link_status.begin(), frame.link_status.end());
+            link_water_age.insert(link_water_age.end(), frame.link_water_age_s.begin(),
+                                  frame.link_water_age_s.end());
+            link_chlorine.insert(link_chlorine.end(), frame.link_chlorine_kgm3.begin(),
+                                 frame.link_chlorine_kgm3.end());
             tank_level.insert(tank_level.end(), frame.tank_level_m.begin(), frame.tank_level_m.end());
             tank_volume.insert(tank_volume.end(), frame.tank_volume_m3.begin(), frame.tank_volume_m3.end());
             tank_inflow.insert(tank_inflow.end(), frame.tank_inflow_m3s.begin(), frame.tank_inflow_m3s.end());
@@ -548,10 +583,14 @@ private:
         append_2d(node_head_dataset_, H5T_NATIVE_DOUBLE, written_frames_, nodes_.size(), node_head);
         append_2d(node_pressure_dataset_, H5T_NATIVE_DOUBLE, written_frames_, nodes_.size(), node_pressure);
         append_2d(node_demand_dataset_, H5T_NATIVE_DOUBLE, written_frames_, nodes_.size(), node_demand);
+        append_2d(node_water_age_dataset_, H5T_NATIVE_DOUBLE, written_frames_, nodes_.size(), node_water_age);
+        append_2d(node_chlorine_dataset_, H5T_NATIVE_DOUBLE, written_frames_, nodes_.size(), node_chlorine);
         append_2d(link_flow_dataset_, H5T_NATIVE_DOUBLE, written_frames_, links_.size(), link_flow);
         append_2d(link_velocity_dataset_, H5T_NATIVE_DOUBLE, written_frames_, links_.size(), link_velocity);
         append_2d(link_headloss_dataset_, H5T_NATIVE_DOUBLE, written_frames_, links_.size(), link_headloss);
         append_2d(link_status_dataset_, H5T_NATIVE_UCHAR, written_frames_, links_.size(), link_status);
+        append_2d(link_water_age_dataset_, H5T_NATIVE_DOUBLE, written_frames_, links_.size(), link_water_age);
+        append_2d(link_chlorine_dataset_, H5T_NATIVE_DOUBLE, written_frames_, links_.size(), link_chlorine);
         append_2d(tank_level_dataset_, H5T_NATIVE_DOUBLE, written_frames_, tanks_.size(), tank_level);
         append_2d(tank_volume_dataset_, H5T_NATIVE_DOUBLE, written_frames_, tanks_.size(), tank_volume);
         append_2d(tank_inflow_dataset_, H5T_NATIVE_DOUBLE, written_frames_, tanks_.size(), tank_inflow);
@@ -567,7 +606,8 @@ private:
     void close_hdf5() {
         const hid_t datasets[] = {
             time_dataset_, node_head_dataset_, node_pressure_dataset_, node_demand_dataset_,
-            link_flow_dataset_, link_velocity_dataset_, link_headloss_dataset_, link_status_dataset_,
+            node_water_age_dataset_, node_chlorine_dataset_, link_flow_dataset_, link_velocity_dataset_,
+            link_headloss_dataset_, link_status_dataset_, link_water_age_dataset_, link_chlorine_dataset_,
             tank_level_dataset_, tank_volume_dataset_, tank_inflow_dataset_, converged_dataset_,
             iterations_dataset_};
         for (hid_t dataset : datasets)
@@ -586,11 +626,15 @@ private:
     void validate(const EpsResultFrame &frame) const {
         const bool node_sizes = frame.node_head_m.size() == nodes_.size() &&
                                 frame.node_pressure_head_m.size() == nodes_.size() &&
-                                frame.node_demand_m3s.size() == nodes_.size();
+                                frame.node_demand_m3s.size() == nodes_.size() &&
+                                frame.node_water_age_s.size() == nodes_.size() &&
+                                frame.node_chlorine_kgm3.size() == nodes_.size();
         const bool link_sizes = frame.link_flow_rate_m3s.size() == links_.size() &&
                                 frame.link_velocity_ms.size() == links_.size() &&
                                 frame.link_headloss_m.size() == links_.size() &&
-                                frame.link_status.size() == links_.size();
+                                frame.link_status.size() == links_.size() &&
+                                frame.link_water_age_s.size() == links_.size() &&
+                                frame.link_chlorine_kgm3.size() == links_.size();
         const bool tank_sizes = frame.tank_level_m.size() == tanks_.size() &&
                                 frame.tank_volume_m3.size() == tanks_.size() &&
                                 frame.tank_inflow_m3s.size() == tanks_.size();
@@ -623,6 +667,10 @@ private:
                << "    \"effective_timestep_seconds\": " << metadata_.effective_timestep_s << ",\n"
                << "    \"pattern_timestep_seconds\": " << metadata_.pattern_timestep_s << ",\n"
                << "    \"report_timestep_seconds\": " << metadata_.report_timestep_s << ",\n"
+               << "    \"quality_timestep_seconds\": " << metadata_.quality_timestep_s << ",\n"
+               << "    \"water_age_enabled\": " << (metadata_.water_age_enabled ? "true" : "false") << ",\n"
+               << "    \"chemical_enabled\": " << (metadata_.chemical_enabled ? "true" : "false") << ",\n"
+               << "    \"chemical_name\": \"" << json_escape(metadata_.chemical_name) << "\",\n"
                << "    \"frames\": " << frame_count_ << ",\n"
                << "    \"hydraulic_states\": " << hydraulic_states << ",\n"
                << "    \"failed_frames\": " << failed_frame_count_ << ",\n"
@@ -633,7 +681,9 @@ private:
                << "  \"ranges\": {\n";
         const std::vector<std::pair<std::string, std::string> > range_order = {
             {"head", "m"}, {"pressure_head", "m"}, {"demand", "m3/s"},
-            {"flow_rate", "m3/s"}, {"velocity", "m/s"}, {"headloss", "m"},
+            {"node_water_age", "s"}, {"node_chlorine", "kg/m3"}, {"flow_rate", "m3/s"},
+            {"velocity", "m/s"}, {"headloss", "m"}, {"link_water_age", "s"},
+            {"link_chlorine", "kg/m3"},
             {"tank_level", "m"}, {"tank_volume", "m3"}, {"tank_inflow", "m3/s"}};
         for (std::size_t index = 0; index < range_order.size(); ++index) {
             const auto found = ranges_.find(range_order[index].first);
