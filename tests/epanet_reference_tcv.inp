@@ -1,0 +1,44 @@
+[TITLE]
+STACI versus EPANET reference: pipe minor loss and TCV
+
+[JUNCTIONS]
+;ID  Elevation  Demand
+J0   5          0
+J1   5          1
+
+[RESERVOIRS]
+;ID  Head
+R1   30
+
+[PIPES]
+;ID  Node1  Node2  Length  Diameter  Roughness  MinorLoss  Status
+P1   R1     J0     200     100       120        1.25       Open
+
+[VALVES]
+;ID  Node1  Node2  Diameter  Type  Setting  MinorLoss
+V1   J0     J1     50        TCV   4        0.5
+
+[OPTIONS]
+Units       LPS
+Headloss    H-W
+Trials      100
+Accuracy    0.000001
+
+[TIMES]
+Duration            0:00
+Hydraulic Timestep  1:00
+Report Timestep     1:00
+
+[REPORT]
+Status      No
+Summary     No
+Nodes       All
+Links       All
+Demand      Precision 6
+Head        Precision 6
+Pressure    Precision 6
+Flow        Precision 6
+Velocity    Precision 6
+Headloss    Precision 6
+
+[END]

@@ -1,0 +1,44 @@
+[TITLE]
+STACI versus EPANET reference: demand-pattern EPS
+
+[JUNCTIONS]
+;ID  Elevation  Demand  Pattern
+J1   10         1       DEMAND-PATTERN
+
+[RESERVOIRS]
+;ID  Head
+R1   40
+
+[PIPES]
+;ID  Node1  Node2  Length  Diameter  Roughness  MinorLoss  Status
+P1   R1     J1     800     150       120        0.75       Open
+
+[PATTERNS]
+;ID              Multipliers
+DEMAND-PATTERN   1.0  1.5  0.5
+
+[OPTIONS]
+Units       LPS
+Headloss    H-W
+Trials      100
+Accuracy    0.000001
+
+[TIMES]
+Duration            2:00
+Hydraulic Timestep  1:00
+Pattern Timestep    1:00
+Report Timestep     1:00
+
+[REPORT]
+Status      No
+Summary     No
+Nodes       All
+Links       All
+Demand      Precision 6
+Head        Precision 6
+Pressure    Precision 6
+Flow        Precision 6
+Velocity    Precision 6
+Headloss    Precision 6
+
+[END]

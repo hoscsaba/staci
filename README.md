@@ -238,6 +238,8 @@ contains only the latest results. Generated artifacts are grouped as follows:
 
 - `networks/`: SPR and INP integration-test copies and their outputs;
 - `hdf5/`: the retained chunked EPS HDF5 test file and related SI outputs;
+- `epanet-reference/`: official EPANET reports, STACI SI results, and a
+  machine- and human-readable `comparison.json` for each validation network;
 - `calibration/`: calibration settings, logs, and best result;
 - `split/2-segments/` and `split/3-segments/`: splitter settings, membership,
   logs, and `network-2-segments.png` or `network-3-segments.png`.
@@ -249,6 +251,50 @@ traversal, so every segment is connected by construction. The test independently
 checks this property and fails if any requested segment contains multiple graph
 components. Old generated STACI sidecar logs (`.ros`, `.rps`, `.rrs`, and
 related variants) are also removed at startup.
+
+### Validate STACI against official EPANET 2.2
+
+The test suite can build the official
+[OpenWaterAnalytics EPANET 2.2](https://github.com/OpenWaterAnalytics/EPANET)
+solver locally and compare its hydraulic results with STACI. The helper pins
+the source to commit `4d8d82ddc260fce216af9321fc3d9a4646ac6827`, so the
+reference calculation is reproducible. It uses CMake and the platform's C/C++
+compiler; on Apple Silicon this creates a native `arm64` executable and needs
+neither Rosetta nor a system-wide EPANET installation.
+
+```bash
+cmake --build build --target setup_epanet_reference
+ctest --test-dir build -L epanet --output-on-failure
+```
+
+The same setup and tests work with a Visual Studio CMake build on Windows and
+with GCC or Clang on Linux. A separately installed solver can be selected at
+configure time:
+
+```bash
+cmake -S . -B build -DSTACI_EPANET_EXECUTABLE=/path/to/runepanet
+```
+
+The portable Python suite discovers this local solver automatically. Its
+location can also be supplied explicitly; `--require-epanet-reference` makes a
+missing reference solver an error instead of a documented skip:
+
+```bash
+python3 tests/setup_epanet_reference.py
+python3 tests/run_tests.py --binary ./build/staci \
+  --epanet-binary ./build/epanet-reference/build/bin/runepanet \
+  --require-epanet-reference
+```
+
+Three fixtures are validated: a two-pipe steady network, pipe minor loss plus
+a TCV, and a three-state EPS demand pattern. At every report time the test
+compares SI node head, junction pressure and demand, plus link flow, velocity,
+and total head loss. The absolute tolerances are 0.002 m for head quantities,
+`1e-9 m3/s` for flow, and `5e-6 m/s` for velocity. These limits allow the small
+expected difference between the independently implemented Hazen-Williams
+equations while still detecting hydraulic or unit-conversion regressions.
+CTest marks these cases skipped if `runepanet` has not been built; the rest of
+the suite remains usable offline.
 
 ### Channel-only hydraulic reference tests
 

@@ -1,0 +1,41 @@
+[TITLE]
+STACI versus EPANET reference: two-pipe steady network
+
+[JUNCTIONS]
+;ID  Elevation  Demand
+J1   10         2
+J2   15         1
+
+[RESERVOIRS]
+;ID  Head
+R1   50
+
+[PIPES]
+;ID  Node1  Node2  Length  Diameter  Roughness  MinorLoss  Status
+P1   R1     J1     1000    200       120        0          Open
+P2   J1     J2     500     150       120        0          Open
+
+[OPTIONS]
+Units       LPS
+Headloss    H-W
+Trials      100
+Accuracy    0.000001
+
+[TIMES]
+Duration            0:00
+Hydraulic Timestep  1:00
+Report Timestep     1:00
+
+[REPORT]
+Status      No
+Summary     No
+Nodes       All
+Links       All
+Demand      Precision 6
+Head        Precision 6
+Pressure    Precision 6
+Flow        Precision 6
+Velocity    Precision 6
+Headloss    Precision 6
+
+[END]

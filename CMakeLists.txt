@@ -172,8 +172,48 @@ install(TARGETS ${STACI_EXECUTABLE_TARGETS}
 
 include(CTest)
 if(BUILD_TESTING)
+    set(STACI_EPANET_EXECUTABLE "" CACHE FILEPATH
+        "Optional path to the official runepanet executable used by reference tests")
     find_package(Python3 COMPONENTS Interpreter QUIET)
     if(Python3_Interpreter_FOUND)
+        add_custom_target(setup_epanet_reference
+            COMMAND "${Python3_EXECUTABLE}"
+                    "${PROJECT_SOURCE_DIR}/tests/setup_epanet_reference.py"
+                    --build-root "${CMAKE_CURRENT_BINARY_DIR}/epanet-reference"
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+            COMMENT "Downloading and building the pinned official OWA EPANET 2.2 solver"
+            VERBATIM
+        )
+
+        set(STACI_EPANET_REFERENCE_INPUTS
+            epanet_reference_pipe.inp
+            epanet_reference_tcv.inp
+            epanet_reference_pattern.inp
+        )
+        foreach(epanet_input IN LISTS STACI_EPANET_REFERENCE_INPUTS)
+            get_filename_component(epanet_case "${epanet_input}" NAME_WE)
+            set(epanet_reference_command
+                "${Python3_EXECUTABLE}"
+                "${PROJECT_SOURCE_DIR}/tests/compare_epanet_reference.py"
+                --staci $<TARGET_FILE:${PROJECT_NAME}>
+                --input "${PROJECT_SOURCE_DIR}/tests/${epanet_input}"
+                --work-dir "${CMAKE_CURRENT_BINARY_DIR}/epanet-reference-tests/${epanet_case}"
+            )
+            if(STACI_EPANET_EXECUTABLE)
+                list(APPEND epanet_reference_command
+                    --epanet "${STACI_EPANET_EXECUTABLE}")
+            endif()
+            add_test(NAME "${epanet_case}"
+                COMMAND ${epanet_reference_command}
+            )
+            set_tests_properties("${epanet_case}" PROPERTIES
+                WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+                SKIP_RETURN_CODE 77
+                TIMEOUT 120
+                LABELS "epanet;hydraulics;reference"
+            )
+        endforeach()
+
         add_test(NAME channel_reference_suite
             COMMAND "${Python3_EXECUTABLE}"
                     "${PROJECT_SOURCE_DIR}/tests/run_channel_tests.py"

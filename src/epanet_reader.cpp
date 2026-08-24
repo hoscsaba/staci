@@ -223,8 +223,13 @@ void EpanetReader::configure_settings() {
     else
         add_warning("OPTIONS", "ACCURACY", 0,
                     "EPANET's relative accuracy criterion is mapped approximately "
-                    "to STACI's pressure tolerance.");
-    settings_["e_mp_max"] = "1.0";
+                    "to STACI's pressure and mass-flow residual tolerances.");
+    // EPANET ACCURACY is dimensionless, so neither STACI dimensional
+    // tolerance is an exact equivalent. Reusing its numeric value for the
+    // RMS mass-flow residual keeps changing EPS demands from being accepted
+    // as converged solely because they differ by less than the old 1 kg/s
+    // threshold.
+    settings_["e_mp_max"] = settings_["e_p_max"];
     settings_["relax"] = "1.0";
     settings_["relax_mul"] = "1.2";
     settings_["mp_init"] = "1.0";

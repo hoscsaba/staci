@@ -114,6 +114,16 @@ def parse_arguments() -> argparse.Namespace:
         help="Path to staci_split; by default it is searched beside staci.",
     )
     parser.add_argument(
+        "--epanet-binary",
+        type=Path,
+        help="Path to the official runepanet executable used for hydraulic reference comparisons.",
+    )
+    parser.add_argument(
+        "--require-epanet-reference",
+        action="store_true",
+        help="Fail instead of skipping reference comparisons when runepanet is unavailable.",
+    )
+    parser.add_argument(
         "--log",
         type=Path,
         default=DEFAULT_LOG,
@@ -202,6 +212,31 @@ def resolve_companion_binary(primary: Path, requested: Optional[Path], stem: str
     )
 
 
+def resolve_epanet_binary(requested: Optional[Path]) -> Optional[Path]:
+    candidates: List[Path] = []
+    if requested is not None:
+        candidates.append(requested.expanduser())
+    environment = os.environ.get("EPANET_EXECUTABLE")
+    if environment:
+        candidates.append(Path(environment).expanduser())
+    on_path = shutil.which("runepanet")
+    if on_path:
+        candidates.append(Path(on_path))
+    names = ("runepanet.exe", "runepanet") if os.name == "nt" else ("runepanet", "runepanet.exe")
+    roots = (
+        REPOSITORY_DIR / "build" / "epanet-reference" / "build" / "bin",
+        REPOSITORY_DIR / "build" / "epanet-reference-build" / "bin",
+    )
+    for root in roots:
+        for configuration in (Path(), Path("Release"), Path("RelWithDebInfo"), Path("Debug")):
+            candidates.extend(root / configuration / name for name in names)
+    for candidate in candidates:
+        resolved = candidate.resolve()
+        if resolved.is_file():
+            return resolved
+    return None
+
+
 def discover_networks(tests_dir: Path) -> Tuple[List[Path], List[Path]]:
     tests_dir = tests_dir.resolve()
     generated_root = (tests_dir / "test-results").resolve()
@@ -249,7 +284,7 @@ def recreate_results_root(tests_dir: Path) -> Path:
                 if attempt == 4:
                     raise
                 time.sleep(0.05)
-    for name in ("networks", "hdf5", "split", "calibration", "channel", "channel-network"):
+    for name in ("networks", "hdf5", "epanet-reference", "split", "calibration", "channel", "channel-network"):
         (results_root / name).mkdir(parents=True, exist_ok=True)
     return results_root
 
@@ -853,6 +888,23 @@ def check_channel_network(binary: Path, tests_dir: Path,
     require_file(case_dir / "run_channel_network_test.log", "multi-channel test log")
 
 
+def check_epanet_reference(binary: Path, epanet: Path, source: Path,
+                           case_dir: Path, tests_dir: Path, log: Log) -> None:
+    script = tests_dir / "compare_epanet_reference.py"
+    require_file(script, "EPANET comparison script")
+    output = run_command(
+        log,
+        (sys.executable, str(script), "--staci", str(binary),
+         "--epanet", str(epanet), "--input", str(source),
+         "--work-dir", str(case_dir)),
+        tests_dir,
+        f"official EPANET hydraulic reference: {source.name}",
+    )
+    if "reference comparison: PASS" not in output:
+        raise TestFailure("EPANET reference comparison did not report PASS")
+    require_file(case_dir / "comparison.json", "EPANET comparison JSON")
+
+
 def run_action(
     kind: str,
     label: str,
@@ -953,6 +1005,8 @@ def main() -> int:
         split_root = results_root / "split"
         channel_root = results_root / "channel"
         channel_network_root = results_root / "channel-network"
+        epanet_reference_root = results_root / "epanet-reference"
+        epanet_binary = resolve_epanet_binary(arguments.epanet_binary)
 
         log.write("STACI integration test report")
         log.write("=============================")
@@ -965,6 +1019,7 @@ def main() -> int:
         log.write(f"Discovered: {len(spr_files)} SPR, {len(inp_files)} INP")
         log.write(f"Removed previous STACI sidecar logs: {len(removed_logs)}")
         log.write(f"Command timeout: {COMMAND_TIMEOUT_SECONDS:g} s")
+        log.write(f"EPANET reference executable: {epanet_binary or 'not found (comparisons skipped)'}")
         log.write(
             "SPR hydraulics: "
             + ("all files" if FULL_SPR_HYDRAULICS else
@@ -994,6 +1049,39 @@ def main() -> int:
             )
             if hdf5_result.is_file():
                 log.write(f"Persistent HDF5 result: {hdf5_result}")
+
+        reference_inputs = [
+            tests_dir / "epanet_reference_pipe.inp",
+            tests_dir / "epanet_reference_tcv.inp",
+            tests_dir / "epanet_reference_pattern.inp",
+        ]
+        if epanet_binary is None:
+            message = (
+                "Official runepanet was not found; EPANET hydraulic reference comparisons "
+                "were skipped. Run tests/setup_epanet_reference.py or pass --epanet-binary."
+            )
+            log.section("EPANET REFERENCE", "-")
+            log.write("RESULT: SKIP")
+            log.write(message)
+            print(f"EPANET reference: SKIP ({message})", flush=True)
+            if arguments.require_epanet_reference:
+                results.append(("EPANET-REFERENCE", Path("runepanet"), False, 0.0, message))
+        else:
+            for source in reference_inputs:
+                case_dir = epanet_reference_root / source.stem
+                case_dir.mkdir(parents=True, exist_ok=True)
+                passed, elapsed, reason = run_action(
+                    "EPANET-REFERENCE",
+                    source.name,
+                    lambda network=source, directory=case_dir: check_epanet_reference(
+                        binary, epanet_binary, network, directory, tests_dir, log
+                    ),
+                    log,
+                )
+                results.append((
+                    "EPANET-REFERENCE", source.relative_to(tests_dir),
+                    passed, elapsed, reason,
+                ))
 
         passed, elapsed, reason = run_action(
             "CALIBRATION",
