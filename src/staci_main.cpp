@@ -26,6 +26,8 @@ int main(int argc, char* argv[]) {
 	Staci feladat(argc, argv);
 	endTime = clock();
 	timing.at(0) = double( endTime - startTime ) / CLOCKS_PER_SEC;
+	if (feladat.get_mode() == -1)
+		return 0;
 
 	time_t start;
 	time(&start);
@@ -35,8 +37,7 @@ int main(int argc, char* argv[]) {
 
 	// Nincs argumentum...
 	//----------------------------------------
-	if (feladat.get_mode() != -1)
-		startTime = clock();
+	startTime = clock();
 	feladat.build_system();
 	endTime = clock();
 	timing.at(1) = double( endTime - startTime ) / CLOCKS_PER_SEC;

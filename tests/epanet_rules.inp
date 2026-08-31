@@ -33,8 +33,8 @@ PSet  R1  J1  POWER 1
 [RULES]
 RULE ELAPSED
 IF SYSTEM TIME >= 0:20
-THEN PIPE TimePipe STATUS IS CLOSED
-ELSE PIPE TimePipe STATUS IS OPEN
+THEN PIPE TimePipe STATUS = CLOSED
+ELSE PIPE TimePipe STATUS = OPEN
 PRIORITY 2
 
 RULE CLOCK_WINDOW
@@ -86,7 +86,7 @@ PRIORITY 4
 RULE PUMP_SETTING
 IF SYSTEM TIME >= 0:20
 AND PUMP PSet SETTING > 0.9
-THEN PUMP PSet SETTING IS 0.5
+THEN PUMP PSet SETTING = 0.5
 PRIORITY 6
 
 RULE TIME_EQUALITY
@@ -115,12 +115,12 @@ THEN PIPE DrainTimePipe STATUS IS CLOSED
 PRIORITY 7
 
 [TIMES]
-Duration             3:00
-Hydraulic Timestep   1:00
-Pattern Timestep     1:00
-Report Timestep      0:30
-Rule Timestep        0:10
-Start ClockTime      12:30 AM
+Duration             3:00:00
+Hydraulic Timestep   1:00:00
+Pattern Timestep     1:00:00
+Report Timestep      0:30:00
+Rule Timestep        0:10:00
+Start ClockTime      00:30:00 AM
 
 [OPTIONS]
 Units       LPS

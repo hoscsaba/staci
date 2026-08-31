@@ -1,0 +1,47 @@
+[TITLE]
+EPANET non-cylindrical tank volume curve regression test
+
+[JUNCTIONS]
+;ID  Elevation  Demand
+J1   0          1.8
+
+[RESERVOIRS]
+;ID  Head
+R1   25
+
+[TANKS]
+;ID  Elevation  InitLevel  MinLevel  MaxLevel  Diameter  MinVol  VolCurve
+T1   0          10         5         15        1         0       TV1
+
+[PIPES]
+;ID  Node1  Node2  Length  Diameter  Roughness  MinorLoss  Status
+P1   R1     J1     1000    200       120        0          Open
+P2   J1     T1     1000    200       120        0          Open
+
+[CURVES]
+;VOLUME: deliberately non-cylindrical storage
+TV1  5   0
+TV1  10  50
+TV1  15  200
+
+[TIMES]
+Duration             1:00:00
+Hydraulic Timestep   0:15:00
+Pattern Timestep     1:00:00
+Report Timestep      0:15:00
+Report Start         0:00:00
+Start ClockTime      00:00:00 AM
+
+[OPTIONS]
+Units                CMH
+Headloss             H-W
+Trials               100
+Accuracy             0.001
+
+[REPORT]
+Status               Full
+Summary              No
+Nodes                All
+Links                All
+
+[END]

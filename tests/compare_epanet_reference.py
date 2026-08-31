@@ -104,7 +104,7 @@ def run(command: list[str], cwd: Path) -> str:
 
 
 def parse_inp(path: Path) -> Tuple[
-        Dict[str, float], Dict[str, Tuple[str, str]], Dict[str, bool]]:
+        Dict[str, float], Dict[str, Tuple[str, str]], Dict[str, bool], str]:
     junction_elevations: Dict[str, float] = {}
     links: Dict[str, Tuple[str, str]] = {}
     initial_status: Dict[str, bool] = {}
@@ -135,7 +135,26 @@ def parse_inp(path: Path) -> Tuple[
             identifier: elevation * 0.3048
             for identifier, elevation in junction_elevations.items()
         }
-    return junction_elevations, links, initial_status
+    return junction_elevations, links, initial_status, flow_units
+
+
+def flow_to_m3s(value: float, units: str) -> float:
+    factors = {
+        "CFS": 0.028316846592,
+        "GPM": 0.0000630901964,
+        "MGD": 0.0438126364,
+        "IMGD": 0.0526167824,
+        "AFD": 0.0142764102,
+        "LPS": 0.001,
+        "LPM": 0.001 / 60.0,
+        "MLD": 1000.0 / 86400.0,
+        "CMH": 1.0 / 3600.0,
+        "CMD": 1.0 / 86400.0,
+    }
+    try:
+        return value * factors[units]
+    except KeyError as error:
+        raise RuntimeError(f"Unsupported EPANET flow units: {units}") from error
 
 
 def parse_epanet_statuses(path: Path, initial_status: Dict[str, bool],
@@ -160,7 +179,8 @@ def parse_epanet_statuses(path: Path, initial_status: Dict[str, bool],
     return result
 
 
-def parse_epanet_report(path: Path) -> Tuple[Dict[Tuple[int, str], dict], Dict[Tuple[int, str], dict]]:
+def parse_epanet_report(path: Path, flow_units: str) -> Tuple[
+        Dict[Tuple[int, str], dict], Dict[Tuple[int, str], dict]]:
     nodes: Dict[Tuple[int, str], dict] = {}
     links: Dict[Tuple[int, str], dict] = {}
     mode = ""
@@ -184,7 +204,14 @@ def parse_epanet_report(path: Path) -> Tuple[Dict[Tuple[int, str], dict], Dict[T
             values = tuple(float(line[start:start + 10]) for start in (17, 27, 37))
             quality_field = line[47:57].strip()
             if mode == "node" and quality_field:
-                values += (float(quality_field),)
+                # With QUALITY NONE the same report column contains the node
+                # type (e.g. "Tank") instead of a numeric quality value.
+                # Keep the hydraulic row and only append genuinely numeric
+                # quality output.
+                try:
+                    values += (float(quality_field),)
+                except ValueError:
+                    pass
         except (ValueError, IndexError):
             match = NODE_ROW.match(line) if mode == "node" else LINK_ROW.match(line) if mode == "link" else None
             if not match:
@@ -196,17 +223,19 @@ def parse_epanet_report(path: Path) -> Tuple[Dict[Tuple[int, str], dict], Dict[T
         if not identifier:
             continue
         if mode == "node":
+            head_factor = 0.3048 if flow_units in {"CFS", "GPM", "MGD", "IMGD", "AFD"} else 1.0
             nodes[(time_seconds, identifier)] = {
-                "demand_m3s": values[0] / 1000.0,
-                "head_m": values[1],
+                "demand_m3s": flow_to_m3s(values[0], flow_units),
+                "head_m": values[1] * head_factor,
                 "pressure_m": values[2],
             }
             if len(values) > 3:
                 nodes[(time_seconds, identifier)]["reported_quality"] = values[3]
         else:
+            velocity_factor = 0.3048 if flow_units in {"CFS", "GPM", "MGD", "IMGD", "AFD"} else 1.0
             links[(time_seconds, identifier)] = {
-                "flow_m3s": values[0] / 1000.0,
-                "velocity_mps": values[1],
+                "flow_m3s": flow_to_m3s(values[0], flow_units),
+                "velocity_mps": values[1] * velocity_factor,
             }
     if not nodes or not links:
         raise RuntimeError(f"Could not parse node/link results from {path}")
@@ -248,8 +277,8 @@ def main() -> int:
     epanet_output = run([str(epanet), str(local_input), str(report), str(binary_output)], work)
     staci_nodes = read_csv(Path(str(prefix) + "-nodes.csv"), "node_id")
     staci_links = read_csv(Path(str(prefix) + "-links.csv"), "link_id")
-    epanet_nodes, epanet_links = parse_epanet_report(report)
-    junction_elevations, topology, initial_status = parse_inp(input_path)
+    junction_elevations, topology, initial_status, flow_units = parse_inp(input_path)
+    epanet_nodes, epanet_links = parse_epanet_report(report, flow_units)
     epanet_statuses = parse_epanet_statuses(
         report, initial_status, (time_seconds for time_seconds, _ in epanet_links)
     ) if args.check_status else {}

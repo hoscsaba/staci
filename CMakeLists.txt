@@ -288,6 +288,12 @@ install(TARGETS ${STACI_EXECUTABLE_TARGETS}
 
 include(CTest)
 if(BUILD_TESTING)
+    add_test(NAME staci_help
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> --help)
+    set_tests_properties(staci_help PROPERTIES
+        PASS_REGULAR_EXPRESSION "staci hasznalata"
+        LABELS "cli;smoke")
+
     if(TARGET staci_example_hydraulics)
         add_test(NAME cpp_example_hydraulics
             COMMAND $<TARGET_FILE:staci_example_hydraulics>)
@@ -385,6 +391,7 @@ if(BUILD_TESTING)
             epanet_eps_smoke.inp
             epanet_controls.inp
             epanet_rules.inp
+            epanet_volume_curve.inp
             epanet_reference_tcv_controls.inp
             epanet_reference_tcv_rules.inp
         )
@@ -440,6 +447,11 @@ if(BUILD_TESTING)
                 list(APPEND epanet_reference_command
                     --head-abs 0.008 --flow-abs 0.001
                     --velocity-abs 0.015 --headloss-abs 0.008 --check-status
+                )
+            elseif(epanet_case STREQUAL "epanet_volume_curve")
+                list(APPEND epanet_reference_command
+                    --head-abs 0.03 --flow-abs 0.0003
+                    --velocity-abs 0.015 --headloss-abs 0.02 --check-status
                 )
             elseif(epanet_case STREQUAL "epanet_reference_tcv_controls" OR
                    epanet_case STREQUAL "epanet_reference_tcv_rules")
@@ -940,6 +952,25 @@ if(BUILD_TESTING)
     )
     set_tests_properties(epanet_rule_controls_results PROPERTIES
         DEPENDS epanet_rule_controls_simulation
+    )
+
+    add_test(NAME epanet_volume_curve_simulation
+        COMMAND $<TARGET_FILE:${PROJECT_NAME}> --epanet-eps
+                "${PROJECT_SOURCE_DIR}/tests/epanet_volume_curve.inp"
+                -o "${CMAKE_CURRENT_BINARY_DIR}/epanet-volume-curve-result"
+    )
+    set_tests_properties(epanet_volume_curve_simulation PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+        PASS_REGULAR_EXPRESSION "EPANET EPS complete: 5 hydraulic states, 0 failed states"
+    )
+
+    add_test(NAME epanet_volume_curve_results
+        COMMAND "${CMAKE_COMMAND}"
+                -DRESULT_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/epanet-volume-curve-result
+                -P "${PROJECT_SOURCE_DIR}/tests/verify_epanet_volume_curve.cmake"
+    )
+    set_tests_properties(epanet_volume_curve_results PROPERTIES
+        DEPENDS epanet_volume_curve_simulation
     )
 
     add_test(NAME epanet_tcv_controls_simulation

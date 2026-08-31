@@ -1147,6 +1147,12 @@ def main() -> int:
                  "--check-status"),
             ),
             (
+                tests_dir / "epanet_volume_curve.inp",
+                ("--head-abs", "0.03", "--flow-abs", "0.0003",
+                 "--velocity-abs", "0.015", "--headloss-abs", "0.02",
+                 "--check-status"),
+            ),
+            (
                 tests_dir / "epanet_reference_tcv_controls.inp",
                 ("--head-abs", "0.003", "--flow-abs", "0.0000002",
                  "--velocity-abs", "0.00002",

@@ -54,6 +54,7 @@ struct TankState {
     double max_level_m;
     double area_m2;
     double min_volume_m3;
+    std::vector<std::pair<double, double> > volume_curve;
     Agelem *boundary;
 };
 
@@ -274,12 +275,33 @@ double parse_number(const std::string &value, const std::string &context) {
 }
 
 long long parse_time_seconds(const std::string &value) {
-    const std::size_t colon = value.find(':');
-    if (colon == std::string::npos)
+    if (value.find(':') == std::string::npos)
         return static_cast<long long>(std::llround(parse_number(value, "[TIMES]") * 3600.0));
-    const double hours = parse_number(value.substr(0, colon), "[TIMES]");
-    const double minutes = parse_number(value.substr(colon + 1), "[TIMES]");
-    return static_cast<long long>(std::llround(hours * 3600.0 + minutes * 60.0));
+
+    std::vector<std::string> components;
+    std::size_t begin = 0;
+    while (begin <= value.size()) {
+        const std::size_t separator = value.find(':', begin);
+        components.push_back(value.substr(
+            begin, separator == std::string::npos ? std::string::npos : separator - begin));
+        if (separator == std::string::npos)
+            break;
+        begin = separator + 1;
+    }
+    if (components.size() < 2 || components.size() > 3 ||
+        components[0].empty() || components[1].empty() ||
+        (components.size() == 3 && components[2].empty()))
+        throw std::runtime_error("Invalid time value '" + value + "' in [TIMES].");
+
+    const double hours = parse_number(components[0], "[TIMES]");
+    const double minutes = parse_number(components[1], "[TIMES]");
+    const double seconds = components.size() == 3
+        ? parse_number(components[2], "[TIMES]") : 0.0;
+    if (hours < 0.0 || minutes < 0.0 || minutes >= 60.0 ||
+        seconds < 0.0 || seconds >= 60.0)
+        throw std::runtime_error("Invalid time value '" + value + "' in [TIMES].");
+    return static_cast<long long>(std::llround(
+        hours * 3600.0 + minutes * 60.0 + seconds));
 }
 
 long long parse_duration_seconds(const std::vector<std::string> &fields,
@@ -312,6 +334,11 @@ long long parse_clock_seconds(const std::vector<std::string> &fields,
         if (suffix == "AM" || suffix == "PM") {
             const long long minutes_and_seconds = seconds % 3600;
             long long hour = seconds / 3600;
+            // WNTR writes midnight as 00:00:00 AM. Although the canonical
+            // 12-hour spelling is 12:00 AM, accepting zero-hour AM makes the
+            // reader interoperable without changing the represented time.
+            if (hour == 0 && suffix == "AM")
+                return minutes_and_seconds;
             if (hour < 1 || hour > 12)
                 throw std::runtime_error("Invalid 12-hour clock value in " + context + ".");
             if (hour == 12)
@@ -357,6 +384,59 @@ double diameter_to_metres(double value, bool is_us) {
 
 double volume_to_m3(double value, bool is_us) {
     return is_us ? value * 0.028316846592 : value;
+}
+
+double interpolate_curve(const std::vector<std::pair<double, double> > &points,
+                         double x) {
+    if (points.size() < 2)
+        throw std::runtime_error("A tank volume curve requires at least two points.");
+    auto upper_point = std::upper_bound(
+        points.begin(), points.end(), x,
+        [](double value, const std::pair<double, double> &point) {
+            return value < point.first;
+        });
+    if (upper_point == points.begin())
+        upper_point = points.begin() + 1;
+    else if (upper_point == points.end())
+        upper_point = points.end() - 1;
+    const auto lower_point = upper_point - 1;
+    const double fraction = (x - lower_point->first) /
+        (upper_point->first - lower_point->first);
+    return lower_point->second + fraction *
+        (upper_point->second - lower_point->second);
+}
+
+double tank_volume_at_level(const TankState &tank, double level_m) {
+    if (!tank.volume_curve.empty())
+        return interpolate_curve(tank.volume_curve, level_m);
+    return tank.min_volume_m3 + tank.area_m2 * (level_m - tank.min_level_m);
+}
+
+double tank_level_at_volume(const TankState &tank, double volume_m3) {
+    if (tank.volume_curve.empty())
+        return tank.min_level_m +
+            (volume_m3 - tank.min_volume_m3) / tank.area_m2;
+    auto upper_point = std::upper_bound(
+        tank.volume_curve.begin(), tank.volume_curve.end(), volume_m3,
+        [](double value, const std::pair<double, double> &point) {
+            return value < point.second;
+        });
+    if (upper_point == tank.volume_curve.begin())
+        upper_point = tank.volume_curve.begin() + 1;
+    else if (upper_point == tank.volume_curve.end())
+        upper_point = tank.volume_curve.end() - 1;
+    const auto lower_point = upper_point - 1;
+    const double fraction = (volume_m3 - lower_point->second) /
+        (upper_point->second - lower_point->second);
+    return lower_point->first + fraction *
+        (upper_point->first - lower_point->first);
+}
+
+double projected_tank_level(const TankState &tank, double elapsed_s) {
+    const double volume = tank_volume_at_level(tank, tank.level_m) +
+        tank.boundary->Get_Q() * elapsed_s;
+    return std::max(tank.min_level_m, std::min(
+        tank.max_level_m, tank_level_at_volume(tank, volume)));
 }
 
 std::string csv(const std::string &value) {
@@ -1392,17 +1472,50 @@ private:
                 continue;
             const double diameter = diameter_to_metres(
                 parse_number(record.fields[5], "[TANKS] diameter"), is_us);
+            std::vector<std::pair<double, double> > volume_curve;
+            const std::string curve_id = record.fields.size() > 7
+                ? record.fields[7] : "";
+            if (!curve_id.empty()) {
+                for (const Record &curve_record : records("CURVES")) {
+                    if (curve_record.fields.size() >= 3 &&
+                        curve_record.fields[0] == curve_id) {
+                        volume_curve.emplace_back(
+                            length_to_metres(parse_number(
+                                curve_record.fields[1], "[CURVES] tank level"), is_us),
+                            volume_to_m3(parse_number(
+                                curve_record.fields[2], "[CURVES] tank volume"), is_us));
+                    }
+                }
+                bool valid = volume_curve.size() >= 2;
+                for (std::size_t index = 1; valid && index < volume_curve.size(); ++index)
+                    valid = volume_curve[index].first > volume_curve[index - 1].first &&
+                            volume_curve[index].second > volume_curve[index - 1].second;
+                if (!valid) {
+                    warn("TANKS", record.fields[0], record.line_number,
+                         "Volume curve '" + curve_id +
+                         "' is missing or is not strictly increasing; the cylindrical diameter is used.");
+                    volume_curve.clear();
+                }
+            }
+            const double min_level = length_to_metres(
+                parse_number(record.fields[3], "[TANKS] minimum level"), is_us);
+            const double max_level = length_to_metres(
+                parse_number(record.fields[4], "[TANKS] maximum level"), is_us);
+            if (!volume_curve.empty() &&
+                (volume_curve.front().first > min_level ||
+                 volume_curve.back().first < max_level))
+                warn("TANKS", record.fields[0], record.line_number,
+                     "Volume curve '" + curve_id +
+                     "' does not span the complete operating level range; endpoint segments are extrapolated.");
             tank_definitions_.push_back(TankState{
                 record.fields[0],
                 length_to_metres(parse_number(record.fields[2], "[TANKS] initial level"), is_us),
-                length_to_metres(parse_number(record.fields[3], "[TANKS] minimum level"), is_us),
-                length_to_metres(parse_number(record.fields[4], "[TANKS] maximum level"), is_us),
+                min_level,
+                max_level,
                 3.14159265358979323846 * diameter * diameter / 4.0,
                 volume_to_m3(parse_number(record.fields[6], "[TANKS] minimum volume"), is_us),
+                std::move(volume_curve),
                 nullptr});
-            if (record.fields.size() > 7 && !record.fields[7].empty())
-                warn("TANKS", record.fields[0], record.line_number,
-                     "Tank volume curves are approximated with the cylindrical diameter.");
         }
         for (const Record &record : records("RESERVOIRS")) {
             if (record.fields.size() < 2)
@@ -1610,7 +1723,8 @@ private:
     }
 
     RuleAction parse_rule_action(const Record &record) const {
-        if (record.fields.size() != 6 || upper(record.fields[4]) != "IS")
+        if (record.fields.size() != 6 ||
+            (upper(record.fields[4]) != "IS" && record.fields[4] != "="))
             throw std::runtime_error("Invalid rule action syntax.");
         const std::string object = upper(record.fields[1]);
         if (object != "LINK" && object != "PIPE" && object != "PUMP" && object != "VALVE")
@@ -1849,10 +1963,8 @@ private:
         while (check_s > time_s && check_s <= candidate_time_s) {
             std::map<std::string, double> projected_levels;
             for (const TankState &tank : tanks) {
-                const double projected = tank.level_m + tank.boundary->Get_Q() *
-                    static_cast<double>(check_s - time_s) / tank.area_m2;
-                projected_levels[tank.id] = std::max(
-                    tank.min_level_m, std::min(tank.max_level_m, projected));
+                projected_levels[tank.id] = projected_tank_level(
+                    tank, static_cast<double>(check_s - time_s));
             }
 
             const EpanetRuleEngine::NumericLookup numeric_lookup =
@@ -1896,16 +2008,16 @@ private:
                                 // (false) premise unless the tank is filling.
                                 if (flow <= 1.0e-12)
                                     return false;
-                                value = (tank->max_level_m - level->second) *
-                                    tank->area_m2 / flow;
+                                value = (tank_volume_at_level(*tank, tank->max_level_m) -
+                                         tank_volume_at_level(*tank, level->second)) / flow;
                             } else {
                                 // Likewise DRAINTIME is false while a tank is
                                 // stationary or filling; infinity would make
                                 // an ABOVE comparison incorrectly true.
                                 if (flow >= -1.0e-12)
                                     return false;
-                                value = (level->second - tank->min_level_m) *
-                                    tank->area_m2 / -flow;
+                                value = (tank_volume_at_level(*tank, level->second) -
+                                         tank_volume_at_level(*tank, tank->min_level_m)) / -flow;
                             }
                         }
                         return true;
@@ -2078,7 +2190,9 @@ private:
 
     void update_tanks(std::vector<TankState> &tanks, double step_s) {
         for (TankState &tank : tanks) {
-            const double next = tank.level_m + tank.boundary->Get_Q() * step_s / tank.area_m2;
+            const double next_volume = tank_volume_at_level(tank, tank.level_m) +
+                tank.boundary->Get_Q() * step_s;
+            const double next = tank_level_at_volume(tank, next_volume);
             if (next < tank.min_level_m) {
                 tank.level_m = tank.min_level_m;
                 warn("TANKS", tank.id, 0, "Minimum level reached; level was clamped.");
@@ -2152,8 +2266,7 @@ private:
         }
         for (const TankState &tank : tanks) {
             frame.tank_level_m.push_back(tank.level_m);
-            frame.tank_volume_m3.push_back(
-                tank.min_volume_m3 + tank.area_m2 * (tank.level_m - tank.min_level_m));
+            frame.tank_volume_m3.push_back(tank_volume_at_level(tank, tank.level_m));
             frame.tank_inflow_m3s.push_back(tank.boundary->Get_Q());
         }
         return frame;

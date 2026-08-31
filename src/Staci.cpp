@@ -54,6 +54,7 @@ struct val_and_ID {
 bool comparison_function1(const val_and_ID& lhs, const val_and_ID& rhs ) { return lhs.val > rhs.val; }
 
 Staci::Staci(int argc, char *argv[]) {
+  mode = -1;
   quiet_mode = false;
   debug_level = 1;
   // Initiate with command line arguments
@@ -324,6 +325,7 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
   opt->setOption("quality_mode");
   opt->setFlag("quality-sensitivity");
   opt->setFlag("quality_sensitivity");
+  opt->setFlag("help", 'h');
 
   opt->processCommandArgs(argc, argv);
 
@@ -331,7 +333,11 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
     mode = -1;
     opt->printUsage();
   } else {
-    if (opt->getFlag("help") || opt->getFlag('h')) opt->printUsage();
+    if (opt->getFlag("help") || opt->getFlag('h')) {
+      mode = -1;
+      opt->printUsage();
+      return;
+    }
 
     if (opt->getValue('s') != NULL || opt->getValue("stac") != NULL) {
       mode = 0;

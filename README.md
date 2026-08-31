@@ -303,7 +303,7 @@ python3 tests/run_tests.py --binary ./build/staci \
   --require-epanet-reference
 ```
 
-Twelve targeted fixtures validate every EPANET hydraulic element that currently
+Thirteen targeted fixtures validate every EPANET hydraulic element that currently
 has a calculation-model counterpart in STACI, together with the supported
 simple-control and rule paths:
 
@@ -318,7 +318,8 @@ simple-control and rule paths:
 | `epanet_pumps.inp` | POWER pump, multi-point HEAD pump, one-point HEAD pump, initial speed, and speed patterns |
 | `epanet_eps_smoke.inp` | Tank storage and level, reservoir head pattern, demand pattern, POWER pump, and tank-level simple control |
 | `epanet_controls.inp` | Elapsed-time, clock-time, junction-pressure, OPEN/CLOSED, and numeric pump-setting controls |
-| `epanet_rules.inp` | Time, clock, demand, pressure, flow, link status, tank level/fill/drain time, AND/OR/ELSE, equality, priority conflicts, and pump setting |
+| `epanet_rules.inp` | Time, clock, demand, pressure, flow, link status, tank level/fill/drain time, AND/OR/ELSE, equality, priority conflicts, pump setting, WNTR-style `=` actions, and `HH:MM:SS` times |
+| `epanet_volume_curve.inp` | Non-cylindrical tank storage, CMH input conversion, piecewise-linear EPANET volume-depth interpolation, SI volume output, and direct EPANET reference comparison |
 | `epanet_reference_tcv_controls.inp` | Numeric and OPEN TCV simple controls |
 | `epanet_reference_tcv_rules.inp` | TCV setting/status premises and actions plus multiple-action THEN/ELSE branches |
 
@@ -538,7 +539,7 @@ EPANET field is supported yet.
 | 3 | Pipe | `Cso`, including one-way `CV` mode | **Direct; hydraulic and status fields retained and applied** | |
 | 4 | Pump, `POWER` form | `EpanetPowerPump` | **Direct; definition, status, speed, patterns and energy metadata retained** | |
 | 5 | Pump, `HEAD` curve form | `Szivattyu` | **Direct; original curve and all pump attributes retained** | |
-| 6 | Tank | `Csomopont` + `Vegakna` | **Approximate** | Represent minimum/maximum level, minimum volume, volume curve and mixing data. The importer currently uses initial level and tank area as a steady fixed boundary; native export must infer missing operating limits. |
+| 6 | Tank | `Csomopont` + `Vegakna` | **Supported in EPS; approximate in steady mode** | EPS applies operating limits, cylindrical storage, and referenced piecewise-linear volume curves. The steady importer uses initial level as a fixed boundary; native SPR export must infer missing operating limits. Tank quality mixing remains. |
 | 7 | Throttle control valve (`TCV`) | `JelleggorbesFojtas` | **Direct; constant curve, setting, minor loss and status retained and applied** | |
 | 8 | General-purpose valve (`GPV`) | `JelleggorbesFojtas` | **Similar STACI type exists; not mapped** | Adapt the referenced GPV head-loss curve without losing its ID or points and validate that its sign and interpolation semantics match STACI. |
 | 9 | Emitter attached to a junction | None | **No equivalent** | Add a pressure-dependent outlet representation with emitter coefficient and pressure exponent, plus INP import/export support. |
@@ -554,7 +555,7 @@ represent structurally, are:
 | EPANET data object | STACI support |
 |---|---|
 | Base demands and `[DEMANDS]` categories | **Supported:** retained as separate typed node metadata with category labels, independent pattern references and complete multiplier series. The hydraulic snapshot receives their time-zero aggregate. |
-| Curves | **Partial:** HEAD pump curves and pump-efficiency curves are retained with their original IDs and SI points; tank-volume and GPV curve types have no general typed STACI representation. |
+| Curves | **Partial:** HEAD pump curves and pump-efficiency curves are retained with their original IDs and SI points. Referenced tank-volume curves are applied by EPS using EPANET piecewise-linear volume-depth interpolation. A general editable tank-curve model and GPV curve mapping remain. |
 | Patterns | **Partial:** complete demand, reservoir-head, pump-speed and pump energy-price patterns are retained by their corresponding STACI elements; hydraulic patterns are used by EPS. A reusable network-level model for other pattern types is still missing. |
 | Simple controls and rule-based controls | **Supported in EPS:** simple controls execute `OPEN`, `CLOSED`, `ACTIVE`, numeric pump speeds and numeric TCV loss settings for node pressure/tank level, elapsed-time, and clock-time triggers. The EPS rule engine supports `IF`/`AND`/`OR`, `THEN`, multiple actions, `ELSE`, priorities, node/tank/link/system premises, TCV setting/status premises, and the separate rule timestep. Both sections remain losslessly retained in the imported INP document; neither yet has a network-level editable STACI object outside EPS. |
 | Water age, chemical sources, reactions and tank mixing | **Partial:** EPS solves `QUALITY AGE` and `QUALITY CHEMICAL` with segment-based plug flow, timestep-volume node mixing, reservoirs, pumps and valves. Initial quality, `CONCEN`/`MASS`/`SETPOINT`/`FLOWPACED` sources with patterns, and first-order global or pipe-specific bulk/wall coefficients are applied. Tank storage/mixing, trace mode, and non-first-order kinetics remain. |
@@ -667,14 +668,18 @@ elapsed simulation time (`AT TIME`), or time of day (`AT CLOCKTIME`), including
 `START CLOCKTIME` and daily clock-event recurrence. Pressure thresholds are
 converted from the declared EPANET pressure units to SI pressure head.
 
-Time-based events shorten the current hydraulic step so off-grid event times
+Both canonical `HH:MM` and WNTR-generated `HH:MM:SS` time values are accepted.
+`START CLOCKTIME 00:00:00 AM` is interpreted as midnight as well as the
+canonical `12:00 AM` spelling. Time-based events shorten the current hydraulic step so off-grid event times
 are solved exactly without shifting later pattern and report boundaries.
 Node-based controls are re-evaluated after the hydraulic solve and the state is
 resolved until the control settings stabilize. These runtime control records
 belong to the EPS orchestration layer; no new hydraulic `Agelem` subclass is
 needed. Pump affinity laws are applied at every hydraulic state. Tank levels
-are advanced from the solved boundary flow and tank area; flow is blocked in
-the prohibited direction when a tank is at its minimum or maximum level.
+are advanced from the solved boundary flow in volume space. Cylindrical tanks
+use their area, while tanks referencing a `[CURVES]` volume curve use
+piecewise-linear volume-depth interpolation and inverse interpolation. Flow is
+blocked in the prohibited direction at the minimum or maximum level.
 
 The `[RULES]` engine uses the separately configurable `RULE TIMESTEP` (default:
 one tenth of the hydraulic timestep). It supports node demand/head/pressure,
@@ -682,9 +687,12 @@ tank level/fill time/drain time, absolute link flow/status/setting, total system
 demand, elapsed time, and clock time. EPANET's OR-before-AND grouping,
 interval-aware time equality, `THEN`/`ELSE` action lists, strict priority
 replacement, and first-rule precedence for equal priorities are retained.
-Tank levels are projected with the last solved flow while the rule interval is
-scanned; the first rule check that causes a real link change becomes the next
-hydraulic event.
+Rule actions accept both EPANET's `IS` spelling and WNTR's equivalent `=`
+spelling for `STATUS` and `SETTING` assignments. Tank levels are projected with
+the last solved flow while the rule interval is scanned. Volume-curve tanks are
+projected in volume space, and their fill/drain times use the actual remaining
+curve volume. The first rule check that causes a real link change becomes the
+next hydraulic event.
 
 The primary output is `PREFIX.h5` using the `STACI EPS OUTPUT v1` schema. A
 small `PREFIX.meta.json` sidecar contains run metadata and precomputed value
@@ -746,8 +754,7 @@ non-standard installation, for example:
 cmake -S . -B build -DHDF5_ROOT=/path/to/hdf5
 ```
 
-Tank volume curves are currently approximated using the tank diameter. `QUALITY
-AGE` and `QUALITY CHEMICAL` are supported for EPS pipe networks with node
+`QUALITY AGE` and `QUALITY CHEMICAL` are supported for EPS pipe networks with node
 mixing, reservoir boundaries, zero-volume pumps/valves, and plug-flow pipe
 storage. Chemical concentrations are converted from the INP declaration and
 written as SI `kg/m3`; bulk coefficients are converted from 1/day to 1/s and
