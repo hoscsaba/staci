@@ -178,6 +178,21 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
+	// Steady water age / first-order chemical quality at fixed hydraulics
+	//----------------------------------------
+	if (feladat.get_mode() == 10) {
+		try {
+			EpanetSteadyQualitySimulation simulation(
+				feladat.get_def_file(), feladat.new_def_file,
+				feladat.steady_quality_mode,
+				feladat.perform_steady_quality_sensitivity_analysis);
+			simulation.run(feladat);
+		} catch (const exception &error) {
+			cerr << "ERROR [EPANET][STEADY_QUALITY]: " << error.what() << endl;
+			return 1;
+		}
+	}
+
 	time_t stop;
 	time(&stop);
 

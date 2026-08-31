@@ -25,9 +25,12 @@ bool has_inp_extension(string filename) {
 // Wiley:
 //#include "/usr/include/suitesparse/umfpack.h"
 // Mac:
+#ifndef STACI_USE_EIGEN_SPARSE
 #include "umfpack.h"
+#endif
 // #include <suitesparse/umfpack.h>
 
+#ifndef STACI_USE_EIGEN_SPARSE
 void UmfpackSymbolicDeleter::operator()(void *symbolic) const noexcept {
   if (symbolic != nullptr)
     umfpack_di_free_symbolic(&symbolic);
@@ -37,6 +40,7 @@ void UmfpackNumericDeleter::operator()(void *numeric) const noexcept {
   if (numeric != nullptr)
     umfpack_di_free_numeric(&numeric);
 }
+#endif
 
 struct val_and_ID {
   double val, x;
@@ -50,6 +54,7 @@ struct val_and_ID {
 bool comparison_function1(const val_and_ID& lhs, const val_and_ID& rhs ) { return lhs.val > rhs.val; }
 
 Staci::Staci(int argc, char *argv[]) {
+  quiet_mode = false;
   debug_level = 1;
   // Initiate with command line arguments
   perform_demand_sensitivity_analysis = false;
@@ -58,9 +63,10 @@ Staci::Staci(int argc, char *argv[]) {
   SetInitialParameters();
 }
 
-Staci::Staci(string spr_filename) {
+Staci::Staci(string spr_filename, bool quiet) {
   mode = 0;
-  debug_level = 1;
+  quiet_mode = quiet;
+  debug_level = quiet_mode ? 0 : 1;
   // Just to be able to delete in the destructor
   perform_demand_sensitivity_analysis = false;
   opt = std::make_unique<AnyOption>();
@@ -101,7 +107,7 @@ void Staci::SetInitialParameters() {
     ss << endl << " Loading system...";
     logfile_write(ss.str(), 1);
 
-    data_io datta_io(def_file.c_str(), mode == 9);
+    data_io datta_io(def_file.c_str(), mode == 9 || mode == 10);
     datta_io.load_system(owned_cspok, owned_agelemek);
     rebuild_network_views();
     if (const EpanetDocument *document = datta_io.get_epanet_document()) {
@@ -115,7 +121,8 @@ void Staci::SetInitialParameters() {
 
     // beallitasok
     // cout<<endl<<endl<<"Beallitasok:";
-    debug_level = atoi(datta_io.read_setting("debug_level").c_str());
+    debug_level = quiet_mode
+        ? 0 : atoi(datta_io.read_setting("debug_level").c_str());
     // cout<<endl<<"\tdebug_level  => "<<datta_io.read_setting("debug_level");
 
     out_file = datta_io.read_setting("out_file");
@@ -159,13 +166,15 @@ void Staci::SetInitialParameters() {
   set_progress_file(def_file + ".rps");
 
   // Delete if previous exists...
-  ostringstream msg;
-  msg << "\n Trying to delete previous logfile " << out_file.c_str() << "... ";
-  if (remove(out_file.c_str()) != 0)
-    msg << " file not found, cannot delete it." << endl;
-  else
-    msg << "file successfully deleted." << endl;
-  logfile_write(msg.str(), 1);
+  if (!quiet_mode) {
+    ostringstream msg;
+    msg << "\n Trying to delete previous logfile " << out_file.c_str() << "... ";
+    if (remove(out_file.c_str()) != 0)
+      msg << " file not found, cannot delete it." << endl;
+    else
+      msg << "file successfully deleted." << endl;
+    logfile_write(msg.str(), 1);
+  }
 
   // If set to false, the result file will not be saved!
   // Only set false for sensitivity analysis
@@ -280,6 +289,13 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
   opt->addUsage("\t EPANET extended-period simulation:");
   opt->addUsage(
     "\t\t -z  (--epanet-eps) <network>.inp -o <result-prefix>");
+  opt->addUsage(" ");
+  opt->addUsage("\t steady water quality for constant hydraulics (SI output):");
+  opt->addUsage(
+    "\t\t -q  (--steady-quality) <network>.inp -o <result-prefix> "
+    "[--quality-mode age|chemical|both]");
+  opt->addUsage(
+    "\t\t     [--quality-sensitivity -e <ID> -p diameter|friction_coeff|demand]");
 
   opt->addUsage(" ");
   opt->addUsage(" ");
@@ -302,6 +318,12 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
   opt->setOption("export_epanet");
   opt->setOption("epanet-eps", 'z');
   opt->setOption("epanet_eps");
+  opt->setOption("steady-quality", 'q');
+  opt->setOption("steady_quality");
+  opt->setOption("quality-mode");
+  opt->setOption("quality_mode");
+  opt->setFlag("quality-sensitivity");
+  opt->setFlag("quality_sensitivity");
 
   opt->processCommandArgs(argc, argv);
 
@@ -460,6 +482,26 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
         def_file = opt->getValue("epanet-eps");
       else
         def_file = opt->getValue("epanet_eps");
+    }
+
+    // Asymptotic water quality for one fixed hydraulic state
+    //-----------------------------
+    if (opt->getValue('q') != NULL || opt->getValue("steady-quality") != NULL ||
+        opt->getValue("steady_quality") != NULL) {
+      mode = 10;
+      if (opt->getValue('q') != NULL)
+        def_file = opt->getValue('q');
+      else if (opt->getValue("steady-quality") != NULL)
+        def_file = opt->getValue("steady-quality");
+      else
+        def_file = opt->getValue("steady_quality");
+      const char *quality_mode_value = opt->getValue("quality-mode");
+      if (quality_mode_value == NULL)
+        quality_mode_value = opt->getValue("quality_mode");
+      steady_quality_mode = quality_mode_value == NULL ? "" : quality_mode_value;
+      perform_steady_quality_sensitivity_analysis =
+        opt->getFlag("quality-sensitivity") ||
+        opt->getFlag("quality_sensitivity");
     }
   }
 }
@@ -1334,8 +1376,12 @@ void Staci::build_sparse_pattern() {
     }
   }
 
+#ifdef STACI_USE_EIGEN_SPARSE
+  m_eigen_solver.reset();
+#else
   m_umfpack_symbolic.reset();
   m_umfpack_numeric.reset();
+#endif
   m_numeric_factorization_valid = false;
   m_sparse_pattern_valid = true;
 }
@@ -1359,7 +1405,11 @@ double Staci::sparse_value(int row, int column) const {
 }
 
 void Staci::invalidate_numeric_factorization() {
+#ifdef STACI_USE_EIGEN_SPARSE
+  // Keep Eigen's symbolic analysis; only the numeric coefficients changed.
+#else
   m_umfpack_numeric.reset();
+#endif
   m_numeric_factorization_valid = false;
 }
 
@@ -2389,6 +2439,33 @@ bool Staci::solve_sparse_system(const vector<double> &rhs,
   if (!m_sparse_pattern_valid || static_cast<int>(rhs.size()) != n)
     return false;
 
+#ifdef STACI_USE_EIGEN_SPARSE
+  using SparseMatrix = Eigen::SparseMatrix<double, Eigen::ColMajor, int>;
+  const Eigen::Map<const SparseMatrix> matrix(
+      n, n, static_cast<int>(m_Ax.size()), m_Ap.data(), m_Ai.data(),
+      m_Ax.data());
+  if (!m_eigen_solver) {
+    m_eigen_solver =
+        std::make_unique<Eigen::SparseLU<SparseMatrix> >();
+    m_eigen_solver->analyzePattern(matrix);
+  }
+  if (!m_numeric_factorization_valid) {
+    m_eigen_solver->factorize(matrix);
+    if (m_eigen_solver->info() != Eigen::Success) {
+      logfile_write("\nERROR: Eigen numeric factorization failed.\n", 1);
+      return false;
+    }
+    m_numeric_factorization_valid = true;
+  }
+  const Eigen::Map<const Eigen::VectorXd> right_hand_side(rhs.data(), n);
+  const Eigen::VectorXd solved = m_eigen_solver->solve(right_hand_side);
+  if (m_eigen_solver->info() != Eigen::Success || !solved.allFinite()) {
+    logfile_write("\nERROR: Eigen sparse solve failed.\n", 1);
+    return false;
+  }
+  solution.assign(solved.data(), solved.data() + solved.size());
+  return true;
+#else
   array<double, UMFPACK_CONTROL> control;
   array<double, UMFPACK_INFO> info;
   umfpack_di_defaults(control.data());
@@ -2448,6 +2525,7 @@ bool Staci::solve_sparse_system(const vector<double> &rhs,
     }
   }
   return true;
+#endif
 }
 
 //--------------------------------------------------------------

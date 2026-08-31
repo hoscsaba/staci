@@ -25,6 +25,8 @@ STACI can:
 
 - solve steady-state pressures, heads, and mass flow rates;
 - calculate residence time and concentration transport;
+- solve asymptotic water age and first-order chemical concentration for a
+  constant hydraulic state with one sparse linear factorization per quantity;
 - calculate parameter and demand sensitivities;
 - read and modify selected node or edge properties;
 - list all network elements;
@@ -72,6 +74,9 @@ SuiteSparse runtime requirements can change between releases.
 - Eigen3 and igraph (used by `staci_split`);
 - HDF5 development files (optional for general STACI use, required for the
   chunked EPS `.h5` output).
+- MATLAB with Global Optimization Toolbox, CMake-visible Eigen3, and a
+  configured supported C/C++ compiler (optional, only for the in-memory MEX
+  optimization demonstration).
 
 The optimizer targets are enabled by default. A minimal hydraulic-only build
 can omit them with `-DSTACI_BUILD_OPTIMIZERS=OFF`.
@@ -198,6 +203,18 @@ ctest --test-dir build --output-on-failure
 
 The test configurations use very small populations and generation counts; they
 verify integration and file output, not optimization quality.
+
+The focused steady-quality checks can be run separately:
+
+```bash
+ctest --test-dir build -R epanet_steady_quality --output-on-failure
+```
+
+They verify the sparse equations against closed-form pipe/mixing results,
+compare the asymptotic result with the existing 24-hour time-marching AGE and
+CHEMICAL models, and compare analytic diameter sensitivities with centered
+finite differences. The readable benchmark log is
+`build/steady-quality-test/steady-quality-test.log`.
 
 The portable Python test runner recursively tests every `.spr` and `.inp` file
 under `tests/`. It uses copies below `tests/test-results/`, so hydraulic
@@ -743,6 +760,208 @@ timestep are not yet implemented. Rule conditions are sampled at `RULE
 TIMESTEP` instants, matching EPANET's discrete rule-engine model; unsupported
 valve operations emit warnings.
 
+### Steady water-quality solution
+
+For constant demands, link states, reservoir concentrations and reaction
+coefficients, STACI can solve the asymptotic water-quality state directly:
+
+```bash
+./build/staci --steady-quality network.inp -o results/steady
+# Equivalent short form, overriding the INP quality mode:
+./build/staci -q network.inp -o results/steady --quality-mode both
+```
+
+The direct solver first computes one steady hydraulic state. It directs every
+link according to its solved signed flow, uses `tau = volume / abs(flow)` for
+pipe travel time, and applies the exact first-order transfer factor
+`exp(k*tau)`. Complete instantaneous mixing gives one sparse linear system for
+node water age and another for node chemical concentration. Pumps and valves
+are represented as zero-volume links. Tanks are fixed quality boundaries at
+their imported initial values for this snapshot. This is an asymptotic,
+fixed-boundary calculation; EPS must be used when demands, controls, tank levels, source
+strengths or flow directions change with time. Non-first-order reactions are
+rejected explicitly.
+
+All output values use SI units. The command writes:
+
+- `PREFIX-steady-nodes.csv`: node water age in seconds and concentration in
+  `kg/m3`;
+- `PREFIX-steady-links.csv`: signed flow in `m3/s`, travel time, volume-average
+  age and concentration, and the first-order transfer factor;
+- `PREFIX-steady-summary.csv`: input, selected mode and matrix dimensions.
+
+The selected hydraulic parameter can be differentiated without rerunning the
+quality solution:
+
+```bash
+./build/staci -q network.inp -o results/steady \
+  --quality-mode both --quality-sensitivity \
+  -e P1 -p diameter
+```
+
+`diameter`, `friction_coeff`, and junction `demand` are supported. The existing
+hydraulic implicit sensitivity supplies all link-flow derivatives; STACI then
+differentiates travel time, wall reaction, pipe transfer and node mixing and
+solves the resulting right-hand side with the already factorized quality
+matrix. `PREFIX-steady-sensitivity.csv` reports derivatives per SI parameter:
+per metre for diameter, per dimensionless roughness value for
+`friction_coeff`, and per `m3/s` for demand.
+
+### Native C++ examples
+
+User-facing, MATLAB-independent programs are provided under
+[`examples/cpp`](examples/cpp/README.md). They use the same C++17 STACI sources
+as the command-line tools and are built by default; they can be disabled with
+`-DSTACI_BUILD_CPP_EXAMPLES=OFF`.
+
+```bash
+cmake -S . -B build -DSTACI_BUILD_CPP_EXAMPLES=ON
+cmake --build build --target \
+  staci_example_hydraulics \
+  staci_example_epanet_inp --parallel
+
+./build/staci_example_hydraulics
+./build/staci_example_epanet_inp tests/epanet_eps_smoke.inp
+```
+
+`staci_example_hydraulics` demonstrates native SPR loading, steady hydraulics
+and SI node/link results. `staci_example_epanet_inp` focuses on EPANET INP
+import, reports the mapped STACI element types, solves the imported snapshot and
+prints the physical EPANET links represented by STACI.
+
+When the official OWA EPANET 2.2 toolkit is available, CMake additionally builds
+`staci_example_epanet_eps_compare`. It runs the official toolkit and STACI EPS
+on the same INP file, matches time/element identifiers and compares total head,
+junction pressure/demand, link flow and velocity in SI units:
+
+```bash
+python3 tests/setup_epanet_reference.py
+cmake -S . -B build \
+  -DSTACI_BUILD_CPP_EXAMPLES=ON \
+  -DSTACI_EPANET_TOOLKIT_ROOT="$PWD/build/epanet-reference"
+cmake --build build --target staci_example_epanet_eps_compare --parallel
+
+./build/staci_example_epanet_eps_compare \
+  tests/epanet_eps_smoke.inp cpp-eps-results
+```
+
+The EPS example calls the EPANET toolkit directly rather than parsing its text
+report. It prints maximum absolute differences and returns a failing exit code
+when the included benchmark tolerances are exceeded. STACI HDF5, JSON and SI
+CSV outputs and EPANET's diagnostic report are retained in the selected output
+directory.
+
+### General in-memory MATLAB interface
+
+The optional `StaciModel` API keeps each parsed STACI network behind a locked
+`staci_mex` handle. After the initial SPR or INP read, property updates,
+hydraulic calculations, steady-quality calculations, sensitivities and result
+transfers happen directly in memory without temporary data or result files.
+Multiple independent `StaciModel` objects may be open in one MATLAB process.
+All public numerical properties use SI units.
+
+```matlab
+cd('/path/to/staci')
+addpath('matlab')
+
+network = StaciModel('tests/anytown_1med.spr');
+pipes = network.linkIds("pipe");
+diameters = network.getLinkProperty(pipes, "diameter_m");
+network.setLinkProperty(pipes, "diameter_m", 1.05 * diameters);
+
+status = network.solveHydraulics();
+nodes = network.nodeTable();
+links = network.linkTable();
+quality = network.solveSteadyWaterAge();
+sensitivity = network.hydraulicSensitivity(pipes(1), "diameter_m");
+```
+
+Important operations are:
+
+- network lifecycle: constructor, `release`, and `resetHydraulicState`;
+- introspection: `nodeIds`, `linkIds`, `linkTypes` and the immutable `Info`
+  structure;
+- vectorized properties: `getNodeProperty`, `setNodeProperty`,
+  `getLinkProperty`, and `setLinkProperty`;
+- hydraulics and results: `solveHydraulics`, `nodeResults`, `linkResults`,
+  `nodeTable`, and `linkTable`;
+- steady quality: `solveSteadyWaterAge` or `solveSteadyQuality` with `age`,
+  `chemical`, `chlorine`, or `both` mode;
+- implicit hydraulic sensitivity: `hydraulicSensitivity` for `diameter_m`,
+  `friction_coeff`, and `demand_m3s` parameters.
+
+Common node properties include `elevation_m`, `pressure_head_m`, `total_head_m`,
+`demand_m3s`, `water_age_s`, `concentration_kgm3`, and
+`source_concentration_kgm3`. Common link properties include `flow_rate_m3s`,
+`velocity_ms`, `status`, and pipe-specific `diameter_m`, `length_m`,
+`friction_coeff`, and `minor_loss`. Pump speed/power, valve position/setting,
+pool water level and fixed boundary head are also exposed when supported by the
+selected STACI element type. Unsupported property/type combinations raise a
+MATLAB exception instead of entering a legacy interactive error path.
+
+On first use, `build_staci_mex.m` configures `build-matlab/` and builds the
+platform-specific module. It recognizes `CMAKE_COMMAND` and the usual
+Homebrew/CMake.app locations when MATLAB does not inherit the login-shell PATH:
+
+```matlab
+addpath('matlab')
+mexFile = build_staci_mex();
+```
+
+User-facing programs are under [`examples/`](examples/README.md), separately
+from developer regression tests. Start with:
+
+```matlab
+addpath('matlab')
+addpath('examples/matlab')
+getting_started_hydraulics();
+modify_network_in_memory();
+steady_water_quality_demo();
+hydraulic_sensitivity_demo();
+```
+
+The Anytown Global Optimization Toolbox demonstration is now an example built
+entirely on the same general API:
+
+```matlab
+result = optimize_anytown_residence_time();
+```
+
+It optimizes all 41 pipe diameters continuously between `0.01` and `1.00 m`,
+minimizes demand-weighted steady water age and enforces `0...60 m` nodal
+pressure head. Feasible seed networks prevent GA from stopping after one
+generation when a uniformly random population violates the hydraulic limits.
+Its final CSV, MAT and grouped diameter/pressure plot are written to
+`matlab/matlab-results/`; GA evaluations remain file-free.
+
+MATLAB developer tests are deliberately kept under `tests/matlab`:
+
+```matlab
+addpath('matlab')
+addpath('tests/matlab')
+results = run_matlab_tests();
+```
+
+They cover handle lifecycle, introspection, vector property round trips,
+hydraulics, steady water age, central-difference sensitivity validation and all
+short user examples. The optimization is exercised separately with reduced GA
+settings in development because its default run has 50 generations.
+
+For manual CMake configuration:
+
+```bash
+cmake -S . -B build-matlab \
+  -DSTACI_BUILD_MATLAB_MEX=ON \
+  -DSTACI_BUILD_OPTIMIZERS=OFF \
+  -DSTACI_ENABLE_HDF5=OFF \
+  -DMatlab_ROOT_DIR=/path/to/MATLAB
+cmake --build build-matlab --target staci_mex --parallel
+```
+
+The normal executables continue to use UMFPACK. The MEX target uses Eigen
+`SparseLU`, avoiding a second OpenMP runtime inside MATLAB when a package-manager
+SuiteSparse build was linked with OpenMP.
+
 ### List network elements
 
 ```bash
@@ -870,6 +1089,7 @@ This produces `nodelist.txt` and `connected_nodes.txt`. The scripts in
 | `-x`, `--export_for_connectivity_check FILE` | Export node connectivity |
 | `-y`, `--export-epanet FILE` | Export a network to the `.inp` path supplied with `-o` |
 | `-z`, `--epanet-eps FILE` | Run EPANET extended-period hydraulics and write chunked HDF5, metadata JSON, and SI CSV files using the `-o` prefix |
+| `-q`, `--steady-quality FILE` | Solve asymptotic AGE and/or CHEMICAL quality for fixed hydraulics; use `--quality-mode`, optionally `--quality-sensitivity`, `-e`, and `-p` |
 | `-e`, `--element_ID ID` | Select a node or edge |
 | `-p`, `--property_ID NAME` | Select a property |
 | `-n`, `--newValue VALUE` | New numeric property value |
@@ -894,6 +1114,9 @@ input filename, depending on the command:
 | `PREFIX-tanks.csv`, `PREFIX-summary.csv` | EPS tank time series and run summary |
 | `PREFIX.h5` | Chunked `STACI EPS OUTPUT v1` data for visualization |
 | `PREFIX.meta.json` | EPS run metadata, dimensions, status codes, warnings, and value ranges |
+| `PREFIX-steady-nodes.csv`, `PREFIX-steady-links.csv` | Steady-quality SI node and link results |
+| `PREFIX-steady-summary.csv` | Steady-quality mode and dimensions |
+| `PREFIX-steady-sensitivity.csv` | Optional water-quality and hydraulic-flow derivatives per SI parameter |
 
 ## Non-standard SuiteSparse installations
 

@@ -483,13 +483,13 @@ void data_io::load_system(vector<unique_ptr<Csomopont> > &cspok,
             cout << agelemek.at(i)->Info();
     }
 
-    //if (debug) {
+    if (debug) {
         cout << endl << endl << endl << "Number of edge types:";
         cout << endl << "\tnode:\t" << csp_db;
         for (int j = 0; j < edge_type_number; j++)
             cout << endl << "\t" << edge_type.at(j) << ":\t" << edge_type_occur.at(j);
         cout << endl ;
-   // }
+    }
 
     if (debug)
         cin.get();

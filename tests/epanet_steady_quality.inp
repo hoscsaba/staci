@@ -1,0 +1,52 @@
+[TITLE]
+STACI steady versus time-marching water-quality benchmark
+
+[JUNCTIONS]
+;ID  Elevation_m  Demand_LPS
+J1   10           10
+J2   12           15
+
+[RESERVOIRS]
+;ID  Head_m
+R1   60
+
+[PIPES]
+;ID  Node1  Node2  Length_m  Diameter_mm  Roughness  MinorLoss  Status
+P1   R1     J1     1000      200          120        0          Open
+P2   J1     J2     800       180          120        0          Open
+P3   R1     J2     1600      150          120        0          Open
+
+[OPTIONS]
+Units       LPS
+Headloss    H-W
+Trials      100
+Accuracy    0.000001
+Quality     CHEMICAL Chlorine mg/L
+
+[QUALITY]
+R1  0.0
+
+[SOURCES]
+R1  CONCEN  1.0
+
+[REACTIONS]
+Order Bulk  1
+Order Wall  1
+Global Bulk -0.50
+Global Wall -0.001
+
+[TIMES]
+Duration            24:00
+Hydraulic Timestep  1:00
+Pattern Timestep    1:00
+Quality Timestep    0:01
+Report Timestep     1:00
+
+[REPORT]
+Status      No
+Summary     No
+Nodes       All
+Links       All
+Quality     Precision 8
+
+[END]

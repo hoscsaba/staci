@@ -174,8 +174,6 @@ double Cso::surlodas() {
         hiba = fabs((lambda - lambda_uj) / lambda);
         lambda = lambda_uj;
 
-        cout << endl << nev << ": (i=" << i << ") Re = " << fabs(v)*D / nu << ", lambda = " << lambda << endl;
-
         i++;
       }
       /*if (i > 8)
@@ -294,9 +292,23 @@ double Cso::Get_dprop(const string &mit) {
 //--------------------------------------------------------------
 double Cso::Get_dfdmu(const string &mit) {
   double out = 0.0;
-  if (mit == "diameter")
-    out = -5. * surlodas() * L / pow(D, 6) * 8 / ro / pow(pi, 2) * mp *
-          abs(mp);  // Pa/m
+  if (mit == "diameter") {
+    // Differentiate the actual selected pipe law.  The former D^-5 formula
+    // omitted the diameter dependence of the Darcy friction factor and did
+    // not represent Hazen-Williams or minor losses consistently.
+    const double original_diameter = D;
+    const double original_lambda = lambda;
+    const double delta = max(abs(D) * 1.0e-5, 1.0e-8);
+    Set_dprop("diameter", original_diameter + delta);
+    lambda = original_lambda;
+    const double plus = ComputeHeadloss();
+    Set_dprop("diameter", original_diameter - delta);
+    lambda = original_lambda;
+    const double minus = ComputeHeadloss();
+    Set_dprop("diameter", original_diameter);
+    lambda = original_lambda;
+    out = (plus - minus) / (2.0 * delta);
+  }
   else if (mit == "friction_coeff") {
     // equation: f(friction_coeff) = 0 = pv - pe + tag1 + ComputeHeadloss();
     // out = -L / pow(D, 5) * 8 / ro / pow(pi, 2) * mp *
@@ -368,6 +380,14 @@ d dp'/dmp=lambda*L/D*ro/2*1/(ro*A)^2*abs(v)
 */
 
 double Cso::ComputeHeadlossDerivative() {
+  if (friction_model_type == 1 && erdesseg > 0.0) {
+    // Hazen-Williams is proportional to mp*|mp|^0.85.  Treating it as the
+    // quadratic Darcy-Weisbach law biases both Newton's Jacobian and all
+    // implicit sensitivities derived from that Jacobian.
+    if (abs(mp) < 1.0e-14)
+      return 0.0;
+    return 1.85 * abs(ComputeHeadloss() / mp);
+  }
   const double resistance = surlodas() * L / D + minor_loss;
   return resistance * abs(mp) / (ro * Aref * Aref);  // Pa/(kg/s)
 }

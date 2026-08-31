@@ -20,6 +20,9 @@ list(REMOVE_ITEM SRC_FILES ${MAIN_FILE} ${EXCLUDE_FILES})
 add_executable(${PROJECT_NAME} ${MAIN_FILE} ${SRC_FILES})
 
 option(STACI_BUILD_OPTIMIZERS "Build the pagmo2-based calibrate and split tools" ON)
+option(STACI_BUILD_MATLAB_MEX
+    "Build the optional general in-memory MATLAB interface" OFF)
+option(STACI_BUILD_CPP_EXAMPLES "Build the user-facing C++ examples" ON)
 set(STACI_EXECUTABLE_TARGETS ${PROJECT_NAME})
 
 if(STACI_BUILD_OPTIMIZERS)
@@ -44,6 +47,72 @@ if(STACI_BUILD_OPTIMIZERS)
     )
     target_link_libraries(staci_split PRIVATE Pagmo::pagmo Eigen3::Eigen igraph::igraph)
     list(APPEND STACI_EXECUTABLE_TARGETS staci_calibrate staci_split)
+endif()
+
+if(STACI_BUILD_CPP_EXAMPLES)
+    set(STACI_EXAMPLE_COMMON_SOURCES ${SRC_FILES} ${MAIN_FILE})
+    list(REMOVE_ITEM STACI_EXAMPLE_COMMON_SOURCES
+        "${PROJECT_SOURCE_DIR}/src/staci_main.cpp"
+    )
+    add_executable(staci_example_hydraulics
+        "${PROJECT_SOURCE_DIR}/examples/cpp/basic_hydraulics.cpp"
+        ${STACI_EXAMPLE_COMMON_SOURCES}
+    )
+    add_executable(staci_example_epanet_inp
+        "${PROJECT_SOURCE_DIR}/examples/cpp/epanet_inp_hydraulics.cpp"
+        ${STACI_EXAMPLE_COMMON_SOURCES}
+    )
+    target_compile_definitions(staci_example_hydraulics PRIVATE
+        STACI_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
+    target_compile_definitions(staci_example_epanet_inp PRIVATE
+        STACI_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
+    list(APPEND STACI_EXECUTABLE_TARGETS
+        staci_example_hydraulics staci_example_epanet_inp)
+
+    set(STACI_EPANET_TOOLKIT_ROOT "" CACHE PATH
+        "Optional root of an official OWA EPANET toolkit build for the C++ EPS comparison example")
+    find_path(STACI_EPANET_TOOLKIT_INCLUDE_DIR
+        NAMES epanet2_2.h
+        HINTS
+            "${STACI_EPANET_TOOLKIT_ROOT}"
+            "${STACI_EPANET_TOOLKIT_ROOT}/src"
+            "$ENV{EPANET_ROOT}"
+            "${PROJECT_BINARY_DIR}/epanet-reference/src"
+            "${PROJECT_SOURCE_DIR}/build/epanet-reference/src"
+        PATH_SUFFIXES include
+    )
+    find_library(STACI_EPANET_TOOLKIT_LIBRARY
+        NAMES epanet2 libepanet2
+        HINTS
+            "${STACI_EPANET_TOOLKIT_ROOT}"
+            "${STACI_EPANET_TOOLKIT_ROOT}/build"
+            "$ENV{EPANET_ROOT}"
+            "${PROJECT_BINARY_DIR}/epanet-reference/build"
+            "${PROJECT_SOURCE_DIR}/build/epanet-reference/build"
+        PATH_SUFFIXES lib lib64 bin
+    )
+    if(STACI_EPANET_TOOLKIT_INCLUDE_DIR AND STACI_EPANET_TOOLKIT_LIBRARY)
+        add_executable(staci_example_epanet_eps_compare
+            "${PROJECT_SOURCE_DIR}/examples/cpp/epanet_staci_eps_compare.cpp"
+            ${STACI_EXAMPLE_COMMON_SOURCES}
+        )
+        target_compile_definitions(staci_example_epanet_eps_compare PRIVATE
+            STACI_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
+        target_include_directories(staci_example_epanet_eps_compare PRIVATE
+            "${STACI_EPANET_TOOLKIT_INCLUDE_DIR}")
+        target_link_libraries(staci_example_epanet_eps_compare PRIVATE
+            "${STACI_EPANET_TOOLKIT_LIBRARY}")
+        get_filename_component(STACI_EPANET_TOOLKIT_LIBRARY_DIR
+            "${STACI_EPANET_TOOLKIT_LIBRARY}" DIRECTORY)
+        set_target_properties(staci_example_epanet_eps_compare PROPERTIES
+            BUILD_RPATH "${STACI_EPANET_TOOLKIT_LIBRARY_DIR}")
+        list(APPEND STACI_EXECUTABLE_TARGETS
+            staci_example_epanet_eps_compare)
+        message(STATUS "C++ EPANET EPS comparison example: enabled")
+    else()
+        message(STATUS
+            "C++ EPANET EPS comparison example: disabled (official EPANET toolkit not found; set STACI_EPANET_TOOLKIT_ROOT)")
+    endif()
 endif()
 
 foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
@@ -165,6 +234,53 @@ else()
     endforeach()
 endif()
 
+if(STACI_BUILD_MATLAB_MEX)
+    find_package(Matlab REQUIRED COMPONENTS MEX_COMPILER MX_LIBRARY)
+    # This adapter deliberately uses the stable C MEX entry point. Recent
+    # FindMatlab versions otherwise add the C++ MEX export map whenever the
+    # optional C++ API libraries happen to be installed, even for a C entry
+    # source, which produces unresolved mexFunctionAdapter symbols on macOS.
+    set(Matlab_HAS_CPP_API FALSE)
+    set(STACI_MATLAB_CORE_SOURCES ${SRC_FILES} ${MAIN_FILE})
+    list(REMOVE_ITEM STACI_MATLAB_CORE_SOURCES
+        "${PROJECT_SOURCE_DIR}/src/staci_main.cpp"
+    )
+    add_library(staci_matlab_core STATIC
+        "${PROJECT_SOURCE_DIR}/matlab/staci_mex.cpp"
+        ${STACI_MATLAB_CORE_SOURCES}
+    )
+    target_compile_features(staci_matlab_core PRIVATE cxx_std_17)
+    set_target_properties(staci_matlab_core PROPERTIES
+        CXX_EXTENSIONS OFF
+        POSITION_INDEPENDENT_CODE ON
+    )
+    target_include_directories(staci_matlab_core PRIVATE
+        "${PROJECT_SOURCE_DIR}/include/staci"
+        ${Matlab_INCLUDE_DIRS}
+    )
+    find_package(Eigen3 CONFIG REQUIRED)
+    target_compile_definitions(staci_matlab_core PRIVATE
+        STACI_USE_EIGEN_SPARSE=1)
+    target_link_libraries(staci_matlab_core PRIVATE Eigen3::Eigen)
+    matlab_add_mex(NAME staci_mex
+        SRC "${PROJECT_SOURCE_DIR}/matlab/staci_mex_entry.c"
+        LINK_TO staci_matlab_core
+    )
+    set_target_properties(staci_mex PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/matlab"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/matlab"
+        LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/matlab"
+        LIBRARY_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/matlab"
+        LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/matlab"
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_BINARY_DIR}/matlab"
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/matlab"
+        RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/matlab"
+    )
+    if(MSVC)
+        target_compile_definitions(staci_matlab_core PRIVATE _USE_MATH_DEFINES)
+    endif()
+endif()
+
 include(GNUInstallDirs)
 install(TARGETS ${STACI_EXECUTABLE_TARGETS}
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
@@ -172,6 +288,27 @@ install(TARGETS ${STACI_EXECUTABLE_TARGETS}
 
 include(CTest)
 if(BUILD_TESTING)
+    if(TARGET staci_example_hydraulics)
+        add_test(NAME cpp_example_hydraulics
+            COMMAND $<TARGET_FILE:staci_example_hydraulics>)
+        set_tests_properties(cpp_example_hydraulics PROPERTIES
+            LABELS "example;cpp;hydraulics")
+    endif()
+    if(TARGET staci_example_epanet_inp)
+        add_test(NAME cpp_example_epanet_inp
+            COMMAND $<TARGET_FILE:staci_example_epanet_inp>)
+        set_tests_properties(cpp_example_epanet_inp PROPERTIES
+            LABELS "example;cpp;epanet;hydraulics")
+    endif()
+    if(TARGET staci_example_epanet_eps_compare)
+        add_test(NAME cpp_example_epanet_eps_compare
+            COMMAND $<TARGET_FILE:staci_example_epanet_eps_compare>
+                    "${PROJECT_SOURCE_DIR}/tests/epanet_eps_smoke.inp"
+                    "${CMAKE_CURRENT_BINARY_DIR}/cpp-example-eps-results")
+        set_tests_properties(cpp_example_epanet_eps_compare PROPERTIES
+            LABELS "example;cpp;epanet;eps;reference"
+            TIMEOUT 120)
+    endif()
     add_executable(staci_epanet_water_age_test
         "${PROJECT_SOURCE_DIR}/tests/test_epanet_water_age.cpp"
         "${PROJECT_SOURCE_DIR}/src/epanet_water_age.cpp"
@@ -185,10 +322,49 @@ if(BUILD_TESTING)
     set_tests_properties(epanet_water_age_model PROPERTIES
         LABELS "epanet;quality;water_age;unit")
 
+    add_executable(staci_epanet_steady_quality_test
+        "${PROJECT_SOURCE_DIR}/tests/test_epanet_steady_quality.cpp"
+        "${PROJECT_SOURCE_DIR}/src/epanet_steady_quality.cpp"
+    )
+    target_compile_features(staci_epanet_steady_quality_test PRIVATE cxx_std_17)
+    set_target_properties(staci_epanet_steady_quality_test PROPERTIES CXX_EXTENSIONS OFF)
+    target_include_directories(staci_epanet_steady_quality_test PRIVATE
+        "${PROJECT_SOURCE_DIR}/include/staci")
+    if(TARGET SuiteSparse::UMFPACK)
+        target_link_libraries(staci_epanet_steady_quality_test PRIVATE SuiteSparse::UMFPACK)
+    elseif(TARGET SuiteSparse::UMFPACK_static)
+        target_link_libraries(staci_epanet_steady_quality_test PRIVATE SuiteSparse::UMFPACK_static)
+    else()
+        target_include_directories(staci_epanet_steady_quality_test PRIVATE
+            "${SUITESPARSE_INCLUDE_DIR}")
+        target_link_libraries(staci_epanet_steady_quality_test PRIVATE
+            "${SUITESPARSE_UMFPACK_LIBRARY}"
+            "${SUITESPARSE_CHOLMOD_LIBRARY}"
+            "${SUITESPARSE_AMD_LIBRARY}"
+            "${SUITESPARSE_COLAMD_LIBRARY}"
+            "${SUITESPARSE_CONFIG_LIBRARY}")
+    endif()
+    add_test(NAME epanet_steady_quality_model
+        COMMAND $<TARGET_FILE:staci_epanet_steady_quality_test>)
+    set_tests_properties(epanet_steady_quality_model PROPERTIES
+        LABELS "epanet;quality;steady;unit;sensitivity")
+
     set(STACI_EPANET_EXECUTABLE "" CACHE FILEPATH
         "Optional path to the official runepanet executable used by reference tests")
     find_package(Python3 COMPONENTS Interpreter QUIET)
     if(Python3_Interpreter_FOUND)
+        add_test(NAME epanet_steady_quality_benchmark
+            COMMAND "${Python3_EXECUTABLE}"
+                    "${PROJECT_SOURCE_DIR}/tests/compare_steady_quality.py"
+                    --staci $<TARGET_FILE:${PROJECT_NAME}>
+                    --input "${PROJECT_SOURCE_DIR}/tests/epanet_steady_quality.inp"
+                    --work-dir "${CMAKE_CURRENT_BINARY_DIR}/steady-quality-test"
+        )
+        set_tests_properties(epanet_steady_quality_benchmark PROPERTIES
+            WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+            TIMEOUT 180
+            LABELS "epanet;quality;steady;integration;sensitivity")
+
         add_custom_target(setup_epanet_reference
             COMMAND "${Python3_EXECUTABLE}"
                     "${PROJECT_SOURCE_DIR}/tests/setup_epanet_reference.py"

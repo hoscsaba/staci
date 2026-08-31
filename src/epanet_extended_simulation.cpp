@@ -6,6 +6,7 @@
 #include "JelleggorbesFojtas.h"
 #include "Staci.h"
 #include "epanet_water_age.h"
+#include "epanet_steady_quality.h"
 #include "eps_result_writer.h"
 
 #include <algorithm>
@@ -805,8 +806,316 @@ public:
             std::cout << "Results: " << prefix << ".h5, " << prefix
                       << ".meta.json and SI CSV files.\n";
         else
-            std::cout << "Results: " << prefix
+        std::cout << "Results: " << prefix
                       << ".meta.json and SI CSV files (HDF5 unavailable).\n";
+    }
+
+    void run_steady_quality(Staci &system, const std::string &prefix,
+                            const std::string &requested_mode,
+                            bool compute_sensitivity) {
+        std::string mode = upper(trim(requested_mode));
+        bool solve_age = quality_age_;
+        bool solve_chemical = quality_chemical_;
+        if (!mode.empty()) {
+            solve_age = mode == "AGE" || mode == "BOTH";
+            solve_chemical = mode == "CHEMICAL" || mode == "CHLORINE" ||
+                             mode == "BOTH";
+            if (!solve_age && !solve_chemical)
+                throw std::runtime_error(
+                    "--quality-mode must be age, chemical, chlorine or both.");
+        }
+        if (!solve_age && !solve_chemical)
+            throw std::runtime_error(
+                "No water-quality mode is selected in [OPTIONS] QUALITY or --quality-mode.");
+        if (std::abs(bulk_order_ - 1.0) > 1.0e-12 ||
+            std::abs(wall_order_ - 1.0) > 1.0e-12)
+            throw std::runtime_error(
+                "Steady chemical quality requires first-order bulk and wall reactions.");
+
+        std::map<std::string, Csomopont *> nodes;
+        for (Csomopont *node : system.cspok)
+            nodes[node->Get_nev()] = node;
+        std::map<std::string, Agelem *> links;
+        for (Agelem *link : system.agelemek)
+            links[link->Get_nev()] = link;
+
+        std::vector<ReservoirState> reservoirs;
+        for (ReservoirState reservoir : reservoir_definitions_) {
+            const auto boundary = links.find("EPANET_RESERVOIR_" + reservoir.id);
+            if (boundary != links.end()) {
+                reservoir.boundary = boundary->second;
+                reservoirs.push_back(reservoir);
+            }
+        }
+        for (const TankState &tank : tank_definitions_) {
+            const auto boundary = links.find("EPANET_TANK_" + tank.id);
+            if (boundary != links.end()) {
+                boundary->second->Set_dprop("water_level", tank.level_m);
+                boundary->second->Set_enabled(true);
+            }
+        }
+        if (!tank_definitions_.empty())
+            warn("QUALITY", "STEADY", 0,
+                 "Tank nodes are fixed quality boundaries at their imported initial values for this hydraulic snapshot; transient storage and mixing require EPS.");
+
+        for (const auto &status : initial_status_) {
+            const auto link = links.find(status.first);
+            if (link == links.end())
+                continue;
+            auto *valve = dynamic_cast<JelleggorbesFojtas *>(link->second);
+            if (valve != nullptr) {
+                valve->SetEpanetTcvStatus(
+                    status.second == RuleStatus::Active ? EpanetTcvStatus::Active :
+                    (status.second == RuleStatus::Open ? EpanetTcvStatus::Open :
+                                                        EpanetTcvStatus::Closed));
+            } else {
+                link->second->Set_enabled(status.second != RuleStatus::Closed);
+            }
+        }
+        for (const auto &setting : initial_settings_) {
+            const auto link = links.find(setting.first);
+            if (link == links.end())
+                continue;
+            if (auto *pump = dynamic_cast<EpanetPumpConfigurable *>(link->second)) {
+                pump->SetOperatingSpeed(setting.second);
+                link->second->Set_enabled(setting.second > 0.0);
+            } else if (auto *valve = dynamic_cast<JelleggorbesFojtas *>(link->second)) {
+                valve->SetEpanetTcvSetting(setting.second);
+            }
+        }
+
+        apply_demands(nodes, 0);
+        apply_reservoir_heads(reservoirs, 0);
+        apply_pump_speeds(links, 0);
+        apply_time_controls(links, 0);
+        const int old_debug = system.Get_debug_level();
+        system.Set_debug_level(0);
+        system.ini();
+        const bool converged = system.solve_system();
+        system.Set_debug_level(old_debug);
+        if (!converged)
+            throw std::runtime_error("The fixed hydraulic state did not converge.");
+
+        std::set<std::string> reservoir_ids;
+        for (const ReservoirState &reservoir : reservoir_definitions_)
+            reservoir_ids.insert(reservoir.id);
+        std::set<std::string> tank_ids;
+        for (const TankState &tank : tank_definitions_)
+            tank_ids.insert(tank.id);
+        std::vector<EpanetSteadyQualityNode> quality_nodes;
+        std::map<std::string, std::size_t> node_index;
+        quality_nodes.reserve(system.cspok.size());
+        for (std::size_t index = 0; index < system.cspok.size(); ++index) {
+            Csomopont *node = system.cspok[index];
+            const std::string id = node->Get_nev();
+            node_index[id] = index;
+            const auto initial = initial_quality_kgm3_.find(id);
+            const bool fixed_boundary = reservoir_ids.count(id) != 0 ||
+                                        tank_ids.count(id) != 0;
+            EpanetSteadyQualityNode quality_node;
+            quality_node.id = id;
+            quality_node.fixed_age = fixed_boundary;
+            quality_node.fixed_chemical = fixed_boundary;
+            quality_node.fixed_concentration_kgm3 =
+                initial == initial_quality_kgm3_.end() ? 0.0 : initial->second;
+            quality_node.external_inflow_m3s =
+                std::max(0.0, -node->Get_dprop("demand") / 3600.0);
+            quality_nodes.push_back(quality_node);
+        }
+
+        std::vector<Agelem *> quality_link_objects;
+        std::vector<EpanetSteadyQualityLink> quality_links;
+        std::vector<double> wall_coefficients;
+        for (Agelem *link : system.agelemek) {
+            if (link->Get_nev().rfind("EPANET_TANK_", 0) == 0 ||
+                link->Get_nev().rfind("EPANET_RESERVOIR_", 0) == 0)
+                continue;
+            const auto from = node_index.find(link->Get_Cspe_Nev());
+            const auto to = node_index.find(link->Get_Cspv_Nev());
+            if (from == node_index.end() || to == node_index.end())
+                continue;
+            double volume = 0.0;
+            double reaction = 0.0;
+            double wall_mps = 0.0;
+            if (link->GetType() == "Cso") {
+                const double length = link->Get_dprop("length");
+                const double diameter = link->Get_dprop("diameter");
+                if (length > 0.0 && diameter > 0.0) {
+                    volume = 3.14159265358979323846 * diameter * diameter *
+                             length / 4.0;
+                    const auto bulk = pipe_bulk_per_s_.find(link->Get_nev());
+                    const auto wall = pipe_wall_mps_.find(link->Get_nev());
+                    reaction = bulk == pipe_bulk_per_s_.end()
+                        ? global_bulk_per_s_ : bulk->second;
+                    wall_mps = wall == pipe_wall_mps_.end()
+                        ? global_wall_mps_ : wall->second;
+                    reaction += 4.0 * wall_mps / diameter;
+                }
+            }
+            quality_link_objects.push_back(link);
+            quality_links.push_back(EpanetSteadyQualityLink{
+                link->Get_nev(), from->second, to->second, link->Get_Q(),
+                volume, reaction});
+            wall_coefficients.push_back(wall_mps);
+        }
+
+        std::vector<double> total_inflow(quality_nodes.size(), 0.0);
+        for (std::size_t index = 0; index < quality_nodes.size(); ++index)
+            total_inflow[index] = quality_nodes[index].external_inflow_m3s;
+        for (const EpanetSteadyQualityLink &link : quality_links) {
+            if (link.flow_m3s >= 0.0)
+                total_inflow[link.to_node] += link.flow_m3s;
+            else
+                total_inflow[link.from_node] -= link.flow_m3s;
+        }
+        for (const auto &entry : chemical_sources_) {
+            const auto found = node_index.find(entry.first);
+            if (found == node_index.end())
+                continue;
+            EpanetSteadyQualityNode &node = quality_nodes[found->second];
+            const double strength = entry.second.strength_si *
+                                    pattern_value(entry.second.pattern_id, 0);
+            if (entry.second.type == EpanetChemicalSourceType::Mass)
+                node.mass_source_kgs += strength;
+            else if (entry.second.type == EpanetChemicalSourceType::Concentration) {
+                if (node.fixed_chemical)
+                    node.fixed_concentration_kgm3 = strength;
+                else
+                    node.external_concentration_kgm3 = strength;
+            } else if (entry.second.type == EpanetChemicalSourceType::FlowPaced) {
+                node.mass_source_kgs += total_inflow[found->second] * strength;
+            } else if (entry.second.type == EpanetChemicalSourceType::Setpoint) {
+                node.fixed_chemical = true;
+                node.fixed_concentration_kgm3 = strength;
+                warn("SOURCES", entry.first, 0,
+                     "SETPOINT was represented as a fixed steady concentration; the conditional no-removal behavior is nonlinear and is not applied.");
+            }
+        }
+
+        EpanetSteadyQualitySensitivityInput sensitivity;
+        const EpanetSteadyQualitySensitivityInput *sensitivity_pointer = nullptr;
+        if (compute_sensitivity) {
+            if (system.element_ID.empty() || system.property_ID.empty())
+                throw std::runtime_error(
+                    "Steady-quality sensitivity requires -e <element> and -p <property>.");
+            if (system.property_ID != "diameter" &&
+                system.property_ID != "friction_coeff" &&
+                system.property_ID != "demand")
+                throw std::runtime_error(
+                    "Steady-quality sensitivity supports diameter, friction_coeff and demand.");
+            system.Compute_dxdmu();
+            const std::vector<double> &hydraulic = system.Get_dxdmu();
+            sensitivity.parameter_element = system.element_ID;
+            sensitivity.parameter_property = system.property_ID;
+            sensitivity.link_flow_derivative_m3s.assign(quality_links.size(), 0.0);
+            sensitivity.link_volume_derivative_m3.assign(quality_links.size(), 0.0);
+            sensitivity.link_reaction_derivative_per_s.assign(quality_links.size(), 0.0);
+            sensitivity.external_inflow_derivative_m3s.assign(quality_nodes.size(), 0.0);
+            const double parameter_scale = system.property_ID == "demand" ? 3600.0 : 1.0;
+            for (std::size_t qindex = 0; qindex < quality_link_objects.size(); ++qindex) {
+                Agelem *object = quality_link_objects[qindex];
+                const auto original = std::find(system.agelemek.begin(),
+                                                system.agelemek.end(), object);
+                if (original != system.agelemek.end()) {
+                    const std::size_t hydraulic_index = static_cast<std::size_t>(
+                        std::distance(system.agelemek.begin(), original));
+                    sensitivity.link_flow_derivative_m3s[qindex] =
+                        hydraulic[hydraulic_index] / object->Get_ro() * parameter_scale;
+                }
+                if (system.property_ID == "diameter" &&
+                    object->Get_nev() == system.element_ID &&
+                    object->GetType() == "Cso") {
+                    const double diameter = object->Get_dprop("diameter");
+                    sensitivity.link_volume_derivative_m3[qindex] =
+                        2.0 * quality_links[qindex].volume_m3 / diameter;
+                    sensitivity.link_reaction_derivative_per_s[qindex] =
+                        -4.0 * wall_coefficients[qindex] / (diameter * diameter);
+                }
+            }
+            if (system.property_ID == "demand") {
+                const auto selected = node_index.find(system.element_ID);
+                if (selected != node_index.end() &&
+                    system.cspok[selected->second]->Get_dprop("demand") < 0.0)
+                    sensitivity.external_inflow_derivative_m3s[selected->second] = -1.0;
+            }
+            sensitivity_pointer = &sensitivity;
+        }
+
+        EpanetSteadyQualityModel model(std::move(quality_nodes), quality_links);
+        const EpanetSteadyQualityResult result =
+            model.solve(solve_age, solve_chemical, sensitivity_pointer);
+        const double missing = std::numeric_limits<double>::quiet_NaN();
+        std::ofstream node_output((prefix + "-steady-nodes.csv").c_str(),
+                                  std::ios::trunc);
+        std::ofstream link_output((prefix + "-steady-links.csv").c_str(),
+                                  std::ios::trunc);
+        std::ofstream summary_output((prefix + "-steady-summary.csv").c_str(),
+                                     std::ios::trunc);
+        if (!node_output || !link_output || !summary_output)
+            throw std::runtime_error("Cannot create steady-quality SI CSV outputs.");
+        node_output << "node_id,water_age_s,chemical_concentration_kgm3\n"
+                    << std::setprecision(15);
+        for (std::size_t index = 0; index < system.cspok.size(); ++index)
+            node_output << csv(system.cspok[index]->Get_nev()) << ','
+                        << (solve_age ? result.node_age_s[index] : missing) << ','
+                        << (solve_chemical ? result.node_concentration_kgm3[index] : missing)
+                        << '\n';
+        link_output << "link_id,node_from,node_to,flow_m3s,travel_time_s,water_age_s,chemical_concentration_kgm3,transfer_factor\n"
+                    << std::setprecision(15);
+        for (std::size_t index = 0; index < quality_links.size(); ++index)
+            link_output << csv(quality_links[index].id) << ','
+                        << csv(system.cspok[quality_links[index].from_node]->Get_nev()) << ','
+                        << csv(system.cspok[quality_links[index].to_node]->Get_nev()) << ','
+                        << quality_links[index].flow_m3s << ','
+                        << result.link_travel_time_s[index] << ','
+                        << (solve_age ? result.link_average_age_s[index] : missing) << ','
+                        << (solve_chemical ? result.link_average_concentration_kgm3[index] : missing) << ','
+                        << result.link_transfer_factor[index] << '\n';
+        summary_output << "property,value\ninput_file," << csv(filename_)
+                       << "\nquality_mode," << (solve_age && solve_chemical ? "BOTH" :
+                           (solve_age ? "AGE" : "CHEMICAL"))
+                       << "\nhydraulic_converged,1\nnodes," << system.cspok.size()
+                       << "\nlinks," << quality_links.size()
+                       << "\nsensitivity," << (compute_sensitivity ? 1 : 0) << '\n';
+
+        if (compute_sensitivity) {
+            std::ofstream output((prefix + "-steady-sensitivity.csv").c_str(),
+                                 std::ios::trunc);
+            if (!output)
+                throw std::runtime_error("Cannot create steady-quality sensitivity CSV.");
+            output << "parameter_element,parameter_property,result_quantity,result_id,derivative_per_si_parameter\n"
+                   << std::setprecision(15);
+            for (std::size_t index = 0; index < system.cspok.size(); ++index) {
+                if (solve_age)
+                    output << csv(system.element_ID) << ',' << csv(system.property_ID)
+                           << ",node_water_age_s," << csv(system.cspok[index]->Get_nev())
+                           << ',' << result.node_age_sensitivity[index] << '\n';
+                if (solve_chemical)
+                    output << csv(system.element_ID) << ',' << csv(system.property_ID)
+                           << ",node_chemical_concentration_kgm3,"
+                           << csv(system.cspok[index]->Get_nev()) << ','
+                           << result.node_concentration_sensitivity[index] << '\n';
+            }
+            for (std::size_t index = 0; index < quality_links.size(); ++index) {
+                output << csv(system.element_ID) << ',' << csv(system.property_ID)
+                       << ",link_flow_m3s," << csv(quality_links[index].id)
+                       << ',' << sensitivity.link_flow_derivative_m3s[index] << '\n';
+                if (solve_age)
+                    output << csv(system.element_ID) << ',' << csv(system.property_ID)
+                           << ",link_water_age_s," << csv(quality_links[index].id)
+                           << ',' << result.link_average_age_sensitivity[index] << '\n';
+                if (solve_chemical)
+                    output << csv(system.element_ID) << ',' << csv(system.property_ID)
+                           << ",link_chemical_concentration_kgm3,"
+                           << csv(quality_links[index].id) << ','
+                           << result.link_average_concentration_sensitivity[index] << '\n';
+            }
+        }
+        for (const std::string &warning : warnings_)
+            std::cerr << warning << '\n';
+        std::cout << "\nSteady water-quality solution complete. SI results: "
+                  << prefix << "-steady-nodes.csv and " << prefix
+                  << "-steady-links.csv.\n";
     }
 
 private:
@@ -1012,8 +1321,6 @@ private:
     }
 
     void parse_quality() {
-        if (!quality_chemical_)
-            return;
         for (const Record &record : records("QUALITY")) {
             if (record.fields.size() >= 2)
                 initial_quality_kgm3_[record.fields[0]] = concentration_to_si(
@@ -1916,4 +2223,22 @@ void EpanetExtendedSimulation::run(Staci &system) {
         std::filesystem::create_directories(prefix_path.parent_path());
     SimulationModel model(input_filename_);
     model.run(system, output_prefix_);
+}
+
+EpanetSteadyQualitySimulation::EpanetSteadyQualitySimulation(
+    const std::string &input_filename, const std::string &output_prefix,
+    const std::string &quality_mode, bool compute_sensitivity)
+    : input_filename_(input_filename), output_prefix_(output_prefix),
+      quality_mode_(quality_mode), compute_sensitivity_(compute_sensitivity) {}
+
+void EpanetSteadyQualitySimulation::run(Staci &system) {
+    if (output_prefix_.empty())
+        throw std::runtime_error(
+            "Steady EPANET water quality requires -o <result-prefix>.");
+    const std::filesystem::path prefix_path(output_prefix_);
+    if (!prefix_path.parent_path().empty())
+        std::filesystem::create_directories(prefix_path.parent_path());
+    SimulationModel model(input_filename_);
+    model.run_steady_quality(system, output_prefix_, quality_mode_,
+                             compute_sensitivity_);
 }

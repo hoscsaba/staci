@@ -15,6 +15,10 @@
 #include "epanet_document.h"
 #include <string>
 
+#ifdef STACI_USE_EIGEN_SPARSE
+#include <Eigen/SparseLU>
+#endif
+
 struct UmfpackSymbolicDeleter {
     void operator()(void *symbolic) const noexcept;
 };
@@ -32,7 +36,7 @@ public:
     vector<Agelem *> agelemek;
     void export_connected_nodes();
     Staci(int argc, char *argv[]);
-    Staci(string spr_filename);
+    explicit Staci(string spr_filename, bool quiet = false);
     ~Staci();
     Staci(const Staci &) = delete;
     Staci &operator=(const Staci &) = delete;
@@ -146,6 +150,7 @@ public:
     void Print_dfdmu();
     void Print_dxdmu();
     void Compute_dxdmu();
+    const vector<double> &Get_dxdmu() const { return m_dxdmu; }
     void Compute_Sensitivity_Matrix(string parameter, int scale);
     void Print_matrix(vector<vector<double> > M);
     void Save_matrix(vector<vector<double> > M, string filename);
@@ -187,9 +192,12 @@ public:
     void Avr_absmax_stddev(vector<double> x, double &a, double &m, double &s);// WR Calculates average, max, standard deviation of a vector x
     vector<vector<double> > CSVRead(ifstream &file);// WR Reading doubles from file, separeted with ','
     bool perform_demand_sensitivity_analysis;
+    bool perform_steady_quality_sensitivity_analysis = false;
+    string steady_quality_mode;
 
 private:
     bool van_ini;
+    bool quiet_mode = false;
     int debug_level, iter_max, mode;
     double p_init, mp_init;
     double e_mp_max, e_p_max, relax, relax_mul;
@@ -249,8 +257,12 @@ private:
     vector<int> m_edge_end_head_position;
     bool m_sparse_pattern_valid = false;
     bool m_numeric_factorization_valid = false;
+#ifdef STACI_USE_EIGEN_SPARSE
+    std::unique_ptr<Eigen::SparseLU<Eigen::SparseMatrix<double> > > m_eigen_solver;
+#else
     std::unique_ptr<void, UmfpackSymbolicDeleter> m_umfpack_symbolic;
     std::unique_ptr<void, UmfpackNumericDeleter> m_umfpack_numeric;
+#endif
 
     string convert_to_hr_min(double seconds);
 
