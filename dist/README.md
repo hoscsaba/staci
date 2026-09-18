@@ -16,7 +16,7 @@ Pushing a tag whose name starts with `v` also runs the workflow.
 
 Linux and macOS are packaged as `.tar.gz` files so the executable permission is
 preserved. Windows is packaged as a `.zip` file. Each archive contains an
-installed `staci`, `staci_calibrate`, and `staci_split` executables in `bin/`
+installed `staci`, `staci_flush`, `staci_calibrate`, and `staci_split` executables in `bin/`
 (with `.exe` suffixes on Windows) and this README. The Windows archive also
 includes the vcpkg-provided runtime DLLs required by the executables.
 

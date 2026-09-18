@@ -1,0 +1,13 @@
+{
+  "hydrant_area_m2": 0.002,
+  "total_loss_coefficient": 2.0,
+  "velocity_threshold_mps": 0.5,
+  "output_dir": "results",
+  "min_pressure_head_m": 0.0,
+  "hydrant_node_ids": [
+    "A",
+    "B",
+    "C"
+  ],
+  "write_network_files": true
+}

@@ -11,6 +11,10 @@ file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
 # own entry points and are not part of the staci executable.
 set(MAIN_FILE "${PROJECT_SOURCE_DIR}/src/Staci.cpp")
 set(EXCLUDE_FILES
+    "${PROJECT_SOURCE_DIR}/src/staci_flush.cpp"
+    "${PROJECT_SOURCE_DIR}/src/flushing.cpp"
+    "${PROJECT_SOURCE_DIR}/src/flushing_plan.cpp"
+    "${PROJECT_SOURCE_DIR}/src/HydrantOutlet.cpp"
     "${PROJECT_SOURCE_DIR}/src/staci_calibrate.cpp"
     "${PROJECT_SOURCE_DIR}/src/staci_split.cpp"
     "${PROJECT_SOURCE_DIR}/src/data_io_2.cpp"
@@ -19,11 +23,24 @@ list(REMOVE_ITEM SRC_FILES ${MAIN_FILE} ${EXCLUDE_FILES})
 
 add_executable(${PROJECT_NAME} ${MAIN_FILE} ${SRC_FILES})
 
+# Flushing shares an internal solver target with its hydraulic regression tests.
+set(STACI_FLUSH_CORE_SOURCES ${SRC_FILES} ${MAIN_FILE})
+list(REMOVE_ITEM STACI_FLUSH_CORE_SOURCES "${PROJECT_SOURCE_DIR}/src/staci_main.cpp")
+add_library(staci_core STATIC ${STACI_FLUSH_CORE_SOURCES}
+    src/HydrantOutlet.cpp src/flushing.cpp src/flushing_plan.cpp)
+target_compile_features(staci_core PUBLIC cxx_std_17)
+target_include_directories(staci_core PUBLIC "${PROJECT_SOURCE_DIR}/include/staci")
+find_package(nlohmann_json 3.2.0 CONFIG REQUIRED)
+target_link_libraries(staci_core PRIVATE nlohmann_json::nlohmann_json)
+add_executable(staci_flush src/staci_flush.cpp)
+target_link_libraries(staci_flush PRIVATE staci_core)
+
+
 option(STACI_BUILD_OPTIMIZERS "Build the pagmo2-based calibrate and split tools" ON)
 option(STACI_BUILD_MATLAB_MEX
     "Build the optional general in-memory MATLAB interface" OFF)
 option(STACI_BUILD_CPP_EXAMPLES "Build the user-facing C++ examples" ON)
-set(STACI_EXECUTABLE_TARGETS ${PROJECT_NAME})
+set(STACI_EXECUTABLE_TARGETS ${PROJECT_NAME} staci_flush)
 
 if(STACI_BUILD_OPTIMIZERS)
     find_package(Pagmo CONFIG REQUIRED)
@@ -46,6 +63,19 @@ if(STACI_BUILD_OPTIMIZERS)
         ${STACI_OPTIMIZER_COMMON_SOURCES}
     )
     target_link_libraries(staci_split PRIVATE Pagmo::pagmo Eigen3::Eigen igraph::igraph)
+
+    # Debian/Ubuntu place generated igraph headers in a multiarch directory
+    # that some igraph CMake packages omit from their imported target.
+    get_target_property(STACI_IGRAPH_INCLUDE_DIRS igraph::igraph INTERFACE_INCLUDE_DIRECTORIES)
+    find_path(STACI_IGRAPH_CONFIG_INCLUDE_DIR
+        NAMES igraph_version.h
+        HINTS ${STACI_IGRAPH_INCLUDE_DIRS}
+        PATH_SUFFIXES "${CMAKE_LIBRARY_ARCHITECTURE}/igraph" igraph
+    )
+    if(NOT STACI_IGRAPH_CONFIG_INCLUDE_DIR)
+        message(FATAL_ERROR "Cannot find igraph generated headers (igraph_version.h)")
+    endif()
+    target_include_directories(staci_split SYSTEM PRIVATE "${STACI_IGRAPH_CONFIG_INCLUDE_DIR}")
     list(APPEND STACI_EXECUTABLE_TARGETS staci_calibrate staci_split)
 endif()
 
@@ -115,7 +145,7 @@ if(STACI_BUILD_CPP_EXAMPLES)
     endif()
 endif()
 
-foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS ITEMS staci_core)
     target_compile_features(${staci_target} PRIVATE cxx_std_17)
     set_target_properties(${staci_target} PROPERTIES CXX_EXTENSIONS OFF)
     target_include_directories(${staci_target} PRIVATE
@@ -126,7 +156,7 @@ endforeach()
 # M_PI is available by default with GCC and Clang, but MSVC requires this
 # definition before including <cmath> or <math.h>.
 if(MSVC)
-    foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+    foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS ITEMS staci_core)
         target_compile_definitions(${staci_target} PRIVATE _USE_MATH_DEFINES)
     endforeach()
 endif()
@@ -140,15 +170,15 @@ if(STACI_ENABLE_HDF5)
     find_package(HDF5 COMPONENTS C QUIET)
     if(HDF5_FOUND)
         set(STACI_HAS_HDF5 ON)
-        foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+        foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS ITEMS staci_core)
             target_compile_definitions(${staci_target} PRIVATE STACI_HAS_HDF5=1)
         endforeach()
         if(TARGET HDF5::HDF5)
-            foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+            foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS ITEMS staci_core)
                 target_link_libraries(${staci_target} PRIVATE HDF5::HDF5)
             endforeach()
         else()
-            foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+            foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS ITEMS staci_core)
                 target_include_directories(${staci_target} PRIVATE ${HDF5_INCLUDE_DIRS})
                 target_link_libraries(${staci_target} PRIVATE ${HDF5_LIBRARIES})
             endforeach()
@@ -169,11 +199,11 @@ endif()
 find_package(UMFPACK CONFIG QUIET)
 
 if(TARGET SuiteSparse::UMFPACK)
-    foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+    foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS ITEMS staci_core)
         target_link_libraries(${staci_target} PRIVATE SuiteSparse::UMFPACK)
     endforeach()
 elseif(TARGET SuiteSparse::UMFPACK_static)
-    foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+    foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS ITEMS staci_core)
         target_link_libraries(${staci_target} PRIVATE SuiteSparse::UMFPACK_static)
     endforeach()
 else()
@@ -222,7 +252,7 @@ else()
         SUITESPARSE_CONFIG_LIBRARY
     )
 
-    foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS)
+    foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS ITEMS staci_core)
         target_include_directories(${staci_target} PRIVATE "${SUITESPARSE_INCLUDE_DIR}")
         target_link_libraries(${staci_target} PRIVATE
             "${SUITESPARSE_UMFPACK_LIBRARY}"
@@ -994,3 +1024,19 @@ if(BUILD_TESTING)
 endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+
+if(BUILD_TESTING)
+    add_executable(staci_flushing_plan_test tests/test_flushing_plan.cpp)
+    target_link_libraries(staci_flushing_plan_test PRIVATE staci_core)
+    add_test(NAME flushing_plan COMMAND staci_flushing_plan_test)
+    add_executable(staci_hydrant_test tests/test_hydrant_outlet.cpp)
+    target_link_libraries(staci_hydrant_test PRIVATE staci_core)
+    add_test(NAME flushing_outlet_law COMMAND staci_hydrant_test)
+    find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    add_test(NAME flushing_worked_example
+        COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_flushing_example.py"
+                $<TARGET_FILE:staci_flush> "${PROJECT_SOURCE_DIR}/examples/flushing")
+    add_test(NAME flushing_scenarios
+        COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_flushing.py"
+                $<TARGET_FILE:staci_flush> "${PROJECT_SOURCE_DIR}/tests/flushing_smoke.inp")
+endif()

@@ -1,0 +1,22 @@
+[TITLE]
+Three-hydrant flushing example: a shared main and two branches
+[JUNCTIONS]
+A 0 0
+B 0 0
+C 0 0
+[RESERVOIRS]
+R 40
+[PIPES]
+MAIN R A 100 150 120 0 Open
+BRANCH_B A B 100 100 120 0 Open
+BRANCH_C C A 150 100 120 0 Open
+[OPTIONS]
+UNITS LPS
+HEADLOSS H-W
+TRIALS 200
+[COORDINATES]
+R 0 0
+A 100 0
+B 200 60
+C 200 -60
+[END]

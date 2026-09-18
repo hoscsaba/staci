@@ -67,6 +67,8 @@ public:
     void save_modified_network();
     void export_epanet(const string &filename);
     bool solve_system();
+    // RMS residual tolerances: edge head equations [m], node continuity [kg/s].
+    void set_solver_tolerances(double head_m, double mass_kgs);
     void solve_residence_time();
     void compute_demand_sensitivity();
     void residence_time_step(string& max_ID, double& max_VAL, double& mean_VAL);

@@ -1,0 +1,15 @@
+[TITLE]
+Single-hydrant coverage and reverse-flow regression
+[JUNCTIONS]
+J1 0 0
+J2 0 0
+[RESERVOIRS]
+R1 40
+[PIPES]
+P1 R1 J1 100 100 120 0 Open
+P2 J2 J1 100 100 120 0 Open
+[OPTIONS]
+UNITS LPS
+HEADLOSS H-W
+TRIALS 200
+[END]
