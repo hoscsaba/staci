@@ -63,6 +63,19 @@ if(STACI_BUILD_OPTIMIZERS)
         ${STACI_OPTIMIZER_COMMON_SOURCES}
     )
     target_link_libraries(staci_split PRIVATE Pagmo::pagmo Eigen3::Eigen igraph::igraph)
+
+    # Debian/Ubuntu place generated igraph headers in a multiarch directory
+    # that some igraph CMake packages omit from their imported target.
+    get_target_property(STACI_IGRAPH_INCLUDE_DIRS igraph::igraph INTERFACE_INCLUDE_DIRECTORIES)
+    find_path(STACI_IGRAPH_CONFIG_INCLUDE_DIR
+        NAMES igraph_version.h
+        HINTS ${STACI_IGRAPH_INCLUDE_DIRS}
+        PATH_SUFFIXES "${CMAKE_LIBRARY_ARCHITECTURE}/igraph" igraph
+    )
+    if(NOT STACI_IGRAPH_CONFIG_INCLUDE_DIR)
+        message(FATAL_ERROR "Cannot find igraph generated headers (igraph_version.h)")
+    endif()
+    target_include_directories(staci_split SYSTEM PRIVATE "${STACI_IGRAPH_CONFIG_INCLUDE_DIR}")
     list(APPEND STACI_EXECUTABLE_TARGETS staci_calibrate staci_split)
 endif()
 
