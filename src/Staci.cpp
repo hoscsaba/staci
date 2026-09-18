@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "Staci.h"
 #include <string.h>
 #include <cctype>
@@ -3821,4 +3822,11 @@ double Staci::GetAbsMaxCoeff(vector< vector<double> > M) {
     }
   }
   return maxval;
+}
+
+void Staci::set_solver_tolerances(double head_m, double mass_kgs) {
+  if (!std::isfinite(head_m) || !std::isfinite(mass_kgs) || head_m <= 0 || mass_kgs <= 0)
+    throw std::invalid_argument("Solver tolerances must be positive and finite");
+  e_p_max = head_m;
+  e_mp_max = mass_kgs;
 }
