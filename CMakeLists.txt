@@ -518,6 +518,8 @@ if(BUILD_TESTING)
                     --binary $<TARGET_FILE:${PROJECT_NAME}>
                     --network "${PROJECT_SOURCE_DIR}/tests/channel_network_merge_split.spr"
                     --results "${CMAKE_CURRENT_BINARY_DIR}/channel-network-test"
+                    --timeout 90
+                    --max-iterations 100
         )
         set_tests_properties(channel_network_merge_split PROPERTIES
             WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
@@ -609,6 +611,10 @@ if(BUILD_TESTING)
     target_include_directories(staci_epanet_node_metadata_test PRIVATE
         "${PROJECT_SOURCE_DIR}/include/staci"
     )
+
+    if(MSVC)
+        target_compile_definitions(staci_epanet_node_metadata_test PRIVATE _USE_MATH_DEFINES)
+    endif()
 
     add_test(NAME epanet_node_metadata_storage_and_export
         COMMAND $<TARGET_FILE:staci_epanet_node_metadata_test>

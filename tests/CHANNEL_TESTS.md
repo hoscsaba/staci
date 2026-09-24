@@ -115,6 +115,20 @@ python3 tests/run_channel_network_test.py --binary build/staci
 ctest --test-dir build -R channel_network_merge_split --output-on-failure
 ```
 
+The Python solver timeout is 90 seconds; CTest allows 120 seconds so the wrapper
+can save diagnostics and generate plots before the outer deadline. A timeout
+preserves `console.log` and the solver log. The test also rejects runs exceeding
+100 Newton iterations, even if they eventually converge.
+
+For automatically initialized networks with multiple circular channels, the
+solver first obtains a wet starting state with the existing diffusive-wave
+approximation. This stage is limited to 30 iterations or one quarter of the
+configured iteration budget, whichever is smaller. Failure restores the original
+starting state. The final solve always uses the original GVF equations and the
+configured residual tolerances; initialization alone never counts as convergence.
+Channel Jacobians are refreshed at every iteration, and finite-difference probes
+cannot overwrite derivatives belonging to the unperturbed state.
+
 The network test retains `channel-network-longitudinal-profile.svg` and a
 multi-page `channel-network-longitudinal-profile.pdf`. Both start with a
 topology sketch naming all `CHANNEL_*` elements and junctions; the test verifies

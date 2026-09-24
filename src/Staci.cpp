@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include "Staci.h"
+#include "Csatorna.h"
 #include <string.h>
 #include <cctype>
 #include <cmath>
@@ -1482,13 +1483,54 @@ bool Staci::solve_system() {
     // cout << m_ss.str();
   }
 
-  // Iteracio!!!
+  vector<Csatorna *> channels;
+  for (auto *edge : agelemek)
+    if (auto *channel = dynamic_cast<Csatorna *>(edge)) channels.push_back(channel);
+  const bool has_channels = !channels.empty();
+  // A common pressure guess can lie below elevated channel beds. Obtain a
+  // wet, mass-balanced starting point before switching to the full GVF model.
+  // Never replace a caller-supplied initialization. Bound the preliminary
+  // solve and restore the original state if it cannot converge.
+  vector<double> initial_state(N);
+  for (unsigned int i = 0; i < agelemek.size(); ++i)
+    initial_state[i] = agelemek[i]->Get_mp();
+  for (unsigned int i = 0; i < cspok.size(); ++i)
+    initial_state[agelemek.size() + i] = cspok[i]->Get_p();
+  const double initial_relax = m_relax;
+  vector<double> channel_min_head(cspok.size(), -numeric_limits<double>::infinity());
+  for (auto *channel : channels) {
+    const int e = channel->Get_Cspe_Index(), v = channel->Get_Cspv_Index();
+    channel_min_head[e] = max(channel_min_head[e], channel->Get_dprop("ze") + 0.001 - cspok[e]->Get_h());
+    channel_min_head[v] = max(channel_min_head[v], channel->Get_dprop("zv") + 0.001 - cspok[v]->Get_h());
+  }
+  bool initializing_channels = channels.size() > 1 && !van_ini && iter_max >= 4;
+  const int initialization_limit = min(30, iter_max / 4);
+  if (initializing_channels)
+    for (unsigned int i = 0; i < cspok.size(); ++i)
+      cspok[i]->Set_p(max(cspok[i]->Get_p(), channel_min_head[i] + 0.5));
+  for (auto *channel : channels) channel->set_diffusive_initialization(initializing_channels);
+  auto finish_initialization = [&](bool success) {
+    for (auto *channel : channels) channel->set_diffusive_initialization(false);
+    initializing_channels = false;
+    if (!success) {
+      for (unsigned int i = 0; i < agelemek.size(); ++i)
+        agelemek[i]->Set_mp(initial_state[i]);
+      for (unsigned int i = 0; i < cspok.size(); ++i)
+        cspok[i]->Set_p(initial_state[agelemek.size() + i]);
+    }
+    logfile_write(success
+        ? "\nChannel initialization complete; solving full GVF equations.\n"
+        : "\nChannel initialization incomplete; restoring original starting point.\n", 1);
+    konv_ok = false;
+    e_mp = e_p = e_mp_r = e_p_r = 1e10;
+    m_relax = initial_relax;
+  };
   bool comp_ok = true;
   while ((iter < iter_max) && (!konv_ok)) {
     if (debug_level > 0) progress_file_write((double)iter / iter_max * 100.0);
 
     bool used_frozen_jacobian = false;
-    if (iter == 0 || (e_mp > 0.1 || e_p > 0.1) || (iter % 5 == 0))
+    if (has_channels || iter == 0 || (e_mp > 0.1 || e_p > 0.1) || (iter % 5 == 0))
       build_vectors(x, f, !m_sparse_pattern_valid);
     else {
       build_vectors_frozen_Jacobian(x, f);
@@ -1516,6 +1558,10 @@ bool Staci::solve_system() {
     if (debug_level >= 3)
       print_worst_iter(x, f, 3);
 
+    if (initializing_channels && (konv_ok || iter >= initialization_limit)) {
+      finish_initialization(konv_ok);
+      continue;
+    }
     if (konv_ok)
       break;
 
@@ -1523,6 +1569,20 @@ bool Staci::solve_system() {
       update_relax(e_mp, e_p, e_mp_r, e_p_r);
 
     comp_ok = umfpack_solver(x, f);
+    if (comp_ok && initializing_channels) {
+      double fraction = 1.0;
+      for (unsigned int i = 0; i < cspok.size(); ++i) {
+        const double old_p = x[agelemek.size() + i], new_p = cspok[i]->Get_p();
+        if (new_p < channel_min_head[i])
+          fraction = min(fraction, 0.9 * (old_p - channel_min_head[i]) / (old_p - new_p));
+      }
+      if (fraction < 1.0) {
+        for (unsigned int i = 0; i < agelemek.size(); ++i)
+          agelemek[i]->Set_mp(x[i] + fraction * (agelemek[i]->Get_mp() - x[i]));
+        for (unsigned int i = 0; i < cspok.size(); ++i)
+          cspok[i]->Set_p(x[agelemek.size() + i] + fraction * (cspok[i]->Get_p() - x[agelemek.size() + i]));
+      }
+    }
 
     m_ss.str("");
     for (unsigned int i = 0; i < agelemek.size(); i++)
@@ -1532,12 +1592,18 @@ bool Staci::solve_system() {
     logfile_write(m_ss.str(), 4);
 
     ++iter;
+    if (!comp_ok && initializing_channels) {
+      finish_initialization(false);
+      comp_ok = true;
+      continue;
+    }
     if (!comp_ok) {
       logfile_write("\nERROR: sparse linear solve failed; nonlinear solve stopped.\n", 1);
       break;
     }
   }
 
+  for (auto *channel : channels) channel->set_diffusive_initialization(false);
   if (!konv_ok && comp_ok) {
     build_vectors_frozen_Jacobian(x, f);
     compute_error(f, e_mp, e_p, e_mp_r, e_p_r, konv_ok);
