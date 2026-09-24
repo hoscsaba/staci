@@ -60,6 +60,7 @@ private:
 
 	/// Ki kell-e __numerikusan__ sz�m�tani a Jacobi elemeit: [df_dye, df_dyv, df_dQ]
 	vector<bool> num_eval_jac;
+	bool diffusive_initialization = false;
 
 	/// A Jacobi elemei: [df_dye, df_dyv, df_dQ]
 	vector<double> jac;
@@ -144,6 +145,8 @@ public:
 	string Info() override;
 
 	/// �gegyenlet �rt�ke
+	// Used only to obtain a wet starting point; final residuals use GVF.
+	void set_diffusive_initialization(bool enabled) { diffusive_initialization = enabled; }
 	double f(const vector<double> &state) override;
 
 	/// �gegyenlet derv�ltja

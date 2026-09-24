@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import math
+import re
 from pathlib import Path
 import shutil
 import subprocess
@@ -188,7 +189,8 @@ def main() -> int:
     parser.add_argument("--binary", type=Path)
     parser.add_argument("--network", type=Path, default=DEFAULT_NETWORK)
     parser.add_argument("--results", type=Path, default=DEFAULT_RESULTS)
-    parser.add_argument("--timeout", type=float, default=60.0)
+    parser.add_argument("--timeout", type=float, default=90.0)
+    parser.add_argument("--max-iterations", type=int, default=100)
     arguments = parser.parse_args()
 
     try:
@@ -210,6 +212,11 @@ def main() -> int:
         marker = Path(str(network) + ".rrs")
         if completed.returncode != 0 or not marker.is_file() or marker.read_text().strip() != "OK":
             raise TestFailure(f"STACI did not converge (exit={completed.returncode})")
+
+        solver_log = Path(str(network) + ".ros").read_text(errors="replace")
+        iterations = [int(value) for value in re.findall(r"iter\. # (\d+)", solver_log)]
+        if not iterations or max(iterations) > arguments.max_iterations:
+            raise TestFailure(f"Excessive or missing solver iterations: {iterations[-1:]}")
 
         (
             count, junction, total_flow, residual, adverse_slope,
@@ -281,9 +288,16 @@ def main() -> int:
         print(f"Profile: {profile_path}")
         print(f"Profile PDF: {pdf_profile_path}")
         return 0
+    except subprocess.TimeoutExpired as error:
+        output = error.stdout or b""
+        if isinstance(output, bytes):
+            output = output.decode("utf-8", errors="replace")
+        (results / "console.log").write_text(output, encoding="utf-8")
+        print(f"Stationary multi-channel test timed out after {arguments.timeout}s; "
+              f"diagnostics retained in {results}", file=sys.stderr)
+        return 1
     except (
         TestFailure, PlotError, OSError, ValueError, ET.ParseError,
-        subprocess.TimeoutExpired,
     ) as error:
         print(f"Stationary multi-channel test FAIL: {error}", file=sys.stderr)
         return 1

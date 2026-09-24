@@ -250,54 +250,62 @@ double Csatorna::f(const vector<double> &x) {
 
 	logfile_write("\n\n  * evaluating f...", 2);
 	which_case(ye, yv);
+	if (diffusive_initialization) pt2fun = &Csatorna::f_diffusive;
 	double ff = (*this.*pt2fun)(ye, yv, mp);
 
-	// Jacobi elemeinek szamitasa
+	// Perturbed residuals can change jac and num_eval_jac; preserve the
+	// base-state linearization while assembling numerical derivatives.
+	vector<double> derivatives = jac;
+	const vector<bool> numeric_derivative = num_eval_jac;
 	double dx, df;
 	double TINY_NUM = 1.e-4;
 
 	// dfdye szamitasa:
 	logfile_write("\n\n  * evaluating df/dye...", 2);
-	if (num_eval_jac[0]) {
+	if (numeric_derivative[0]) {
 		double ye_old = ye;
 		dx = -0.001 * ye;
 		if (fabs(ye) < TINY_NUM)
 			dx = TINY_NUM;
 		// which_case(ye + dx, yv);
 		df = (*this.*pt2fun)(ye + dx, yv, mp);
-		jac[0] = (df - ff) / dx;
+		derivatives[0] = (df - ff) / dx;
 		ye = ye_old;
 	}
 
 	// dfdyv szamitasa:
 	logfile_write("\n\n  * evaluating df/dyv...", 2);
-	if (num_eval_jac[1]) {
+	if (numeric_derivative[1]) {
 		double yv_old = yv;
 		dx = -0.001 * yv;
 		if (fabs(yv) < TINY_NUM)
 			dx = TINY_NUM;
 		// which_case(ye, yv + dx);
 		df = (*this.*pt2fun)(ye, yv + dx, mp);
-		jac[1] = (df - ff) / dx;
+		derivatives[1] = (df - ff) / dx;
 		yv = yv_old;
 	}
 
 	// dfdmp szamitasa:
 	logfile_write("\n\n  * evaluating df/dmp...", 2);
-	if (num_eval_jac[2]) {
+	if (numeric_derivative[2]) {
 		double mdot_old = mp;
 		dx = -0.001 * mp;
 		if (fabs(mp) < TINY_NUM)
 			dx = TINY_NUM;
 		mp = mp + dx;
 		which_case(ye, yv);
+		if (diffusive_initialization) pt2fun = &Csatorna::f_diffusive;
 		df = (*this.*pt2fun)(ye, yv, mp);
-		jac[2] = (df - ff) / dx;
+		derivatives[2] = (df - ff) / dx;
 		mp = mdot_old;
 		which_case(ye, yv);
+		if (diffusive_initialization) pt2fun = &Csatorna::f_diffusive;
 	}
 
 	// konstans tag, csak linearizalas eseten van jelentosege
+	jac = derivatives;
+	num_eval_jac = numeric_derivative;
 	jac.push_back(0.);
 
 	f_count++;

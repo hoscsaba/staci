@@ -16,6 +16,16 @@
 
 namespace {
 
+std::string normalize_newlines(const std::string &text) {
+    std::string result;
+    for (size_t i = 0; i < text.size(); ++i) {
+        if (text[i] == '\r' && i + 1 < text.size() && text[i + 1] == '\n')
+            continue;
+        result += text[i];
+    }
+    return result;
+}
+
 bool contains(const std::string &text, const std::string &expected) {
     if (text.find(expected) != std::string::npos)
         return true;
@@ -26,6 +36,11 @@ bool contains(const std::string &text, const std::string &expected) {
 } // namespace
 
 int main(int argc, char *argv[]) {
+    if (normalize_newlines("[QUALITY]\r\n;Node\tInitQual\r\nJ1\t0") !=
+        "[QUALITY]\n;Node\tInitQual\nJ1\t0") {
+        std::cerr << "CRLF normalization failed\n";
+        return 1;
+    }
     if (argc != 2) {
         std::cerr << "Usage: test_epanet_node_metadata output.inp\n";
         return 2;
@@ -188,8 +203,8 @@ int main(int argc, char *argv[]) {
     EpanetWriter::write(argv[1], nodes, edges, "HW");
 
     std::ifstream input(argv[1], std::ios::binary);
-    const std::string exported((std::istreambuf_iterator<char>(input)),
-                               std::istreambuf_iterator<char>());
+    const std::string exported = normalize_newlines(std::string(
+        (std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>()));
     const bool valid =
         contains(exported, "J1\t10\t1\tP-BASE") &&
         contains(exported, "J1\t2\tP-DOM\tDomestic users") &&
