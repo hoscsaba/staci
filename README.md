@@ -163,7 +163,7 @@ with C++** workload, CMake, Git, and vcpkg.
 In PowerShell:
 
 ```powershell
-vcpkg install suitesparse:x64-windows hdf5:x64-windows pagmo2:x64-windows `
+vcpkg install suitesparse-umfpack:x64-windows hdf5:x64-windows pagmo2:x64-windows `
   eigen3:x64-windows igraph:x64-windows nlohmann-json:x64-windows
 
 cmake -S . -B build `
@@ -171,6 +171,10 @@ cmake -S . -B build `
 
 cmake --build build --config Release --parallel
 ```
+
+Install `suitesparse-umfpack` explicitly: the `suitesparse` umbrella package
+does not include UMFPACK by default. Its required SuiteSparse dependencies are
+installed automatically.
 
 If `VCPKG_ROOT` is not defined, replace it with the absolute path to the vcpkg
 checkout. The executables are normally in `build\Release\`, with `.exe` suffixes.

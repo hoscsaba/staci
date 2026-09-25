@@ -252,6 +252,15 @@ else()
         SUITESPARSE_CONFIG_LIBRARY
     )
 
+    if(NOT SuiteSparse_FOUND)
+        message(FATAL_ERROR
+            "SuiteSparse/UMFPACK development files were not found. "
+            "With vcpkg, install suitesparse-umfpack:x64-windows and configure "
+            "with the vcpkg toolchain; the suitesparse umbrella package does not "
+            "include UMFPACK by default. For other installations, set "
+            "CMAKE_PREFIX_PATH or SUITESPARSE_ROOT to the SuiteSparse prefix.")
+    endif()
+
     foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS ITEMS staci_core)
         target_include_directories(${staci_target} PRIVATE "${SUITESPARSE_INCLUDE_DIR}")
         target_link_libraries(${staci_target} PRIVATE

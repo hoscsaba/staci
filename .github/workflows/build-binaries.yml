@@ -44,7 +44,7 @@ jobs:
       - name: Install dependencies on Windows
         if: runner.os == 'Windows'
         shell: pwsh
-        run: vcpkg install suitesparse:x64-windows hdf5:x64-windows pagmo2:x64-windows eigen3:x64-windows igraph:x64-windows nlohmann-json:x64-windows
+        run: vcpkg install suitesparse-umfpack:x64-windows hdf5:x64-windows pagmo2:x64-windows eigen3:x64-windows igraph:x64-windows nlohmann-json:x64-windows
 
       - name: Configure on Linux or macOS
         if: runner.os != 'Windows'
