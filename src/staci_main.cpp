@@ -1,3 +1,5 @@
+#include "diagnostics.h"
+#include "epanet_reader.h"
 #include <ctime>
 #include <iostream>
 #include <iomanip>
@@ -10,9 +12,9 @@
 
 using namespace std;
 
-void solve_hydraulics(Staci&  feladat, double& time2, double& time3);
+bool solve_hydraulics(Staci&  feladat, double& time2, double& time3);
 
-int main(int argc, char* argv[]) {
+int run_staci(int argc, char* argv[]) {
 
 	// cout << endl << " STACI v2.0";
 	// cout << endl << " (c) BME Dept. of Hydrodynamic Systems";
@@ -26,8 +28,13 @@ int main(int argc, char* argv[]) {
 	Staci feladat(argc, argv);
 	endTime = clock();
 	timing.at(0) = double( endTime - startTime ) / CLOCKS_PER_SEC;
-	if (feladat.get_mode() == -1)
-		return 0;
+	if (feladat.get_mode() == -1) {
+        bool help = argc == 1;
+        for (int i=1; i<argc; ++i)
+            help = help || std::string(argv[i]) == "--help" || std::string(argv[i]) == "-h";
+        if (!help) throw diagnostics::Error("CLI.INPUT", "No valid operation selected. Supply an input file, for example: staci -s network.inp.");
+        return 0;
+    }
 
 	time_t start;
 	time(&start);
@@ -46,7 +53,7 @@ int main(int argc, char* argv[]) {
 	// Stacioner halozatszamitas
 	//----------------------------------------
 	if (feladat.get_mode() == 0) {
-		solve_hydraulics(feladat, timing.at(2), timing.at(3));
+		if (!solve_hydraulics(feladat, timing.at(2), timing.at(3))) return 1;
 		//feladat.solve_residence_time();
 	}
 
@@ -142,7 +149,7 @@ int main(int argc, char* argv[]) {
 		cout << endl << "property_ID : " << feladat.property_ID;
 
 		//feladat.set_do_save_file(false);
-		solve_hydraulics(feladat, timing.at(2), timing.at(3));
+		if (!solve_hydraulics(feladat, timing.at(2), timing.at(3))) return 1;
 
 		feladat.Compute_dxdmu();
 		feladat.Print_dxdmu();
@@ -173,7 +180,8 @@ int main(int argc, char* argv[]) {
 		try {
 			EpanetExtendedSimulation simulation(feladat.get_def_file(), feladat.new_def_file);
 			simulation.run(feladat);
-		} catch (const exception &error) {
+		} catch (const diagnostics::Error &) { throw; }
+        catch (const exception &error) {
 			cerr << "ERROR [EPANET][EPS]: " << error.what() << endl;
 			return 1;
 		}
@@ -219,13 +227,15 @@ int main(int argc, char* argv[]) {
 * @param double& time needed for saving the results
 * @date 2/28/2009 */
 
-void solve_hydraulics(Staci&  feladat, double& time2, double& time3) {
+bool solve_hydraulics(Staci&  feladat, double& time2, double& time3) {
 
 	clock_t startTime, endTime;
 
 	feladat.ini();
 	startTime = clock();
-	bool konv_ok = feladat.solve_system();
+	bool konv_ok = feladat.is_epanet_input()
+        ? solve_epanet_initial_hydraulics(feladat, feladat.get_def_file())
+        : feladat.solve_system();
 	endTime = clock();
 	time2 = double( endTime - startTime ) / CLOCKS_PER_SEC;
 
@@ -269,5 +279,10 @@ void solve_hydraulics(Staci&  feladat, double& time2, double& time3) {
 	time3 = double( endTime - startTime ) / CLOCKS_PER_SEC;
 
 	feladat.Statistics();
+	return konv_ok;
 
+}
+
+int main(int argc, char* argv[]) {
+    return diagnostics::run("staci", argc, argv, run_staci);
 }

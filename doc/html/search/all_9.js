@@ -1,4 +1,32 @@
 var searchData=
 [
-  ['jelleggorbesfojtas_0',['JelleggorbesFojtas',['../class_jelleggorbes_fojtas.html',1,'']]]
+  ['g_0',['g',['../class_agelem.html#ab382ba1135a9aae3a5fd817f5746be43',1,'Agelem']]],
+  ['general_20in_20memory_20matlab_20interface_1',['General in-memory MATLAB interface',['../md_doc_2staci__usage.html#general-in-memory-matlab-interface',1,'']]],
+  ['generated_20files_2',['Generated files',['../md_doc_2staci__usage.html#generated-files',1,'']]],
+  ['get_5faref_3',['Get_Aref',['../class_agelem.html#a47b441de19cf771363bf25e3f65fc228',1,'Agelem']]],
+  ['get_5fcsp_5fdb_4',['Get_Csp_db',['../class_agelem.html#ac22e9baaf66552cc60c1d5aa4f17c2ce',1,'Agelem']]],
+  ['get_5fcspe_5findex_5',['Get_Cspe_Index',['../class_agelem.html#a04dd7ea38bc9409b454da7bba81d9ac5',1,'Agelem']]],
+  ['get_5fcspe_5fnev_6',['Get_Cspe_Nev',['../class_agelem.html#af8805a7cf6c37899232e238d1faeb4aa',1,'Agelem']]],
+  ['get_5fcspv_5findex_7',['Get_Cspv_Index',['../class_agelem.html#a3a3728e971c8bc8e86657a2d578f2387',1,'Agelem']]],
+  ['get_5fcspv_5fnev_8',['Get_Cspv_Nev',['../class_agelem.html#a00ac3e9b7e68add609af6ef9574bb98e',1,'Agelem']]],
+  ['get_5fdprop_9',['Get_dprop',['../class_agelem.html#adc69e55efc0669bc87998508e70e87f1',1,'Agelem::Get_dprop()'],['../class_buko_mutargy.html#a10adde7c6b8d4a3dd62df7d3d154c065',1,'BukoMutargy::Get_dprop()'],['../class_csatorna.html#a3df4eb04fcccb2493b1398e1e8303e61',1,'Csatorna::Get_dprop()'],['../class_cso.html#a26b5af7ec15be11973e6a90e1d8ee51d',1,'Cso::Get_dprop()'],['../class_csomopont.html#a8fc8edacd08a31f0486b51e69f4fc3df',1,'Csomopont::Get_dprop()'],['../class_epanet_emitter.html#a6ae125025f5e5850d5b42fc69a6523ad',1,'EpanetEmitter::Get_dprop()'],['../class_epanet_power_pump.html#ae928877988302deecd19cc1caeec3d10',1,'EpanetPowerPump::Get_dprop()'],['../class_epanet_valve.html#a5feb608ee73cee0ccd6ac66e31866d98',1,'EpanetValve::Get_dprop()'],['../class_hydrant_outlet.html#ae5057f3487296e85c2bc89056ba6a5d2',1,'HydrantOutlet::Get_dprop()'],['../class_jelleggorbes_fojtas.html#a5129bbcbd1cbc5e4d0dccd5a9916224d',1,'JelleggorbesFojtas::Get_dprop()'],['../class_konst_nyomas.html#a1644f7ce667797c40f6b508f62a5a47e',1,'KonstNyomas::Get_dprop()'],['../class_szivattyu.html#a7dd3e107563a7193f505c6da9576dc55',1,'Szivattyu::Get_dprop()'],['../class_vegakna.html#a8c5ae777604e53a791e214bcb355f585',1,'Vegakna::Get_dprop()'],['../class_visszacsapo_szelep.html#a13109d8f3c3fa666790d35b566985e56',1,'VisszacsapoSzelep::Get_dprop()']]],
+  ['get_5ffogy_10',['Get_fogy',['../class_csomopont.html#a425443053bf8409b85f0419099177549',1,'Csomopont']]],
+  ['get_5ffolyterf_11',['Get_FolyTerf',['../class_csatorna.html#a9fbc1c6bdbf6fb68e11ddaf5f85db616',1,'Csatorna']]],
+  ['get_5fh_12',['Get_h',['../class_csomopont.html#a6f7e4bd2099fe3a7242eb7e8f1fe5e09',1,'Csomopont']]],
+  ['get_5fhead_5floss_13',['Get_head_loss',['../class_agelem.html#a9c448326eb07e271b4e2dc8a9dd2a0d9',1,'Agelem']]],
+  ['get_5fmp_14',['Get_mp',['../class_agelem.html#ab1bd05d137565c3a964e31598f8e2e71',1,'Agelem']]],
+  ['get_5fnev_15',['Get_nev',['../class_agelem.html#a84d1f499c225876e499a7ccccfa1c541',1,'Agelem::Get_nev()'],['../class_csomopont.html#a19f60c3f477657d8e5c46795b11bb01f',1,'Csomopont::Get_nev()']]],
+  ['get_5fp_16',['Get_p',['../class_csomopont.html#a17b75feaeae3493b7c8c5ed164693cd0',1,'Csomopont']]],
+  ['get_5fq_17',['Get_Q',['../class_agelem.html#a26d71146bf7bb2cde89ac5bfde045e59',1,'Agelem']]],
+  ['get_5frank_18',['Get_rank',['../class_csomopont.html#ac47dfdfb22091a645e66e1a575d20e2b',1,'Csomopont']]],
+  ['get_5fres_19',['Get_res',['../class_csatorna.html#a39041fa17a48f8e19ced4e466a5b38a4',1,'Csatorna']]],
+  ['get_5ftt_5fend_20',['Get_tt_end',['../class_agelem.html#a65596050a3f47d1afdd3fd24a30fe43d',1,'Agelem']]],
+  ['get_5ftt_5fstart_21',['Get_tt_start',['../class_agelem.html#ae7811ac45d172913eb4caaf2312295eb',1,'Agelem']]],
+  ['get_5fuser1_22',['Get_user1',['../class_agelem.html#a6c70af264d70582f5852ad595e12ef57',1,'Agelem::Get_user1()'],['../class_csomopont.html#a83dac1e52b1aa8b713a31c06419bf901',1,'Csomopont::Get_user1()']]],
+  ['get_5fuser2_23',['Get_user2',['../class_agelem.html#a9a42c82c3804294d6cf104f1a36c4038',1,'Agelem::Get_user2()'],['../class_csomopont.html#a952fbb74694ce3c409680de648201981',1,'Csomopont::Get_user2()']]],
+  ['get_5fv_24',['Get_v',['../class_agelem.html#a22269a8213c70e027d70e0f0b90c3df1',1,'Agelem::Get_v()'],['../class_csatorna.html#a3ba1d5f7174260da0fd502e27d3b33fb',1,'Csatorna::Get_v()']]],
+  ['gettype_25',['GetType',['../class_agelem.html#a666516b38ad643f2252040cbf5f9cd20',1,'Agelem::GetType()'],['../class_buko_mutargy.html#ae6899eda2c8e639bff5e113db8a82850',1,'BukoMutargy::GetType()'],['../class_csatorna.html#ac11b50c169bea9269007060e849982b2',1,'Csatorna::GetType()'],['../class_cso.html#a6eea941d56e713a96018c4705067e760',1,'Cso::GetType()'],['../class_epanet_emitter.html#ab2f91a4125cbfb8545cebf515b934adb',1,'EpanetEmitter::GetType()'],['../class_epanet_power_pump.html#a68e89f5f75c4ec461717ce7bb5e11fbb',1,'EpanetPowerPump::GetType()'],['../class_epanet_valve.html#a703eff363e5f8bd329f5ad98c0a8aff4',1,'EpanetValve::GetType()'],['../class_hydrant_outlet.html#a4587917bce764c589c5820058e92972a',1,'HydrantOutlet::GetType()'],['../class_jelleggorbes_fojtas.html#a6c3b4c6940a01d520fb278233847e3a4',1,'JelleggorbesFojtas::GetType()'],['../class_konst_nyomas.html#aa2051f05b80b4afff24946b074af01c2',1,'KonstNyomas::GetType()'],['../class_szivattyu.html#a534c89abc9a46501ed89086fe38d5888',1,'Szivattyu::GetType()'],['../class_vegakna.html#abaec8c76cd28480c323ab9648044f62e',1,'Vegakna::GetType()'],['../class_visszacsapo_szelep.html#ab953157720241b2814e186809f860b0e',1,'VisszacsapoSzelep::GetType()']]],
+  ['gpv_20implementation_20stage_26',['Historical PRV/FCV/GPV implementation stage',['../md_doc_2error__classification.html#historical-prvfcvgpv-implementation-stage',1,'']]],
+  ['gui_20diagnostics_27',['Common GUI diagnostics',['../index.html#common-gui-diagnostics',1,'']]],
+  ['guide_28',['STACI developer integration guide',['../md__r_e_a_d_m_e___d_e_v.html',1,'']]]
 ];

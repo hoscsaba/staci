@@ -1,3 +1,5 @@
+#include "diagnostics.h"
+#include "input_config.h"
 // #include <stdio.h>
 #include <vector>
 #include <sstream>
@@ -230,7 +232,15 @@ private:
 };
 
 
-int main(int argc, char **argv) {
+
+std::string settings_file;
+int run_application(int argc, char **argv) {
+    if (argc == 2 && std::string(argv[1]) == "--help") {
+        std::cout << "Usage: staci_split [--settings FILE.xml|FILE.json] [--seed N] [--diagnostics-file PATH]\n"
+                  << "Default: staci_split_settings.xml, or .json if XML is absent; relative paths use the working directory.\n";
+        return 0;
+    }
+    settings_file = input_config::settings_path(argc, argv, "staci_split_settings");
 
     obj_offset = 1.0;
     info = false;
@@ -272,7 +282,7 @@ int main(int argc, char **argv) {
         }
         else {
             cout << endl << endl << "ERROR: illegal weight_type: >" << weight_type << "<" << endl;
-            exit(-1);
+            diagnostics::fail_legacy(__FILE__, __LINE__);
         }
     }
 
@@ -617,7 +627,7 @@ void Optimize() {
     }
     else {
         cout << endl << "ERROR: !!bad obj_type value: " << obj_type << " !!!" << endl << endl;
-        exit(-1);
+        diagnostics::fail_legacy(__FILE__, __LINE__);
     }
 }
 
@@ -691,7 +701,7 @@ void Q_Optimize() {
     }
     else {
         cout << endl << endl << "ERROR: illegal weight_type: >" << weight_type << "<" << endl;
-        exit(-1);
+        diagnostics::fail_legacy(__FILE__, __LINE__);
     }
 
 
@@ -784,7 +794,7 @@ void Initializer(GAGenome & c) {
     }
     else {
         cout << endl << "ERROR: !!bad obj_type value: " << obj_type << " !!!" << endl << endl;
-        exit(-1);
+        diagnostics::fail_legacy(__FILE__, __LINE__);
     }
 }
 
@@ -877,7 +887,7 @@ int Mutator(GAGenome & c, float prob_mut) {
     }
     else {
         cout << endl << "ERROR: !!bad obj_type value: " << obj_type << " !!!" << endl << endl;
-        exit(-1);
+        diagnostics::fail_legacy(__FILE__, __LINE__);
 
     }
 }
@@ -1274,7 +1284,7 @@ double Objective(const Genome &c) {
     }
     else {
         cout << endl << "ERROR: !!bad obj_type value: " << obj_type << " !!!" << endl << endl;
-        exit(-1);
+        diagnostics::fail_legacy(__FILE__, __LINE__);
 
     }
     return std::numeric_limits<double>::infinity();
@@ -1609,7 +1619,7 @@ void LoadMatrices(MatrixXd & A, VectorXd & W, VectorXd & p, string weight_type) 
         }
         else {
             cout << endl << endl << "ERROR: illegal weight_type: >" << weight_type << "<" << endl;
-            exit(-1);
+            diagnostics::fail_legacy(__FILE__, __LINE__);
         }
         vector<double> node_weights;
         int n_nodes = wds->cspok.size();
@@ -1685,19 +1695,19 @@ void logfile_write(string msg, int debug_level) {
 
 void Load_Settings() {
 
-    XMLNode xMainNode = XMLNode::openFileHelper("staci_split_settings.xml", "settings");
-    global_debug_level = atoi(xMainNode.getChildNode("global_debug_level").getText());
-    n_comm = atoi(xMainNode.getChildNode("n_comm").getText());
-    weight_type = xMainNode.getChildNode("weight_type").getText();
-    weight_type_mod = xMainNode.getChildNode("weight_type_mod").getText();
-    fname = xMainNode.getChildNode("fname").getText();
-    logfilename = xMainNode.getChildNode("logfilename").getText();
-    obj_type = xMainNode.getChildNode("obj_type").getText();
+    input_config::Settings settings(settings_file);
+    global_debug_level = settings.integer("global_debug_level");
+    n_comm = settings.integer("n_comm");
+    weight_type = settings.text("weight_type");
+    weight_type_mod = settings.text("weight_type_mod");
+    fname = settings.text("fname");
+    logfilename = settings.text("logfilename");
+    obj_type = settings.text("obj_type");
 
-    popsize = atoi(xMainNode.getChildNode("popsize").getText());
-    ngen = atoi(xMainNode.getChildNode("ngen").getText());
-    pmut = atof(xMainNode.getChildNode("pmut").getText());
-    pcross = atof(xMainNode.getChildNode("pcross").getText());
+    popsize = settings.integer("popsize");
+    ngen = settings.integer("ngen");
+    pmut = settings.real("pmut");
+    pcross = settings.real("pcross");
 
     stringstream msg;
     msg.str("");
@@ -1731,19 +1741,19 @@ void Load_Settings() {
             cout << endl << "ERROR in Load_Settings() unknown weight_type >" << weight_type << "<";
             cout << endl << "obj_type = " << obj_type << " -> possible weigths: topology, dp, sensitivity";
             cout << endl << "Exiting..." << endl;
-            exit(-1);
+            diagnostics::fail_legacy(__FILE__, __LINE__);
         }
         else if ((obj_type == "A-optimality") || (obj_type == "D-optimality")) {
             cout << endl << "ERROR in Load_Settings() unknown weight_type >" << weight_type << "<";
             cout << endl << "obj_type = " << obj_type << " -> possible weigths: friction_coeff, diameter, demand";
             cout << "Exiting..." << endl;
-            exit(-1);
+            diagnostics::fail_legacy(__FILE__, __LINE__);
         }
         else {
             cout << endl << "ERROR in Load_Settings() unknown obj_type >" << obj_type << "<";
             cout << endl << "obj_type = " << obj_type << " -> possible weigths: modularity, A-optimality, D-optimality";
             cout << endl << "Exiting..." << endl;
-            exit(-1);
+            diagnostics::fail_legacy(__FILE__, __LINE__);
         }
     }
 
@@ -1918,4 +1928,8 @@ void save_state(const igraph_vector_int_t *v) {
     }
 
     wds->save_mod_prop_all_elements("concentration");
+}
+
+int main(int argc, char **argv) {
+    return diagnostics::run("staci_split", argc, argv, run_application);
 }

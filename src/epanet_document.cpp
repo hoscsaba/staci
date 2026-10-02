@@ -1,4 +1,5 @@
 #include "epanet_document.h"
+#include "diagnostics.h"
 
 #include <algorithm>
 #include <cctype>
@@ -38,7 +39,7 @@ std::vector<std::string> fields(const std::string &value) {
 EpanetDocument EpanetDocument::read(const std::string &filename) {
     std::ifstream input(filename.c_str(), std::ios::binary);
     if (!input)
-        throw std::runtime_error("Cannot open EPANET input file: " + filename);
+        throw diagnostics::Error("INPUT.FILE", "Cannot open EPANET input file: " + filename);
 
     EpanetDocument document;
     document.raw_text_.assign(std::istreambuf_iterator<char>(input),

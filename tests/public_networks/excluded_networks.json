@@ -1,0 +1,31 @@
+{
+  "description": "Excluded upstream files; metadata retained for provenance, not run by the standard corpus tests.",
+  "networks": [
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/exeter/wolf-3.inp",
+      "path": "owa/epanet-tests/exeter/wolf-3.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/exeter/wolf-3.inp",
+      "sha256": "e5be17714a80324e1e8ef434d95598c8b9459eafb6a35e28c31972dd9cdd4811",
+      "counts": {
+        "junctions": 1782,
+        "reservoirs": 4,
+        "tanks": 0,
+        "pipes": 1985,
+        "pumps": 6,
+        "valves": 4
+      },
+      "valve_types": [
+        "PRV"
+      ],
+      "expected": "nonconvergence",
+      "reason": "Valve model is supported; known hydraulic solver convergence limitation under the strict reference profile. A successful numerical match is accepted as an improvement.",
+      "reference_expected": "reference_numerical_failure",
+      "reference_reason": "The pinned official EPANET initial solver is unbalanced under both configured accuracy settings; no reliable numerical reference exists.",
+      "accept_solved_improvement": true,
+      "exclusion_reason": "Removed at user request: the pinned EPANET 2.2 solver fails to converge at both 1e-6 and 1e-5 accuracy with 1000 trials."
+    }
+  ]
+}

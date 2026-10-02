@@ -65,6 +65,7 @@ public:
     void save_mod_prop(bool is_general_property);
     void save_mod_prop_all_elements(string property_ID);
     void save_modified_network();
+    bool is_epanet_input() const { return has_epanet_document; }
     void export_epanet(const string &filename);
     bool solve_system();
     // RMS residual tolerances: edge head equations [m], node continuity [kg/s].

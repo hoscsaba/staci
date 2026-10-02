@@ -1,0 +1,20 @@
+{
+  "global_debug_level": 1,
+  "Staci_debug_level": 0,
+  "dir_name": "./",
+  "fname_prefix": "calibrate_network_",
+  "logfilename": "calibrate-test.log",
+  "best_logfilename": "calibrate-best.log",
+  "sollwert_dfile": "calibrate_targets.json",
+  "Start_of_Periods": 0,
+  "Num_of_Periods": 1,
+  "Spoil_Active_Pipes": false,
+  "dt": 1.0,
+  "weight_p_err": 1.0,
+  "type_of_pipe_selection": "largest_diameter",
+  "num_of_active_pipes": 1,
+  "popsize": 4,
+  "ngen": 1,
+  "pmut": 0.2,
+  "pcross": 0.8
+}

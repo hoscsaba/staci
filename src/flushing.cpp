@@ -1,3 +1,4 @@
+#include "diagnostics.h"
 #include "flushing.h"
 #include "HydrantOutlet.h"
 #include "Staci.h"
@@ -44,7 +45,7 @@ struct Input {
 };
 void require(bool condition, const std::string &message) {
   if (!condition)
-    throw std::runtime_error(message);
+    throw diagnostics::Error("FLUSH.INPUT", message);
 }
 std::string upper(std::string s) {
   for (char &c : s)
@@ -707,7 +708,10 @@ int execute(const Options &o) {
     manifest["baseline_max_mass_residual_kgs"] = initial.balance;
     manifest["baseline_max_edge_residual"] = initial.residual;
     write_json(o.output / "run.json", manifest);
-    throw std::runtime_error("Baseline failed: " + baseline_status);
+    throw diagnostics::Error("FLUSH.BASELINE", "Network '" + o.inp.string() + "': baseline failed: " + baseline_status +
+        "; minimum pressure head=" + std::to_string(initial.min_head) + " m" +
+        "; maximum mass residual=" + std::to_string(initial.balance) + " kg/s" +
+        "; maximum edge residual=" + std::to_string(initial.residual), diagnostics::calculation_error);
   }
   State baseline(s);
   std::map<std::string, double> base_v, max_v;
@@ -804,8 +808,11 @@ int execute(const Options &o) {
           best[id] = h.asset;
         }
       }
-    else
+    else {
       ++failures;
+      diagnostics::warning("FLUSH.SCENARIO", "Hydrant '" + h.asset + "' at node '" + h.node +
+                           "' excluded: " + state + "; network: " + o.inp.string());
+    }
     if (state == "ok") {
       std::vector<TravelArc> arcs;
       for (const auto &id : in.links) {
@@ -994,7 +1001,10 @@ int execute(const Options &o) {
   write_json(o.output / "run.json", manifest);
   std::cout << "Flushing complete: " << hydrants.size() << " scenarios, "
             << failures << " failed. Results: " << o.output << '\n';
-  return failures ? 2 : 0;
+  if (failures) diagnostics::error("FLUSH.PARTIAL_FAILURE", std::to_string(failures) +
+      " of " + std::to_string(hydrants.size()) + " hydrant scenarios were excluded; inspect FLUSH.SCENARIO warnings and " +
+      (o.output / "scenarios.csv").string());
+  return failures ? diagnostics::partial_failure : diagnostics::success;
 }
 } // namespace
 int run(int argc, char **argv) {
@@ -1013,17 +1023,17 @@ int run(int argc, char **argv) {
                  "kinetic head.\n"
                  "Each scenario opens one hydrant; network valve/pump states "
                  "remain fixed.\n"
-                 "Exit codes: 0 complete; 1 input/baseline error; 2 partial "
-                 "scenario failure.\n";
+                 "Exit codes: 0 complete; 1 calculation error; 2 input error; "
+                 "3 partial scenario failure.\n";
     return 0;
   }
+  Options options;
   try {
-    return execute(parse(argc, argv));
-  } catch (StaciException &e) {
-    std::cerr << "staci_flush: " << e.getDescription() << '\n';
-  } catch (const std::exception &e) {
-    std::cerr << "staci_flush: " << e.what() << '\n';
-  }
-  return 1;
+    options = parse(argc, argv);
+  } catch (const diagnostics::Error &) { throw; }
+    catch (const std::exception &error) {
+      throw diagnostics::Error("FLUSH.INPUT", error.what());
+    }
+  return execute(options);
 }
 } // namespace flushing

@@ -1,6 +1,11 @@
+#include "EpanetPowerPump.h"
+#include "EpanetEmitter.h"
+#include "EpanetValve.h"
+#include "diagnostics.h"
 #include <stdexcept>
 #include "Staci.h"
 #include "Csatorna.h"
+#include "Cso.h"
 #include <string.h>
 #include <cctype>
 #include <cmath>
@@ -11,6 +16,8 @@
 #include <stdexcept>
 #include <algorithm>
 #include <array>
+#include <unordered_map>
+#include <unordered_set>
 #include <limits>
 #include "StaciException.h"
 #include "data_io.h"
@@ -56,6 +63,7 @@ struct val_and_ID {
 bool comparison_function1(const val_and_ID& lhs, const val_and_ID& rhs ) { return lhs.val > rhs.val; }
 
 Staci::Staci(int argc, char *argv[]) {
+  van_ini = false;
   mode = -1;
   quiet_mode = false;
   debug_level = 1;
@@ -67,6 +75,7 @@ Staci::Staci(int argc, char *argv[]) {
 }
 
 Staci::Staci(string spr_filename, bool quiet) {
+  van_ini = false;
   mode = 0;
   quiet_mode = quiet;
   debug_level = quiet_mode ? 0 : 1;
@@ -98,8 +107,6 @@ void Staci::SetInitialParameters() {
   logfile_write(m_ss.str(), 1);
   m_ss.str("");
 
-  van_ini = false;
-
   m_nnz = 0; /*!< Number of nonzero entries of the Jacobian. */
   // az adatfile olvasasa
   if (mode >= 0) {
@@ -110,7 +117,13 @@ void Staci::SetInitialParameters() {
     ss << endl << " Loading system...";
     logfile_write(ss.str(), 1);
 
+    // A rejected new solve must not leave an earlier success marker behind.
+    if (mode == 0 || mode == 6) {
+      std::remove((def_file + ".rrs").c_str());
+      if (has_inp_extension(def_file)) std::remove((def_file + ".hydraulics.json").c_str());
+    }
     data_io datta_io(def_file.c_str(), mode == 9 || mode == 10);
+    if (mode == 0 || mode == 6) datta_io.validate_hydraulic_compatibility();
     datta_io.load_system(owned_cspok, owned_agelemek);
     rebuild_network_views();
     if (const EpanetDocument *document = datta_io.get_epanet_document()) {
@@ -138,6 +151,7 @@ void Staci::SetInitialParameters() {
     // cout<<endl<<"\te_p_max      => "<<e_p_max;
 
     e_mp_max = atof(datta_io.read_setting("e_mp_max").c_str());
+    diagnostics::apply_solver_overrides(e_p_max, e_mp_max, iter_max);
     // cout<<endl<<"\te_mp_max     => "<<e_mp_max;
 
     m_relax = atof(datta_io.read_setting("relax").c_str());
@@ -239,7 +253,7 @@ void Staci::get_command_line_options(int argc, char *argv[]) {
   opt->addUsage(
     "\t\t -s  (--stac) <halofile>.spr|.inp      Definicios file, kotelezo");
   opt->addUsage(
-    "\t\t -i  (--ini) <resfile>.xml             Inicializacios file, nem "
+    "\t\t -i  (--ini) <resfile>.xml|.json       Inicializacios file, nem "
     "kotelezo");
   opt->addUsage(" ");
   opt->addUsage("\t tartozkodasi ido szamitasa: ");
@@ -560,7 +574,7 @@ double Staci::m_get_dprop() {
          << "ERROR!!! Staci::m_get_dprop(): node/edge not found: " << element_ID
          << endl
          << endl;
-    exit(-1);
+    diagnostics::fail_legacy(__FILE__, __LINE__);
   } else {
     if (!prop_megvan) {
       cout << endl
@@ -569,7 +583,7 @@ double Staci::m_get_dprop() {
            << ", property not found: " << property_ID << endl;
       cout << "  edges: diameter|mass_flow_rate|bottom_level|water_level|position|minor_loss|tcv_setting|tcv_minor_loss|status|check_valve|power|effective_power|speed|base_speed|speed_pattern_length|efficiency_curve_points|head_curve_points" << endl;
       cout << "  nodes: pressure|head|demand" << endl << endl;
-      exit(-1);
+      diagnostics::fail_legacy(__FILE__, __LINE__);
     } else
       return outdata;
   }
@@ -641,7 +655,7 @@ void Staci::m_set_dprop() {
          << "HIBA!!! Staci::m_set_dprop(): Nincs ilyen elem: " << element_ID
          << endl
          << endl;
-    exit(-1);
+    diagnostics::fail_legacy(__FILE__, __LINE__);
   }
   if (!prop_megvan) {
     cout << endl
@@ -649,7 +663,7 @@ void Staci::m_set_dprop() {
          << "HIBA!!! Staci::m_set_dprop(): Elem: " << element_ID
          << ", nincs ilyen adat: " << property_ID << endl
          << endl;
-    exit(-1);
+    diagnostics::fail_legacy(__FILE__, __LINE__);
   }
 }
 
@@ -731,7 +745,7 @@ double Staci::get_dprop(string in_element_ID, string in_property_ID) {
          << "HIBA!!! Staci::m_get_dprop(): Nincs ilyen elem: " << in_element_ID
          << endl
          << endl;
-    exit(-1);
+    diagnostics::fail_legacy(__FILE__, __LINE__);
   } else {
     if (!prop_megvan) {
       cout << endl
@@ -739,7 +753,7 @@ double Staci::get_dprop(string in_element_ID, string in_property_ID) {
            << "HIBA!!! Staci::m_get_dprop(): Elem: " << in_element_ID
            << ", nincs ilyen adat: " << in_property_ID << endl
            << endl;
-      exit(-1);
+      diagnostics::fail_legacy(__FILE__, __LINE__);
     } else
       return outdata;
   }
@@ -811,7 +825,7 @@ void Staci::set_dprop(string in_element_ID, string in_property_ID,
          << "HIBA!!! Staci::m_set_dprop(): Nincs ilyen elem: " << in_element_ID
          << endl
          << endl;
-    exit(-1);
+    diagnostics::fail_legacy(__FILE__, __LINE__);
   }
   if (!prop_megvan) {
     cout << endl
@@ -819,171 +833,41 @@ void Staci::set_dprop(string in_element_ID, string in_property_ID,
          << "HIBA!!! Staci::m_set_dprop(): Elem: " << in_element_ID
          << ", nincs ilyen adat: " << in_property_ID << endl
          << endl;
-    exit(-1);
+    diagnostics::fail_legacy(__FILE__, __LINE__);
   }
 }
 
 //--------------------------------------------------------------
 void Staci::build_system() {
-  ostringstream msg1;
-
-  bool stop = false;
-
-  msg1 << endl << " Building system...";
-  logfile_write(msg1.str(), 1);
-  msg1.str("");
-
-  logfile_write("\n Azonos ID-k keresese....", 3);
-  // ELEMEK
-  string nev1, nev2;
-  // int szam = 0;
-  for (unsigned int i = 0; i < agelemek.size(); i++) {
-    /*printf("\n i=%d",i); cin.get();*/
-    // szam = 0;
-    nev1 = agelemek.at(i)->Get_nev();
-    /*cout<<endl<<nev1;
-    cin.get();*/
-    for (unsigned int j = 0; j < agelemek.size(); j++) {
-      nev2 = agelemek.at(j)->Get_nev();
-      // cout<<"\n\t"<<nev1 <<"?=?"<<nev2;
-      if (i != j) {
-        if (nev1 == nev2) {
-          ostringstream msg;
-          msg << "\n !!!ERROR!!! edge #" << i << ": " << nev1 << " and edge #" << j << ": " << nev2 << " with same ID!" << endl;
-          // cout << msg.str();
-          logfile_write(msg.str(), 1);
-          stop = true;
-        }
-      }
-    }
-
-    for (unsigned int j = 0; j < cspok.size(); j++) {
-      nev2 = cspok.at(j)->Get_nev();
-      // cout<<"\n\t"<<nev1 <<"?=?"<<nev2;
-      if (i != j) {
-        if (nev1 == nev2) {
-          ostringstream msg;
-          msg << "\n !!!ERROR!!! edge #" << i << ": " << nev1 << " and node #" << j << ": " << nev2 << " with same ID!" << endl;
-          // cout << msg.str();
-          logfile_write(msg.str(), 1);
-          stop = true;
-        }
-      }
-    }
+  edge.clear();
+  std::unordered_map<std::string, int> node_indices;
+  std::unordered_set<std::string> edge_ids;
+  for (std::size_t i = 0; i < cspok.size(); ++i) {
+    auto *node = cspok[i];
+    if (!node_indices.emplace(node->Get_nev(), static_cast<int>(i)).second)
+      throw diagnostics::Error("INPUT.DUPLICATE_ID", "Duplicate node ID '" + node->Get_nev() + "'.");
+    node->Set_index(static_cast<int>(i));
+    node->ag_be.clear(); node->ag_ki.clear();
   }
-
-  if (stop)
-    exit(-1);
-  else
-    logfile_write("\t ok.", 3);
-
-  logfile_write("\n\n Rendszer epitese...", 3);
-  bool e_megvan = false;
-  bool v_megvan = false;
-  unsigned int j = 0;
-  int cspe = -1, cspv = -1;
-  ostringstream strstrm;
-
-  // az vege csp. nem mindig kell...
-  for (unsigned int i = 0; i < agelemek.size(); i++) {
-    /*cout << "\n\t" << agelemek[i]->Get_nev() << ":\tcspe:";*/
-
-    e_megvan = false;
-    j = 0;
-    while ((j < cspok.size()) && (!e_megvan)) {
-      // log
-      strstrm.str("");
-      strstrm << "\n\t" << agelemek[i]->Get_nev().c_str()
-              << " cspe: " << agelemek[i]->Get_Cspe_Nev().c_str() << " =? "
-              << cspok[j]->Get_nev().c_str();
-      logfile_write(strstrm.str(), 5);
-      // cout<<strstrm.str();
-      // cout << strstrm.str();
-      if ((agelemek[i]->Get_Cspe_Nev()).compare(cspok[j]->Get_nev()) == 0) {
-        e_megvan = true;
-        cspe = j;
-        cspok.at(j)->Set_index(j); // WR indexing the nodes
-        cspok[j]->ag_ki.push_back(i);
-        // log
-        //                logfile_write(" OK", 3);
-        //                 strstrm.str("");
-        //                 strstrm << "\n\t" << agelemek[i]->Get_nev() << "
-        //                 cspe: "
-        //                         << agelemek[i]->Get_Cspe_Nev() << " OK ";
-        //                 logfile_write(strstrm.str(), 4);
-        //                cout<<strstrm.str();
-      }
-      j++;
+  for (std::size_t i = 0; i < agelemek.size(); ++i) {
+    auto *edge = agelemek[i];
+    const auto id = edge->Get_nev();
+    if (!edge_ids.insert(id).second || (!has_epanet_document && node_indices.count(id)))
+      throw diagnostics::Error("INPUT.DUPLICATE_ID", "Duplicate edge/node ID '" + id + "'.");
+    const auto from = node_indices.find(edge->Get_Cspe_Nev());
+    if (from == node_indices.end())
+      throw diagnostics::Error("INPUT.ENDPOINT", "Edge '" + id + "': unknown upstream node '" + edge->Get_Cspe_Nev() + "'.");
+    int to_index = -1;
+    if (edge->Get_Csp_db() == 2) {
+      const auto to = node_indices.find(edge->Get_Cspv_Nev());
+      if (to == node_indices.end())
+        throw diagnostics::Error("INPUT.ENDPOINT", "Edge '" + id + "': unknown downstream node '" + edge->Get_Cspv_Nev() + "'.");
+      to_index = to->second;
+      cspok[to_index]->ag_be.push_back(static_cast<int>(i));
+      Add_edge(from->second, to_index);
     }
-    if (!e_megvan) {
-      strstrm.str("");
-      strstrm << "\n!!! Nincs meg a " << agelemek[i]->Get_nev().c_str()
-              << " agelem eleji csomopont: " << agelemek[i]->Get_Cspe_Nev()
-              << " !!!";
-      logfile_write(strstrm.str(), 1);
-      // cout << strstrm.str();
-      StaciException csphiba(strstrm.str());
-      throw csphiba;
-    } else {
-      //        strstrm.str("");
-      //        strstrm<<"\n\t"<<agelemek[i]->Get_nev()<<" cspe: "<<cspe;
-      //        cout<<strstrm.str();
-    }
-
-    // cout<<"\tcspv: ";
-    if (agelemek[i]->Get_Csp_db() == 2) {
-      v_megvan = false;
-      j = 0;
-      while ((j < cspok.size()) && (!v_megvan)) {
-        // log
-        //                      strstrm.str("");
-        //                      strstrm << "\n\t"<<agelemek[i]->Get_nev()<<"
-        //                      cspv: "
-        //                          <<agelemek[i]->Get_Cspv_Nev()<<" =?
-        //                          "<<cspok[j]->Get_nev();
-        //                      logfile_write(strstrm.str(), 3);
-        //                      cout<<strstrm.str();
-        if ((agelemek[i]->Get_Cspv_Nev()).compare(cspok[j]->Get_nev()) == 0) {
-          v_megvan = true;
-          cspv = j;
-          cspok.at(j)->Set_index(j); // WR: indexing the nodes
-          cspok[j]->ag_be.push_back(i);
-          // log
-          //                                logfile_write(" OK", 3);
-          //                                strstrm.str("");
-          //                                strstrm<<"\n\t"<<agelemek[i]->Get_nev()<<"
-          //                                cspv: "
-          //                                   <<agelemek[i]->Get_Cspv_Nev()<<"
-          //                                   OK ";
-          //                                logfile_write(strstrm.str(), 3);
-          ////                                cout<<strstrm.str();
-        }
-        j++;
-      }
-      if (!v_megvan) {
-        strstrm.str("");
-        strstrm << "\n!!! Nincs meg a " << agelemek[i]->Get_nev().c_str()
-                << " agelem vegi csomopont!";
-        logfile_write(strstrm.str(), 1);
-        // cout << strstrm.str();
-      } else {
-        //      strstrm.str("");
-        //      strstrm<<"\n\t"<<agelemek[i]->Get_nev()<<" cspv: "<<cspv;
-        //      cout<<strstrm.str();
-      }
-    } else {
-      strstrm.str("");
-      strstrm << "\n\t" << agelemek[i]->Get_nev().c_str() << " cspv: - "
-              << cspv;
-      //        cout<<strstrm.str();
-    }
-
-    if (agelemek[i]->Get_Csp_db() == 2) {
-      agelemek[i]->add_csp(cspe, cspv);
-      Add_edge(cspe, cspv); // WR: collecting the edge vector for igraph
-    }
-    else
-      agelemek[i]->add_csp(cspe, -1);
+    cspok[from->second]->ag_ki.push_back(static_cast<int>(i));
+    edge->add_csp(from->second, to_index);
   }
 
   // Surlodas beallitasa
@@ -993,9 +877,7 @@ void Staci::build_system() {
 
   logfile_write("\t ok.", 3);
 
-  msg1.str("");
-  msg1 << " ready." << endl;
-  logfile_write(msg1.str(), 1);
+  logfile_write(" ready.\n", 1);
 
 }
 
@@ -1197,7 +1079,7 @@ void Staci::export_epanet(const string &filename) {
       EpanetWriter::write(filename, cspok, agelemek, friction_model);
   } catch (const exception &error) {
     cerr << "ERROR [EPANET][EXPORT]: " << error.what() << endl;
-    exit(-1);
+    diagnostics::fail_legacy(__FILE__, __LINE__);
   }
 }
 
@@ -1224,7 +1106,7 @@ void Staci::save_modified_network() {
     save_mod_prop(false);
   } catch (const exception &error) {
     cerr << "ERROR [NETWORK][MODIFY]: " << error.what() << endl;
-    exit(-1);
+    diagnostics::fail_legacy(__FILE__, __LINE__);
   }
 }
 
@@ -1279,7 +1161,8 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern) {
   }
 
   for (unsigned int i = 0; i < cspok.size(); i++) {
-    f[agelemek.size() + i] = -cspok[i]->Get_fogy();
+    f[agelemek.size() + i] = -cspok[i]->DeliveredDemand();
+    m_Ax[sparse_position(agelemek.size()+i,agelemek.size()+i)] = -cspok[i]->DemandDerivative();
     for (unsigned int j = 0; j < cspok[i]->ag_be.size(); j++) {
       f[agelemek.size() + i] += agelemek[cspok[i]->ag_be.at(j)]->Get_mp();
     }
@@ -1326,7 +1209,7 @@ void Staci::build_vectors(Vec_DP &x, Vec_DP &f, bool create_sparse_pattern) {
   //   ostringstream msg1;
   //   msg1 << endl
   //        << " Number of nonzero Jacobian entries: " << m_nnz << " out of "
-  //        << (N * N);
+  //        << (static_cast<long long>(N) * N);
   //   msg1 << " (" << ((((double)m_nnz) / N / N) * 100) << "%)" << endl;
   //   // msg1 << endl << " Jacobian size check : m_jac.capacity()=" <<
   //   // m_jac.capacity();
@@ -1353,6 +1236,8 @@ void Staci::build_sparse_pattern() {
       column_rows[edge_count + end_node].push_back(edge);
     }
   }
+
+  for(int node=0;node<node_count;++node) column_rows[edge_count+node].push_back(edge_count+node);
 
   m_Ap.assign(n + 1, 0);
   m_Ai.clear();
@@ -1449,7 +1334,7 @@ void Staci::build_vectors_frozen_Jacobian(Vec_DP &x, Vec_DP &f) {
   }
 
   for (unsigned int i = 0; i < cspok.size(); i++) {
-    f[agelemek.size() + i] = -cspok[i]->Get_fogy();
+    f[agelemek.size() + i] = -cspok[i]->DeliveredDemand();
     for (unsigned int j = 0; j < cspok[i]->ag_be.size(); j++)
       f[agelemek.size() + i] += agelemek[cspok[i]->ag_be.at(j)]->Get_mp();
 
@@ -1487,6 +1372,18 @@ bool Staci::solve_system() {
   for (auto *edge : agelemek)
     if (auto *channel = dynamic_cast<Csatorna *>(edge)) channels.push_back(channel);
   const bool has_channels = !channels.empty();
+  bool has_control_valves=false;
+  for(auto* edge : agelemek) has_control_valves = has_control_valves || dynamic_cast<EpanetValve*>(edge)!=nullptr;
+  for(auto* edge:agelemek) if(auto* pump=dynamic_cast<EpanetPowerPump*>(edge)) {
+    if(pump->Get_dprop("status")<=0) continue;
+    auto* downstream=cspok[pump->Get_Cspv_Index()];
+    if(downstream->Get_fogy()==0 && downstream->ag_ki.empty() && downstream->ag_be.size()==1)
+      diagnostics::warning("EPANET.POWER_PUMP_DEAD_END","Network '"+def_file+"': constant-power pump '"+pump->Get_nev()+"' discharges into terminal junction '"+downstream->Get_nev()+"' with no demand or outlet. Continuity requires zero flow, but a running constant-power pump requires nonzero flow; no finite steady operating point exists. Stop the pump or provide a physical discharge path in the model.");
+  }
+  bool has_pressure_outlets=false;
+  for(auto* node:cspok) has_pressure_outlets=has_pressure_outlets || node->HasPressureDemand();
+  for(auto* edge:agelemek) has_pressure_outlets=has_pressure_outlets || dynamic_cast<EpanetEmitter*>(edge)!=nullptr;
+  const bool safeguarded_newton=has_control_valves || has_pressure_outlets;
   // A common pressure guess can lie below elevated channel beds. Obtain a
   // wet, mass-balanced starting point before switching to the full GVF model.
   // Never replace a caller-supplied initialization. Bound the preliminary
@@ -1530,7 +1427,7 @@ bool Staci::solve_system() {
     if (debug_level > 0) progress_file_write((double)iter / iter_max * 100.0);
 
     bool used_frozen_jacobian = false;
-    if (has_channels || iter == 0 || (e_mp > 0.1 || e_p > 0.1) || (iter % 5 == 0))
+    if (has_channels || safeguarded_newton || iter == 0 || (e_mp > 0.1 || e_p > 0.1) || (iter % 5 == 0))
       build_vectors(x, f, !m_sparse_pattern_valid);
     else {
       build_vectors_frozen_Jacobian(x, f);
@@ -1562,13 +1459,73 @@ bool Staci::solve_system() {
       finish_initialization(konv_ok);
       continue;
     }
-    if (konv_ok)
-      break;
+    if (konv_ok) {
+      bool changed = false;
+      for (auto* edge : agelemek) if (auto* valve = dynamic_cast<EpanetValve*>(edge)) {
+        auto* a=cspok[valve->Get_Cspe_Index()];auto* b=cspok[valve->Get_Cspv_Index()];
+        changed = valve->update_status({a->Get_p(),b->Get_p(),a->Get_h(),b->Get_h()}) || changed;
+      }
+      if (!changed) {
+        for(auto* edge : agelemek) {
+          if(auto* valve=dynamic_cast<EpanetValve*>(edge)) valve->report_operating_status();
+          if(auto* emitter=dynamic_cast<EpanetEmitter*>(edge)) emitter->ReportOperatingStatus();
+        }
+        break;
+      }
+      konv_ok=false;
+      m_relax=initial_relax;
+      e_mp_r=e_p_r=1e10;
+      build_vectors(x,f,false);
+      compute_error(f,e_mp,e_p,e_mp_r,e_p_r,konv_ok);
+      konv_ok=false;
+    }
 
-    if (iter > 0)
-      update_relax(e_mp, e_p, e_mp_r, e_p_r);
+    if (safeguarded_newton) m_relax=1.0;
+    else if (iter > 0) update_relax(e_mp, e_p, e_mp_r, e_p_r);
 
     comp_ok = umfpack_solver(x, f);
+    if (comp_ok && safeguarded_newton) {
+      // Backtrack Newton steps against the actual residual, retaining the best
+      // finite trial. Valve status remains fixed during this line search.
+      vector<double> correction(N);
+      for(unsigned int i=0;i<agelemek.size();++i) correction[i]=agelemek[i]->Get_mp()-x[i];
+      for(unsigned int i=0;i<cspok.size();++i) correction[agelemek.size()+i]=cspok[i]->Get_p()-x[agelemek.size()+i];
+      Vec_DP trial_x(N),trial_f(N);
+      // Fixed 1 m / 1 kg/s merit scales let continuity improve while the
+      // pressure-dependent demand changes. Final tolerances remain unchanged.
+      const double head_merit_scale=has_pressure_outlets ? max(1.0,e_p_max) : e_p_max;
+      const double mass_merit_scale=has_pressure_outlets ? max(1.0,e_mp_max) : e_mp_max;
+      auto norm = [&](const Vec_DP& values) {
+        double error=0;
+        for(int i=0;i<N;++i) {
+          double scale=i<static_cast<int>(agelemek.size()) ? head_merit_scale : mass_merit_scale;
+          double value=values[i]/scale;
+          if(!isfinite(value)) return numeric_limits<double>::infinity();
+          error+=value*value;
+        }
+        return error;
+      };
+      const double before=norm(f);
+      // A running constant-power pump requires forward flow: crossing zero
+      // would select an unphysical reverse-flow root of P = rho*g*Q*dH.
+      double maximum_fraction=1;
+      for(unsigned int i=0;i<agelemek.size();++i)
+        if(auto* pump=dynamic_cast<EpanetPowerPump*>(agelemek[i]))
+          if(pump->Get_dprop("status")>0 && x[i]>0 && correction[i]<0)
+            maximum_fraction=min(maximum_fraction,0.99*x[i]/(-correction[i]));
+      double best=numeric_limits<double>::infinity(),best_fraction=maximum_fraction;
+      for(int backtrack=0;backtrack<=12;++backtrack) {
+        const double fraction=maximum_fraction*std::pow(0.5,backtrack);
+        for(unsigned int i=0;i<agelemek.size();++i) agelemek[i]->Set_mp(x[i]+fraction*correction[i]);
+        for(unsigned int i=0;i<cspok.size();++i) cspok[i]->Set_p(x[agelemek.size()+i]+fraction*correction[agelemek.size()+i]);
+        build_vectors_frozen_Jacobian(trial_x,trial_f);
+        double error=norm(trial_f);
+        if(error<best) {best=error;best_fraction=fraction;}
+        if(error<before) break;
+      }
+      for(unsigned int i=0;i<agelemek.size();++i) agelemek[i]->Set_mp(x[i]+best_fraction*correction[i]);
+      for(unsigned int i=0;i<cspok.size();++i) cspok[i]->Set_p(x[agelemek.size()+i]+best_fraction*correction[agelemek.size()+i]);
+    }
     if (comp_ok && initializing_channels) {
       double fraction = 1.0;
       for (unsigned int i = 0; i < cspok.size(); ++i) {
@@ -1609,8 +1566,58 @@ bool Staci::solve_system() {
     compute_error(f, e_mp, e_p, e_mp_r, e_p_r, konv_ok);
   }
 
-  if (!konv_ok)
+  bool valve_constraint_failed = false;
+  for (auto *edge : agelemek) {
+    if (auto *valve = dynamic_cast<EpanetValve *>(edge)) {
+      const std::string violation = valve->operating_violation();
+      if (!violation.empty()) {
+        diagnostics::error("HYDRAULICS.VALVE_CONSTRAINT", "Network '" + def_file + "': " + violation);
+        valve_constraint_failed = true;
+        konv_ok = false;
+      }
+    }
+  }
+  if (!konv_ok) {
     print_worst_iter(x, f, 1);
+    std::ostringstream diagnostic;
+    diagnostic << "ERROR [HYDRAULICS][NONCONVERGENCE] Network '" << def_file
+               << "': " << (valve_constraint_failed ? "physical valve constraint violated" :
+                   (comp_ok ? "iteration limit reached" : "sparse linear system could not be solved"))
+               << " after " << iter << " iterations. RMS head residual=" << e_p
+               << " m (limit " << e_p_max << "), RMS continuity residual=" << e_mp
+               << " kg/s (limit " << e_mp_max << ").\n";
+    if (!agelemek.empty()) {
+      std::size_t worst = 0;
+      for (std::size_t i = 1; i < agelemek.size(); ++i)
+        if (!std::isfinite(f[i]) || std::abs(f[i]) > std::abs(f[worst])) worst = i;
+      diagnostic << "  Worst link '" << agelemek[worst]->Get_nev()
+                 << "': head-equation residual=" << f[worst] << " m.\n";
+    }
+    if (!cspok.empty()) {
+      std::size_t worst = 0;
+      for (std::size_t i = 1; i < cspok.size(); ++i)
+        if (!std::isfinite(f[agelemek.size() + i]) ||
+            std::abs(f[agelemek.size() + i]) > std::abs(f[agelemek.size() + worst])) worst = i;
+      diagnostic << "  Worst node '" << cspok[worst]->Get_nev()
+                 << "': continuity residual=" << f[agelemek.size() + worst] << " kg/s.\n";
+    }
+    for (Agelem *edge : agelemek)
+      if (auto *pipe = dynamic_cast<Cso *>(edge)) {
+        const double diameter = pipe->Get_dprop("diameter");
+        if (diameter > 0.0 && diameter < 1.0e-5) {
+          diagnostic << "  Pipe '" << edge->Get_nev() << "' has a very small diameter ("
+                     << diameter << " m), which can make hydraulic equations ill-conditioned. "
+                     << "Check whether it represents a practically closed/design-candidate pipe.\n";
+          break;
+        }
+      }
+    diagnostic << "  Check source connectivity, closed/check-valve links, pump operating points and demand feasibility. "
+               << "This is a numerical hydraulic failure; it does not by itself prove an unsupported element. "
+               << "See the .ros solver log for iteration details.\n";
+    diagnostics::error("HYDRAULICS.NONCONVERGENCE", diagnostic.str());
+    std::ofstream diagnostic_log(out_file.c_str(), std::ios::app);
+    diagnostic_log << diagnostic.str();
+  }
 
   if (konv_ok) {
     for (Agelem *edge : agelemek)
@@ -1776,7 +1783,8 @@ bool Staci::solve_system_old() {
     }
 
     for (unsigned int i = 0; i < cspok.size(); i++) {
-      f[agelemek.size() + i] = -cspok[i]->Get_fogy();
+      f[agelemek.size() + i] = -cspok[i]->DeliveredDemand();
+      jac[agelemek.size()+i][agelemek.size()+i] = -cspok[i]->DemandDerivative();
       for (unsigned int j = 0; j < cspok[i]->ag_be.size(); j++) {
         f[agelemek.size() + i] += agelemek[cspok[i]->ag_be.at(j)]->Get_mp();
         jac[agelemek.size() + i][cspok[i]->ag_be.at(j)] = +1.0;
@@ -2036,6 +2044,7 @@ void Staci::ini() {
     strstrm << endl << "\tedge mass flow rates:\t" << mp_init << " kg/s ...";
     for (unsigned int i = 0; i < agelemek.size(); i++)
       agelemek.at(i)->Ini(1., mp_init);
+    for(auto* edge:agelemek) if(auto* emitter=dynamic_cast<EpanetEmitter*>(edge)) emitter->InitializePressure(cspok[edge->Get_Cspe_Index()]->Get_p());
 
   } else {
     strstrm << endl
@@ -2525,7 +2534,7 @@ bool Staci::solve_sparse_system(const vector<double> &rhs,
   if (!m_numeric_factorization_valid) {
     m_eigen_solver->factorize(matrix);
     if (m_eigen_solver->info() != Eigen::Success) {
-      logfile_write("\nERROR: Eigen numeric factorization failed.\n", 1);
+      diagnostics::error("HYDRAULICS.LINEAR_SOLVE", "Network '" + def_file + "': Eigen numeric factorization failed.");
       return false;
     }
     m_numeric_factorization_valid = true;
@@ -2533,7 +2542,7 @@ bool Staci::solve_sparse_system(const vector<double> &rhs,
   const Eigen::Map<const Eigen::VectorXd> right_hand_side(rhs.data(), n);
   const Eigen::VectorXd solved = m_eigen_solver->solve(right_hand_side);
   if (m_eigen_solver->info() != Eigen::Success || !solved.allFinite()) {
-    logfile_write("\nERROR: Eigen sparse solve failed.\n", 1);
+    diagnostics::error("HYDRAULICS.LINEAR_SOLVE", "Network '" + def_file + "': Eigen sparse solve failed or returned non-finite values.");
     return false;
   }
   solution.assign(solved.data(), solved.data() + solved.size());
@@ -2566,8 +2575,18 @@ bool Staci::solve_sparse_system(const vector<double> &rhs,
     if (status != UMFPACK_OK || numeric == nullptr) {
       if (numeric != nullptr)
         umfpack_di_free_numeric(&numeric);
-      logfile_write("\nERROR: UMFPACK numeric factorization failed (status " +
-                        to_string(status) + ").\n", 1);
+      std::ostringstream message;
+      message << "ERROR [HYDRAULICS][LINEAR_SOLVE] Network '" << def_file
+              << "': UMFPACK numeric factorization failed (status " << status << "). ";
+      if (status == UMFPACK_WARNING_singular_matrix)
+        message << "The hydraulic Jacobian is singular: the current linearized equations do not determine a unique correction. "
+                << "Check isolated nodes, closed source paths and zero/degenerate link derivatives.";
+      else
+        message << "The sparse matrix could not be factorized; check non-finite hydraulic coefficients and available memory.";
+      message << "\n";
+      diagnostics::error("HYDRAULICS.LINEAR_SOLVE", message.str());
+      std::ofstream failure_log(out_file.c_str(), std::ios::app);
+      failure_log << message.str();
       return false;
     }
     m_umfpack_numeric.reset(numeric);
@@ -2575,9 +2594,10 @@ bool Staci::solve_sparse_system(const vector<double> &rhs,
     const double reciprocal_condition = info[UMFPACK_RCOND];
     if (isfinite(reciprocal_condition) && reciprocal_condition > 0.0 &&
         reciprocal_condition < 1.0e-14) {
-      logfile_write("\nWARNING: UMFPACK reports an ill-conditioned Jacobian "
-                    "(estimated reciprocal condition " +
-                        to_string(reciprocal_condition) + ").\n", 1);
+      std::ostringstream message;
+      message << "Network '" << def_file << "': UMFPACK reports an ill-conditioned hydraulic Jacobian "
+              << "(estimated reciprocal condition " << reciprocal_condition << ").";
+      diagnostics::warning("HYDRAULICS.ILL_CONDITIONED", message.str());
     }
   }
 
@@ -2927,7 +2947,7 @@ void Staci::Compute_Sensitivity_Matrix(string parameter, int scale) {
          << parameter;
     cout << "\n possible values: diameter|friction_coeff|demand" << endl
          << endl;
-    exit(-1);
+    diagnostics::fail_legacy(__FILE__, __LINE__);
   }
 
   SM_row_name.clear();
@@ -3697,7 +3717,7 @@ void Staci::Statistics() {
   m_ss << "max : " << GetMaxGeoHeight(idx) << "m (ID: " << cspok.at(idx)->Get_nev() << ")" << endl;
 
   int N = cspok.size() + agelemek.size();
-  m_ss << endl << " \t number of nonzero Jacobian entries: " << m_nnz << " out of " << (N * N);
+  m_ss << endl << " \t number of nonzero Jacobian entries: " << m_nnz << " out of " << (static_cast<long long>(N) * N);
   m_ss << " (" << ((((double)m_nnz) / N / N) * 100) << "%)" << endl;
 
 
@@ -3895,4 +3915,5 @@ void Staci::set_solver_tolerances(double head_m, double mass_kgs) {
     throw std::invalid_argument("Solver tolerances must be positive and finite");
   e_p_max = head_m;
   e_mp_max = mass_kgs;
+  diagnostics::apply_solver_overrides(e_p_max, e_mp_max, iter_max);
 }

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['wavefilt_0',['wavefilt',['../classwavefilt.html',1,'']]]
+  ['travelarc_0',['TravelArc',['../structflushing_1_1_travel_arc.html',1,'flushing']]]
 ];

@@ -1,0 +1,13 @@
+{
+  "global_debug_level": 1,
+  "n_comm": 2,
+  "weight_type": "topology",
+  "weight_type_mod": "diameter",
+  "fname": "network.spr",
+  "logfilename": "split-test.log",
+  "obj_type": "modularity",
+  "popsize": 4,
+  "ngen": 2,
+  "pmut": 0.25,
+  "pcross": 0.8
+}

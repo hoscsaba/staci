@@ -1,3 +1,4 @@
+#include "diagnostics.h"
 /*
  * AnyOption 1.3  
  *
@@ -128,7 +129,7 @@ void AnyOption::init(int maxopt, int maxcharopt) {
 		cout << endl << "OPTIONS ERROR : Failed allocating memory";
 		cout << endl ;
 		cout << "Exiting."<< endl ;
-		exit (0);
+		diagnostics::fail_legacy(__FILE__, __LINE__);
 	}
 }
 
@@ -471,7 +472,7 @@ void AnyOption::addOptionError(const char *opt) {
 	cout << "While adding the option : \""<< opt << "\""<< endl;
 	cout << "Exiting."<< endl ;
 	cout << endl ;
-	exit(0);
+	diagnostics::fail_legacy(__FILE__, __LINE__);
 }
 
 void AnyOption::addOptionError(char opt) {
@@ -480,7 +481,7 @@ void AnyOption::addOptionError(char opt) {
 	cout << "While adding the option: \""<< opt << "\""<< endl;
 	cout << "Exiting."<< endl ;
 	cout << endl ;
-	exit(0);
+	diagnostics::fail_legacy(__FILE__, __LINE__);
 }
 
 void AnyOption::processOptions() {
@@ -975,7 +976,7 @@ void AnyOption::addUsage(const char *line) {
 	if (usage_lines >= max_usage_lines ) {
 		if (doubleUsageStorage() == false) {
 			addUsageError(line );
-			exit(1);
+			diagnostics::fail_legacy(__FILE__, __LINE__);
 		}
 	}
 	usage[ usage_lines ] = line ;
@@ -988,6 +989,6 @@ void AnyOption::addUsageError(const char *line) {
 	cout << "While adding the usage/help  : \""<< line << "\""<< endl;
 	cout << "Exiting."<< endl ;
 	cout << endl ;
-	exit(0);
+	diagnostics::fail_legacy(__FILE__, __LINE__);
 
 }

@@ -10,6 +10,7 @@ networks are tested even if an earlier test fails.
 from __future__ import annotations
 
 import argparse
+from epanet_reference import resolve_library
 import csv
 import datetime as dt
 import json
@@ -111,6 +112,7 @@ def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Test the compiled STACI executable with every tests/*.spr and tests/*.inp file."
     )
+    parser.add_argument('--epanet-library', type=Path, help='Official EPANET shared library for public-network comparison.')
     parser.add_argument(
         "--binary",
         type=Path,
@@ -257,11 +259,13 @@ def discover_networks(tests_dir: Path) -> Tuple[List[Path], List[Path]]:
         path for path in tests_dir.rglob("*")
         if path.is_file() and path.suffix.lower() == ".spr"
         and generated_root not in path.resolve().parents
+        and tests_dir / "public_networks" not in path.resolve().parents
     )
     inp_files = sorted(
         path for path in tests_dir.rglob("*")
         if path.is_file() and path.suffix.lower() == ".inp"
         and generated_root not in path.resolve().parents
+        and tests_dir / "public_networks" not in path.resolve().parents
     )
     if not spr_files and not inp_files:
         raise TestFailure(f"No .spr or .inp files were found under {tests_dir}")
@@ -1078,6 +1082,24 @@ def main() -> int:
                     kind, source, binary, work_root, tests_dir, log
                 )
                 results.append((kind, source.relative_to(tests_dir), passed, elapsed, reason))
+
+        public_runner = SCRIPT_DIR / "test_public_networks.py"
+        if (tests_dir / "public_networks" / "manifest.json").is_file():
+            started = time.monotonic()
+            reference_library = resolve_library(arguments.epanet_library)
+            reference_arguments = ['--reference-library', str(reference_library), '--require-reference'] if reference_library else []
+            if not reference_library:
+                log.write('Public-network numerical comparison: SKIP (official EPANET library unavailable).')
+            completed = subprocess.run(
+                [sys.executable, str(public_runner), "--binary", str(binary),
+                 "--output-dir", str(results_root / "public-networks")] + reference_arguments,
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
+                encoding="utf-8", errors="replace")
+            log.section("Public EPANET steady-snapshot corpus")
+            log.write(completed.stdout)
+            results.append(("PUBLIC-INP", Path("public_networks/manifest.json"),
+                            completed.returncode == 0, time.monotonic() - started,
+                            "See public-networks/report.txt for solved, compatibility and numerical outcomes."))
 
         if inp_files:
             smoke_input = tests_dir / "epanet_eps_smoke.inp"

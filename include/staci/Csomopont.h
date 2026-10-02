@@ -58,6 +58,8 @@ private:
     /// aggregate demand used by the steady-state hydraulic equations.
     std::vector<EpanetDemandComponent> epanet_demand_components;
     double epanet_demand_multiplier;
+    bool pressure_demand_ = false;
+    double minimum_pressure_ = 0, required_pressure_ = 0.1, pressure_exponent_ = 0.5;
     /// Original per-node EPANET initial-quality value and its interpretation.
     EpanetInitialQuality epanet_initial_quality;
 
@@ -152,6 +154,14 @@ public:
     void SetEpanetInitialQuality(const EpanetInitialQuality &quality);
     const EpanetInitialQuality &GetEpanetInitialQuality() const;
 
+
+    void SetPressureDemand(double minimum, double required, double exponent);
+    double DeliveredDemand() const;
+    double DemandDerivative() const;
+    double MinimumPressure() const { return minimum_pressure_; }
+    double RequiredPressure() const { return required_pressure_; }
+    double PressureExponent() const { return pressure_exponent_; }
+    bool HasPressureDemand() const { return pressure_demand_; }
 
     /// Inicializ�ci�
     void Ini(int mode, double value);

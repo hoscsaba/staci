@@ -1,0 +1,3 @@
+# Public reference inputs are pinned by SHA256; preserve original line endings.
+tests/public_networks/**/*.inp -text
+doc/model_sources/*.inp -text

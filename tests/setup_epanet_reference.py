@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import platform
 import os
 from pathlib import Path
 import shutil
@@ -98,17 +99,25 @@ def main() -> int:
             shutil.move(str(extracted), str(source_dir))
         marker.write_text(EPANET_COMMIT + "\n", encoding="ascii")
 
+    sdk_arguments = []
+    if platform.system() == 'Darwin':
+        sdk = subprocess.check_output(['xcrun', '--sdk', 'macosx', '--show-sdk-path'], text=True).strip()
+        sdk_arguments = ['-DCMAKE_OSX_SYSROOT=' + sdk]
     run([
         "cmake", "-S", str(source_dir), "-B", str(build_dir),
         "-DCMAKE_BUILD_TYPE=Release", "-DBUILD_TESTS=OFF", "-DBUILD_PY_LIB=OFF",
         "-DCMAKE_POLICY_VERSION_MINIMUM=3.5",
-    ])
+    ] + sdk_arguments)
     run(["cmake", "--build", str(build_dir), "--config", "Release", "--parallel", str(args.jobs)])
 
     executable = next((path for path in executable_candidates(build_dir) if path.is_file()), None)
     if executable is None:
         raise SystemExit(f"Build succeeded but runepanet was not found below {build_dir}")
     print(f"EPANET_EXECUTABLE={executable}")
+    for name in ('libepanet2.dylib','libepanet2.so','epanet2.dll'):
+        for directory in ('lib','bin','bin/Release','lib/Release'):
+            library = build_dir / directory / name
+            if library.is_file(): print(f"EPANET_LIBRARY={library}")
     return 0
 
 

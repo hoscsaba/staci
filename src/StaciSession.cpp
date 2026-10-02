@@ -1,3 +1,4 @@
+#include "EpanetEmitter.h"
 #include "StaciSession.h"
 
 #include "epanet_steady_quality.h"
@@ -114,7 +115,7 @@ std::vector<double> StaciSession::get_node_property(
         else if (property == "total_head_m")
             result.push_back(item.Get_h() + item.Get_p());
         else if (property == "demand_m3s")
-            result.push_back(item.Get_dprop("demand") / 3600.0);
+            result.push_back(item.DeliveredDemand() / item.Get_dprop("ro"));
         else if (property == "water_age_s")
             result.push_back(item.Get_dprop("tt"));
         else if (property == "concentration_kgm3")
@@ -248,7 +249,9 @@ StaciNodeResults StaciSession::node_results() const {
         result.elevation_m.push_back(item.Get_h());
         result.pressure_head_m.push_back(item.Get_p());
         result.total_head_m.push_back(item.Get_h() + item.Get_p());
-        result.demand_m3s.push_back(item.Get_dprop("demand") / 3600.0);
+        double demand=item.DeliveredDemand()/item.Get_dprop("ro");
+        for(auto* edge:system_->agelemek) if(dynamic_cast<EpanetEmitter*>(edge) && edge->Get_Cspe_Nev()==id) demand+=edge->Get_Q();
+        result.demand_m3s.push_back(demand);
     }
     return result;
 }
@@ -290,7 +293,7 @@ StaciSteadyQualityResults StaciSession::solve_steady_quality(
         Csomopont &item = node(info_.node_ids[index]);
         quality_nodes[index].id = info_.node_ids[index];
         quality_nodes[index].external_inflow_m3s =
-            std::max(0.0, -item.Get_dprop("demand") / 3600.0);
+            std::max(0.0, -item.DeliveredDemand() / item.Get_dprop("ro"));
         quality_nodes[index].external_concentration_kgm3 =
             item.Get_dprop("cl_be");
     }

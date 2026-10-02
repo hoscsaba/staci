@@ -117,12 +117,14 @@ Inheritance diagram for Agelem:</div>
 <area href="class_buko_mutargy.html" alt="BukoMutargy" shape="rect" coords="131,56,252,80"/>
 <area href="class_csatorna.html" alt="Csatorna" shape="rect" coords="131,112,252,136"/>
 <area href="class_cso.html" alt="Cso" shape="rect" coords="131,168,252,192"/>
-<area href="class_epanet_power_pump.html" alt="EpanetPowerPump" shape="rect" coords="131,224,252,248"/>
-<area href="class_jelleggorbes_fojtas.html" alt="JelleggorbesFojtas" shape="rect" coords="131,280,252,304"/>
-<area href="class_konst_nyomas.html" alt="KonstNyomas" shape="rect" coords="131,336,252,360"/>
-<area href="class_szivattyu.html" alt="Szivattyu" shape="rect" coords="131,392,252,416"/>
-<area href="class_vegakna.html" alt="Vegakna" shape="rect" coords="131,448,252,472"/>
-<area href="class_visszacsapo_szelep.html" alt="VisszacsapoSzelep" shape="rect" coords="131,504,252,528"/>
+<area href="class_epanet_emitter.html" alt="EpanetEmitter" shape="rect" coords="131,224,252,248"/>
+<area href="class_epanet_power_pump.html" alt="EpanetPowerPump" shape="rect" coords="131,280,252,304"/>
+<area href="class_hydrant_outlet.html" alt="HydrantOutlet" shape="rect" coords="131,336,252,360"/>
+<area href="class_jelleggorbes_fojtas.html" alt="JelleggorbesFojtas" shape="rect" coords="131,392,252,416"/>
+<area href="class_konst_nyomas.html" alt="KonstNyomas" shape="rect" coords="131,448,252,472"/>
+<area href="class_szivattyu.html" alt="Szivattyu" shape="rect" coords="131,504,252,528"/>
+<area href="class_vegakna.html" alt="Vegakna" shape="rect" coords="131,560,252,584"/>
+<area href="class_visszacsapo_szelep.html" alt="VisszacsapoSzelep" shape="rect" coords="131,616,252,640"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -203,8 +205,8 @@ void&#160;</td><td class="memItemRight"><b>Set_tt_end</b> (double tmp)</td></tr>
 <tr class="memdesc:a666516b38ad643f2252040cbf5f9cd20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the runtime type identifier used throughout STACI.  <br /></td></tr>
 <tr class="memitem:a0c6ee94ed5706b9d40651d69f495da51" id="r_a0c6ee94ed5706b9d40651d69f495da51"><td class="memItemLeft"><a id="a0c6ee94ed5706b9d40651d69f495da51" name="a0c6ee94ed5706b9d40651d69f495da51"></a>
 void&#160;</td><td class="memItemRight"><b>Set_enabled</b> (bool value)</td></tr>
-<tr class="memitem:a8ca0ae50344237cca93f951ae81dd00f" id="r_a8ca0ae50344237cca93f951ae81dd00f"><td class="memItemLeft"><a id="a8ca0ae50344237cca93f951ae81dd00f" name="a8ca0ae50344237cca93f951ae81dd00f"></a>
-bool&#160;</td><td class="memItemRight"><b>Is_enabled</b> () const</td></tr>
+<tr class="memitem:ae15a64229c9ddc1b4b09b8e5b5803c1c" id="r_ae15a64229c9ddc1b4b09b8e5b5803c1c"><td class="memItemLeft"><a id="ae15a64229c9ddc1b4b09b8e5b5803c1c" name="ae15a64229c9ddc1b4b09b8e5b5803c1c"></a>
+virtual bool&#160;</td><td class="memItemRight"><b>Is_enabled</b> () const</td></tr>
 <tr class="memitem:a0fe1b2066bfd416f6568a4e09e6375b6" id="r_a0fe1b2066bfd416f6568a4e09e6375b6"><td class="memItemLeft"><a id="a0fe1b2066bfd416f6568a4e09e6375b6" name="a0fe1b2066bfd416f6568a4e09e6375b6"></a>
 vector&lt; double &gt;&#160;</td><td class="memItemRight"><b>interp</b> (const vector&lt; double &gt; &amp;x, const vector&lt; double &gt; &amp;y, const vector&lt; double &gt; &amp;xg)</td></tr>
 <tr class="memdesc:a0fe1b2066bfd416f6568a4e09e6375b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matlab-szeru linearis interpolacio. <br /></td></tr>
@@ -358,7 +360,7 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
 
 <p>Jacobi: df/dhe, df/dhv, df/dmp, konstans tag. </p>
 
-<p>Implemented in <a class="el" href="class_buko_mutargy.html#ab321d25a55f6e34709ed36ca3fe47ff6">BukoMutargy</a>, <a class="el" href="class_csatorna.html#afc0c83e0449ec527f8abf6fc1d3debe7">Csatorna</a>, <a class="el" href="class_cso.html#aca3c25a35b2ff588ddb3e77c1c105e02">Cso</a>, <a class="el" href="class_epanet_power_pump.html#affffc68dd3fa822cde183d500d295f62">EpanetPowerPump</a>, <a class="el" href="class_jelleggorbes_fojtas.html#a1b29218898e53b9ba8ff34423fb26d42">JelleggorbesFojtas</a>, <a class="el" href="class_konst_nyomas.html#a384bff40eb22c1a5de04fb080987b549">KonstNyomas</a>, <a class="el" href="class_szivattyu.html#aecdeab44e6272a7a855ffdea57767069">Szivattyu</a>, <a class="el" href="class_vegakna.html#aa9647c8e9da70b32576dfc129c74dc15">Vegakna</a>, and <a class="el" href="class_visszacsapo_szelep.html#afff911623176627990f495482ccfbce8">VisszacsapoSzelep</a>.</p>
+<p>Implemented in <a class="el" href="class_buko_mutargy.html#ab321d25a55f6e34709ed36ca3fe47ff6">BukoMutargy</a>, <a class="el" href="class_csatorna.html#afc0c83e0449ec527f8abf6fc1d3debe7">Csatorna</a>, <a class="el" href="class_cso.html#aca3c25a35b2ff588ddb3e77c1c105e02">Cso</a>, <a class="el" href="class_epanet_emitter.html#a0547038466109f129e916acf3c812cbf">EpanetEmitter</a>, <a class="el" href="class_epanet_power_pump.html#affffc68dd3fa822cde183d500d295f62">EpanetPowerPump</a>, <a class="el" href="class_epanet_valve.html#a6147644768fd00e1f479f927333a9d8f">EpanetValve</a>, <a class="el" href="class_hydrant_outlet.html#aee87800d2679274d21b3431be657d8c1">HydrantOutlet</a>, <a class="el" href="class_jelleggorbes_fojtas.html#a1b29218898e53b9ba8ff34423fb26d42">JelleggorbesFojtas</a>, <a class="el" href="class_konst_nyomas.html#a384bff40eb22c1a5de04fb080987b549">KonstNyomas</a>, <a class="el" href="class_szivattyu.html#aecdeab44e6272a7a855ffdea57767069">Szivattyu</a>, <a class="el" href="class_vegakna.html#aa9647c8e9da70b32576dfc129c74dc15">Vegakna</a>, and <a class="el" href="class_visszacsapo_szelep.html#afff911623176627990f495482ccfbce8">VisszacsapoSzelep</a>.</p>
 
 </div>
 </div>
@@ -387,7 +389,7 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
 
 <p>Az agegyenlet erteke, nullara rendezve, v.o.m.-ben. </p>
 
-<p>Implemented in <a class="el" href="class_buko_mutargy.html#a9d124f3bea69c36d956515bfe93d33a2">BukoMutargy</a>, <a class="el" href="class_csatorna.html#a4cbef5f4033eb7d0ab2884f36e0a7041">Csatorna</a>, <a class="el" href="class_cso.html#a9eb675069a4c10b79de64b36ae996b48">Cso</a>, <a class="el" href="class_epanet_power_pump.html#a006ff7037cccfe47455036f79ac60f3f">EpanetPowerPump</a>, <a class="el" href="class_jelleggorbes_fojtas.html#a1e414a1f7a088319a27a8162ce93ed1b">JelleggorbesFojtas</a>, <a class="el" href="class_konst_nyomas.html#ac0286fac02b1e967f370e3eb80066628">KonstNyomas</a>, <a class="el" href="class_szivattyu.html#a38411828ecea6506b4b26338b806b276">Szivattyu</a>, <a class="el" href="class_vegakna.html#a0fe9f6afd4f574754ef2ef1a377cbb50">Vegakna</a>, and <a class="el" href="class_visszacsapo_szelep.html#a711e089ef715c0c294989b5d3d829088">VisszacsapoSzelep</a>.</p>
+<p>Implemented in <a class="el" href="class_buko_mutargy.html#a9d124f3bea69c36d956515bfe93d33a2">BukoMutargy</a>, <a class="el" href="class_csatorna.html#a4cbef5f4033eb7d0ab2884f36e0a7041">Csatorna</a>, <a class="el" href="class_cso.html#a9eb675069a4c10b79de64b36ae996b48">Cso</a>, <a class="el" href="class_epanet_emitter.html#a0ae878b7d8539daf9624dbe8ce2e80bf">EpanetEmitter</a>, <a class="el" href="class_epanet_power_pump.html#a006ff7037cccfe47455036f79ac60f3f">EpanetPowerPump</a>, <a class="el" href="class_epanet_valve.html#aaf030a628045d8e0b02b15a43fc527c1">EpanetValve</a>, <a class="el" href="class_hydrant_outlet.html#af382918791585c689db9d09ab53ff879">HydrantOutlet</a>, <a class="el" href="class_jelleggorbes_fojtas.html#a1e414a1f7a088319a27a8162ce93ed1b">JelleggorbesFojtas</a>, <a class="el" href="class_konst_nyomas.html#ac0286fac02b1e967f370e3eb80066628">KonstNyomas</a>, <a class="el" href="class_szivattyu.html#a38411828ecea6506b4b26338b806b276">Szivattyu</a>, <a class="el" href="class_vegakna.html#a0fe9f6afd4f574754ef2ef1a377cbb50">Vegakna</a>, and <a class="el" href="class_visszacsapo_szelep.html#a711e089ef715c0c294989b5d3d829088">VisszacsapoSzelep</a>.</p>
 
 </div>
 </div>
@@ -416,7 +418,7 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
 
 <p>Get double property, <a class="el" href="class_cso.html">Cso</a> es <a class="el" href="class_csatorna.html">Csatorna</a> akarja elulirja. </p>
 
-<p>Implemented in <a class="el" href="class_buko_mutargy.html#a10adde7c6b8d4a3dd62df7d3d154c065">BukoMutargy</a>, <a class="el" href="class_csatorna.html#a3df4eb04fcccb2493b1398e1e8303e61">Csatorna</a>, <a class="el" href="class_cso.html#a26b5af7ec15be11973e6a90e1d8ee51d">Cso</a>, <a class="el" href="class_epanet_power_pump.html#ae928877988302deecd19cc1caeec3d10">EpanetPowerPump</a>, <a class="el" href="class_jelleggorbes_fojtas.html#a5129bbcbd1cbc5e4d0dccd5a9916224d">JelleggorbesFojtas</a>, <a class="el" href="class_konst_nyomas.html#a1644f7ce667797c40f6b508f62a5a47e">KonstNyomas</a>, <a class="el" href="class_szivattyu.html#a7dd3e107563a7193f505c6da9576dc55">Szivattyu</a>, <a class="el" href="class_vegakna.html#a8c5ae777604e53a791e214bcb355f585">Vegakna</a>, and <a class="el" href="class_visszacsapo_szelep.html#a13109d8f3c3fa666790d35b566985e56">VisszacsapoSzelep</a>.</p>
+<p>Implemented in <a class="el" href="class_buko_mutargy.html#a10adde7c6b8d4a3dd62df7d3d154c065">BukoMutargy</a>, <a class="el" href="class_csatorna.html#a3df4eb04fcccb2493b1398e1e8303e61">Csatorna</a>, <a class="el" href="class_cso.html#a26b5af7ec15be11973e6a90e1d8ee51d">Cso</a>, <a class="el" href="class_epanet_emitter.html#a6ae125025f5e5850d5b42fc69a6523ad">EpanetEmitter</a>, <a class="el" href="class_epanet_power_pump.html#ae928877988302deecd19cc1caeec3d10">EpanetPowerPump</a>, <a class="el" href="class_epanet_valve.html#a5feb608ee73cee0ccd6ac66e31866d98">EpanetValve</a>, <a class="el" href="class_hydrant_outlet.html#ae5057f3487296e85c2bc89056ba6a5d2">HydrantOutlet</a>, <a class="el" href="class_jelleggorbes_fojtas.html#a5129bbcbd1cbc5e4d0dccd5a9916224d">JelleggorbesFojtas</a>, <a class="el" href="class_konst_nyomas.html#a1644f7ce667797c40f6b508f62a5a47e">KonstNyomas</a>, <a class="el" href="class_szivattyu.html#a7dd3e107563a7193f505c6da9576dc55">Szivattyu</a>, <a class="el" href="class_vegakna.html#a8c5ae777604e53a791e214bcb355f585">Vegakna</a>, and <a class="el" href="class_visszacsapo_szelep.html#a13109d8f3c3fa666790d35b566985e56">VisszacsapoSzelep</a>.</p>
 
 </div>
 </div>
@@ -501,7 +503,7 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
 
 <p>Returns the runtime type identifier used throughout STACI. </p>
 
-<p>Implemented in <a class="el" href="class_buko_mutargy.html#ae6899eda2c8e639bff5e113db8a82850">BukoMutargy</a>, <a class="el" href="class_csatorna.html#ac11b50c169bea9269007060e849982b2">Csatorna</a>, <a class="el" href="class_cso.html#a6eea941d56e713a96018c4705067e760">Cso</a>, <a class="el" href="class_epanet_power_pump.html#a68e89f5f75c4ec461717ce7bb5e11fbb">EpanetPowerPump</a>, <a class="el" href="class_jelleggorbes_fojtas.html#a6c3b4c6940a01d520fb278233847e3a4">JelleggorbesFojtas</a>, <a class="el" href="class_konst_nyomas.html#aa2051f05b80b4afff24946b074af01c2">KonstNyomas</a>, <a class="el" href="class_szivattyu.html#a534c89abc9a46501ed89086fe38d5888">Szivattyu</a>, <a class="el" href="class_vegakna.html#abaec8c76cd28480c323ab9648044f62e">Vegakna</a>, and <a class="el" href="class_visszacsapo_szelep.html#ab953157720241b2814e186809f860b0e">VisszacsapoSzelep</a>.</p>
+<p>Implemented in <a class="el" href="class_buko_mutargy.html#ae6899eda2c8e639bff5e113db8a82850">BukoMutargy</a>, <a class="el" href="class_csatorna.html#ac11b50c169bea9269007060e849982b2">Csatorna</a>, <a class="el" href="class_cso.html#a6eea941d56e713a96018c4705067e760">Cso</a>, <a class="el" href="class_epanet_emitter.html#ab2f91a4125cbfb8545cebf515b934adb">EpanetEmitter</a>, <a class="el" href="class_epanet_power_pump.html#a68e89f5f75c4ec461717ce7bb5e11fbb">EpanetPowerPump</a>, <a class="el" href="class_epanet_valve.html#a703eff363e5f8bd329f5ad98c0a8aff4">EpanetValve</a>, <a class="el" href="class_hydrant_outlet.html#a4587917bce764c589c5820058e92972a">HydrantOutlet</a>, <a class="el" href="class_jelleggorbes_fojtas.html#a6c3b4c6940a01d520fb278233847e3a4">JelleggorbesFojtas</a>, <a class="el" href="class_konst_nyomas.html#aa2051f05b80b4afff24946b074af01c2">KonstNyomas</a>, <a class="el" href="class_szivattyu.html#a534c89abc9a46501ed89086fe38d5888">Szivattyu</a>, <a class="el" href="class_vegakna.html#abaec8c76cd28480c323ab9648044f62e">Vegakna</a>, and <a class="el" href="class_visszacsapo_szelep.html#ab953157720241b2814e186809f860b0e">VisszacsapoSzelep</a>.</p>
 
 </div>
 </div>
@@ -563,7 +565,7 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
 
 <p>Inicializacio, mode=0 -&gt; automatikus, mode=1 -&gt; value beirasa. </p>
 
-<p>Implemented in <a class="el" href="class_buko_mutargy.html#afd9e54cf447dd433330b64fadca456cc">BukoMutargy</a>, <a class="el" href="class_csatorna.html#ae0265e98ca0d12c4bfe4685d1390938a">Csatorna</a>, <a class="el" href="class_cso.html#a2e4c6be2cd1731cc4ab6b14192514fd5">Cso</a>, <a class="el" href="class_epanet_power_pump.html#a51195635465ad759444afd42dae51b1c">EpanetPowerPump</a>, <a class="el" href="class_jelleggorbes_fojtas.html#abd0e1ee67e86566a9fc23c63951944c0">JelleggorbesFojtas</a>, <a class="el" href="class_konst_nyomas.html#af79ed796116893de514f32f344f26c86">KonstNyomas</a>, <a class="el" href="class_szivattyu.html#aa959cbb38453f75dbca9fce2a4c2ca7c">Szivattyu</a>, <a class="el" href="class_vegakna.html#a043852ba5b96e03c7cab7f52a128ef0a">Vegakna</a>, and <a class="el" href="class_visszacsapo_szelep.html#aeadf7c9a1cd51de4075a246d59f75171">VisszacsapoSzelep</a>.</p>
+<p>Implemented in <a class="el" href="class_buko_mutargy.html#afd9e54cf447dd433330b64fadca456cc">BukoMutargy</a>, <a class="el" href="class_csatorna.html#ae0265e98ca0d12c4bfe4685d1390938a">Csatorna</a>, <a class="el" href="class_cso.html#a2e4c6be2cd1731cc4ab6b14192514fd5">Cso</a>, <a class="el" href="class_epanet_emitter.html#a2f851aa7cb7ac43c25b9a53a0315d25c">EpanetEmitter</a>, <a class="el" href="class_epanet_power_pump.html#a51195635465ad759444afd42dae51b1c">EpanetPowerPump</a>, <a class="el" href="class_hydrant_outlet.html#a8f4d9c271d4d999c85e6fa0721afaadd">HydrantOutlet</a>, <a class="el" href="class_jelleggorbes_fojtas.html#abd0e1ee67e86566a9fc23c63951944c0">JelleggorbesFojtas</a>, <a class="el" href="class_konst_nyomas.html#af79ed796116893de514f32f344f26c86">KonstNyomas</a>, <a class="el" href="class_szivattyu.html#aa959cbb38453f75dbca9fce2a4c2ca7c">Szivattyu</a>, <a class="el" href="class_vegakna.html#a043852ba5b96e03c7cab7f52a128ef0a">Vegakna</a>, and <a class="el" href="class_visszacsapo_szelep.html#aeadf7c9a1cd51de4075a246d59f75171">VisszacsapoSzelep</a>.</p>
 
 </div>
 </div>
@@ -596,7 +598,7 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
 
 <p>Set a supported numeric property. </p>
 
-<p>Implemented in <a class="el" href="class_buko_mutargy.html#a4ba80154ab28bafe3a8f9314417cc3f7">BukoMutargy</a>, <a class="el" href="class_csatorna.html#aa4eefd1c820c3f84e75be6ba6d50a473">Csatorna</a>, <a class="el" href="class_cso.html#aa2e7b91b731a487822c2a5108613bb4b">Cso</a>, <a class="el" href="class_epanet_power_pump.html#a7a1f9d04e67d61cc83865cd8b84c0b6c">EpanetPowerPump</a>, <a class="el" href="class_jelleggorbes_fojtas.html#af824d8d1f7e90a152be63227b0188827">JelleggorbesFojtas</a>, <a class="el" href="class_konst_nyomas.html#a940bea09c0ff87880dad00057bddd5fc">KonstNyomas</a>, <a class="el" href="class_szivattyu.html#a4b157ff3ef6429e3620ff0b6f9299839">Szivattyu</a>, <a class="el" href="class_vegakna.html#a23b5966027fca215665fbdb1ed085566">Vegakna</a>, and <a class="el" href="class_visszacsapo_szelep.html#a5280792ece67e2057b581e71fd0a5f03">VisszacsapoSzelep</a>.</p>
+<p>Implemented in <a class="el" href="class_buko_mutargy.html#a4ba80154ab28bafe3a8f9314417cc3f7">BukoMutargy</a>, <a class="el" href="class_csatorna.html#aa4eefd1c820c3f84e75be6ba6d50a473">Csatorna</a>, <a class="el" href="class_cso.html#aa2e7b91b731a487822c2a5108613bb4b">Cso</a>, <a class="el" href="class_epanet_emitter.html#a001f30f644501d8d49818a7faa73ee59">EpanetEmitter</a>, <a class="el" href="class_epanet_power_pump.html#a7a1f9d04e67d61cc83865cd8b84c0b6c">EpanetPowerPump</a>, <a class="el" href="class_epanet_valve.html#a996a02b6d8b0b44039e87ab9fd47498b">EpanetValve</a>, <a class="el" href="class_hydrant_outlet.html#a8071d1120fb63fc592114100a8119514">HydrantOutlet</a>, <a class="el" href="class_jelleggorbes_fojtas.html#af824d8d1f7e90a152be63227b0188827">JelleggorbesFojtas</a>, <a class="el" href="class_konst_nyomas.html#a940bea09c0ff87880dad00057bddd5fc">KonstNyomas</a>, <a class="el" href="class_szivattyu.html#a4b157ff3ef6429e3620ff0b6f9299839">Szivattyu</a>, <a class="el" href="class_vegakna.html#a23b5966027fca215665fbdb1ed085566">Vegakna</a>, and <a class="el" href="class_visszacsapo_szelep.html#a5280792ece67e2057b581e71fd0a5f03">VisszacsapoSzelep</a>.</p>
 
 </div>
 </div>

@@ -1,3 +1,5 @@
+#include "EpanetEmitter.h"
+#include "EpanetValve.h"
 #include "epanet_reader.h"
 
 #include "Cso.h"
@@ -86,8 +88,195 @@ EpanetReader::EpanetReader(const std::string &filename, bool extended_period)
     parse_file();
     parse_options();
     parse_patterns();
+    if (default_pattern_.empty() && patterns_.count("1")) default_pattern_ = "1";
     parse_curves();
     configure_settings();
+}
+
+void EpanetReader::validate_hydraulic_compatibility() const {
+    std::vector<std::string> problems;
+    auto problem = [&](const std::string &section, const Record &record,
+                       const std::string &message) {
+        std::ostringstream text;
+        text << "[" << section << "]";
+        if (!record.fields.empty()) text << " element '" << record.fields[0] << "'";
+        text << " line " << record.line_number << ": " << message;
+        problems.push_back(text.str());
+    };
+    auto numeric = [&](const std::string &section, const Record &record,
+                       std::size_t index, const std::string &label,
+                       bool positive = false, bool nonnegative = false) {
+        if (index >= record.fields.size()) return;
+        char *end = nullptr;
+        const double value = std::strtod(record.fields[index].c_str(), &end);
+        if (end == record.fields[index].c_str() || *end || !std::isfinite(value))
+            problem(section, record, label + " must be a finite number; got '" +
+                    record.fields[index] + "'.");
+        else if ((positive && value <= 0.0) || (nonnegative && value < 0.0))
+            problem(section, record, label + (positive ? " must be positive." : " must be non-negative."));
+    };
+    static const std::set<std::string> known_sections = {
+        "TITLE", "JUNCTIONS", "RESERVOIRS", "TANKS", "PIPES", "PUMPS", "VALVES",
+        "TAGS", "DEMANDS", "STATUS", "PATTERNS", "CURVES", "CONTROLS", "RULES",
+        "ENERGY", "EMITTERS", "QUALITY", "SOURCES", "REACTIONS", "MIXING", "TIMES",
+        "REPORT", "OPTIONS", "COORDINATES", "VERTICES", "LABELS", "BACKDROP", "END", "LEAKS"
+    };
+    for (const auto &section : sections_)
+        if (!known_sections.count(section.first) && !section.second.empty())
+            problem(section.first, section.second.front(), "Unknown EPANET section; its physical meaning cannot be validated. Hydraulic calculation was refused.");
+    for (const auto &section : {"PATTERNS", "CURVES"})
+        for (const Record &r : records(section))
+            for (std::size_t i = 1; i < r.fields.size(); ++i)
+                numeric(section, r, i, "Pattern/curve value");
+    for (const Record &r : records("OPTIONS")) {
+        if (r.fields.size() < 2) continue;
+        const auto key = upper(r.fields[0]);
+        if(r.fields.size()>2) {
+            const auto second=upper(r.fields[1]);
+            if((key=="EMITTER" || key=="PRESSURE") && second=="EXPONENT") numeric("OPTIONS",r,2,"Pressure/emitter exponent",true);
+            if((key=="MINIMUM" || key=="REQUIRED") && second=="PRESSURE") numeric("OPTIONS",r,2,"Demand pressure",false,true);
+        }
+        if (key == "HEADLOSS" && upper(r.fields[1]) != "H-W" &&
+            upper(r.fields[1]) != "D-W" && upper(r.fields[1]) != "HW" && upper(r.fields[1]) != "DW")
+            problem("OPTIONS", r, "Head-loss formula '" + r.fields[1] +
+                    "' is not implemented; supported formulas are H-W and D-W. The formula will not be silently substituted.");
+        if (key == "UNITS" && std::set<std::string>{"CFS", "GPM", "MGD", "IMGD", "AFD", "LPS", "LPM", "MLD", "CMH", "CMD", "SI"}.count(upper(r.fields[1])) == 0)
+            problem("OPTIONS", r, "Unknown flow units '" + r.fields[1] + "'.");
+        if (r.fields.size() > 2 && key == "DEMAND" && upper(r.fields[1]) == "MODEL" &&
+            upper(r.fields[2]) != "DDA" && upper(r.fields[2]) != "PDA")
+            problem("OPTIONS", r, "Pressure-dependent demand model '" + r.fields[2] +
+                    "' is not implemented; STACI solves fixed demands (DDA).");
+    }
+    double pmin=0,preq=0.1;bool preq_specified=false;
+    const Record* pressure_record=nullptr;
+    for(const auto& option:records("OPTIONS")) if(option.fields.size()>2) {
+        const auto a=upper(option.fields[0]),b=upper(option.fields[1]);
+        if(a=="MINIMUM" && b=="PRESSURE") {pmin=std::strtod(option.fields[2].c_str(),nullptr);pressure_record=&option;}
+        if(a=="REQUIRED" && b=="PRESSURE") {preq=std::strtod(option.fields[2].c_str(),nullptr);preq_specified=true;pressure_record=&option;}
+    }
+    if(preq_specified && std::isfinite(pmin) && std::isfinite(preq) && preq-pmin<0.1 && pressure_record)
+        problem("OPTIONS",*pressure_record,"Required pressure must exceed minimum pressure by at least 0.1 in the input pressure units.");
+    std::set<std::string> nodes, links, boundaries;
+    std::map<std::string, std::vector<std::string>> adjacent;
+    for (const auto &section : {"JUNCTIONS", "RESERVOIRS", "TANKS"}) {
+        const std::size_t required = std::string(section) == "TANKS" ? 6 : 2;
+        for (const Record &r : records(section)) {
+            if (r.fields.size() < required) {
+                problem(section, r, "Incomplete node record; requires at least " + std::to_string(required) + " fields.");
+                continue;
+            }
+            const auto &id = r.fields[0];
+            if (!nodes.insert(id).second) problem(section, r, "Duplicate node ID.");
+            adjacent[id];
+            numeric(section, r, 1, "Elevation/head");
+            if (std::string(section) == "JUNCTIONS") numeric(section, r, 2, "Demand");
+            else boundaries.insert(id);
+            if (std::string(section) == "TANKS") {
+                for (std::size_t i = 2; i < 5; ++i) numeric(section, r, i, "Tank level");
+                numeric(section, r, 5, "Tank diameter", true);
+            }
+        }
+    }
+    for (const auto &section : {"PIPES", "PUMPS", "VALVES"}) {
+        const std::size_t required = std::string(section) == "PUMPS" ? 5 : 6;
+        for (const Record &r : records(section)) {
+            if (r.fields.size() < required) {
+                problem(section, r, "Incomplete link record; requires at least " + std::to_string(required) +
+                        " fields (pumps must use HEAD curveID or POWER value).");
+                continue;
+            }
+            if (!links.insert(r.fields[0]).second) problem(section, r, "Duplicate link ID.");
+            for (std::size_t i = 1; i <= 2; ++i)
+                if (!nodes.count(r.fields[i])) problem(section, r, "Unknown endpoint node '" + r.fields[i] + "'.");
+            bool closed = std::string(section) == "PIPES" && r.fields.size() > 7 && upper(r.fields[7]) == "CLOSED";
+            for (const Record &status : records("STATUS"))
+                if (status.fields.size() > 1 && status.fields[0] == r.fields[0]) {
+                    if (upper(status.fields[1]) == "CLOSED") closed = true;
+                    if (upper(status.fields[1]) == "OPEN") closed = false;
+                }
+            if (!closed && nodes.count(r.fields[1]) && nodes.count(r.fields[2])) {
+                adjacent[r.fields[1]].push_back(r.fields[2]);
+                adjacent[r.fields[2]].push_back(r.fields[1]);
+            }
+            if (std::string(section) == "PIPES") {
+                numeric(section, r, 3, "Pipe length", false, true);
+                numeric(section, r, 4, "Pipe diameter", true);
+                numeric(section, r, 5, "Pipe roughness", headloss_model_ == "H-W", true);
+                numeric(section, r, 6, "Minor-loss coefficient", false, true);
+            } else if (std::string(section) == "VALVES") {
+                if (upper(r.fields[4]) != "TCV" && upper(r.fields[4]) != "PRV" && upper(r.fields[4]) != "FCV" && upper(r.fields[4]) != "GPV" && upper(r.fields[4]) != "PSV" && upper(r.fields[4]) != "PBV")
+                    problem(section, r, "Valve type '" + r.fields[4] +
+                            "' is not implemented in STACI (TCV, PRV, PSV, PBV, FCV and GPV are supported). Removing this valve would change the network topology; hydraulic calculation was refused.");
+                numeric(section, r, 3, "Valve diameter", true);
+                if(r.fields.size()>6) numeric(section,r,6,"Valve minor loss",false,true);
+                if(upper(r.fields[4])=="GPV") {
+                    for(const auto& point : records("CURVES")) {
+                        if(point.fields.empty() || point.fields[0]!=r.fields[5]) continue;
+                        if(point.fields.size()<3) problem("CURVES",point,"GPV curve point requires flow and headloss values.");
+                        else { numeric("CURVES",point,1,"GPV curve flow",false,true); numeric("CURVES",point,2,"GPV curve headloss",false,true); }
+                    }
+                    auto curve=curves_.find(r.fields[5]);
+                    if(curve==curves_.end() || curve->second.size()<2)
+                        problem(section,r,"GPV headloss curve '"+r.fields[5]+"' requires at least two points.");
+                    else for(std::size_t i=0;i<curve->second.size();++i) {
+                        const auto& p=curve->second[i];
+                        if(!std::isfinite(p.first)||!std::isfinite(p.second)||p.first<0||p.second<0 ||
+                           (i>0 && (p.first<=curve->second[i-1].first || p.second<curve->second[i-1].second)))
+                            problem(section,r,"GPV curve must have finite nonnegative values and strictly increasing flow and nondecreasing headloss.");
+                    }
+                } else numeric(section,r,5,"Valve setting",false,upper(r.fields[4])!="PRV" && upper(r.fields[4])!="PSV");
+            } else {
+                bool definition = false;
+                for (std::size_t i = 3; i + 1 < r.fields.size(); i += 2) {
+                    const auto keyword = upper(r.fields[i]);
+                    if (keyword == "POWER") {
+                        definition = true;
+                        numeric(section, r, i + 1, "Pump power", true);
+                    } else if (keyword == "HEAD") {
+                        definition = true;
+                        if (!curves_.count(r.fields[i + 1]))
+                            problem(section, r, "Pump head curve '" + r.fields[i + 1] + "' was not found in [CURVES].");
+                    }
+                }
+                if (!definition) problem(section, r, "Unsupported pump definition; use EPANET 2 HEAD curveID or POWER value. Legacy numeric pump records are not implemented.");
+            }
+        }
+    }
+    for (const Record &r : records("EMITTERS")) {
+        if(r.fields.size()<2) problem("EMITTERS",r,"Emitter requires a junction and coefficient.");
+        else { numeric("EMITTERS",r,1,"Emitter coefficient",false,true);
+            bool junction=false;for(const auto& j : records("JUNCTIONS")) if(!j.fields.empty() && j.fields[0]==r.fields[0]) junction=true;
+            if(!junction) problem("EMITTERS",r,"Emitter references an unknown junction.");
+        }
+    }
+    for (const Record &r : records("LEAKS"))
+        problem("LEAKS", r, "Leak-discharge equations are not implemented by STACI.");
+    // Report source-free components before sparse factorization fails without context.
+    if (problems.empty()) {
+        std::set<std::string> visited;
+        for (const auto &node : adjacent) {
+            if (!visited.insert(node.first).second) continue;
+            std::vector<std::string> component{node.first};
+            bool supplied = false;
+            for (std::size_t i = 0; i < component.size(); ++i) {
+                supplied = supplied || boundaries.count(component[i]);
+                for (const auto &next : adjacent.at(component[i]))
+                    if (visited.insert(next).second) component.push_back(next);
+            }
+            if (!supplied) problems.push_back("[TOPOLOGY] Component containing node '" + node.first + "' (" +
+                    std::to_string(component.size()) + " nodes) has no reservoir or tank connected through initially open links. No reference head/water supply is available.");
+        }
+        if (nodes.empty()) problems.push_back("[TOPOLOGY] No hydraulic nodes were found.");
+    }
+    if (!problems.empty()) {
+        std::ostringstream message;
+        message << "ERROR [EPANET][COMPATIBILITY] Network '" << filename_ << "': "
+                << problems.size() << " problem(s) prevent a faithful steady hydraulic calculation.\n";
+        for (std::size_t i = 0; i < std::min<std::size_t>(20, problems.size()); ++i)
+            message << "  " << problems[i] << '\n';
+        if (problems.size() > 20) message << "  " << problems.size() - 20 << " additional problems omitted.\n";
+        throw EpanetCompatibilityError(message.str());
+    }
 }
 
 void EpanetReader::parse_file() {
@@ -104,8 +293,12 @@ void EpanetReader::parse_file() {
                         "Data before the first section was ignored.");
             continue;
         }
-        sections_[line.section].push_back(
-            Record{line.line_number, line.content, split_fields(line.content)});
+        auto fields = split_fields(line.content);
+        const bool legacy_reservoir = line.section == "TANKS" && fields.size() >= 2 && fields.size() <= 3;
+        sections_[legacy_reservoir ? "RESERVOIRS" : line.section].push_back(
+            Record{line.line_number, line.content, fields});
+        if (legacy_reservoir) add_warning("TANKS", fields[0], line.line_number,
+            "Legacy short tank record interpreted as a fixed-head reservoir, matching EPANET 2.2.");
     }
 
     if (sections_.find("END") == sections_.end())
@@ -120,8 +313,14 @@ void EpanetReader::parse_options() {
             continue;
         }
         const std::string key = upper(record.fields[0]);
-        if (key == "UNITS")
+        if (key == "UNITS") {
             flow_units_ = upper(record.fields[1]);
+            if (flow_units_ == "SI") {
+                flow_units_ = "LPS";
+                add_warning("OPTIONS", "UNITS", record.line_number,
+                    "Legacy SI flow units interpreted as LPS, matching EPANET 2.2.");
+            }
+        }
         else if (key == "HEADLOSS")
             headloss_model_ = upper(record.fields[1]);
         else if (key == "PATTERN")
@@ -156,9 +355,12 @@ void EpanetReader::parse_options() {
             } else if (quality_mode_ != "NONE") {
                 quality_units_ = record.fields.size() > 2
                     ? join_fields(record.fields, 2) : "";
-                add_warning("OPTIONS", "QUALITY", record.line_number,
-                            "Quality mode '" + record.fields[1] +
-                            "' is retained as node metadata but is not simulated.");
+                quality_chemical_name_ = record.fields[1];
+                quality_mode_ = "CHEMICAL";
+                if (quality_units_.empty()) quality_units_ = "mg/L";
+                if (!extended_period_)
+                    add_warning("OPTIONS", "QUALITY", record.line_number,
+                                "Chemical configuration is retained; use EPS to simulate transport, sources and reactions.");
             }
         }
         else if (starts_with(record.fields, {"SPECIFIC", "GRAVITY"}))
@@ -216,18 +418,10 @@ void EpanetReader::configure_settings() {
     settings_["out_file"] = "staci.out";
     if (settings_.find("iter_max") == settings_.end())
         settings_["iter_max"] = "100";
-    if (settings_.find("e_p_max") == settings_.end())
-        settings_["e_p_max"] = "0.001";
-    else
-        add_warning("OPTIONS", "ACCURACY", 0,
-                    "EPANET's relative accuracy criterion is mapped approximately "
-                    "to STACI's pressure and mass-flow residual tolerances.");
-    // EPANET ACCURACY is dimensionless, so neither STACI dimensional
-    // tolerance is an exact equivalent. Reusing its numeric value for the
-    // RMS mass-flow residual keeps changing EPS demands from being accepted
-    // as converged solely because they differ by less than the old 1 kg/s
-    // threshold.
-    settings_["e_mp_max"] = settings_["e_p_max"];
+    // EPANET ACCURACY is dimensionless; it cannot be reused as a dimensional
+    // RMS residual. Tight physical tolerances prevent spurious small flows.
+    settings_["e_p_max"] = "0.0001";
+    settings_["e_mp_max"] = "1e-8";
     settings_["relax"] = "1.0";
     settings_["relax_mul"] = "1.2";
     settings_["mp_init"] = "1.0";
@@ -276,7 +470,7 @@ double EpanetReader::number(const Record &record,
     }
     char *end = nullptr;
     const double value = std::strtod(record.fields[field].c_str(), &end);
-    if (end == record.fields[field].c_str() || *end != '\0') {
+    if (end == record.fields[field].c_str() || *end != '\0' || !std::isfinite(value)) {
         add_warning("PARSE", record.fields[0], record.line_number,
                     "Invalid " + label + " '" + record.fields[field] +
                     "'; default value used.");
@@ -312,7 +506,7 @@ double EpanetReader::tank_diameter_to_metres(double value) const {
 }
 
 double EpanetReader::pump_power_to_watts(double value) const {
-    return us_customary_units_ ? value * 745.699871582 : value * 1000.0;
+    return us_customary_units_ ? value * 745.7 : value * 1000.0;
 }
 
 double EpanetReader::first_pattern_multiplier(const std::string &pattern_id) const {
@@ -345,7 +539,9 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
             status_overrides[record.fields[0]] = status;
         else {
             const double setting = number(record, 1, "link setting", -1.0);
-            if (setting >= 0.0)
+            bool pressure_valve=false;
+            for(const auto& valve:records("VALVES")) if(valve.fields.size()>4 && valve.fields[0]==record.fields[0]) pressure_valve=upper(valve.fields[4])=="PRV" || upper(valve.fields[4])=="PSV";
+            if (setting >= 0.0 || pressure_valve)
                 setting_overrides[record.fields[0]] = setting;
             else
                 add_warning("STATUS", record.fields[0], record.line_number,
@@ -396,6 +592,27 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
                     record.line_number, "Incomplete row was ignored.");
         return false;
     };
+
+    bool pressure_demand=false;
+    double minimum_pressure=0,required_pressure=0.1,pressure_exponent=0.5,emitter_exponent=0.5;
+    double pressure_factor=us_customary_units_ ? 0.3048/(0.4333*specific_gravity_) : 1.0/specific_gravity_;
+    for(const auto& option : records("OPTIONS")) if(option.fields.size()>1 && upper(option.fields[0])=="PRESSURE" && upper(option.fields[1])!="EXPONENT") {
+        const auto unit=upper(option.fields[1]);
+        pressure_factor=unit=="PSI"?0.3048/(0.4333*specific_gravity_):unit=="KPA"?0.3048/(2.98907*specific_gravity_):unit=="FEET"?0.3048:1.0/specific_gravity_;
+    }
+    required_pressure=0.1*pressure_factor;
+    bool required_specified=false;
+    for(const auto& option : records("OPTIONS")) if(option.fields.size()>2) {
+        const auto a=upper(option.fields[0]),b=upper(option.fields[1]);
+        if(a=="DEMAND" && b=="MODEL") pressure_demand=upper(option.fields[2])=="PDA";
+        if(a=="MINIMUM" && b=="PRESSURE") minimum_pressure=number(option,2,"minimum pressure",0)*pressure_factor;
+        if(a=="REQUIRED" && b=="PRESSURE") { required_pressure=number(option,2,"required pressure",0.1)*pressure_factor; required_specified=true; }
+        if(a=="PRESSURE" && b=="EXPONENT") pressure_exponent=number(option,2,"pressure exponent",0.5);
+        if(a=="EMITTER" && b=="EXPONENT") emitter_exponent=number(option,2,"emitter exponent",0.5);
+    }
+    if(!required_specified) required_pressure=minimum_pressure+0.1*pressure_factor;
+    if(!std::isfinite(emitter_exponent)||emitter_exponent<=0 || !std::isfinite(pressure_exponent)||pressure_exponent<=0 || minimum_pressure<0 || required_pressure<=minimum_pressure)
+        throw std::runtime_error("ERROR [EPANET][COMPATIBILITY]: Invalid pressure-demand/emitter options: require positive exponents and required pressure greater than nonnegative minimum pressure.");
 
     for (const Record &record : records("DEMANDS")) {
         if (!has_fields(record, 2, "DEMANDS"))
@@ -478,6 +695,7 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
             ? quality.source_value : 0.0;
         auto node = std::make_unique<Csomopont>(id, elevation, demand, 0.0, 0.0,
                                                 density, initial_age);
+        if(pressure_demand) node->SetPressureDemand(minimum_pressure,required_pressure,pressure_exponent);
         node->SetEpanetDemandComponents(components, demand_multiplier_);
         node->SetEpanetInitialQuality(quality);
         if (quality_mode_ == "CHEMICAL" && quality.specified)
@@ -485,6 +703,20 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
         nodes.push_back(std::move(node));
     }
 
+    for(const auto& record : records("EMITTERS")) {
+        const double raw=number(record,1,"emitter coefficient",0);
+        if(raw==0) continue;
+        std::string id="EPANET_EMITTER_"+record.fields[0];
+        auto reserved=[&](const std::string& candidate) {
+            if(edge_ids.count(candidate)) return true;
+            for(const auto& section:{"PIPES","PUMPS","VALVES"})
+                for(const auto& link:records(section)) if(!link.fields.empty() && link.fields[0]==candidate) return true;
+            return false;
+        };
+        while(reserved(id)) id+="_";
+        edge_ids.insert(id);
+        edges.push_back(std::make_unique<EpanetEmitter>(id,record.fields[0],density,flow_to_m3_per_hour(raw)/3600.0/std::pow(pressure_factor,emitter_exponent),emitter_exponent));
+    }
     double fixed_head_sum = 0.0;
     std::size_t fixed_head_count = 0;
     std::size_t reservoir_head_pattern_count = 0;
@@ -612,6 +844,16 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
         }
         auto pipe = std::make_unique<Cso>(id, from, to, density, length, diameter,
                                           roughness, 0.0, 0.0, 1.0);
+        double viscosity_multiplier = 1.0;
+        for (const auto &option : records("OPTIONS"))
+            if (option.fields.size() >= 2 && upper(option.fields[0]) == "VISCOSITY")
+                {
+                    const double value = number(option, 1, "viscosity", 1.0);
+                    // EPANET treats values <= 1e-3 as actual kinematic viscosity.
+                    const double si = us_customary_units_ ? value * 0.3048 * 0.3048 : value;
+                    viscosity_multiplier = value > 1e-3 ? value : si / (1.1e-5 * 0.3048 * 0.3048);
+                }
+        pipe->SetEpanetHydraulics(viscosity_multiplier);
         pipe->Set_dprop("minor_loss", minor_loss);
         pipe->SetCheckValve(check_valve);
         pipe->Set_enabled(enabled);
@@ -765,7 +1007,7 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
         const std::string &from = record.fields[1];
         const std::string &to = record.fields[2];
         const std::string valve_type = upper(record.fields[4]);
-        if (valve_type != "TCV") {
+        if (valve_type != "TCV" && valve_type != "PRV" && valve_type != "FCV" && valve_type != "GPV" && valve_type != "PSV" && valve_type != "PBV") {
             add_warning("VALVES", id, record.line_number,
                         "EPANET valve type '" + record.fields[4] +
                         "' has no equivalent STACI element; valve was not imported.");
@@ -789,13 +1031,13 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
                         "Non-positive TCV diameter; valve was not imported.");
             continue;
         }
-        double setting = number(record, 5, "TCV loss coefficient", 0.0);
+        double setting = valve_type == "GPV" ? 0.0 : number(record, 5, "valve setting", 0.0);
         double minor_loss = record.fields.size() > 6
             ? number(record, 6, "valve minor loss", 0.0) : 0.0;
-        if (setting < 0.0 || minor_loss < 0.0) {
+        if ((setting < 0.0 && valve_type!="PRV" && valve_type!="PSV") || minor_loss < 0.0) {
             add_warning("VALVES", id, record.line_number,
                         "Negative TCV loss coefficients were replaced with zero.");
-            setting = std::max(0.0, setting);
+            if(valve_type!="PRV" && valve_type!="PSV") setting = std::max(0.0, setting);
             minor_loss = std::max(0.0, minor_loss);
         }
 
@@ -815,6 +1057,28 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
         }
 
         const double area = 3.14159265358979323846 * diameter * diameter / 4.0;
+        if (valve_type != "TCV") {
+            double factor = 1.0;
+            if (valve_type == "FCV") factor = flow_to_m3_per_hour(1.0)/3600.0;
+            if (valve_type == "PRV" || valve_type == "PSV" || valve_type == "PBV") {
+                std::string pressure = us_customary_units_ ? "PSI" : "METERS";
+                for (const auto& option : records("OPTIONS"))
+                    if(option.fields.size()>1 && upper(option.fields[0])=="PRESSURE" && upper(option.fields[1])!="EXPONENT") pressure=upper(option.fields[1]);
+                if(pressure=="PSI") factor=0.3048/(0.4333*specific_gravity_);
+                else if(pressure=="KPA") factor=0.3048/(2.98907*specific_gravity_);
+                else if(pressure=="FEET") factor=0.3048;
+                else factor=1.0/specific_gravity_;
+            }
+            std::vector<std::pair<double,double>> curve;
+            if(valve_type=="GPV") for(const auto& point : curves_.at(record.fields[5]))
+                curve.emplace_back(flow_to_m3_per_hour(point.first)/3600.0,length_to_metres(point.second));
+            auto valve=std::make_unique<EpanetValve>(id,from,to,density,area,
+                valve_type=="PSV" ? EpanetValve::Kind::PSV : valve_type=="PBV" ? EpanetValve::Kind::PBV : valve_type=="PRV" ? EpanetValve::Kind::PRV : valve_type=="FCV" ? EpanetValve::Kind::FCV : EpanetValve::Kind::GPV,
+                setting,factor,minor_loss,valve_type=="GPV" ? record.fields[5] : "",curve);
+            if(status != EpanetTcvStatus::Active) valve->SetEpanetTcvStatus(status);
+            edges.push_back(std::move(valve));
+            continue;
+        }
         auto valve = std::make_unique<JelleggorbesFojtas>(
             id, from, to, density, area,
             std::vector<double>{0.0, 100.0},
@@ -855,7 +1119,7 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
 
 void EpanetReader::warn_for_unsupported_sections() {
     const std::vector<std::pair<std::string, std::string> > unsupported = {
-        {"EMITTERS", "Pressure-dependent emitters are not represented."},
+
         {"SOURCES", "EPANET water-quality sources are not represented."},
         {"REACTIONS", "EPANET reaction options are not transferred to STACI's transport model."},
         {"MIXING", "Tank mixing models are not represented."},

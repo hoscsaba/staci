@@ -26,6 +26,8 @@ enum class EpanetChemicalSourceType {
 struct EpanetChemicalNode {
     double initial_concentration_kgm3 = 0.0;
     bool fixed_external_concentration = false;
+    double tank_volume_m3 = -1.0; // negative means a junction/reservoir
+    double tank_reaction_per_s = 0.0;
 };
 
 struct EpanetChemicalLink {
@@ -36,6 +38,11 @@ struct EpanetChemicalLink {
     // consume the chemical and positive values produce it.
     double reaction_coefficient_per_s = 0.0;
     double initial_concentration_kgm3 = 0.0;
+    double diameter_m = 0.0;
+    double length_m = 0.0;
+    double wall_mps = 0.0;
+    double viscosity_m2s = 1.1e-5 * 0.3048 * 0.3048;
+    double diffusivity_m2s = 1.3e-8 * 0.3048 * 0.3048;
 };
 
 struct EpanetChemicalSource {
@@ -51,7 +58,8 @@ class EpanetChemicalModel {
 public:
     EpanetChemicalModel(std::vector<EpanetChemicalNode> nodes,
                         std::vector<EpanetChemicalLink> links,
-                        double quality_timestep_s);
+                        double quality_timestep_s, double concentration_tolerance = 1.0e-12);
+    // External flows are signed: positive supply, negative consumption.
     void advance(double duration_s,
                  const std::vector<double> &link_flows_m3s,
                  const std::vector<double> &external_inflows_m3s,
@@ -68,6 +76,7 @@ private:
     std::vector<EpanetChemicalLink> links_;
     std::vector<std::deque<Segment> > segments_;
     std::vector<double> node_concentration_kgm3_;
+    double concentration_tolerance_;
     double quality_timestep_s_;
 
     void step(double dt_s, const std::vector<double> &link_flows_m3s,

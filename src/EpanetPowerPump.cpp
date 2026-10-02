@@ -4,6 +4,9 @@
 #include <sstream>
 #include <stdexcept>
 
+// EPANET constant-power coefficient (8.814 ft*cfs/HP), in SI per watt.
+static constexpr double epanet_power_head_per_watt = 8.814 * 0.3048 * 0.028316846592 / 745.7;
+
 EpanetPowerPump::EpanetPowerPump(const string &name,
                                  const string &node_from,
                                  const string &node_to,
@@ -32,7 +35,7 @@ double EpanetPowerPump::f(const vector<double> &x) {
     if (!enabled || operating_speed <= 0.0)
         return mp;
     const double flow = safe_mass_flow();
-    const double pump_head = effective_power() / (g * flow);
+    const double pump_head = effective_power() * epanet_power_head_per_watt * 1000.0 / flow;
     return (x[1] - x[0]) + (x[3] - x[2]) - pump_head;
 }
 
@@ -43,7 +46,7 @@ vector<double> EpanetPowerPump::df(const vector<double> &) {
     vector<double> result;
     result.push_back(-1.0);
     result.push_back(1.0);
-    result.push_back(effective_power() / (g * flow * flow));
+    result.push_back(effective_power() * epanet_power_head_per_watt * 1000.0 / (flow * flow));
     result.push_back(0.0);
     return result;
 }
@@ -73,7 +76,7 @@ double EpanetPowerPump::Get_dprop(const string &property) {
     if (property == "status")
         return enabled && operating_speed > 0.0 ? 1.0 : 0.0;
     if (property == "headloss" || property == "headloss_per_unit_length")
-        return std::fabs(effective_power() / (g * safe_mass_flow()));
+        return std::fabs(effective_power() * epanet_power_head_per_watt * 1000.0 / safe_mass_flow());
     if (property == "concentration" || property == "konc_atlag")
         return konc_atlag;
     return 0.0;

@@ -120,18 +120,18 @@ int main(int argc, char *argv[]) {
         std::vector<double>{0.0, 0.0}, 50.0, 1.0);
     tcv.SetEpanetTcvMetadata(8.0, 1.5, EpanetTcvStatus::Active);
     const double expected_active_coefficient =
-        8.0 / (2.0 * 9.81 * 1000.0 * 1000.0 * area * area);
+        8.0 * 0.05093871858091765 / (1000.0 * 1000.0 * area * area);
     if (std::fabs(tcv.Get_dprop("position") - 50.0) > 1.0e-12 ||
         std::fabs(tcv.Get_dprop("veszt") - expected_active_coefficient) > 1.0e-12 ||
         tcv.GetEpanetTcvSetting() != 8.0 ||
         tcv.GetEpanetTcvMinorLoss() != 1.5 ||
         !tcv.CanExportAsEpanetTcv()) {
-        std::cerr << "TCV metadata or K*v^2/(2g) conversion is incorrect\n";
+        std::cerr << "TCV metadata or EPANET minor-loss conversion is incorrect\n";
         return 1;
     }
     tcv.SetEpanetTcvStatus(EpanetTcvStatus::Open);
     const double expected_open_coefficient =
-        1.5 / (2.0 * 9.81 * 1000.0 * 1000.0 * area * area);
+        1.5 * 0.05093871858091765 / (1000.0 * 1000.0 * area * area);
     if (std::fabs(tcv.Get_dprop("veszt") - expected_open_coefficient) > 1.0e-12) {
         std::cerr << "OPEN TCV does not use its minor-loss coefficient\n";
         return 1;

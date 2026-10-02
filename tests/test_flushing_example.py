@@ -31,7 +31,7 @@ with tempfile.TemporaryDirectory(prefix='staci worked example ') as temp:
     # Solve h_supply = h_MAIN(Q) + h_branch(Q) + K*(Q/A)^2/(2g)
     # independently by bisection, using STACI's documented H-W resistance.
     def resistance(length, diameter):
-        return length/120**1.85/diameter**4.87*7.88/.85**1.85
+        return length/120**1.852/diameter**4.871*(4.727*.3048**4.871/.028316846592**1.852)
     for row in rows(output/'scenarios.csv'):
         node = row['node_id']
         pipe_resistance = resistance(100,.15)
@@ -40,7 +40,7 @@ with tempfile.TemporaryDirectory(prefix='staci worked example ') as temp:
         lo, hi = 0., .1
         for _ in range(100):
             q = (lo+hi)/2
-            head = pipe_resistance*q**1.85 + 2*(q/.002)**2/(2*9.81)
+            head = pipe_resistance*q**1.852 + 2*(q/.002)**2/(2*9.81)
             if head > 40: hi=q
             else: lo=q
         assert row['status']=='ok'

@@ -112,6 +112,7 @@ Inheritance diagram for JelleggorbesFojtas:</div>
   <img src="class_jelleggorbes_fojtas.png" usemap="#JelleggorbesFojtas_map" alt=""/>
   <map id="JelleggorbesFojtas_map" name="JelleggorbesFojtas_map">
 <area href="class_agelem.html" alt="Agelem" shape="rect" coords="0,0,119,24"/>
+<area href="class_epanet_valve.html" alt="EpanetValve" shape="rect" coords="0,112,119,136"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -133,6 +134,22 @@ void&#160;</td><td class="memItemRight"><b>Update_zeta</b> ()</td></tr>
 <tr class="memdesc:af824d8d1f7e90a152be63227b0188827"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set a supported numeric property.  <br /></td></tr>
 <tr class="memitem:a5129bbcbd1cbc5e4d0dccd5a9916224d" id="r_a5129bbcbd1cbc5e4d0dccd5a9916224d"><td class="memItemLeft">double&#160;</td><td class="memItemRight"><a class="el" href="#a5129bbcbd1cbc5e4d0dccd5a9916224d">Get_dprop</a> (const string &amp;property) override</td></tr>
 <tr class="memdesc:a5129bbcbd1cbc5e4d0dccd5a9916224d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get double property, <a class="el" href="class_cso.html">Cso</a> es <a class="el" href="class_csatorna.html">Csatorna</a> akarja elulirja.  <br /></td></tr>
+<tr class="memitem:a2bc8a8aa54a92f82999e46e8d6f49026" id="r_a2bc8a8aa54a92f82999e46e8d6f49026"><td class="memItemLeft"><a id="a2bc8a8aa54a92f82999e46e8d6f49026" name="a2bc8a8aa54a92f82999e46e8d6f49026"></a>
+void&#160;</td><td class="memItemRight"><b>SetEpanetTcvMetadata</b> (double setting, double minor_loss, EpanetTcvStatus status=EpanetTcvStatus::Active)</td></tr>
+<tr class="memitem:a6f4e613b9aaec96e7e9455d35bb075fe" id="r_a6f4e613b9aaec96e7e9455d35bb075fe"><td class="memItemLeft"><a id="a6f4e613b9aaec96e7e9455d35bb075fe" name="a6f4e613b9aaec96e7e9455d35bb075fe"></a>
+virtual void&#160;</td><td class="memItemRight"><b>SetEpanetTcvSetting</b> (double setting)</td></tr>
+<tr class="memitem:ae8e215f9d26bfecb19ab3aab71981179" id="r_ae8e215f9d26bfecb19ab3aab71981179"><td class="memItemLeft"><a id="ae8e215f9d26bfecb19ab3aab71981179" name="ae8e215f9d26bfecb19ab3aab71981179"></a>
+virtual void&#160;</td><td class="memItemRight"><b>SetEpanetTcvStatus</b> (EpanetTcvStatus status)</td></tr>
+<tr class="memitem:a5cb3fb4a6c74256f974e6423f7d820bb" id="r_a5cb3fb4a6c74256f974e6423f7d820bb"><td class="memItemLeft"><a id="a5cb3fb4a6c74256f974e6423f7d820bb" name="a5cb3fb4a6c74256f974e6423f7d820bb"></a>
+bool&#160;</td><td class="memItemRight"><b>HasEpanetTcvMetadata</b> () const noexcept</td></tr>
+<tr class="memitem:a819f37e63c621ba589daec45575b5f78" id="r_a819f37e63c621ba589daec45575b5f78"><td class="memItemLeft"><a id="a819f37e63c621ba589daec45575b5f78" name="a819f37e63c621ba589daec45575b5f78"></a>
+virtual bool&#160;</td><td class="memItemRight"><b>CanExportAsEpanetTcv</b> () const noexcept</td></tr>
+<tr class="memitem:a6984cdf6eb74e14dd745b8715309fa3a" id="r_a6984cdf6eb74e14dd745b8715309fa3a"><td class="memItemLeft"><a id="a6984cdf6eb74e14dd745b8715309fa3a" name="a6984cdf6eb74e14dd745b8715309fa3a"></a>
+virtual double&#160;</td><td class="memItemRight"><b>GetEpanetTcvSetting</b> () const noexcept</td></tr>
+<tr class="memitem:ad565e69ca2c739a036d7d004f7cddbe9" id="r_ad565e69ca2c739a036d7d004f7cddbe9"><td class="memItemLeft"><a id="ad565e69ca2c739a036d7d004f7cddbe9" name="ad565e69ca2c739a036d7d004f7cddbe9"></a>
+virtual double&#160;</td><td class="memItemRight"><b>GetEpanetTcvMinorLoss</b> () const noexcept</td></tr>
+<tr class="memitem:ab52f62799b494f66bda343070ca8239e" id="r_ab52f62799b494f66bda343070ca8239e"><td class="memItemLeft"><a id="ab52f62799b494f66bda343070ca8239e" name="ab52f62799b494f66bda343070ca8239e"></a>
+virtual EpanetTcvStatus&#160;</td><td class="memItemRight"><b>GetEpanetTcvStatus</b> () const noexcept</td></tr>
 <tr class="memitem:a6c3b4c6940a01d520fb278233847e3a4" id="r_a6c3b4c6940a01d520fb278233847e3a4"><td class="memItemLeft">string_view&#160;</td><td class="memItemRight"><a class="el" href="#a6c3b4c6940a01d520fb278233847e3a4">GetType</a> () const noexcept override</td></tr>
 <tr class="memdesc:a6c3b4c6940a01d520fb278233847e3a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the runtime type identifier used throughout STACI.  <br /></td></tr>
 <tr class="inherit_header pub_methods_class_agelem"><td colspan="2">Public Member Functions inherited from <a class="el" href="class_agelem.html">Agelem</a></td></tr>
@@ -197,8 +214,8 @@ void&#160;</td><td class="memItemRight"><b>Set_tt_end</b> (double tmp)</td></tr>
 <tr class="memitem:a0b858ef17c27b14b60c29404be67e486 pub_methods_class_agelem" id="r_a0b858ef17c27b14b60c29404be67e486"><td class="memItemLeft">virtual double&#160;</td><td class="memItemRight"><a class="el" href="class_agelem.html#a0b858ef17c27b14b60c29404be67e486">Get_FolyTerf</a> ()</td></tr>
 <tr class="memitem:a0c6ee94ed5706b9d40651d69f495da51 pub_methods_class_agelem" id="r_a0c6ee94ed5706b9d40651d69f495da51"><td class="memItemLeft">
 void&#160;</td><td class="memItemRight"><b>Set_enabled</b> (bool value)</td></tr>
-<tr class="memitem:a8ca0ae50344237cca93f951ae81dd00f pub_methods_class_agelem" id="r_a8ca0ae50344237cca93f951ae81dd00f"><td class="memItemLeft">
-bool&#160;</td><td class="memItemRight"><b>Is_enabled</b> () const</td></tr>
+<tr class="memitem:ae15a64229c9ddc1b4b09b8e5b5803c1c pub_methods_class_agelem" id="r_ae15a64229c9ddc1b4b09b8e5b5803c1c"><td class="memItemLeft">
+virtual bool&#160;</td><td class="memItemRight"><b>Is_enabled</b> () const</td></tr>
 <tr class="memitem:a0fe1b2066bfd416f6568a4e09e6375b6 pub_methods_class_agelem" id="r_a0fe1b2066bfd416f6568a4e09e6375b6"><td class="memItemLeft">
 vector&lt; double &gt;&#160;</td><td class="memItemRight"><b>interp</b> (const vector&lt; double &gt; &amp;x, const vector&lt; double &gt; &amp;y, const vector&lt; double &gt; &amp;xg)</td></tr>
 <tr class="memdesc:a0fe1b2066bfd416f6568a4e09e6375b6 pub_methods_class_agelem"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matlab-szeru linearis interpolacio. <br /></td></tr>

@@ -1,3 +1,6 @@
+#include <stdexcept>
+#include <cmath>
+#include "diagnostics.h"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -104,7 +107,7 @@ string Csomopont::Info(bool check_if_lonely)
         strstrm << "\n!!! PANIC !!! Lonely node: " << nev
                 << " !!!\n";
         cout << strstrm.str();
-        exit(-1);
+        diagnostics::fail_legacy(__FILE__, __LINE__);
     }
 
     return strstrm.str();
@@ -195,4 +198,18 @@ double Csomopont::Get_dprop(string mit)
         cout << ", helyes ertekek: cl_be|konc_atlag|demand|pressure" << endl << endl;
     }
     return outdata;
+}
+
+void Csomopont::SetPressureDemand(double minimum,double required,double exponent) {
+    if(!std::isfinite(minimum)||!std::isfinite(required)||!std::isfinite(exponent)||minimum<0||required<=minimum||exponent<=0) throw std::invalid_argument("PDA requires finite nonnegative minimum pressure, greater required pressure, and positive exponent at junction "+nev);
+    pressure_demand_=true;minimum_pressure_=minimum;required_pressure_=required;pressure_exponent_=exponent;
+}
+double Csomopont::DeliveredDemand() const {
+    if(!pressure_demand_ || fogy<=0 || p_head>=required_pressure_) return fogy;
+    if(p_head<=minimum_pressure_) return 0;
+    return fogy*std::pow((p_head-minimum_pressure_)/(required_pressure_-minimum_pressure_),pressure_exponent_);
+}
+double Csomopont::DemandDerivative() const {
+    if(!pressure_demand_ || fogy<=0 || p_head<=minimum_pressure_ || p_head>=required_pressure_) return 0;
+    return fogy*pressure_exponent_/(required_pressure_-minimum_pressure_)*std::pow((p_head-minimum_pressure_)/(required_pressure_-minimum_pressure_),pressure_exponent_-1);
 }

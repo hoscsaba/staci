@@ -41,18 +41,20 @@ does not have a STACI equivalent. It currently transfers:
   setting, diameter, separate minor-loss coefficient, and
   `ACTIVE`/`OPEN`/`CLOSED` state while converting the active hydraulic
   coefficient to STACI's SI mass-flow form;
-- relevant solver settings such as trial count and accuracy (the latter is an
-  approximate mapping because the convergence criteria differ);
+- trial count and explicit SI residual limits; EPANET dimensionless ACCURACY
+  is not treated as a dimensional STACI tolerance;
 - a lossless EPANET document containing the original text, section and record
   order, line endings, inline comments and their record IDs, tags, map data,
   and non-hydraulic run configuration.
 
 Rule-based controls are executed in EPANET EPS mode but do not affect a single
-steady-state import. TCV settings and states are supported; other regulated
-valve types and emitters are not simulated. Chemical EPS applies initial
-quality, all four EPANET source types and their patterns, plus first-order global
-and pipe-specific bulk and wall reactions. Tank chemical storage/mixing and
-non-first-order reactions remain unsupported and produce explicit warnings.
+steady-state import. TCV, PRV, PSV, PBV, FCV and GPV valves, emitters and
+pressure-dependent demands are supported. Chemical EPS applies initial quality,
+all four source types and their patterns, first-order bulk/wall reactions with
+mass transfer, and MIXED tank storage/reaction. Other chemical tank mixing laws
+and non-first-order reaction laws produce explicit compatibility errors.
+Water-age tank mixing and TRACE remain limited. Element support does not imply
+complete EPS agreement; see [current reference status](epanet_reference.md).
 Descriptive metadata, map sections, and non-hydraulic run configuration do not
 affect the hydraulic snapshot, but they remain attached to the imported
 EPANET document for lossless export. Each incompatible calculation feature is
@@ -105,14 +107,14 @@ EPANET field is supported yet.
 | 3 | Pipe | `Cso`, including one-way `CV` mode | **Direct; hydraulic and status fields retained and applied** | |
 | 4 | Pump, `POWER` form | `EpanetPowerPump` | **Direct; definition, status, speed, patterns and energy metadata retained** | |
 | 5 | Pump, `HEAD` curve form | `Szivattyu` | **Direct; original curve and all pump attributes retained** | |
-| 6 | Tank | `Csomopont` + `Vegakna` | **Supported in EPS; approximate in steady mode** | EPS applies operating limits, cylindrical storage, and referenced piecewise-linear volume curves. The steady importer uses initial level as a fixed boundary; native SPR export must infer missing operating limits. Tank quality mixing remains. |
+| 6 | Tank | `Csomopont` + `Vegakna` | **Supported in EPS; approximate in steady mode** | EPS applies operating limits, cylindrical storage, and referenced piecewise-linear volume curves. The steady importer uses initial level as a fixed boundary; native SPR export must infer missing operating limits. Chemical MIXED storage/reaction is supported; other chemical mixing models and water-age tank mixing remain limited. |
 | 7 | Throttle control valve (`TCV`) | `JelleggorbesFojtas` | **Direct; constant curve, setting, minor loss and status retained and applied** | |
-| 8 | General-purpose valve (`GPV`) | `JelleggorbesFojtas` | **Similar STACI type exists; not mapped** | Adapt the referenced GPV head-loss curve without losing its ID or points and validate that its sign and interpolation semantics match STACI. |
-| 9 | Emitter attached to a junction | None | **No equivalent** | Add a pressure-dependent outlet representation with emitter coefficient and pressure exponent, plus INP import/export support. |
-| 10 | Pressure breaker valve (`PBV`) | None | **No exact equivalent** | Add a valve with a prescribed pressure drop and open/closed state; an ordinary throttling curve is not an exact substitute. |
-| 11 | Flow control valve (`FCV`) | None | **No equivalent** | Add a flow-setpoint valve and its active/open/closed operating states. |
-| 12 | Pressure reducing valve (`PRV`) | None | **No equivalent** | Add downstream-pressure regulation and the EPANET active/open/closed state model. |
-| 13 | Pressure sustaining valve (`PSV`) | None | **No equivalent** | Add upstream-pressure regulation and the EPANET active/open/closed state model. |
+| 8 | General-purpose valve (`GPV`) | `EpanetValve` | **Referenced head-loss curve and status supported** | See valve/pressure validation for physical constraints. |
+| 9 | Emitter attached to a junction | `EpanetEmitter` | **Pressure-dependent outlet, coefficient and exponent supported** | See valve/pressure validation for physical constraints. |
+| 10 | Pressure breaker valve (`PBV`) | `EpanetValve` | **Prescribed pressure drop and operating states supported** | See valve/pressure validation for physical constraints. |
+| 11 | Flow control valve (`FCV`) | `EpanetValve` | **Flow setpoint and active/open/closed states supported** | See valve/pressure validation for physical constraints. |
+| 12 | Pressure reducing valve (`PRV`) | `EpanetValve` | **Downstream pressure regulation and operating states supported** | See valve/pressure validation for physical constraints. |
+| 13 | Pressure sustaining valve (`PSV`) | `EpanetValve` | **Upstream pressure regulation and operating states supported** | See valve/pressure validation for physical constraints. |
 
 EPANET also has data objects that are not standalone hydraulic elements. Their
 current STACI counterparts, ordered approximately from easier to harder to
@@ -121,10 +123,10 @@ represent structurally, are:
 | EPANET data object | STACI support |
 |---|---|
 | Base demands and `[DEMANDS]` categories | **Supported:** retained as separate typed node metadata with category labels, independent pattern references and complete multiplier series. The hydraulic snapshot receives their time-zero aggregate. |
-| Curves | **Partial:** HEAD pump curves and pump-efficiency curves are retained with their original IDs and SI points. Referenced tank-volume curves are applied by EPS using EPANET piecewise-linear volume-depth interpolation. A general editable tank-curve model and GPV curve mapping remain. |
+| Curves | **Partial:** HEAD pump curves and pump-efficiency curves are retained with their original IDs and SI points. Referenced tank-volume curves are applied by EPS using EPANET piecewise-linear volume-depth interpolation. GPV head-loss curves are also mapped; a general network editing API remains separate from lossless import/export. |
 | Patterns | **Partial:** complete demand, reservoir-head, pump-speed and pump energy-price patterns are retained by their corresponding STACI elements; hydraulic patterns are used by EPS. A reusable network-level model for other pattern types is still missing. |
 | Simple controls and rule-based controls | **Supported in EPS:** simple controls execute `OPEN`, `CLOSED`, `ACTIVE`, numeric pump speeds and numeric TCV loss settings for node pressure/tank level, elapsed-time, and clock-time triggers. The EPS rule engine supports `IF`/`AND`/`OR`, `THEN`, multiple actions, `ELSE`, priorities, node/tank/link/system premises, TCV setting/status premises, and the separate rule timestep. Both sections remain losslessly retained in the imported INP document; neither yet has a network-level editable STACI object outside EPS. |
-| Water age, chemical sources, reactions and tank mixing | **Partial:** EPS solves `QUALITY AGE` and `QUALITY CHEMICAL` with segment-based plug flow, timestep-volume node mixing, reservoirs, pumps and valves. Initial quality, `CONCEN`/`MASS`/`SETPOINT`/`FLOWPACED` sources with patterns, and first-order global or pipe-specific bulk/wall coefficients are applied. Tank storage/mixing, trace mode, and non-first-order kinetics remain. |
+| Water age, chemical sources, reactions and tank mixing | **Partial:** EPS solves `QUALITY AGE` and `QUALITY CHEMICAL` with segment-based plug flow, timestep-volume node mixing, reservoirs, pumps and valves. Initial quality, `CONCEN`/`MASS`/`SETPOINT`/`FLOWPACED` sources with patterns, and first-order global or pipe-specific bulk/wall coefficients are applied. Chemical MIXED tank storage/reaction is supported; other mixing laws, TRACE and non-first-order kinetics remain limited or explicitly rejected. |
 
 STACI also contains `Csatorna` (open channel) and `BukoMutargy` (overflow/weir),
 for which EPANET has no native hydraulic element. These elements are therefore
@@ -149,72 +151,30 @@ separate from lossless INP preservation: unsupported records and sections in an
 imported `EpanetDocument` can still be re-exported unchanged even when STACI
 cannot simulate them.
 
-### EPANET–STACI compatibility TODO (easiest first)
+### EPANET–STACI compatibility status and remaining work
 
-The following work is ordered by expected implementation difficulty. It is
-limited to INP data coverage, lossless import/export, and the set of available
-network elements; changes to the hydraulic solution method are intentionally
-out of scope. Each completed item should include a minimal INP fixture and a
-field-level `INP -> STACI -> INP` round-trip assertion.
+Implemented coverage includes lossless INP metadata, demand categories, pump
+metadata, CV pipes, all six valve types, emitters, PDA, dynamic controls/rules,
+and first-order chemical EPS with complete-mix tanks. Imported INP preservation
+is distinct from native SPR export and from numerical equivalence.
 
-1. [x] **Preserve descriptive metadata.** Store and re-export `[TITLE]`, inline
-   comments, and `[TAGS]` without changing their text or association with
-   nodes and links.
-2. [x] **Preserve map metadata.** Round-trip `[COORDINATES]`, `[VERTICES]`,
-   `[LABELS]`, and `[BACKDROP]`, including numeric values, backdrop declarations,
-   associations, and ordering.
-3. [x] **Preserve non-hydraulic run configuration.** Store and re-export all
-   recognized `[TIMES]`, `[REPORT]`, `[ENERGY]`, and currently unused
-   `[OPTIONS]` entries instead of reducing them to warnings.
-4. [ ] **Retain the source unit system.** When an INP network is imported and
-   exported again, preserve its original EPANET flow units and convert every
-   affected field back consistently; keep `LPS` as the default for native SPR
-   exports.
-5. [x] **Complete pipe field coverage.** Import and export minor-loss
-   coefficients, `Open`/`Closed`/`CV` pipe status, and matching `[STATUS]`
-   overrides. `CV` uses a one-way `Cso` mode so the original pipe geometry,
-   friction model, and minor-loss coefficient remain active.
-6. [ ] **Round-trip all tank fields.** Retain minimum and maximum level,
-   minimum volume, diameter, initial level, and the referenced volume-curve ID
-   instead of inferring missing values during export.
-7. [x] **Preserve multiple demand categories.** Keep every `[DEMANDS]` row,
-   category label, pattern reference, and junction base demand separately
-   instead of storing only one summed STACI demand value. The solver-facing
-   aggregate remains available without replacing the retained components.
-8. [ ] **Add a native pattern data model.** Store complete `[PATTERNS]` series,
-   the default pattern, and all object-to-pattern references so an
-   INP–SPR–INP round trip does not collapse a pattern to its first multiplier.
-9. [x] **Complete pump data coverage.** Preserve pump curve IDs, `POWER`/`HEAD`
-   form, initial status, relative speed, speed-pattern reference, and associated
-   efficiency and energy records during import and export.
-10. [ ] **Classify and preserve every curve.** Distinguish pump, efficiency,
-    volume, and general-purpose curves, validate their references, and export
-    them with their original IDs and numeric data.
-11. [ ] **Represent emitters as network elements.** Add an import/export mapping
-    for `[EMITTERS]`, including the emitter coefficient and the relevant
-    pressure-exponent option, with an explicit placeholder representation when
-    no equivalent STACI element is available.
-12. [ ] **Map general-purpose valves.** TCV records are now mapped to constant
-    `JelleggorbesFojtas` curves with unit-correct setting, minor-loss and status
-    handling. Implement the remaining EPANET `GPV` mapping using its referenced
-    head-loss curve without changing its interpolation semantics.
-13. [ ] **Represent regulated EPANET valves.** Add native element records and
-    lossless INP mappings for `PRV`, `PSV`, `PBV`, and `FCV`, including setting,
-    minor-loss coefficient, and initial status.
-14. [ ] **Expose controls and rules as editable network objects.** EPS now
-    parses and executes `[CONTROLS]` and `[RULES]` as typed runtime objects, and
-    imported INP text is re-exported losslessly. A reusable network-level API
-    is still needed to edit their references, thresholds, actions, priorities,
-    and ordering outside an EPS run.
-15. [x] **Preserve water-quality configuration.** Round-trip `[QUALITY]`,
-    `[SOURCES]`, `[REACTIONS]`, and `[MIXING]`, including units, source types,
-    coefficients, tank mixing models, and pattern references. EPS now applies
-    chemical initial quality, sources and first-order reactions; unsupported
-    tank mixing and reaction orders remain losslessly preserved and warned.
-16. [ ] **Introduce a lossless fallback for unknown sections.** Keep unknown or
-    newer EPANET sections and unsupported records as raw, ordered INP data so
-    STACI can modify known properties without silently discarding future
-    EPANET extensions.
+Remaining work includes:
+
+1. Resolve the recorded full-period hydraulic discrepancies in Net3/Net6
+   variants and strict-profile edge cases, without changing common tolerances.
+2. Resolve stagnant-branch chemical concentration differences and extend
+   independent reaction/transport/mixing validation; the stagnant Batch
+   chemical reference is currently unavailable.
+3. Extend chemical tank mixing beyond MIXED, non-first-order reactions and TRACE;
+   improve water-age tank mixing.
+4. Extend the editable network API and native SPR round trips for complete
+   pattern, control, rule, tank and curve metadata. Lossless preservation of an
+   imported INP does not by itself implement these native editing interfaces.
+
+Use [reference validation](epanet_reference.md), [valves](epanet_valves.md) and
+[pressure elements](epanet_pressure_elements.md) for current results and scope.
+The physically inconsistent valve/pump fixtures are diagnostic regressions,
+not a request to make the solver accept a nonphysical solution.
 
 ### Run an EPANET extended-period simulation
 
@@ -623,7 +583,7 @@ For an EPANET extended-period water-age simulation, set `QUALITY AGE` in the
 INP `[OPTIONS]` section and run `--epanet-eps`; node and link ages are then
 written to CSV and HDF5 in SI seconds.
 
-For chlorine, set `QUALITY CHEMICAL Chlorine mg/L` and use `[QUALITY]`,
+For chlorine, set the EPANET-compatible `QUALITY Chlorine mg/L` and use `[QUALITY]`,
 `[SOURCES]`, and `[REACTIONS]` normally. The same EPS command writes node and
 link concentrations to CSV and HDF5 as SI `kg/m3`.
 
@@ -645,6 +605,10 @@ link concentrations to CSV and HDF5 as SI `kg/m3`.
 
 This produces `nodelist.txt` and `connected_nodes.txt`. The scripts in
 `python_tools/` can be used for additional connectivity analysis.
+
+Auxiliary optimizer settings, calibration measurements and `staci -i` initial
+values also accept JSON. Network definitions remain SPR/XML or INP; see
+[JSON input formats](json_inputs.md) for schemas and examples.
 
 ## Command-line reference
 

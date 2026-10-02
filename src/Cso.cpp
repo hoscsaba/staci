@@ -366,7 +366,47 @@ void Cso::Set_dprop(const string &mit, double mire) {
 /*!
 dp'=lambda*L/D*ro/2*v*fabs(v)
 */
+// EPANET 2.2 pipe equations in SI. Native SPR equations retain their legacy model.
+// H-W exponents/coefficient and D-W transition interpolation follow the
+// published EPANET hydraulic algorithms (OWA hydcoeffs.c, MIT license;
+// see tests/public_networks/licenses/OWA-EPANET-MIT.txt).
+double Cso::EpanetHeadloss(double flow) const {
+  const double q = std::abs(flow);
+  const double minor = 0.02517 * std::pow(0.3048, 5) /
+      std::pow(0.028316846592, 2) * minor_loss / std::pow(D, 4) * q * flow;
+  if (friction_model_type == 1) {
+    const double coefficient = 4.727 * std::pow(0.3048, 4.871) /
+        std::pow(0.028316846592, 1.852);
+    const double resistance = coefficient * L / std::pow(erdesseg, 1.852) / std::pow(D, 4.871);
+    const double minimum_gradient = 1e-7 * 0.3048 / 0.028316846592;
+    if (1.852 * resistance * std::pow(q, 0.852) < minimum_gradient)
+      return minimum_gradient * flow + minor;
+    return resistance * std::pow(q, 0.852) * flow + minor;
+  }
+  const double area = M_PI * D * D / 4.0;
+  const double reynolds = q * D / area / epanet_viscosity;
+  const double resistance = L / (2.0 * 32.2 * 0.3048 * D * area * area);
+  if (reynolds <= 2000.0)
+    return 16.0 * M_PI * epanet_viscosity * D * resistance * flow + minor;
+  const double roughness = erdesseg / 1000.0 / D;
+  double friction;
+  if (reynolds >= 4000.0) {
+    const double x = std::log10(roughness / 3.7 + 5.74 / std::pow(reynolds, 0.9));
+    friction = 0.25 / (x*x);
+  } else {
+    const double y2 = roughness / 3.7 + 3.28895476345399058690e-3;
+    const double y3 = -2.0 / std::log(10.0) * std::log(y2);
+    const double fa = 1.0 / (y3*y3);
+    const double fb = (2.0 - 5.14214965799093883760e-3 / (y2*y3)) * fa;
+    const double t = reynolds / 2000.0;
+    friction = (7*fa-fb) + t*((0.128-17*fa+2.5*fb) +
+        t*((-0.128+13*fa-2*fb) + t*(0.032-3*fa+0.5*fb)));
+  }
+  return resistance * friction * q * flow + minor;
+}
+
 double Cso::ComputeHeadloss() {
+  if (epanet_hydraulics) return ro * g * EpanetHeadloss(mp / ro);
   double v = mp / ro / Aref;
   const double resistance = surlodas() * L / D + minor_loss;
   return resistance * ro / 2. * v * fabs(v);
@@ -380,6 +420,11 @@ d dp'/dmp=lambda*L/D*ro/2*1/(ro*A)^2*abs(v)
 */
 
 double Cso::ComputeHeadlossDerivative() {
+  if (epanet_hydraulics) {
+    const double q = mp / ro;
+    const double step = std::max(1e-10, std::abs(q) * 1e-5);
+    return g * (EpanetHeadloss(q + step) - EpanetHeadloss(q - step)) / (2 * step);
+  }
   if (friction_model_type == 1 && erdesseg > 0.0) {
     // Hazen-Williams is proportional to mp*|mp|^0.85.  Treating it as the
     // quadratic Darcy-Weisbach law biases both Newton's Jacobian and all

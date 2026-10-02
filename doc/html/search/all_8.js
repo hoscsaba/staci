@@ -1,13 +1,20 @@
 var searchData=
 [
-  ['ido_0',['ido',['../class_agelem.html#a0cdf382c62ac004b8a120319be0cea84',1,'Agelem']]],
-  ['impl_1',['Impl',['../class_eps_result_writer_1_1_impl.html',1,'EpsResultWriter']]],
-  ['import_20an_20epanet_20network_2',['Import an EPANET network',['../index.html#autotoc_md12',1,'']]],
-  ['inc_5frank_3',['Inc_rank',['../class_csomopont.html#ae928b4beecf8437a96eb6af5c494ff2b',1,'Csomopont']]],
-  ['info_4',['Info',['../class_agelem.html#a2e6c4688cdbdf17c6d3bde0c6c08ff49',1,'Agelem::Info()'],['../class_buko_mutargy.html#a1d0c623e681d89d913925e26599c3a63',1,'BukoMutargy::Info()'],['../class_csatorna.html#aa95738a92b7158901e8ad29644915655',1,'Csatorna::Info()'],['../class_cso.html#a49aa46060ddf197b8afc80975871ade1',1,'Cso::Info()'],['../class_epanet_power_pump.html#a73478e600b4f2beb8d43de4be3ffaf92',1,'EpanetPowerPump::Info()'],['../class_jelleggorbes_fojtas.html#a9cfc7a3e03f166e69a4ecef7d5af0393',1,'JelleggorbesFojtas::Info()'],['../class_konst_nyomas.html#a7547b07f6cab9e0d9dabdfae3172cd48',1,'KonstNyomas::Info()'],['../class_szivattyu.html#a1d4e92a65b3da84a4b0d69561630d1e3',1,'Szivattyu::Info()'],['../class_vegakna.html#afc8c1e9d4da4bab47fd63c9842baf7f5',1,'Vegakna::Info()'],['../class_visszacsapo_szelep.html#a968eb3fc85eabd2d185cb13ec59056eb',1,'VisszacsapoSzelep::Info()']]],
-  ['ini_5',['Ini',['../class_agelem.html#a844171faf01143770bbd894b1a48e72f',1,'Agelem::Ini()'],['../class_buko_mutargy.html#afd9e54cf447dd433330b64fadca456cc',1,'BukoMutargy::Ini()'],['../class_csatorna.html#ae0265e98ca0d12c4bfe4685d1390938a',1,'Csatorna::Ini()'],['../class_cso.html#a2e4c6be2cd1731cc4ab6b14192514fd5',1,'Cso::Ini()'],['../class_csomopont.html#ac60c263a3ceae0a0ad83be1a35130c18',1,'Csomopont::Ini()'],['../class_epanet_power_pump.html#a51195635465ad759444afd42dae51b1c',1,'EpanetPowerPump::Ini()'],['../class_jelleggorbes_fojtas.html#abd0e1ee67e86566a9fc23c63951944c0',1,'JelleggorbesFojtas::Ini()'],['../class_konst_nyomas.html#af79ed796116893de514f32f344f26c86',1,'KonstNyomas::Ini()'],['../class_szivattyu.html#aa959cbb38453f75dbca9fce2a4c2ca7c',1,'Szivattyu::Ini()'],['../class_vegakna.html#a043852ba5b96e03c7cab7f52a128ef0a',1,'Vegakna::Ini()'],['../class_visszacsapo_szelep.html#aeadf7c9a1cd51de4075a246d59f75171',1,'VisszacsapoSzelep::Ini()']]],
-  ['install_20to_20a_20staging_20directory_6',['Install to a staging directory',['../index.html#autotoc_md9',1,'']]],
-  ['installations_7',['Non-standard SuiteSparse installations',['../index.html#autotoc_md25',1,'']]],
-  ['integration_20tests_8',['Run the integration tests',['../index.html#autotoc_md10',1,'']]],
-  ['interp_9',['interp',['../class_agelem.html#a0fe1b2066bfd416f6568a4e09e6375b6',1,'Agelem']]]
+  ['f_0',['f',['../class_agelem.html#a19e5f8de2f41443582f71ebc461999ef',1,'Agelem::f()'],['../class_buko_mutargy.html#a9d124f3bea69c36d956515bfe93d33a2',1,'BukoMutargy::f()'],['../class_csatorna.html#a4cbef5f4033eb7d0ab2884f36e0a7041',1,'Csatorna::f()'],['../class_cso.html#a9eb675069a4c10b79de64b36ae996b48',1,'Cso::f()'],['../class_epanet_emitter.html#a0ae878b7d8539daf9624dbe8ce2e80bf',1,'EpanetEmitter::f()'],['../class_epanet_power_pump.html#a006ff7037cccfe47455036f79ac60f3f',1,'EpanetPowerPump::f()'],['../class_epanet_valve.html#aaf030a628045d8e0b02b15a43fc527c1',1,'EpanetValve::f()'],['../class_hydrant_outlet.html#af382918791585c689db9d09ab53ff879',1,'HydrantOutlet::f()'],['../class_jelleggorbes_fojtas.html#a1e414a1f7a088319a27a8162ce93ed1b',1,'JelleggorbesFojtas::f()'],['../class_konst_nyomas.html#ac0286fac02b1e967f370e3eb80066628',1,'KonstNyomas::f()'],['../class_szivattyu.html#a38411828ecea6506b4b26338b806b276',1,'Szivattyu::f()'],['../class_vegakna.html#a0fe9f6afd4f574754ef2ef1a377cbb50',1,'Vegakna::f()'],['../class_visszacsapo_szelep.html#a711e089ef715c0c294989b5d3d829088',1,'VisszacsapoSzelep::f()']]],
+  ['failures_20and_20integration_1',['Physical failures and integration',['../md_doc_2epanet__reference.html#physical-failures-and-integration',1,'']]],
+  ['fcv_20gpv_20implementation_20stage_2',['Historical PRV/FCV/GPV implementation stage',['../md_doc_2error__classification.html#historical-prvfcvgpv-implementation-stage',1,'']]],
+  ['fedora_3',['Fedora',['../index.html#fedora',1,'']]],
+  ['felépítése_4',['A &lt;span class=&quot;tt&quot;&gt;staci_split_settings.xml&lt;/span&gt; felépítése',['../md_doc_2staci__split__manual.html#a-staci_split_settingsxml-felépítése',1,'']]],
+  ['files_5',['Generated files',['../md_doc_2staci__usage.html#generated-files',1,'']]],
+  ['first_6',['EPANET–STACI element mapping (easiest first)',['../md_doc_2staci__usage.html#epanetstaci-element-mapping-easiest-first',1,'']]],
+  ['first_20error_20categories_20before_20valve_20emitter_20pda_20support_7',['Historical first-error categories (before valve/emitter/PDA support)',['../md_doc_2error__classification.html#historical-first-error-categories-before-valveemitterpda-support',1,'']]],
+  ['fixes_20made_20during_20this_20audit_8',['Fixes made during this audit',['../md_doc_2package__validation.html#fixes-made-during-this-audit',1,'']]],
+  ['flushing_9',['Flushing',['../md_doc_2json__inputs.html#flushing',1,'']]],
+  ['flushing_20analysis_10',['Single-hydrant flushing analysis',['../md_doc_2flushing.html#single-hydrant-flushing-analysis',1,'']]],
+  ['flushing_20reference_11',['STACI flushing reference',['../md_doc_2flushing.html',1,'']]],
+  ['flushing_20sequence_20and_20opening_20times_12',['Flushing sequence and opening times',['../md_doc_2flushing.html#flushing-sequence-and-opening-times',1,'']]],
+  ['folyterf_13',['FolyTerf',['../class_agelem.html#ab235bccddd3f04b9f4e991ee8f3dd8ff',1,'Agelem']]],
+  ['for_20the_20test_20harness_14',['Consequence for the test harness',['../md_doc_2ky10__convergence.html#consequence-for-the-test-harness',1,'']]],
+  ['frictionmodelconfigurable_15',['FrictionModelConfigurable',['../class_friction_model_configurable.html',1,'']]],
+  ['further_20documentation_20and_20examples_16',['Further documentation and examples',['../index.html#further-documentation-and-examples',1,'']]]
 ];

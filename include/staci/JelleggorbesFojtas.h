@@ -1,3 +1,4 @@
+#pragma once
 #include "Agelem.h"
 
 enum class EpanetTcvStatus
@@ -39,13 +40,13 @@ public:
   double Get_dprop(const string &property) override;
   void SetEpanetTcvMetadata(double setting, double minor_loss,
                             EpanetTcvStatus status = EpanetTcvStatus::Active);
-  void SetEpanetTcvSetting(double setting);
-  void SetEpanetTcvStatus(EpanetTcvStatus status);
+  virtual void SetEpanetTcvSetting(double setting);
+  virtual void SetEpanetTcvStatus(EpanetTcvStatus status);
   bool HasEpanetTcvMetadata() const noexcept { return epanet_tcv; }
-  bool CanExportAsEpanetTcv() const noexcept;
-  double GetEpanetTcvSetting() const noexcept;
-  double GetEpanetTcvMinorLoss() const noexcept;
-  EpanetTcvStatus GetEpanetTcvStatus() const noexcept;
+  virtual bool CanExportAsEpanetTcv() const noexcept;
+  virtual double GetEpanetTcvSetting() const noexcept;
+  virtual double GetEpanetTcvMinorLoss() const noexcept;
+  virtual EpanetTcvStatus GetEpanetTcvStatus() const noexcept;
   string_view GetType() const noexcept override
   {
     return "JelleggorbesFojtas";

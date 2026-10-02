@@ -13,14 +13,24 @@ A `staci_split` program segítségével egy hidraulikus hálózat részhálózat
 A program futtatásához szükséges 
 
 - a hidraulikus modellt tartalmazó `.spr` fájl, valamint
-- a beállításokat tartalmazó `staci_split_settings.xml` fájl
+- a beállításokat tartalmazó XML- vagy JSON-fájl
 
-A számítás maga a `staci_split` parancs kiadásával történik abban a könyvtárban, ahol a fenti két fájl is található.
+A beállításfájl explicit kiválasztása:
+
+```sh
+staci_split --settings beallitasok.json --seed 12345
+```
+
+A kiterjesztés választja ki a formátumot. `--settings` nélkül a program a
+munkakönyvtárban lévő `staci_split_settings.xml` fájlt, annak hiányában a
+`staci_split_settings.json` fájlt használja. A relatív útvonalak mindkét esetben
+a munkakönyvtárhoz képest értendők. [JSON-minta](../examples/config/staci_split_settings.json)
+és [formátumleírás](json_inputs.md).
 
 A program futtatása után keletkező eredmények:
 
-- `bog.dat`: az optimalizáló eljárás (genetikus algoritmus) kimenete (statisztika),
-- `staci_split.log`: a staci_split üzenetei.
+- a `logfilename` beállítással megadott napló: a staci_split üzenetei;
+- `staci-diagnostics.jsonl`: a közös hibák és figyelmeztetések (felülírható a `--diagnostics-file` opcióval).
 - `sensitivity_matrix_<...>.csv`: az érzékenységeket tartalmazó fájl.
 - `membership.txt`: a csomópontok és ágak tagsága.
 

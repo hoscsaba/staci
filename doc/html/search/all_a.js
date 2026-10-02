@@ -1,7 +1,26 @@
 var searchData=
 [
-  ['keresztmetszet_0',['keresztmetszet',['../class_csatorna.html#ab9528187fc3d40d210c85b72d7856f10',1,'Csatorna']]],
-  ['konc_1',['konc',['../class_agelem.html#ae31b4979900d8e4c254c4405b04df2a0',1,'Agelem']]],
-  ['konc_5fatlag_2',['konc_atlag',['../class_agelem.html#a23aaf89345c6b3c6ad6d90fc26b01b54',1,'Agelem']]],
-  ['konstnyomas_3',['KonstNyomas',['../class_konst_nyomas.html',1,'']]]
+  ['hálózat_20részekre_20bontása_0',['Hidraulikus hálózat részekre bontása',['../md_doc_2staci__split__manual.html',1,'']]],
+  ['harness_1',['Consequence for the test harness',['../md_doc_2ky10__convergence.html#consequence-for-the-test-harness',1,'']]],
+  ['head_5floss_2',['head_loss',['../class_agelem.html#a723a132d3fc5ce069b16f22d169d9772',1,'Agelem']]],
+  ['here_3',['EPANET&apos;s nominal convergence is unreliable here',['../md_doc_2anytown__convergence.html#epanets-nominal-convergence-is-unreliable-here',1,'']]],
+  ['hidraulikus_20hálózat_20részekre_20bontása_4',['Hidraulikus hálózat részekre bontása',['../md_doc_2staci__split__manual.html',1,'']]],
+  ['historical_20completed_20development_20stages_201–4_5',['Historical completed development stages 1–4',['../md_doc_2error__classification.html#historical-completed-development-stages-14',1,'']]],
+  ['historical_20conclusions_20and_20saved_20evidence_6',['Historical conclusions and saved evidence',['../md_doc_2anytown__convergence.html#historical-conclusions-and-saved-evidence',1,'']]],
+  ['historical_20development_20stage_20report_7',['Historical development-stage report',['../md_doc_2error__classification.html#historical-development-stage-report',1,'']]],
+  ['historical_20first_20error_20categories_20before_20valve_20emitter_20pda_20support_8',['Historical first-error categories (before valve/emitter/PDA support)',['../md_doc_2error__classification.html#historical-first-error-categories-before-valveemitterpda-support',1,'']]],
+  ['historical_20prv_20fcv_20gpv_20implementation_20stage_9',['Historical PRV/FCV/GPV implementation stage',['../md_doc_2error__classification.html#historical-prvfcvgpv-implementation-stage',1,'']]],
+  ['huffcode_10',['huffcode',['../classhuffcode.html',1,'']]],
+  ['hydrant_20flushing_20analysis_11',['Single-hydrant flushing analysis',['../md_doc_2flushing.html#single-hydrant-flushing-analysis',1,'']]],
+  ['hydrantoutlet_12',['HydrantOutlet',['../class_hydrant_outlet.html',1,'']]],
+  ['hydrants_20on_20a_20branched_20network_13',['Worked example: three hydrants on a branched network',['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#worked-example-three-hydrants-on-a-branched-network',1,'']]],
+  ['hydraulic_20initial_20values_14',['Hydraulic initial values',['../md_doc_2json__inputs.html#hydraulic-initial-values',1,'']]],
+  ['hydraulic_20models_15',['Supported hydraulic models',['../index.html#supported-hydraulic-models',1,'']]],
+  ['hydraulic_20reference_20tests_16',['Channel-only hydraulic reference tests',['../md_doc_2testing.html#channel-only-hydraulic-reference-tests',1,'']]],
+  ['hydraulic_20regression_20corpus_17',['Public EPANET hydraulic regression corpus',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#public-epanet-hydraulic-regression-corpus',1,'']]],
+  ['hydraulic_20simulation_18',['Run a steady-state hydraulic simulation',['../md_doc_2staci__usage.html#run-a-steady-state-hydraulic-simulation',1,'']]],
+  ['hydraulic_20solver_19',['staci hydraulic solver',['../index.html#staci-hydraulic-solver',1,'']]],
+  ['hydraulic_20solver_20options_20',['Hydraulic solver options',['../md_doc_2diagnostics.html#hydraulic-solver-options',1,'']]],
+  ['hydraulic_20support_20and_20current_20validation_21',['EPANET hydraulic support and current validation',['../index.html#epanet-hydraulic-support-and-current-validation',1,'']]],
+  ['hydraulics_22',['Basic SPR hydraulics',['../dir_8976e5d03119516083eaca3ddca61311.html#basic-spr-hydraulics',1,'']]]
 ];

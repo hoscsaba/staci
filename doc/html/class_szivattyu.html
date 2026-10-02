@@ -111,7 +111,8 @@ Inheritance diagram for Szivattyu:</div>
  <div class="center">
   <img src="class_szivattyu.png" usemap="#Szivattyu_map" alt=""/>
   <map id="Szivattyu_map" name="Szivattyu_map">
-<area href="class_agelem.html" alt="Agelem" shape="rect" coords="0,0,63,24"/>
+<area href="class_agelem.html" alt="Agelem" shape="rect" coords="0,0,155,24"/>
+<area href="class_epanet_pump_configurable.html" alt="EpanetPumpConfigurable" shape="rect" coords="165,0,320,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -122,7 +123,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a1d4e92a65b3da84a4b0d69561630d1e3" id="r_a1d4e92a65b3da84a4b0d69561630d1e3"><td class="memItemLeft">string&#160;</td><td class="memItemRight"><a class="el" href="#a1d4e92a65b3da84a4b0d69561630d1e3">Info</a> () override</td></tr>
 <tr class="memdesc:a1d4e92a65b3da84a4b0d69561630d1e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Informacio.  <br /></td></tr>
 <tr class="memitem:a38411828ecea6506b4b26338b806b276" id="r_a38411828ecea6506b4b26338b806b276"><td class="memItemLeft">double&#160;</td><td class="memItemRight"><a class="el" href="#a38411828ecea6506b4b26338b806b276">f</a> (const vector&lt; double &gt; &amp;state) override</td></tr>
-<tr class="memdesc:a38411828ecea6506b4b26338b806b276"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pump branch equation.  <br /></td></tr>
+<tr class="memdesc:a38411828ecea6506b4b26338b806b276"><td class="mdescLeft">&#160;</td><td class="mdescRight">Az agegyenlet erteke, nullara rendezve, v.o.m.-ben.  <br /></td></tr>
 <tr class="memitem:aecdeab44e6272a7a855ffdea57767069" id="r_aecdeab44e6272a7a855ffdea57767069"><td class="memItemLeft">vector&lt; double &gt;&#160;</td><td class="memItemRight"><a class="el" href="#aecdeab44e6272a7a855ffdea57767069">df</a> (const vector&lt; double &gt; &amp;state) override</td></tr>
 <tr class="memdesc:aecdeab44e6272a7a855ffdea57767069"><td class="mdescLeft">&#160;</td><td class="mdescRight">Jacobi: df/dhe, df/dhv, df/dmp, konstans tag.  <br /></td></tr>
 <tr class="memitem:aa959cbb38453f75dbca9fce2a4c2ca7c" id="r_aa959cbb38453f75dbca9fce2a4c2ca7c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa959cbb38453f75dbca9fce2a4c2ca7c">Ini</a> (int mode, double value) override</td></tr>
@@ -141,6 +142,10 @@ double&#160;</td><td class="memItemRight"><b>Get_PumpHeadAt</b> (double q)</td><
 vector&lt; double &gt;&#160;</td><td class="memItemRight"><b>GetCurveFlowM3PerHour</b> () const</td></tr>
 <tr class="memitem:ab3c5debcc1af02c2c1677a6feb9e9224" id="r_ab3c5debcc1af02c2c1677a6feb9e9224"><td class="memItemLeft"><a id="ab3c5debcc1af02c2c1677a6feb9e9224" name="ab3c5debcc1af02c2c1677a6feb9e9224"></a>
 const vector&lt; double &gt; &amp;&#160;</td><td class="memItemRight"><b>GetCurveHead</b> () const</td></tr>
+<tr class="memitem:a6357b6d21ffdbee902bda63dfcb707f9" id="r_a6357b6d21ffdbee902bda63dfcb707f9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a6357b6d21ffdbee902bda63dfcb707f9">SetEpanetPumpMetadata</a> (const <a class="el" href="struct_epanet_pump_metadata.html">EpanetPumpMetadata</a> &amp;value) override</td></tr>
+<tr class="memitem:a4efcb8a4ec53ecc875244d7d540489b5" id="r_a4efcb8a4ec53ecc875244d7d540489b5"><td class="memItemLeft">const <a class="el" href="struct_epanet_pump_metadata.html">EpanetPumpMetadata</a> &amp;&#160;</td><td class="memItemRight"><a class="el" href="#a4efcb8a4ec53ecc875244d7d540489b5">GetEpanetPumpMetadata</a> () const override</td></tr>
+<tr class="memitem:a05f8647be3f849fefa2e49018c8ffd46" id="r_a05f8647be3f849fefa2e49018c8ffd46"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a05f8647be3f849fefa2e49018c8ffd46">SetOperatingSpeed</a> (double value) override</td></tr>
+<tr class="memitem:affd00fff7f5dc4e532d43d729a9c890b" id="r_affd00fff7f5dc4e532d43d729a9c890b"><td class="memItemLeft">double&#160;</td><td class="memItemRight"><a class="el" href="#affd00fff7f5dc4e532d43d729a9c890b">GetOperatingSpeed</a> () const override</td></tr>
 <tr class="inherit_header pub_methods_class_agelem"><td colspan="2">Public Member Functions inherited from <a class="el" href="class_agelem.html">Agelem</a></td></tr>
 <tr class="memitem:a8d6f191a4e818eb31b5c800f0bfe5543 pub_methods_class_agelem" id="r_a8d6f191a4e818eb31b5c800f0bfe5543"><td class="memItemLeft">
 void&#160;</td><td class="memItemRight"><b>logfile_write</b> (const string &amp;msg, int msg_debug_level)</td></tr>
@@ -203,8 +208,8 @@ void&#160;</td><td class="memItemRight"><b>Set_tt_end</b> (double tmp)</td></tr>
 <tr class="memitem:a0b858ef17c27b14b60c29404be67e486 pub_methods_class_agelem" id="r_a0b858ef17c27b14b60c29404be67e486"><td class="memItemLeft">virtual double&#160;</td><td class="memItemRight"><a class="el" href="class_agelem.html#a0b858ef17c27b14b60c29404be67e486">Get_FolyTerf</a> ()</td></tr>
 <tr class="memitem:a0c6ee94ed5706b9d40651d69f495da51 pub_methods_class_agelem" id="r_a0c6ee94ed5706b9d40651d69f495da51"><td class="memItemLeft">
 void&#160;</td><td class="memItemRight"><b>Set_enabled</b> (bool value)</td></tr>
-<tr class="memitem:a8ca0ae50344237cca93f951ae81dd00f pub_methods_class_agelem" id="r_a8ca0ae50344237cca93f951ae81dd00f"><td class="memItemLeft">
-bool&#160;</td><td class="memItemRight"><b>Is_enabled</b> () const</td></tr>
+<tr class="memitem:ae15a64229c9ddc1b4b09b8e5b5803c1c pub_methods_class_agelem" id="r_ae15a64229c9ddc1b4b09b8e5b5803c1c"><td class="memItemLeft">
+virtual bool&#160;</td><td class="memItemRight"><b>Is_enabled</b> () const</td></tr>
 <tr class="memitem:a0fe1b2066bfd416f6568a4e09e6375b6 pub_methods_class_agelem" id="r_a0fe1b2066bfd416f6568a4e09e6375b6"><td class="memItemLeft">
 vector&lt; double &gt;&#160;</td><td class="memItemRight"><b>interp</b> (const vector&lt; double &gt; &amp;x, const vector&lt; double &gt; &amp;y, const vector&lt; double &gt; &amp;xg)</td></tr>
 <tr class="memdesc:a0fe1b2066bfd416f6568a4e09e6375b6 pub_methods_class_agelem"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matlab-szeru linearis interpolacio. <br /></td></tr>
@@ -371,7 +376,7 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
         <tr>
           <td class="memname">double Szivattyu::f </td>
           <td>(</td>
-          <td class="paramtype">const vector&lt; double &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>x</em></span></td><td>)</td>
+          <td class="paramtype">const vector&lt; double &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>state</em></span></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -382,16 +387,7 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Pump branch equation. </p>
-<p>The function evaluates the curve fit by the constructor </p><dl class="section see"><dt>See also</dt><dd>Szivattyu() </dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">x</td><td>State vector containing the upstream and downstream pressure heads and elevations in positions 0 through 3. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>(double) function error (should be zero) </dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#ad2fec54e4e5cb236bc7b6a3e8dfbed2f" title="Pump performance curve evaluation.">PumpCharCurve()</a> </dd></dl>
+<p>Az agegyenlet erteke, nullara rendezve, v.o.m.-ben. </p>
 
 <p>Implements <a class="el" href="class_agelem.html#a19e5f8de2f41443582f71ebc461999ef">Agelem</a>.</p>
 
@@ -423,6 +419,60 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
 <p>Get double property, <a class="el" href="class_cso.html">Cso</a> es <a class="el" href="class_csatorna.html">Csatorna</a> akarja elulirja. </p>
 
 <p>Implements <a class="el" href="class_agelem.html#adc69e55efc0669bc87998508e70e87f1">Agelem</a>.</p>
+
+</div>
+</div>
+<a id="a4efcb8a4ec53ecc875244d7d540489b5" name="a4efcb8a4ec53ecc875244d7d540489b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4efcb8a4ec53ecc875244d7d540489b5">&#9670;&#160;</a></span>GetEpanetPumpMetadata()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="struct_epanet_pump_metadata.html">EpanetPumpMetadata</a> &amp; Szivattyu::GetEpanetPumpMetadata </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="class_epanet_pump_configurable.html">EpanetPumpConfigurable</a>.</p>
+
+</div>
+</div>
+<a id="affd00fff7f5dc4e532d43d729a9c890b" name="affd00fff7f5dc4e532d43d729a9c890b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affd00fff7f5dc4e532d43d729a9c890b">&#9670;&#160;</a></span>GetOperatingSpeed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">double Szivattyu::GetOperatingSpeed </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="class_epanet_pump_configurable.html">EpanetPumpConfigurable</a>.</p>
 
 </div>
 </div>
@@ -541,7 +591,7 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>(double) head in m </dd></dl>
-<dl class="section see"><dt>See also</dt><dd>Szivattyu() and <a class="el" href="#a38411828ecea6506b4b26338b806b276" title="Pump branch equation.">f()</a> </dd></dl>
+<dl class="section see"><dt>See also</dt><dd>Szivattyu() and <a class="el" href="#a38411828ecea6506b4b26338b806b276" title="Az agegyenlet erteke, nullara rendezve, v.o.m.-ben.">f()</a> </dd></dl>
 
 </div>
 </div>
@@ -575,6 +625,60 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
 <p>Set a supported numeric property. </p>
 
 <p>Implements <a class="el" href="class_agelem.html#ae8b806c549d05c46723bec3796ece542">Agelem</a>.</p>
+
+</div>
+</div>
+<a id="a6357b6d21ffdbee902bda63dfcb707f9" name="a6357b6d21ffdbee902bda63dfcb707f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6357b6d21ffdbee902bda63dfcb707f9">&#9670;&#160;</a></span>SetEpanetPumpMetadata()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Szivattyu::SetEpanetPumpMetadata </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="struct_epanet_pump_metadata.html">EpanetPumpMetadata</a> &amp;</td>          <td class="paramname"><span class="paramname"><em>value</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="class_epanet_pump_configurable.html">EpanetPumpConfigurable</a>.</p>
+
+</div>
+</div>
+<a id="a05f8647be3f849fefa2e49018c8ffd46" name="a05f8647be3f849fefa2e49018c8ffd46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05f8647be3f849fefa2e49018c8ffd46">&#9670;&#160;</a></span>SetOperatingSpeed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Szivattyu::SetOperatingSpeed </td>
+          <td>(</td>
+          <td class="paramtype">double</td>          <td class="paramname"><span class="paramname"><em>value</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="class_epanet_pump_configurable.html">EpanetPumpConfigurable</a>.</p>
 
 </div>
 </div>

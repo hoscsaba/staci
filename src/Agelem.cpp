@@ -1,3 +1,4 @@
+#include "diagnostics.h"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -181,7 +182,7 @@ void Agelem::error(const string &fv, const string &msg) {
     strstrm << "\n\tmessage     : " << msg << "\n\n";
     logfile_write(strstrm.str(), 0);
     cout << strstrm.str();
-    exit(0);
+    throw diagnostics::Error("INPUT.ELEMENT_PROPERTY", strstrm.str());
 }
 
 //--------------------------------------------------------------

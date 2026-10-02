@@ -1,10 +1,5 @@
 var searchData=
 [
-  ['bevezetés_0',['Bevezetés',['../md_doc_2staci__split__manual.html#autotoc_md29',1,'']]],
-  ['binary_20distributions_1',['Binary distributions',['../dir_b94f9f0c034b39d5d6d39e3a6fbfd3e1.html#autotoc_md26',1,'']]],
-  ['bontása_2',['Hidraulikus hálózat részekre bontása',['../md_doc_2staci__split__manual.html',1,'']]],
-  ['build_20on_20linux_3',['Build on Linux',['../index.html#autotoc_md4',1,'']]],
-  ['build_20on_20macos_4',['Build on macOS',['../index.html#autotoc_md7',1,'']]],
-  ['build_20on_20windows_5',['Build on Windows',['../index.html#autotoc_md8',1,'']]],
-  ['bukomutargy_6',['BukoMutargy',['../class_buko_mutargy.html',1,'BukoMutargy'],['../class_buko_mutargy.html#acb9c45ccc043ba6d5100d2db259a2397',1,'BukoMutargy::BukoMutargy()']]]
+  ['1–4_0',['Historical completed development stages 1–4',['../md_doc_2error__classification.html#historical-completed-development-stages-14',1,'']]],
+  ['10_2002_1',['10 02',['../md_doc_2testing.html#chemical-eps-and-integration-regressions-2026-10-02',1,'Chemical EPS and integration regressions (2026-10-02)'],['../dir_50a2aaf16926734421f021d7ec4de7b5.html#current-numerical-verification-2026-10-02',1,'Current numerical verification (2026-10-02)'],['../md_doc_2epanet__valves.html#current-verification-2026-10-02',1,'Current verification (2026-10-02)'],['../md_doc_2package__validation.html',1,'Package validation — 2026-10-02']]]
 ];

@@ -19,7 +19,11 @@ set(EXCLUDE_FILES
     "${PROJECT_SOURCE_DIR}/src/staci_split.cpp"
     "${PROJECT_SOURCE_DIR}/src/data_io_2.cpp"
 )
-list(REMOVE_ITEM SRC_FILES ${MAIN_FILE} ${EXCLUDE_FILES})
+list(REMOVE_ITEM SRC_FILES ${MAIN_FILE} ${EXCLUDE_FILES}
+    "${PROJECT_SOURCE_DIR}/src/diagnostics.cpp")
+add_library(staci_diagnostics STATIC src/diagnostics.cpp)
+target_compile_features(staci_diagnostics PUBLIC cxx_std_17)
+target_include_directories(staci_diagnostics PUBLIC "${PROJECT_SOURCE_DIR}/include/staci")
 
 add_executable(${PROJECT_NAME} ${MAIN_FILE} ${SRC_FILES})
 
@@ -31,6 +35,7 @@ add_library(staci_core STATIC ${STACI_FLUSH_CORE_SOURCES}
 target_compile_features(staci_core PUBLIC cxx_std_17)
 target_include_directories(staci_core PUBLIC "${PROJECT_SOURCE_DIR}/include/staci")
 find_package(nlohmann_json 3.2.0 CONFIG REQUIRED)
+target_link_libraries(staci_diagnostics PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(staci_core PRIVATE nlohmann_json::nlohmann_json)
 add_executable(staci_flush src/staci_flush.cpp)
 target_link_libraries(staci_flush PRIVATE staci_core)
@@ -146,6 +151,7 @@ if(STACI_BUILD_CPP_EXAMPLES)
 endif()
 
 foreach(staci_target IN LISTS STACI_EXECUTABLE_TARGETS ITEMS staci_core)
+    target_link_libraries(${staci_target} PRIVATE nlohmann_json::nlohmann_json)
     target_compile_features(${staci_target} PRIVATE cxx_std_17)
     set_target_properties(${staci_target} PROPERTIES CXX_EXTENSIONS OFF)
     target_include_directories(${staci_target} PRIVATE
@@ -300,7 +306,7 @@ if(STACI_BUILD_MATLAB_MEX)
     find_package(Eigen3 CONFIG REQUIRED)
     target_compile_definitions(staci_matlab_core PRIVATE
         STACI_USE_EIGEN_SPARSE=1)
-    target_link_libraries(staci_matlab_core PRIVATE Eigen3::Eigen)
+    target_link_libraries(staci_matlab_core PRIVATE Eigen3::Eigen nlohmann_json::nlohmann_json)
     matlab_add_mex(NAME staci_mex
         SRC "${PROJECT_SOURCE_DIR}/matlab/staci_mex_entry.c"
         LINK_TO staci_matlab_core
@@ -608,6 +614,7 @@ if(BUILD_TESTING)
         "${PROJECT_SOURCE_DIR}/src/Cso.cpp"
         "${PROJECT_SOURCE_DIR}/src/EpanetPowerPump.cpp"
         "${PROJECT_SOURCE_DIR}/src/JelleggorbesFojtas.cpp"
+        "${PROJECT_SOURCE_DIR}/src/EpanetValve.cpp"
         "${PROJECT_SOURCE_DIR}/src/KonstNyomas.cpp"
         "${PROJECT_SOURCE_DIR}/src/Szivattyu.cpp"
         "${PROJECT_SOURCE_DIR}/src/lubksb.cpp"
@@ -1048,6 +1055,103 @@ if(BUILD_TESTING)
     target_link_libraries(staci_hydrant_test PRIVATE staci_core)
     add_test(NAME flushing_outlet_law COMMAND staci_hydrant_test)
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
+    if(STACI_BUILD_OPTIMIZERS)
+        add_test(NAME solver_options
+            COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_solver_options.py"
+                --staci $<TARGET_FILE:staci> --split $<TARGET_FILE:staci_split>
+                --calibrate $<TARGET_FILE:staci_calibrate> --flush $<TARGET_FILE:staci_flush>
+                --input "${PROJECT_SOURCE_DIR}/tests/ky16.inp")
+        set_tests_properties(solver_options PROPERTIES
+            LABELS "cli;hydraulics;convergence;integration" TIMEOUT 240)
+        add_test(NAME application_diagnostics
+            COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_application_diagnostics.py"
+                --staci $<TARGET_FILE:staci> --split $<TARGET_FILE:staci_split>
+                --calibrate $<TARGET_FILE:staci_calibrate> --flush $<TARGET_FILE:staci_flush>)
+        set_tests_properties(application_diagnostics PROPERTIES
+            LABELS "cli;diagnostics;gui;integration" TIMEOUT 180)
+        add_test(NAME json_auxiliary_inputs
+            COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_json_inputs.py"
+                --staci $<TARGET_FILE:staci> --split $<TARGET_FILE:staci_split>
+                --calibrate $<TARGET_FILE:staci_calibrate>)
+        set_tests_properties(json_auxiliary_inputs PROPERTIES
+            LABELS "cli;json;integration" TIMEOUT 240)
+    endif()
+    add_test(NAME epanet_hydraulic_diagnostics
+        COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_epanet_diagnostics.py"
+            --binary $<TARGET_FILE:staci>)
+    set_tests_properties(epanet_hydraulic_diagnostics PROPERTIES
+        LABELS "epanet;hydraulics;compatibility" TIMEOUT 120)
+    set(STACI_EPANET_LIBRARY "" CACHE FILEPATH "Official EPANET shared library for public-network numerical comparisons")
+    set(_public_reference_args --reference-only)
+    if(STACI_EPANET_LIBRARY)
+        list(APPEND _public_reference_args --reference-library "${STACI_EPANET_LIBRARY}" --require-reference)
+    endif()
+    add_test(NAME python_cli_adapter
+        COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_cli_adapter.py"
+            --binary $<TARGET_FILE:staci>)
+    set_tests_properties(python_cli_adapter PROPERTIES
+        LABELS "integration;python;diagnostics" TIMEOUT 60)
+    add_test(NAME epanet_infeasible_valve_diagnostics
+        COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_epanet_infeasible_valves.py"
+            --binary $<TARGET_FILE:staci>)
+    set_tests_properties(epanet_infeasible_valve_diagnostics PROPERTIES
+        LABELS "epanet;hydraulics;diagnostics;valves" TIMEOUT 240)
+    add_test(NAME public_epanet_reference
+        COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_public_networks.py"
+            --binary $<TARGET_FILE:staci> ${_public_reference_args}
+            --output-dir "${CMAKE_CURRENT_BINARY_DIR}/public-network-reference-tests")
+    set_tests_properties(public_epanet_reference PROPERTIES
+        LABELS "epanet;hydraulics;public_networks;reference" TIMEOUT 1800 SKIP_RETURN_CODE 77)
+    if(STACI_EPANET_LIBRARY)
+        add_test(NAME epanet_eps_chemical_reference
+            COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_epanet_eps_corpus.py"
+                --binary $<TARGET_FILE:staci> --library "${STACI_EPANET_LIBRARY}"
+                --output "${CMAKE_CURRENT_BINARY_DIR}/epanet-eps-chemical-reference"
+                --only Net1,Net2,net2-cl2 --require-equivalence)
+        set_tests_properties(epanet_eps_chemical_reference PROPERTIES
+            LABELS "epanet;quality;eps;reference" TIMEOUT 120)
+        add_test(NAME epanet_eps_check_valve_reference
+            COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_epanet_eps_corpus.py"
+                --binary $<TARGET_FILE:staci>
+                --library "${STACI_EPANET_LIBRARY}"
+                --manifest "${PROJECT_SOURCE_DIR}/tests/public_networks/manifest.json"
+                --output "${CMAKE_CURRENT_BINARY_DIR}/epanet-eps-check-valve-reference"
+                --only NET1cv --require-equivalence)
+        set_tests_properties(epanet_eps_check_valve_reference PROPERTIES
+            LABELS "epanet;hydraulics;eps;check_valve;reference" TIMEOUT 120)
+    endif()
+    set(_unit_reference_args)
+    if(STACI_EPANET_LIBRARY)
+        list(APPEND _unit_reference_args --reference-library "${STACI_EPANET_LIBRARY}")
+    endif()
+    add_test(NAME epanet_physical_models
+        COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_epanet_physical_models.py"
+            --binary $<TARGET_FILE:staci> ${_unit_reference_args}
+            --anytown "${PROJECT_SOURCE_DIR}/tests/public_networks/wntr/wntr/tests/networks_for_testing/Anytown.inp")
+    set_tests_properties(epanet_physical_models PROPERTIES
+        LABELS "epanet;hydraulics;reference;pumps;physical_model" SKIP_RETURN_CODE 77 TIMEOUT 240)
+    add_test(NAME epanet_reference_valves
+        COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_epanet_valves.py"
+            --binary $<TARGET_FILE:staci> ${_unit_reference_args})
+    set_tests_properties(epanet_reference_valves PROPERTIES
+        SKIP_RETURN_CODE 77 LABELS "epanet;reference;valves" TIMEOUT 240)
+    add_test(NAME epanet_pressure_elements
+        COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_epanet_pressure_elements.py"
+            --binary $<TARGET_FILE:staci> ${_unit_reference_args})
+    set_tests_properties(epanet_pressure_elements PROPERTIES
+        SKIP_RETURN_CODE 77 LABELS "epanet;reference;valves;emitters;pda;hydraulics" TIMEOUT 240)
+    add_test(NAME epanet_reference_units
+        COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_epanet_reference_units.py"
+            --binary $<TARGET_FILE:staci> ${_unit_reference_args})
+    set_tests_properties(epanet_reference_units PROPERTIES
+        LABELS "epanet;hydraulics;units;reference" TIMEOUT 120 SKIP_RETURN_CODE 77)
+    add_test(NAME public_epanet_networks
+        COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_public_networks.py"
+            --binary $<TARGET_FILE:staci>
+            --output-dir "${CMAKE_CURRENT_BINARY_DIR}/public-network-tests")
+    set_tests_properties(public_epanet_networks PROPERTIES
+        LABELS "epanet;hydraulics;public_networks;compatibility"
+        TIMEOUT 1800)
     add_test(NAME flushing_worked_example
         COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_flushing_example.py"
                 $<TARGET_FILE:staci_flush> "${PROJECT_SOURCE_DIR}/examples/flushing")
@@ -1055,3 +1159,14 @@ if(BUILD_TESTING)
         COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_flushing.py"
                 $<TARGET_FILE:staci_flush> "${PROJECT_SOURCE_DIR}/tests/flushing_smoke.inp")
 endif()
+
+# All entry points and solver consumers use the same diagnostic boundary.
+get_property(STACI_ALL_TARGETS DIRECTORY PROPERTY BUILDSYSTEM_TARGETS)
+foreach(staci_target IN LISTS STACI_ALL_TARGETS)
+    if(NOT staci_target STREQUAL "staci_diagnostics")
+        get_target_property(staci_type ${staci_target} TYPE)
+        if(staci_type STREQUAL "EXECUTABLE" OR staci_type STREQUAL "STATIC_LIBRARY")
+            target_link_libraries(${staci_target} PRIVATE staci_diagnostics)
+        endif()
+    endif()
+endforeach()

@@ -273,7 +273,8 @@ def main() -> int:
     report = work / "epanet.rpt"
     binary_output = work / "epanet.bin"
 
-    staci_output = run([str(staci), "--epanet-eps", str(local_input), "-o", str(prefix)], work)
+    staci_output = run([str(staci), "--epanet-eps", str(local_input), "-o", str(prefix),
+                        "--head-tolerance-m", "1e-12", "--mass-tolerance-kg-s", "1e-8"], work)
     epanet_output = run([str(epanet), str(local_input), str(report), str(binary_output)], work)
     staci_nodes = read_csv(Path(str(prefix) + "-nodes.csv"), "node_id")
     staci_links = read_csv(Path(str(prefix) + "-links.csv"), "link_id")

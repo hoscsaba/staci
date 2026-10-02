@@ -1,0 +1,11 @@
+{
+  "measurements": [
+    {
+      "id": "NODE64",
+      "type": "node",
+      "values": [
+        0.0
+      ]
+    }
+  ]
+}

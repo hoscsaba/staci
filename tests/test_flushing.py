@@ -39,11 +39,11 @@ with tempfile.TemporaryDirectory(prefix='staci flushing ') as d:
         assert math.isclose(h, 2*(q/.002)**2/(2*9.81), abs_tol=1e-5)
         assert float(r['max_mass_residual_kgs']) < 1e-6
         pipe_count = 1 if r['hydrant_id'] == 'J1' else 2
-        resistance = pipe_count * 100 / 120**1.85 / .1**4.87 * 7.88 / .85**1.85
+        resistance = pipe_count * 100 / 120**1.852 / .1**4.871 * (4.727*.3048**4.871/.028316846592**1.852)
         lo, hi = 0., .1
         for _ in range(100):
             mid = (lo + hi)/2
-            loss = resistance*mid**1.85 + 2*(mid/.002)**2/(2*9.81)
+            loss = resistance*mid**1.852 + 2*(mid/.002)**2/(2*9.81)
             if loss > 40: hi = mid
             else: lo = mid
         assert math.isclose(q, (lo+hi)/2, rel_tol=1e-6)
@@ -83,7 +83,7 @@ with tempfile.TemporaryDirectory(prefix='staci flushing ') as d:
     shared = run('shared', hydrants=js)
     sr = rows(shared,'scenarios.csv')
     assert len(sr)==2 and math.isclose(float(sr[0]['flow_m3s']), float(sr[1]['flow_m3s']), rel_tol=1e-6)
-    low = run('low-pressure',extra=('--min-pressure-head-m','35'),expected=2)
+    low = run('low-pressure',extra=('--min-pressure-head-m','35'),expected=3)
     assert all(r['status']=='below_min_pressure' for r in rows(low,'scenarios.csv'))
     assert rows(low,'pipes_above_threshold.csv') == []
     assert rows(low,'scenario_pipes.csv') == []
@@ -126,8 +126,8 @@ with tempfile.TemporaryDirectory(prefix='staci flushing ') as d:
     assert rows(low,'flushing_plan.csv') == []
     assert float(plan[-1]['cumulative_volume_m3']) == float(plan[0]['qualifying_volume_m3'])
     # Unknown node, duplicate node/asset, unsupported hydraulic inputs.
-    nodes.write_text('unknown\n');run('unknown',expected=1)
-    nodes.write_text('J1\nJ1\n');run('duplicate',expected=1)
+    nodes.write_text('unknown\n');run('unknown',expected=2)
+    nodes.write_text('J1\nJ1\n');run('duplicate',expected=2)
     nodes.write_text('J1\n')
     for label, before, after in [
         ('closed','120 0 Open','120 0 Closed'),
@@ -136,10 +136,10 @@ with tempfile.TemporaryDirectory(prefix='staci flushing ') as d:
         ('negative','R1 40','R1 -10'),
     ]:
         bad=root/(label+'.inp');bad.write_text(original.decode().replace(before,after))
-        run(label,model=bad,expected=1)
-    run('zero-threshold',threshold='0',expected=1)
+        run(label,model=bad,expected=1 if label == 'negative' else 2)
+    run('zero-threshold',threshold='0',expected=2)
     # Prevent accidental overwrite of old output.
-    run('forward',expected=1)
+    run('forward',expected=2)
     manifest=json.loads((out/'run.json').read_text())
     assert manifest['status']=='complete' and manifest['scenario_count']==2
 
@@ -162,12 +162,12 @@ with tempfile.TemporaryDirectory(prefix='staci flushing ') as d:
     assert len(rows(config_dir / 'results', 'scenarios.csv')) == 2
     for changes in [dict(hydrant_area_m2='0.002'), dict(total_loss_coefficient=True),
                     dict(typo=1), dict(output_dir=''), dict(min_pressure_head_m=-1)]:
-        config_run({**config, 'output_dir': 'invalid', **changes}, expected=1)
+        config_run({**config, 'output_dir': 'invalid', **changes}, expected=2)
     missing = dict(config); del missing['hydrant_area_m2']
-    config_run(missing, expected=1)
-    config_run(dict(config, output_dir='duplicate'), expected=1,
+    config_run(missing, expected=2)
+    config_run(dict(config, output_dir='duplicate'), expected=2,
                extra=('--loss-coefficient', '2'))
-    config_run(dict(config, output_dir='filtered', min_pressure_head_m=35), expected=2)
+    config_run(dict(config, output_dir='filtered', min_pressure_head_m=35), expected=3)
 
     # Node IDs now live in config; export geometry/marking is independent of hydraulics.
     inp.write_text(original.decode().replace('[END]',
@@ -217,12 +217,12 @@ with tempfile.TemporaryDirectory(prefix='staci flushing ') as d:
     for change in [dict(hydrant_node_ids=[]), dict(hydrant_node_ids=['J1','J1']),
                    dict(hydrant_node_ids=['missing']), dict(hydrant_node_ids=[1]),
                    dict(write_network_files='true')]:
-        inline_run({**inline, 'output_dir':'bad-inline', **change}, expected=1)
-    inline_run(dict(inline, output_dir='invalid-exports', min_pressure_head_m=35), expected=2)
+        inline_run({**inline, 'output_dir':'bad-inline', **change}, expected=2)
+    inline_run(dict(inline, output_dir='invalid-exports', min_pressure_head_m=35), expected=3)
     for entry in rows(config_dir/'invalid-exports', 'networks.csv'):
         doc = sections(config_dir/'invalid-exports'/entry['network_file'])
         assert all(row[2]=='INVALID_SCENARIO' for row in doc['TAGS'] if row[0]=='LINK')
     # Supplying both node IDs and an external list is ambiguous and rejected.
-    config_run(inline, expected=1)
+    config_run(inline, expected=2)
 
 print('Flushing end-to-end checks passed')

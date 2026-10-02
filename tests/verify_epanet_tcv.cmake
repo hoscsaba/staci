@@ -28,17 +28,17 @@ if(NOT links MATCHES "10800,TCV1,VALVE,[^\n]*,1,1")
 endif()
 
 # With Q = 0.001 m3/s and D = 0.02 m, the expected head losses are
-# K*v^2/(2g): approximately 1.033 m (K=2), 4.131 m (K=8),
-# 0.258 m (OPEN minor loss K=0.5), and 4.131 m (ACTIVE again).
+# K*v^2/(2g): with EPANET's coefficient: 1.032 m (K=2), 4.129 m (K=8),
+# 0.258 m (OPEN minor loss K=0.5), and 4.129 m (ACTIVE again).
 if(NOT links MATCHES "0,TCV1,VALVE,[^\n]*,1\\.03[0-9]*,1,1")
     message(FATAL_ERROR "Initial TCV head loss does not match K*v^2/(2g)")
 endif()
-if(NOT links MATCHES "3600,TCV1,VALVE,[^\n]*,4\\.13[0-9]*,1,1")
+if(NOT links MATCHES "3600,TCV1,VALVE,[^\n]*,4\\.1289[0-9]*,1,1")
     message(FATAL_ERROR "Numeric TCV setting did not update the head loss")
 endif()
 if(NOT links MATCHES "7200,TCV1,VALVE,[^\n]*,0\\.25[0-9]*,1,1")
     message(FATAL_ERROR "OPEN TCV did not use the separate minor-loss coefficient")
 endif()
-if(NOT links MATCHES "10800,TCV1,VALVE,[^\n]*,4\\.13[0-9]*,1,1")
+if(NOT links MATCHES "10800,TCV1,VALVE,[^\n]*,4\\.1289[0-9]*,1,1")
     message(FATAL_ERROR "ACTIVE TCV did not restore the controlled setting")
 endif()

@@ -51,10 +51,26 @@ Sensitivity parameters currently supported are pipe `diameter_m`, pipe
 every link flow and node pressure head in consistent SI units.
 
 Build explicitly with `build_staci_mex()` or allow the first `StaciModel`
-constructor to build automatically. MATLAB, CMake, a C++17 compiler and Eigen3
-are required. On Windows the CMake generator must be compatible with the
+constructor to build automatically. MATLAB, CMake, a C++17 compiler, Eigen3
+and nlohmann/json are required. For a preconfigured build (including an explicit
+macOS SDK when needed), use CMake with `STACI_BUILD_MATLAB_MEX=ON`, build target
+`staci_mex`, and add the build's `matlab` directory to MATLAB's path. On Windows the CMake generator must be compatible with the
 installed MATLAB MEX compiler.
 
 Each MATLAB worker is a separate process. Parallel optimization workers must
 therefore construct their own `StaciModel`; a MEX handle cannot be shared
 between workers.
+
+## Validation and external-process alternative
+
+The in-memory interface is covered by `tests/matlab/run_matlab_tests.m` (six
+tests). The current MEX module was built and these tests passed in MATLAB
+R2026a on macOS arm64. Each build must match the MATLAB architecture.
+
+For a process-based call, including EPS, use
+[run_staci_cli.m](../examples/integration/run_staci_cli.m) and
+[example_staci_cli.m](../examples/integration/example_staci_cli.m). This requires
+MATLAB's JVM but no MEX or Python. The separate
+`test_staci_cli_adapter('/absolute/path/staci')` checks successful steady/EPS
+runs, invalid input, timeouts and paths containing spaces. See
+[README_DEV](../README_DEV.md#matlab) for usage and diagnostics.

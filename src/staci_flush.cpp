@@ -1,2 +1,5 @@
 #include "flushing.h"
-int main(int argc, char **argv) { return flushing::run(argc, argv); }
+#include "diagnostics.h"
+int main(int argc, char **argv) {
+    return diagnostics::run("staci_flush", argc, argv, flushing::run);
+}

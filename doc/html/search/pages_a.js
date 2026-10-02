@@ -1,5 +1,23 @@
 var searchData=
 [
-  ['macos_0',['Build on macOS',['../index.html#autotoc_md7',1,'']]],
-  ['modify_20a_20property_20and_20save_20a_20new_20network_1',['Modify a property and save a new network',['../index.html#autotoc_md19',1,'']]]
+  ['hálózat_20részekre_20bontása_0',['Hidraulikus hálózat részekre bontása',['../md_doc_2staci__split__manual.html',1,'']]],
+  ['harness_1',['Consequence for the test harness',['../md_doc_2ky10__convergence.html#consequence-for-the-test-harness',1,'']]],
+  ['here_2',['EPANET&apos;s nominal convergence is unreliable here',['../md_doc_2anytown__convergence.html#epanets-nominal-convergence-is-unreliable-here',1,'']]],
+  ['hidraulikus_20hálózat_20részekre_20bontása_3',['Hidraulikus hálózat részekre bontása',['../md_doc_2staci__split__manual.html',1,'']]],
+  ['historical_20completed_20development_20stages_201–4_4',['Historical completed development stages 1–4',['../md_doc_2error__classification.html#historical-completed-development-stages-14',1,'']]],
+  ['historical_20conclusions_20and_20saved_20evidence_5',['Historical conclusions and saved evidence',['../md_doc_2anytown__convergence.html#historical-conclusions-and-saved-evidence',1,'']]],
+  ['historical_20development_20stage_20report_6',['Historical development-stage report',['../md_doc_2error__classification.html#historical-development-stage-report',1,'']]],
+  ['historical_20first_20error_20categories_20before_20valve_20emitter_20pda_20support_7',['Historical first-error categories (before valve/emitter/PDA support)',['../md_doc_2error__classification.html#historical-first-error-categories-before-valveemitterpda-support',1,'']]],
+  ['historical_20prv_20fcv_20gpv_20implementation_20stage_8',['Historical PRV/FCV/GPV implementation stage',['../md_doc_2error__classification.html#historical-prvfcvgpv-implementation-stage',1,'']]],
+  ['hydrant_20flushing_20analysis_9',['Single-hydrant flushing analysis',['../md_doc_2flushing.html#single-hydrant-flushing-analysis',1,'']]],
+  ['hydrants_20on_20a_20branched_20network_10',['Worked example: three hydrants on a branched network',['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#worked-example-three-hydrants-on-a-branched-network',1,'']]],
+  ['hydraulic_20initial_20values_11',['Hydraulic initial values',['../md_doc_2json__inputs.html#hydraulic-initial-values',1,'']]],
+  ['hydraulic_20models_12',['Supported hydraulic models',['../index.html#supported-hydraulic-models',1,'']]],
+  ['hydraulic_20reference_20tests_13',['Channel-only hydraulic reference tests',['../md_doc_2testing.html#channel-only-hydraulic-reference-tests',1,'']]],
+  ['hydraulic_20regression_20corpus_14',['Public EPANET hydraulic regression corpus',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#public-epanet-hydraulic-regression-corpus',1,'']]],
+  ['hydraulic_20simulation_15',['Run a steady-state hydraulic simulation',['../md_doc_2staci__usage.html#run-a-steady-state-hydraulic-simulation',1,'']]],
+  ['hydraulic_20solver_16',['staci hydraulic solver',['../index.html#staci-hydraulic-solver',1,'']]],
+  ['hydraulic_20solver_20options_17',['Hydraulic solver options',['../md_doc_2diagnostics.html#hydraulic-solver-options',1,'']]],
+  ['hydraulic_20support_20and_20current_20validation_18',['EPANET hydraulic support and current validation',['../index.html#epanet-hydraulic-support-and-current-validation',1,'']]],
+  ['hydraulics_19',['Basic SPR hydraulics',['../dir_8976e5d03119516083eaca3ddca61311.html#basic-spr-hydraulics',1,'']]]
 ];

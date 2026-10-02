@@ -1,3 +1,6 @@
+#include "EpanetEmitter.h"
+#include "diagnostics.h"
+#include <nlohmann/json.hpp>
 #include <algorithm>
 #include <cctype>
 #include <iostream>
@@ -19,6 +22,7 @@
 #include "epanet_reader.h"
 #include "xmlParser.h"
 
+#include "input_config.h"
 using namespace std;
 
 data_io::data_io(const char *a_xml_fnev, bool epanet_extended) {
@@ -53,6 +57,8 @@ data_io::data_io(const char *a_xml_fnev, bool epanet_extended) {
         return;
     }
 
+    // JSON is accepted only by load_ini_values(), not as a network definition.
+    if (input_config::extension(filename) == ".json") return;
     XMLNode xMainNode = XMLNode::openFileHelper(xml_fnev, "staci");
 
     string cpp_xml_debug = xMainNode.getChildNode("settings").getChildNode("cpp_xml_debug").getText();
@@ -64,6 +70,12 @@ data_io::data_io(const char *a_xml_fnev, bool epanet_extended) {
 }
 
 data_io::~data_io() = default;
+
+void data_io::validate_hydraulic_compatibility() const {
+    if (input_config::extension(xml_fnev) == ".json")
+        input_config::fail(xml_fnev, "JSON is supported for auxiliary inputs, not network definitions; use SPR/XML or INP.");
+    if (epanet_reader) epanet_reader->validate_hydraulic_compatibility();
+}
 
 const EpanetDocument *data_io::get_epanet_document() const {
     return epanet_reader ? &epanet_reader->document() : nullptr;
@@ -636,7 +648,32 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
                            bool conv_reached, int staci_debug_level) {
 
     if (is_epanet_input) {
-        warn_epanet_write_unsupported("Saving hydraulic results");
+        nlohmann::json results = {{"schema_version", 1}, {"converged", conv_reached},
+            {"nodes", nlohmann::json::object()}, {"links", nlohmann::json::object()}};
+        for (auto *n : cspok) {
+            results["nodes"][n->Get_nev()] = {{"head_m", n->Get_p() + n->Get_h()},
+                {"pressure_m", n->Get_p()}, {"demand_m3s", n->DeliveredDemand() / n->Get_dprop("ro")}};
+        }
+        for (auto *edge : agelemek) {
+            if(dynamic_cast<EpanetEmitter*>(edge)) {
+                auto& demand=results["nodes"][edge->Get_Cspe_Nev()]["demand_m3s"];
+                demand=demand.get<double>()+edge->Get_Q();
+                continue;
+            }
+            results["links"][edge->Get_nev()] = {{"flow_m3s", edge->Get_mp() / edge->Get_ro()},
+                {"velocity_mps", std::abs(edge->Get_mp() / edge->Get_ro() / edge->Get_Aref())},
+                {"enabled", edge->Is_enabled() && !(dynamic_cast<EpanetPumpConfigurable*>(edge) && edge->Get_dprop("status")==0) &&
+                    !(dynamic_cast<Cso *>(edge) && static_cast<Cso *>(edge)->IsCheckValve() && edge->Get_mp() <= 0.0)}};
+        }
+        for (auto *edge : agelemek) {
+            if (edge->Get_Csp_db() == 1 && (edge->Get_nev().find("EPANET_RESERVOIR_") == 0 ||
+                edge->Get_nev().find("EPANET_TANK_") == 0))
+                results["nodes"][edge->Get_Cspe_Nev()]["demand_m3s"] = edge->Get_mp() / edge->Get_ro();
+        }
+        std::ofstream output(std::string(xml_fnev) + ".hydraulics.json");
+        output << results.dump(2) << '\n';
+        if (!output) throw diagnostics::Error("OUTPUT.HYDRAULICS", "Cannot write hydraulic results for network '" +
+            std::string(xml_fnev) + "'.", diagnostics::calculation_error);
         return;
     }
 
@@ -1231,7 +1268,7 @@ void data_io::save_mod_prop(const vector<Csomopont *> &cspok, const vector<Agele
 
     if (!megvan) {
         cout << "\n ERROR!!! data_io.save_mod_prop() -> eID " << eID << " was not found!!!\n";
-        exit(-1);
+        diagnostics::fail_legacy(__FILE__, __LINE__);
     } else {
         xMainNode.writeToFile(xml_fnev);
         if (debug) {
@@ -1243,6 +1280,38 @@ void data_io::save_mod_prop(const vector<Csomopont *> &cspok, const vector<Agele
 
 //--------------------------------------------------------------------------------
 void data_io::load_ini_values(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek) {
+
+    if (input_config::extension(xml_fnev) == ".json") {
+        auto root = input_config::read_json(xml_fnev);
+        input_config::keys(root, {"nodes", "edges"}, xml_fnev);
+        if (!root.contains("nodes") && !root.contains("edges"))
+            input_config::fail(xml_fnev, "initial values require nodes and/or edges arrays.");
+        auto apply = [&](const char *key, auto &elements, const char *property, double scale) {
+            if (!root.contains(key)) return;
+            if (!root[key].is_array()) input_config::fail(xml_fnev, std::string(key) + " must be an array.");
+            std::set<std::string> seen;
+            for (const auto &item : root[key]) {
+                input_config::keys(item, {"id", property, "concentration_kg_m3"}, xml_fnev);
+                if (!item.contains("id") || !item["id"].is_string() || !item.contains(property))
+                    input_config::fail(xml_fnev, std::string(key) + " entries require id and " + property + ".");
+                std::string id = item["id"].get<std::string>();
+                if (!seen.insert(id).second) input_config::fail(xml_fnev, "duplicate initial value ID '" + id + "'.");
+                auto found = std::find_if(elements.begin(), elements.end(), [&](auto *e) { return e->Get_nev() == id; });
+                if (found == elements.end()) input_config::fail(xml_fnev, "unknown " + std::string(key) + " ID '" + id + "'.");
+                double value = input_config::number(item[property], xml_fnev, id + "." + property);
+                (*found)->Ini(1, value / scale);
+                if (item.contains("concentration_kg_m3")) {
+                    double concentration = input_config::number(item["concentration_kg_m3"], xml_fnev, id + ".concentration_kg_m3");
+                    if (concentration < 0) input_config::fail(xml_fnev, "negative concentration for '" + id + "'.");
+                    (*found)->Set_dprop("concentration", concentration);
+                }
+            }
+        };
+        // Match legacy XML pressure conversion (Pa -> metres of water).
+        apply("nodes", cspok, "pressure_pa", 1000.0 * 9.81);
+        apply("edges", agelemek, "mass_flow_rate_kg_s", 1.0);
+        return;
+    }
 
     if (is_epanet_input) {
         cerr << "WARNING [EPANET][INITIAL VALUES]: EPANET .inp files do not contain "

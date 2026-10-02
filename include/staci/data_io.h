@@ -16,6 +16,7 @@ public:
     /// Konstruktor
     data_io(const char *xml_fnev, bool epanet_extended = false);
     ~data_io();
+    void validate_hydraulic_compatibility() const;
     void load_system(std::vector<std::unique_ptr<Csomopont> > &cspok,
                      std::vector<std::unique_ptr<Agelem> > &agelemek);
     void load_ini_values(vector<Csomopont *> &cspok, vector<Agelem *> &agelemek);

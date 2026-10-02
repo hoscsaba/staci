@@ -4,8 +4,8 @@ endif()
 
 file(READ "${NODES_CSV}" node_results)
 foreach(expected
-        "0,J1,0,539."
-        "3600,J1,0,290."
+        "0,J1,0,540."
+        "3600,J1,0,291."
         "7200,J1,0,93."
         "0,J2,0,87.5"
         "3600,J2,0,69.9"

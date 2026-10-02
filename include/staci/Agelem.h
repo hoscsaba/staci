@@ -173,7 +173,7 @@ public:
     /// Returns the runtime type identifier used throughout STACI.
     virtual string_view GetType() const noexcept = 0;
     void Set_enabled(bool value) { enabled = value; }
-    bool Is_enabled() const { return enabled; }
+    virtual bool Is_enabled() const { return enabled; }
     /// Matlab-szeru linearis interpolacio
     vector<double> interp(const vector<double> &x, const vector<double> &y,
                           const vector<double> &xg);

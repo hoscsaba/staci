@@ -179,9 +179,10 @@ std::vector<double> EpanetWaterAgeModel::link_average_age_s(
 EpanetChemicalModel::EpanetChemicalModel(
     std::vector<EpanetChemicalNode> nodes,
     std::vector<EpanetChemicalLink> links,
-    double quality_timestep_s)
+    double quality_timestep_s, double concentration_tolerance)
     : nodes_(std::move(nodes)), links_(std::move(links)),
       segments_(links_.size()), node_concentration_kgm3_(nodes_.size(), 0.0),
+      concentration_tolerance_(concentration_tolerance),
       quality_timestep_s_(quality_timestep_s) {
     if (!(quality_timestep_s_ > 0.0) || !std::isfinite(quality_timestep_s_))
         throw std::invalid_argument("Chemical quality timestep must be positive and finite.");
@@ -229,9 +230,33 @@ void EpanetChemicalModel::step(
     double dt_s, const std::vector<double> &link_flows_m3s,
     const std::vector<double> &external_inflows_m3s,
     const std::vector<EpanetChemicalSource> &sources) {
+    const bool reactive = std::any_of(links_.begin(), links_.end(), [](const auto &link) {
+        return link.reaction_coefficient_per_s != 0.0 || link.wall_mps != 0.0;
+    }) || std::any_of(nodes_.begin(), nodes_.end(), [](const auto &node) {
+        return node.tank_reaction_per_s != 0.0;
+    });
     for (std::size_t index = 0; index < segments_.size(); ++index) {
-        const double multiplier = std::exp(
-            links_[index].reaction_coefficient_per_s * dt_s);
+        const auto &link = links_[index];
+        double rate = link.reaction_coefficient_per_s;
+        if (link.diameter_m > 0.0 && link.wall_mps != 0.0) {
+            double wall = link.wall_mps;
+            if (link.diffusivity_m2s > 0.0) {
+                const double re = 4.0 * std::abs(link_flows_m3s[index]) /
+                    (3.14159265358979323846 * link.diameter_m * link.viscosity_m2s);
+                const double sc = link.viscosity_m2s / link.diffusivity_m2s;
+                double sh = 2.0;
+                if (re >= 2300.0) sh = 0.0149 * std::pow(re, 0.88) * std::pow(sc, 0.333);
+                else if (re >= 1.0) {
+                    const double y = link.diameter_m / link.length_m * re * sc;
+                    sh = 3.65 + 0.0668 * y / (1.0 + 0.04 * std::pow(y, 0.667));
+                }
+                const double kf = sh * link.diffusivity_m2s / link.diameter_m;
+                wall *= kf / (kf + std::abs(wall));
+            }
+            rate += 4.0 * wall / link.diameter_m;
+        }
+        // EPANET's quality step uses an explicit reaction increment.
+        const double multiplier = std::max(0.0, 1.0 + rate * dt_s);
         for (Segment &segment : segments_[index])
             segment.concentration_kgm3 = std::max(
                 0.0, segment.concentration_kgm3 * multiplier);
@@ -240,10 +265,13 @@ void EpanetChemicalModel::step(
     // not merely the instantaneous concentration at a pipe outlet. This is
     // essential when a concentration front reaches a node part-way through a
     // timestep.
+    std::vector<std::vector<std::size_t> > incident(nodes_.size());
     std::vector<std::vector<std::size_t> > incoming(nodes_.size());
     std::vector<std::vector<std::size_t> > outgoing(nodes_.size());
     std::vector<std::size_t> indegree(nodes_.size(), 0);
     for (std::size_t index = 0; index < links_.size(); ++index) {
+        incident[links_[index].from_node].push_back(index);
+        incident[links_[index].to_node].push_back(index);
         const double flow = link_flows_m3s[index];
         if (std::abs(flow) <= kFlowEpsilon)
             continue;
@@ -302,8 +330,10 @@ void EpanetChemicalModel::step(
         std::deque<Segment> &pipe = segments_[link_index];
         Segment *last = nullptr;
         if (!pipe.empty()) last = flow > 0.0 ? &pipe.front() : &pipe.back();
-        if (last != nullptr && std::abs(last->concentration_kgm3 - concentration) < 1.0e-12)
+        if (last != nullptr && std::abs(last->concentration_kgm3 - concentration) < concentration_tolerance_) {
+            last->concentration_kgm3 = (last->concentration_kgm3 * last->volume_m3 + concentration * volume) / (last->volume_m3 + volume);
             last->volume_m3 += volume;
+        }
         else if (flow > 0.0)
             pipe.push_front(Segment{volume, concentration});
         else
@@ -311,6 +341,9 @@ void EpanetChemicalModel::step(
     };
 
     for (std::size_t node : order) {
+        if (nodes_[node].tank_volume_m3 >= 0.0)
+            node_concentration_kgm3_[node] *= std::max(
+                0.0, 1.0 + nodes_[node].tank_reaction_per_s * dt_s);
         double inflow_volume = 0.0;
         double inflow_mass = 0.0;
         for (std::size_t link_index : incoming[node]) {
@@ -327,12 +360,33 @@ void EpanetChemicalModel::step(
         }
         const double external_volume = std::max(0.0, external_inflows_m3s[node]) * dt_s;
         inflow_volume += external_volume;
-        if (!nodes_[node].fixed_external_concentration && inflow_volume > kVolumeEpsilon)
+        if (nodes_[node].tank_volume_m3 >= 0.0) {
+            // Complete mixing: mix incoming mass with stored mass, then
+            // withdraw the outgoing volume at the new concentration.
+            const double mixed_volume = nodes_[node].tank_volume_m3 + inflow_volume;
+            if (mixed_volume > kVolumeEpsilon)
+                node_concentration_kgm3_[node] =
+                    (nodes_[node].tank_volume_m3 * node_concentration_kgm3_[node] + inflow_mass) / mixed_volume;
+            double withdrawn = 0.0;
+            for (std::size_t link_index : outgoing[node])
+                withdrawn += std::abs(link_flows_m3s[link_index]) * dt_s;
+            nodes_[node].tank_volume_m3 = std::max(0.0, mixed_volume - withdrawn);
+        } else if (!nodes_[node].fixed_external_concentration && inflow_volume > kVolumeEpsilon)
             node_concentration_kgm3_[node] = inflow_mass / inflow_volume;
+        else if (!nodes_[node].fixed_external_concentration && reactive) {
+            double sum = 0.0;
+            std::size_t count = 0;
+            for (std::size_t i : incident[node]) {
+                if (segments_[i].empty()) continue;
+                if (links_[i].from_node == node) {sum += segments_[i].front().concentration_kgm3; ++count;}
+                else if (links_[i].to_node == node) {sum += segments_[i].back().concentration_kgm3; ++count;}
+            }
+            if (count) node_concentration_kgm3_[node] = sum / count;
+        }
         if (nodes_[node].fixed_external_concentration)
             node_concentration_kgm3_[node] = nodes_[node].initial_concentration_kgm3;
 
-        double outflow_volume = 0.0;
+        double outflow_volume = std::max(0.0, -external_inflows_m3s[node]) * dt_s;
         for (std::size_t link_index : outgoing[node])
             outflow_volume += std::abs(link_flows_m3s[link_index]) * dt_s;
         const EpanetChemicalSource &source = sources[node];

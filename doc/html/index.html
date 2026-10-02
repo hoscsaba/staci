@@ -105,309 +105,546 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="textblock"><p><a class="anchor" id="md__r_e_a_d_m_e"></a></p>
 <p>STACI is a command-line simulator for steady-state hydraulic and transport calculations in pressurized and open-channel networks. Its native network and result format is XML-based <span class="tt">.spr</span>; EPANET <span class="tt">.inp</span> network files can also be imported, modified, exported, and used for extended-period simulations.</p>
 <p>The project is written in C++17 and built with CMake. It supports GCC and Clang on Linux and macOS, and MSVC on Windows. The numerical solver uses UMFPACK from SuiteSparse.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md1"></a>
-Capabilities</h1>
-<p>STACI can:</p>
+<p>Compared with EPANET's water-distribution focus, STACI additionally provides:</p>
 <ul>
-<li>solve steady-state pressures, heads, and mass flow rates;</li>
-<li>calculate residence time and concentration transport;</li>
-<li>calculate parameter and demand sensitivities;</li>
-<li>read and modify selected node or edge properties;</li>
-<li>list all network elements;</li>
-<li>export network connectivity for island detection;</li>
-<li>import EPANET <span class="tt">.inp</span> files with unit conversion and compatibility warnings;</li>
-<li>export native STACI networks to EPANET <span class="tt">.inp</span> files;</li>
-<li>run EPANET extended-period hydraulic simulations with demand patterns, changing tank levels, and tank-level pump controls;</li>
-<li>model pipes, pumps, pressure boundaries, pools/reservoirs, valves, check valves, overflows, and several open-channel cross-sections;</li>
-<li>write convergence markers, progress logs, and updated network/result files.</li>
+<li>native stationary open-channel elements with rectangular, circular and arbitrary cross-sections, plus overflow/weir elements;</li>
+<li>hydraulic parameter and demand-sensitivity calculations;</li>
+<li>pagmo2-based pipe calibration and graph-aware network partitioning for sensor-placement studies;</li>
+<li>chunked, incrementally written HDF5 EPS results with SI arrays and explicit node/link index mappings.</li>
 </ul>
-<p>The repository currently builds a command-line executable named <span class="tt">staci</span>. It does not yet install a separate C++ link library or stable public API.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md2"></a>
-Precompiled executables</h1>
+<h1 class="doxsection"><a class="anchor" id="table-of-contents"></a>
+Table of contents</h1>
+<ul>
+<li><a class="el" href="#standalone-programs" title="Standalone programs">Standalone programs</a>Standalone programs</li>
+</ul>
+<ul>
+<li><a class="el" href="#installation" title="Installation">Installation</a>Installation</li>
+</ul>
+<ul>
+<li><a class="el" href="#quick-start-and-build-options" title="Quick start and build options">Quick start and build options</a>Quick start and build options</li>
+</ul>
+<ul>
+<li><a class="el" href="#precompiled-executables" title="Precompiled executables">Precompiled executables</a>Precompiled executables</li>
+</ul>
+<ul>
+<li><a class="el" href="#requirements" title="Requirements">Requirements</a>Requirements</li>
+</ul>
+<ul>
+<li><a class="el" href="#build-on-linux" title="Build on Linux">Linux</a>Linux</li>
+</ul>
+<ul>
+<li><a class="el" href="#build-on-macos" title="Build on macOS">macOS</a>macOS</li>
+</ul>
+<ul>
+<li><a class="el" href="#build-on-windows" title="Build on Windows">Windows</a>Windows</li>
+</ul>
+<ul>
+<li><a class="el" href="#install-to-a-staging-directory" title="Install to a staging directory">Install to a staging directory</a>Install to a staging directory</li>
+</ul>
+<ul>
+<li><a class="el" href="#non-standard-suitesparse-installations" title="Non-standard SuiteSparse installations">Non-standard SuiteSparse installations</a>Non-standard SuiteSparse installations</li>
+</ul>
+<ul>
+<li><a class="el" href="#usage" title="Usage">Usage</a>Usage</li>
+</ul>
+<ul>
+<li><a class="el" href="#staci-hydraulic-solver" title="staci hydraulic solver">staci: hydraulic and transport calculations</a>staci: hydraulic and transport calculations</li>
+</ul>
+<ul>
+<li><a class="el" href="#staci_split" title="staci_split">staci_split: partitioning and sensor placement</a>staci_split: partitioning and sensor placement</li>
+</ul>
+<ul>
+<li><a class="el" href="#staci_calibrate" title="staci_calibrate">staci_calibrate: pipe diameter calibration</a>staci_calibrate: pipe diameter calibration</li>
+</ul>
+<ul>
+<li><a class="el" href="#staci_flush" title="staci_flush">staci_flush: single-hydrant flushing plans</a>staci_flush: single-hydrant flushing plans</li>
+</ul>
+<ul>
+<li><a class="el" href="#project-directories-and-launching-programs" title="Project directories and launching programs">Project directories and launching programs</a>Project directories and launching programs</li>
+</ul>
+<ul>
+<li><a class="el" href="#installation-and-execution-troubleshooting" title="Installation and execution troubleshooting">Installation and execution troubleshooting</a>Installation and execution troubleshooting</li>
+</ul>
+<ul>
+<li><a class="el" href="#tests" title="Tests">Tests</a>Tests</li>
+</ul>
+<ul>
+<li><a class="el" href="#further-documentation-and-examples" title="Further documentation and examples">Further documentation and examples</a>Further documentation and examples</li>
+</ul>
+<ul>
+<li><a class="el" href="#epanet-hydraulic-support-and-current-validation" title="EPANET hydraulic support and current validation">EPANET support, GUI diagnostics, solver settings and validation</a>EPANET support, GUI diagnostics, solver settings and validation</li>
+</ul>
+<h1 class="doxsection"><a class="anchor" id="standalone-programs"></a>
+Standalone programs</h1>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Executable  </th><th class="markdownTableHeadNone">Purpose  </th><th class="markdownTableHeadNone">Main inputs  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">staci</span>  </td><td class="markdownTableBodyNone">Hydraulics, transport, sensitivity, network inspection and conversion  </td><td class="markdownTableBodyNone">Native <span class="tt">.spr</span> or EPANET <span class="tt">.inp</span> network and command-line options  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">staci_split</span>  </td><td class="markdownTableBodyNone">Network partitioning or sensor-placement optimization  </td><td class="markdownTableBodyNone">XML/JSON settings (<span class="tt">--settings</span>) and a network  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">staci_calibrate</span>  </td><td class="markdownTableBodyNone">Fit selected pipe diameters to measured pressures and pool levels  </td><td class="markdownTableBodyNone">XML/JSON settings (<span class="tt">--settings</span>), period-specific <span class="tt">.spr</span> networks and measured data  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">staci_flush</span>  </td><td class="markdownTableBodyNone">Evaluate hydrants individually and rank a flushing sequence  </td><td class="markdownTableBodyNone">EPANET <span class="tt">.inp</span> network and JSON flushing config  </td></tr>
+</table>
+<p>Each program runs independently. A model-specific project needs only its inputs and a command or launcher that calls the appropriate executable. The optimizer tools use pagmo2; <span class="tt">staci_split</span> also uses Eigen3 and igraph. The build also provides the internal <span class="tt">staci_core</span> target and C++ examples, but does not install a separate C++ link library or promise a stable public API.</p>
+<h1 class="doxsection"><a class="anchor" id="installation"></a>
+Installation</h1>
+<h2 class="doxsection"><a class="anchor" id="quick-start-and-build-options"></a>
+Quick start and build options</h2>
+<p>Open a terminal in the repository root (the directory containing this README and <span class="tt">CMakeLists.txt</span>). Install the dependencies for your operating system using the sections below, then build and install:</p>
+<div class="fragment"><div class="line">cmake -S . -B build -DCMAKE_BUILD_TYPE=Release</div>
+<div class="line">cmake --build build --parallel</div>
+<div class="line">cmake --install build --prefix &quot;$HOME/.local&quot;</div>
+</div><!-- fragment --><p>The default build includes all four applications. Add <span class="tt">$HOME/.local/bin</span> to <span class="tt">PATH</span>, or launch executables by their full path. For example, on Linux/macOS:</p>
+<div class="fragment"><div class="line">export PATH=&quot;$HOME/.local/bin:$PATH&quot;</div>
+<div class="line">staci --help</div>
+<div class="line">staci_split --help</div>
+<div class="line">staci_calibrate --help</div>
+<div class="line">staci_flush --help</div>
+</div><!-- fragment --><p>This <span class="tt">export</span> affects the current shell; put it in your shell startup file if needed permanently. On Windows use the PowerShell/Visual Studio commands below and the <span class="tt">.exe</span> files in <span class="tt">build\Release</span> or the installed <span class="tt">bin</span> directory.</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">CMake option  </th><th class="markdownTableHeadNone">Default  </th><th class="markdownTableHeadNone">Effect  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">STACI_BUILD_OPTIMIZERS</span>  </td><td class="markdownTableBodyNone"><span class="tt">ON</span>  </td><td class="markdownTableBodyNone">Build <span class="tt">staci_split</span> and <span class="tt">staci_calibrate</span>; requires pagmo2, Eigen3 and igraph  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">STACI_ENABLE_HDF5</span>  </td><td class="markdownTableBodyNone"><span class="tt">ON</span>  </td><td class="markdownTableBodyNone">Look for HDF5 and enable chunked EPS <span class="tt">.h5</span> output when found  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">STACI_BUILD_CPP_EXAMPLES</span>  </td><td class="markdownTableBodyNone"><span class="tt">ON</span>  </td><td class="markdownTableBodyNone">Build the native C++ examples  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">STACI_BUILD_MATLAB_MEX</span>  </td><td class="markdownTableBodyNone"><span class="tt">OFF</span>  </td><td class="markdownTableBodyNone">Build the optional MATLAB MEX interface  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">BUILD_TESTING</span>  </td><td class="markdownTableBodyNone"><span class="tt">ON</span>  </td><td class="markdownTableBodyNone">Configure CTest checks and test examples; requires Python  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">STACI_EPANET_LIBRARY</span>  </td><td class="markdownTableBodyNone">Unset  </td><td class="markdownTableBodyNone">Official EPANET shared-library path for independent reference tests  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">STACI_EPANET_EXECUTABLE</span>  </td><td class="markdownTableBodyNone">Unset  </td><td class="markdownTableBodyNone">Official EPANET executable path for applicable reference tests  </td></tr>
+</table>
+<p>For a smaller build containing <span class="tt">staci</span> and <span class="tt">staci_flush</span>:</p>
+<div class="fragment"><div class="line">cmake -S . -B build-minimal -DCMAKE_BUILD_TYPE=Release -DSTACI_BUILD_OPTIMIZERS=OFF -DSTACI_BUILD_CPP_EXAMPLES=OFF -DBUILD_TESTING=OFF</div>
+<div class="line">cmake --build build-minimal --parallel</div>
+</div><!-- fragment --><p>SuiteSparse and nlohmann/json are still required. HDF5 is optional: without it, EPS still supplies CSV/JSON outputs, but does not produce the chunked <span class="tt">.h5</span> file. EPANET is a test/reference dependency, not a required runtime backend for STACI's own hydraulic solver. Check the CMake configure output to see which optional features were enabled. Reconfigure after changing options.</p>
+<h2 class="doxsection"><a class="anchor" id="precompiled-executables"></a>
+Precompiled executables</h2>
 <p>The <a href=".github/workflows/build-binaries.yml">Build platform binaries</a> workflow builds Release executables on native GitHub-hosted runners for:</p>
 <ul>
 <li>Windows x64;</li>
 <li>Linux x64;</li>
 <li>macOS using the architecture of the current <span class="tt">macos-latest</span> runner.</li>
 </ul>
-<p>Run the workflow manually from the repository's <b>Actions</b> tab, or push a tag matching <span class="tt">v*</span>. Download the resulting <span class="tt">staci-Windows-*</span>, <span class="tt">staci-Linux-*</span>, or <span class="tt">staci-macOS-*</span> artifact. See <a class="el" href="dir_b94f9f0c034b39d5d6d39e3a6fbfd3e1.html" title="/Users/hoscsaba/CLionProjects/staci/dist/README.md">dist/README.md</a> for packaging and runtime dependency details.</p>
+<p>Run the workflow manually from the repository's <b>Actions</b> tab, or push a tag matching <span class="tt">v*</span>. Download the resulting <span class="tt">staci-Windows-*</span>, <span class="tt">staci-Linux-*</span>, or <span class="tt">staci-macOS-*</span> artifact. See <a class="el" href="dir_b94f9f0c034b39d5d6d39e3a6fbfd3e1.html" title="/Users/hoscsaba/Documents/GitHub/staci/dist/README.md">dist/README.md</a> for packaging and runtime dependency details.</p>
 <p>Precompiled binaries are intentionally generated by CI instead of being committed to Git: executables are platform- and architecture-specific, and SuiteSparse runtime requirements can change between releases.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md3"></a>
-Requirements</h1>
+<h2 class="doxsection"><a class="anchor" id="requirements"></a>
+Requirements</h2>
 <ul>
 <li>CMake 3.16 or newer;</li>
 <li>a C++17 compiler;</li>
+<li>nlohmann/json 3.2 or newer (shared diagnostics, JSON results and flushing);</li>
+<li>Python 3 for tests (or configure with <span class="tt">-DBUILD_TESTING=OFF</span>);</li>
 <li>SuiteSparse with UMFPACK, CHOLMOD, AMD, COLAMD, and SuiteSparseConfig.</li>
+<li>pagmo2 and its Boost/TBB dependencies;</li>
+<li>Eigen3 and igraph (used by <span class="tt">staci_split</span>);</li>
 <li>HDF5 development files (optional for general STACI use, required for the chunked EPS <span class="tt">.h5</span> output).</li>
+<li>MATLAB with Global Optimization Toolbox, CMake-visible Eigen3, and a configured supported C/C++ compiler (optional, only for the in-memory MEX optimization demonstration).</li>
 </ul>
+<p>The optimizer targets are enabled by default. A minimal hydraulic-only build can omit them with <span class="tt">-DSTACI_BUILD_OPTIMIZERS=OFF</span>.</p>
 <p>CMake first uses SuiteSparse's official imported <span class="tt">SuiteSparse::UMFPACK</span> target. For older system packages without CMake metadata, it falls back to finding the headers and libraries in standard installation prefixes.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
-Build on Linux</h1>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md5"></a>
-Debian or Ubuntu</h2>
+<h2 class="doxsection"><a class="anchor" id="build-on-linux"></a>
+Build on Linux</h2>
+<h3 class="doxsection"><a class="anchor" id="debian-or-ubuntu"></a>
+Debian or Ubuntu</h3>
 <div class="fragment"><div class="line">sudo apt update</div>
-<div class="line">sudo apt install build-essential cmake libsuitesparse-dev libhdf5-dev</div>
+<div class="line">sudo apt install build-essential cmake libsuitesparse-dev libhdf5-dev \</div>
+<div class="line">  libpagmo-dev libeigen3-dev libigraph-dev nlohmann-json3-dev python3</div>
 <div class="line"> </div>
 <div class="line">cmake -S . -B build -DCMAKE_BUILD_TYPE=Release</div>
 <div class="line">cmake --build build --parallel</div>
-</div><!-- fragment --><p>The executable is <span class="tt">build/staci</span>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md6"></a>
-Fedora</h2>
-<div class="fragment"><div class="line">sudo dnf install cmake gcc-c++ suitesparse-devel hdf5-devel</div>
+</div><!-- fragment --><p>The executables are <span class="tt">build/staci</span>, <span class="tt">build/staci_flush</span>, <span class="tt">build/staci_split</span> and <span class="tt">build/staci_calibrate</span>; the last two require optimizers to be enabled.</p>
+<h3 class="doxsection"><a class="anchor" id="fedora"></a>
+Fedora</h3>
+<p>This builds the hydraulic and flushing programs. To build the optimizers too, install pagmo2, Eigen3 and igraph development packages and omit <span class="tt">-DSTACI_BUILD_OPTIMIZERS=OFF</span>.</p>
+<div class="fragment"><div class="line">sudo dnf install cmake gcc-c++ suitesparse-devel hdf5-devel json-devel python3</div>
 <div class="line"> </div>
-<div class="line">cmake -S . -B build -DCMAKE_BUILD_TYPE=Release</div>
+<div class="line">cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DSTACI_BUILD_OPTIMIZERS=OFF</div>
 <div class="line">cmake --build build --parallel</div>
 </div><!-- fragment --><p>To select Clang explicitly:</p>
 <div class="fragment"><div class="line">CC=clang CXX=clang++ cmake -S . -B build-clang -DCMAKE_BUILD_TYPE=Release</div>
 <div class="line">cmake --build build-clang --parallel</div>
-</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="autotoc_md7"></a>
-Build on macOS</h1>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="build-on-macos"></a>
+Build on macOS</h2>
 <p>Install the command-line tools and dependencies:</p>
 <div class="fragment"><div class="line">xcode-select --install</div>
-<div class="line">brew install cmake suite-sparse hdf5</div>
+<div class="line">brew install cmake suite-sparse hdf5 pagmo eigen igraph nlohmann-json python</div>
 </div><!-- fragment --><p>Configure and build with Apple Clang:</p>
 <div class="fragment"><div class="line">cmake -S . -B build -DCMAKE_BUILD_TYPE=Release</div>
 <div class="line">cmake --build build --parallel</div>
-</div><!-- fragment --><p>The executable is <span class="tt">build/staci</span>.</p>
+</div><!-- fragment --><p>The executables are <span class="tt">build/staci</span>, <span class="tt">build/staci_flush</span>, <span class="tt">build/staci_split</span> and <span class="tt">build/staci_calibrate</span>; the last two require optimizers to be enabled.</p>
 <p>To use Homebrew GCC instead, adjust the version suffix to the installed compiler:</p>
 <div class="fragment"><div class="line">CC=gcc-16 CXX=g++-16 cmake -S . -B build-gcc -DCMAKE_BUILD_TYPE=Release</div>
 <div class="line">cmake --build build-gcc --parallel</div>
-</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="autotoc_md8"></a>
-Build on Windows</h1>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="build-on-windows"></a>
+Build on Windows</h2>
 <p>The recommended setup is Visual Studio 2022 with the <b>Desktop development with C++</b> workload, CMake, Git, and vcpkg.</p>
 <p>In PowerShell:</p>
-<div class="fragment"><div class="line">vcpkg install suitesparse:x64-windows hdf5:x64-windows</div>
+<div class="fragment"><div class="line">vcpkg install suitesparse-umfpack:x64-windows hdf5:x64-windows pagmo2:x64-windows `</div>
+<div class="line">  eigen3:x64-windows igraph:x64-windows nlohmann-json:x64-windows</div>
 <div class="line"> </div>
 <div class="line">cmake -S . -B build `</div>
 <div class="line">  -DCMAKE_TOOLCHAIN_FILE=&quot;$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake&quot;</div>
 <div class="line"> </div>
 <div class="line">cmake --build build --config Release --parallel</div>
-</div><!-- fragment --><p>If <span class="tt">VCPKG_ROOT</span> is not defined, replace it with the absolute path to the vcpkg checkout. The executable is normally <span class="tt">build\Release\staci.exe</span>.</p>
+</div><!-- fragment --><p>Install <span class="tt">suitesparse-umfpack</span> explicitly: the <span class="tt">suitesparse</span> umbrella package does not include UMFPACK by default. Its required SuiteSparse dependencies are installed automatically.</p>
+<p>If <span class="tt">VCPKG_ROOT</span> is not defined, replace it with the absolute path to the vcpkg checkout. The executables are normally in <span class="tt">build\Release\</span>, with <span class="tt">.exe</span> suffixes.</p>
 <p>To build with Ninja instead of the Visual Studio generator:</p>
 <div class="fragment"><div class="line">cmake -S . -B build -G Ninja `</div>
 <div class="line">  -DCMAKE_BUILD_TYPE=Release `</div>
 <div class="line">  -DCMAKE_TOOLCHAIN_FILE=&quot;$env:VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake&quot;</div>
 <div class="line"> </div>
 <div class="line">cmake --build build --parallel</div>
-</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="autotoc_md9"></a>
-Install to a staging directory</h1>
-<p>CMake can copy the executable into a conventional <span class="tt">bin</span> directory:</p>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="install-to-a-staging-directory"></a>
+Install to a staging directory</h2>
+<p>CMake can copy the built executables into a conventional <span class="tt">bin</span> directory:</p>
 <div class="fragment"><div class="line">cmake --install build --prefix install</div>
 </div><!-- fragment --><p>For a multi-configuration generator such as Visual Studio:</p>
 <div class="fragment"><div class="line">cmake --install build --config Release --prefix install</div>
-</div><!-- fragment --><p>The installed executable is <span class="tt">install/bin/staci</span> on Unix-like systems and <span class="tt">install\bin\staci.exe</span> on Windows.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md10"></a>
-Run the integration tests</h1>
-<p>The portable Python test runner recursively tests every <span class="tt">.spr</span> and <span class="tt">.inp</span> file under <span class="tt">tests/</span>. It uses temporary copies, so hydraulic calculations never overwrite the original test networks. On Linux and macOS:</p>
-<div class="fragment"><div class="line">python3 tests/run_tests.py --binary ./build/staci</div>
-</div><!-- fragment --><p>On Windows:</p>
-<div class="fragment"><div class="line">py tests\run_tests.py --binary build\Release\staci.exe</div>
-</div><!-- fragment --><p>SPR files up to 1 MB receive a steady-state hydraulic test, convergence-marker check, EPANET export, and round-trip import. Larger SPR files receive the export and round-trip test by default, avoiding multi-minute hydraulic runs. To force hydraulics for every SPR file, add <span class="tt">--full-spr-hydraulics</span> and optionally raise the per-command limit with <span class="tt">--timeout SECONDS</span>.</p>
-<p>Every INP file receives a byte-for-byte metadata round-trip, import, and extended-period simulation test. The runner verifies the SI CSV schema, JSON metadata, and convergence counts. A separate HDF5 test generates an EPS result and verifies its file signature, required datasets, SI unit attributes, extendible time dimension, and 16-frame chunking. This check requires either the Python <span class="tt">h5py</span> package or the <span class="tt">h5dump</span> command-line utility; use the <span class="tt">H5DUMP</span> environment variable if the utility is not on <span class="tt">PATH</span>. The HDF5 test output is always retained in a timestamped directory below <span class="tt">tests/test-results/hdf5/</span>, and its exact path is printed at the end of the run.</p>
-<p>The runner continues after individual failures and writes the full human-readable report to <span class="tt">tests/run_tests.log</span>. That report is recreated on every run, and old generated STACI sidecar logs (<span class="tt">.ros</span>, <span class="tt">.rps</span>, <span class="tt">.rrs</span>, and related variants) are removed at startup, so the report describes only the latest test run. Use <span class="tt">--keep-workdir</span> to retain the other generated files in a timestamped directory below <span class="tt">tests/test-results/runs/</span> for debugging. Retained HDF5 files are not deleted by later test runs.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md11"></a>
-Quick start</h1>
-<p>The commands below use the included <span class="tt">tests/anytown_1med.spr</span> network. From the repository root, use <span class="tt">./build/staci</span> on Linux or macOS and <span class="tt">.\build\Release\staci.exe</span> on Windows.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
-Import an EPANET network</h2>
-<p>STACI recognizes the <span class="tt">.inp</span> extension automatically. For example:</p>
-<div class="fragment"><div class="line">./build/staci -l model.inp</div>
-<div class="line">./build/staci -g model.inp -e J-1 -p demand</div>
-<div class="line">./build/staci -s model.inp</div>
-</div><!-- fragment --><p>The importer reads every EPANET section and reports a warning for data that does not have a STACI equivalent. It currently transfers:</p>
-<ul>
-<li>junction elevations, demands, demand multipliers, initial quality, and the first multiplier of demand patterns;</li>
-<li>reservoir heads and tank initial levels as fixed hydraulic boundaries;</li>
-<li>pipes, with EPANET-to-SI conversion for flow, length, diameter, and Darcy-Weisbach roughness;</li>
-<li>Hazen-Williams and Darcy-Weisbach head-loss selection;</li>
-<li>pump head curves and constant-power pumps;</li>
-<li>relevant solver settings such as trial count and accuracy (the latter is an approximate mapping because the convergence criteria differ);</li>
-<li>a lossless EPANET document containing the original text, section and record order, line endings, inline comments and their record IDs, tags, map data, and non-hydraulic run configuration.</li>
-</ul>
-<p>Extended-period patterns, dynamic tank storage, controls and rules, valves, emitters, and water-quality sources/reactions are parsed but not simulated. Descriptive metadata, map sections, and non-hydraulic run configuration do not affect the hydraulic snapshot, but they remain attached to the imported EPANET document for lossless export. Each incompatible calculation feature is identified on standard error with its section, element where available, and source line.</p>
-<p>Hydraulic results are not written into <span class="tt">.inp</span> files because EPANET input files describe network definitions rather than simulation results. Hydraulic runs can still create the normal <span class="tt">.ros</span>, <span class="tt">.rps</span>, and <span class="tt">.rrs</span> sidecar files. Network properties can be changed safely with <span class="tt">-m</span>; STACI writes a new <span class="tt">.inp</span> file and does not alter the source.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md13"></a>
-Export a STACI network to EPANET</h2>
-<div class="fragment"><div class="line">./build/staci --export-epanet network.spr -o network.inp</div>
-<div class="line"># Equivalent short form:</div>
-<div class="line">./build/staci -y network.spr -o network.inp</div>
-</div><!-- fragment --><p>The generated file uses metric <span class="tt">LPS</span> units. Junctions, fixed-head boundaries, tanks, pipes, pump curves, constant-power pumps, demands, initial chemical quality, and the selected pipe-friction model are exported. Tank operating limits are inferred because native STACI pools do not store all EPANET tank constraints. STACI-only elements are skipped with explicit warnings.</p>
-<p>When the source is an EPANET INP file, STACI exports its retained <span class="tt"><a class="el" href="class_epanet_document.html">EpanetDocument</a></span> representation. <span class="tt">[TITLE]</span>, inline and full-line comments, <span class="tt">[TAGS]</span>, <span class="tt">[COORDINATES]</span>, <span class="tt">[VERTICES]</span>, <span class="tt">[LABELS]</span>, <span class="tt">[BACKDROP]</span>, <span class="tt">[TIMES]</span>, <span class="tt">[REPORT]</span>, <span class="tt">[ENERGY]</span>, and all <span class="tt">[OPTIONS]</span> records retain their original text, association, order, whitespace, and line endings. An unchanged INP therefore round-trips byte-for-byte. The <span class="tt">-m</span> INP modification path changes only the requested field and preserves all other lines.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md14"></a>
-EPANET–STACI compatibility TODO (easiest first)</h2>
-<p>The following work is ordered by expected implementation difficulty. It is limited to INP data coverage, lossless import/export, and the set of available network elements; changes to the hydraulic solution method are intentionally out of scope. Each completed item should include a minimal INP fixture and a field-level <span class="tt">INP -&gt; STACI -&gt; INP</span> round-trip assertion.</p>
-<ol type="1">
-<li>[x] <b>Preserve descriptive metadata.</b> Store and re-export <span class="tt">[TITLE]</span>, inline comments, and <span class="tt">[TAGS]</span> without changing their text or association with nodes and links.</li>
-<li>[x] <b>Preserve map metadata.</b> Round-trip <span class="tt">[COORDINATES]</span>, <span class="tt">[VERTICES]</span>, <span class="tt">[LABELS]</span>, and <span class="tt">[BACKDROP]</span>, including numeric values, backdrop declarations, associations, and ordering.</li>
-<li>[x] <b>Preserve non-hydraulic run configuration.</b> Store and re-export all recognized <span class="tt">[TIMES]</span>, <span class="tt">[REPORT]</span>, <span class="tt">[ENERGY]</span>, and currently unused <span class="tt">[OPTIONS]</span> entries instead of reducing them to warnings.</li>
-<li>[ ] <b>Retain the source unit system.</b> When an INP network is imported and exported again, preserve its original EPANET flow units and convert every affected field back consistently; keep <span class="tt">LPS</span> as the default for native SPR exports.</li>
-<li>[ ] <b>Complete pipe field coverage.</b> Import and export minor-loss coefficients, <span class="tt">Open</span>/<span class="tt">Closed</span>/<span class="tt">CV</span> pipe status, and matching <span class="tt">[STATUS]</span> overrides. Map <span class="tt">CV</span> to STACI's existing check-valve element where possible.</li>
-<li>[ ] <b>Round-trip all tank fields.</b> Retain minimum and maximum level, minimum volume, diameter, initial level, and the referenced volume-curve ID instead of inferring missing values during export.</li>
-<li>[ ] <b>Preserve multiple demand categories.</b> Keep every <span class="tt">[DEMANDS]</span> row, category label, pattern reference, and junction base demand separately instead of summing them into one STACI demand value.</li>
-<li>[ ] <b>Add a native pattern data model.</b> Store complete <span class="tt">[PATTERNS]</span> series, the default pattern, and all object-to-pattern references so an INP–SPR–INP round trip does not collapse a pattern to its first multiplier.</li>
-<li>[ ] <b>Complete pump data coverage.</b> Preserve pump curve IDs, <span class="tt">POWER</span>/<span class="tt">HEAD</span> form, initial status, relative speed, speed-pattern reference, and associated efficiency and energy records during import and export.</li>
-<li>[ ] <b>Classify and preserve every curve.</b> Distinguish pump, efficiency, volume, and general-purpose curves, validate their references, and export them with their original IDs and numeric data.</li>
-<li>[ ] <b>Represent emitters as network elements.</b> Add an import/export mapping for <span class="tt">[EMITTERS]</span>, including the emitter coefficient and the relevant pressure-exponent option, with an explicit placeholder representation when no equivalent STACI element is available.</li>
-<li>[ ] <b>Map directly compatible valve types.</b> Implement data mappings for check valves and for EPANET <span class="tt">TCV</span> and <span class="tt">GPV</span> records using existing STACI throttling/check-valve elements where their stored parameters are equivalent.</li>
-<li>[ ] <b>Represent regulated EPANET valves.</b> Add native element records and lossless INP mappings for <span class="tt">PRV</span>, <span class="tt">PSV</span>, <span class="tt">PBV</span>, and <span class="tt">FCV</span>, including setting, minor-loss coefficient, and initial status.</li>
-<li>[ ] <b>Preserve controls and rules structurally.</b> Parse <span class="tt">[CONTROLS]</span> and <span class="tt">[RULES]</span> into typed objects that retain link/node references, thresholds, clock times, priorities, and original order, then re-export them unchanged. Executing these objects is a separate calculation task.</li>
-<li>[ ] <b>Preserve water-quality configuration.</b> Round-trip <span class="tt">[QUALITY]</span>, <span class="tt">[SOURCES]</span>, <span class="tt">[REACTIONS]</span>, and <span class="tt">[MIXING]</span>, including units, source types, coefficients, tank mixing models, and pattern references. Water-quality calculation remains outside this item.</li>
-<li>[ ] <b>Introduce a lossless fallback for unknown sections.</b> Keep unknown or newer EPANET sections and unsupported records as raw, ordered INP data so STACI can modify known properties without silently discarding future EPANET extensions.</li>
-</ol>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md15"></a>
-Run an EPANET extended-period simulation</h2>
-<div class="fragment"><div class="line">./build/staci --epanet-eps network.inp -o results/network</div>
-<div class="line"># Equivalent short form:</div>
-<div class="line">./build/staci -z network.inp -o results/network</div>
-</div><!-- fragment --><p>EPS mode reads <span class="tt">Duration</span>, hydraulic/pattern/report timesteps, pattern start, junction demand patterns, demand multiplier, reservoir head patterns, tank geometry and operating levels, initial pump status, and simple tank-level pump controls from the EPANET file. Each hydraulic state is solved with the existing STACI steady-state solver. Tank levels are advanced from the solved boundary flow and tank area; flow is blocked in the prohibited direction when a tank is at its minimum or maximum level.</p>
-<p>The primary output is <span class="tt">PREFIX.h5</span> using the <span class="tt">STACI EPS OUTPUT v1</span> schema. A small <span class="tt">PREFIX.meta.json</span> sidecar contains run metadata and precomputed value ranges for plot color bars. Four analysis-friendly SI CSV files are retained for interoperability and manual inspection:</p>
-<ul>
-<li><span class="tt">PREFIX-nodes.csv</span>: pressure head, total head, elevation, and demand for each node and report time;</li>
-<li><span class="tt">PREFIX-links.csv</span>: flow, head loss, endpoints, type, and enabled state for each link;</li>
-<li><span class="tt">PREFIX-tanks.csv</span>: tank level, volume, inflow, and limits;</li>
-<li><span class="tt">PREFIX-summary.csv</span>: duration, timestep, state count, failed states, and warning count.</li>
-</ul>
-<p>All physical quantities in the HDF5, JSON, and CSV outputs use SI units: seconds, metres, cubic metres, cubic metres per second, and metres per second. The CSV files use one observation per row and can be read directly by Excel, LibreOffice, pandas, R, MATLAB, or plotting tools.</p>
-<p>The HDF5 dynamic arrays use <span class="tt">[time, element]</span> order:</p>
-<div class="fragment"><div class="line">/time                       int64   [T]    s</div>
-<div class="line">/nodes/head                 float64 [T,N]  m</div>
-<div class="line">/nodes/pressure_head        float64 [T,N]  m</div>
-<div class="line">/nodes/demand               float64 [T,N]  m3/s</div>
-<div class="line">/links/flow_rate            float64 [T,L]  m3/s</div>
-<div class="line">/links/velocity             float64 [T,L]  m/s</div>
-<div class="line">/links/headloss             float64 [T,L]  m</div>
-<div class="line">/links/status               uint8   [T,L]</div>
-<div class="line">/tanks/level                float64 [T,K]  m</div>
-<div class="line">/tanks/volume               float64 [T,K]  m3</div>
-<div class="line">/tanks/inflow               float64 [T,K]  m3/s</div>
-<div class="line">/simulation/converged       uint8   [T]</div>
-<div class="line">/simulation/iterations      uint32  [T]</div>
-</div><!-- fragment --><p>Static <span class="tt">nodes</span>, <span class="tt">links</span>, and <span class="tt">tanks</span> datasets provide ID-to-index mapping, topology, elevations, coordinates, lengths, diameters, and operating limits. Coordinates from an EPANET file are converted using that network's length-unit family. Missing coordinates and non-applicable link dimensions are stored as <span class="tt">NaN</span>.</p>
-<p>Dynamic datasets are extensible along the time dimension and are written in 16-frame chunks. For 10,000 nodes a <span class="tt">float64 [16,10000]</span> chunk is about 1.28 MB. Shuffle plus gzip level 1 is used when the linked HDF5 library provides the deflate filter. The file is flushed after every chunk and its <span class="tt">frames_written</span> and <span class="tt">simulation_status</span> attributes allow interrupted runs to be recognized.</p>
-<p>If HDF5 was not found while configuring the build, CMake prints a warning and the EPS command writes only the SI CSV and JSON files. Set <span class="tt">HDF5_ROOT</span> for a non-standard installation, for example:</p>
-<div class="fragment"><div class="line">cmake -S . -B build -DHDF5_ROOT=/path/to/hdf5</div>
-</div><!-- fragment --><p>Tank volume curves are currently approximated using the tank diameter. Rule-based controls, valve controls, pump-speed patterns, water-quality EPS, and event interpolation inside a hydraulic timestep are not yet implemented; present occurrences emit warnings or use the documented hydraulic-step approximation.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md16"></a>
-List network elements</h2>
-<div class="fragment"><div class="line">./build/staci -l tests/anytown_1med.spr</div>
-</div><!-- fragment --><p>This also writes <span class="tt">element_list.txt</span> in the current working directory.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md17"></a>
-Run a steady-state hydraulic simulation</h2>
-<div class="fragment"><div class="line">./build/staci -s tests/anytown_1med.spr</div>
-</div><!-- fragment --><p>The solved values are written back to the input network file. Work on a copy if the original input must remain unchanged:</p>
-<div class="fragment"><div class="line">cp tests/anytown_1med.spr network.spr</div>
-<div class="line">./build/staci -s network.spr</div>
-</div><!-- fragment --><p><span class="tt">network.spr.rrs</span> contains <span class="tt">OK</span> when the solver converges or <span class="tt">ERROR!</span> when it does not.</p>
-<p>An earlier result file can be used for initialization:</p>
-<div class="fragment"><div class="line">./build/staci -s network.spr -i previous-result.spr</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md18"></a>
-Read a property</h2>
-<div class="fragment"><div class="line">./build/staci -g network.spr -e NODE210 -p pressure</div>
-<div class="line">./build/staci -g network.spr -e PIPE74 -p mass_flow_rate</div>
-</div><!-- fragment --><p>The value is printed and also written to <span class="tt">tmp.dat</span>. Readable edge properties are <span class="tt">diameter</span>, <span class="tt">mass_flow_rate</span>, <span class="tt">bottom_level</span>, <span class="tt">water_level</span>, and <span class="tt">position</span>. Readable node properties are <span class="tt">pressure</span>, <span class="tt">head</span>, and <span class="tt">demand</span>.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md19"></a>
-Modify a property and save a new network</h2>
-<div class="fragment"><div class="line">./build/staci -m network.spr \</div>
-<div class="line">  -e PIPE74 -p diameter -n 0.8 -o network-modified.spr</div>
-</div><!-- fragment --><p>Writable edge properties are <span class="tt">diameter</span>, <span class="tt">bottom_level</span>, <span class="tt">water_level</span>, and <span class="tt">position</span>. The writable node property is <span class="tt">demand</span>. The original file is copied to the path supplied with <span class="tt">-o</span>, then the requested value is saved there.</p>
-<p>The same command works directly with EPANET input files:</p>
-<div class="fragment"><div class="line">./build/staci -m network.inp \</div>
-<div class="line">  -e PIPE74 -p diameter -n 0.8 -o network-modified.inp</div>
-</div><!-- fragment --><p>Modification values use STACI SI units, so pipe diameter and tank levels are specified in metres and demand in m³/h. STACI converts values back to the units declared by the EPANET file. All other <span class="tt">.inp</span> sections—including controls, patterns, coordinates, and metadata—are preserved. Supported EPANET write-back properties are pipe <span class="tt">diameter</span>, junction <span class="tt">demand</span>, and tank <span class="tt">bottom_level</span>/<span class="tt">water_level</span> (using the imported <span class="tt">EPANET_TANK_ID</span> element ID).</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md20"></a>
-Transport calculations</h2>
-<div class="fragment"><div class="line"># Residence time</div>
-<div class="line">./build/staci -t network.spr</div>
-<div class="line"> </div>
-<div class="line"># Concentration distribution</div>
-<div class="line">./build/staci -c network.spr</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md21"></a>
-Sensitivity calculations</h2>
-<div class="fragment"><div class="line"># Sensitivity to one element property</div>
-<div class="line">./build/staci -r network.spr -e PIPE74 -p diameter</div>
-<div class="line"> </div>
-<div class="line"># Hydraulic solution, residence time, and demand sensitivity</div>
-<div class="line">./build/staci -d network.spr</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md22"></a>
-Export connectivity</h2>
-<div class="fragment"><div class="line">./build/staci -x network.spr</div>
-</div><!-- fragment --><p>This produces <span class="tt">nodelist.txt</span> and <span class="tt">connected_nodes.txt</span>. The scripts in <span class="tt">python_tools/</span> can be used for additional connectivity analysis.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md23"></a>
-Command-line reference</h1>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">Option  </th><th class="markdownTableHeadNone">Purpose  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-s</span>, <span class="tt">--stac FILE</span>  </td><td class="markdownTableBodyNone">Steady-state hydraulic simulation  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">-i</span>, <span class="tt">--ini FILE</span>  </td><td class="markdownTableBodyNone">Initialization/result file used with a hydraulic run  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-t</span>, <span class="tt">--travel_time FILE</span>  </td><td class="markdownTableBodyNone">Residence-time calculation  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">-c</span>, <span class="tt">--conc_transp FILE</span>  </td><td class="markdownTableBodyNone">Concentration transport calculation  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-m</span>, <span class="tt">--mod_prop FILE</span>  </td><td class="markdownTableBodyNone">Modify a property; also requires <span class="tt">-e</span>, <span class="tt">-p</span>, <span class="tt">-n</span>, and <span class="tt">-o</span>  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">-l</span>, <span class="tt">--list_all_elements FILE</span>  </td><td class="markdownTableBodyNone">List all nodes and edges  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-g</span>, <span class="tt">--get_data FILE</span>  </td><td class="markdownTableBodyNone">Read a property; also requires <span class="tt">-e</span> and <span class="tt">-p</span>  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">-r</span>, <span class="tt">--sensitivity FILE</span>  </td><td class="markdownTableBodyNone">Parameter sensitivity; also requires <span class="tt">-e</span> and <span class="tt">-p</span>  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-d</span>, <span class="tt">--demand_sensitivity FILE</span>  </td><td class="markdownTableBodyNone">Hydraulic, residence-time, and demand-sensitivity calculation  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">-x</span>, <span class="tt">--export_for_connectivity_check FILE</span>  </td><td class="markdownTableBodyNone">Export node connectivity  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-y</span>, <span class="tt">--export-epanet FILE</span>  </td><td class="markdownTableBodyNone">Export a network to the <span class="tt">.inp</span> path supplied with <span class="tt">-o</span>  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">-z</span>, <span class="tt">--epanet-eps FILE</span>  </td><td class="markdownTableBodyNone">Run EPANET extended-period hydraulics and write chunked HDF5, metadata JSON, and SI CSV files using the <span class="tt">-o</span> prefix  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-e</span>, <span class="tt">--element_ID ID</span>  </td><td class="markdownTableBodyNone">Select a node or edge  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">-p</span>, <span class="tt">--property_ID NAME</span>  </td><td class="markdownTableBodyNone">Select a property  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">-n</span>, <span class="tt">--newValue VALUE</span>  </td><td class="markdownTableBodyNone">New numeric property value  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">-o</span>, <span class="tt">--outfile FILE</span>  </td><td class="markdownTableBodyNone">Output network file for property modification  </td></tr>
-</table>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md24"></a>
-Generated files</h1>
-<p>STACI writes files relative to the current working directory or beside the input filename, depending on the command:</p>
-<table class="markdownTable">
-<tr class="markdownTableHead">
-<th class="markdownTableHeadNone">File  </th><th class="markdownTableHeadNone">Meaning  </th></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">INPUT.ros</span>  </td><td class="markdownTableBodyNone">Steady-state log/output  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">INPUT.rps</span>  </td><td class="markdownTableBodyNone">Steady-state progress  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">INPUT.rrs</span>  </td><td class="markdownTableBodyNone">Steady-state convergence marker  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">INPUT.rot</span>, <span class="tt">INPUT.rpt</span>, <span class="tt">INPUT.rrt</span>  </td><td class="markdownTableBodyNone">Residence-time output, progress, and completion marker  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">INPUT.roc</span>, <span class="tt">INPUT.rpc</span>, <span class="tt">INPUT.rrc</span>  </td><td class="markdownTableBodyNone">Concentration output, progress, and completion marker  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">element_list.txt</span>  </td><td class="markdownTableBodyNone">Element list created by <span class="tt">-l</span>  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">tmp.dat</span>  </td><td class="markdownTableBodyNone">Numeric value created by <span class="tt">-g</span>  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">nodelist.txt</span>, <span class="tt">connected_nodes.txt</span>  </td><td class="markdownTableBodyNone">Connectivity exports created by <span class="tt">-x</span>  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">PREFIX-nodes.csv</span>, <span class="tt">PREFIX-links.csv</span>  </td><td class="markdownTableBodyNone">EPS node and link time series  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">PREFIX-tanks.csv</span>, <span class="tt">PREFIX-summary.csv</span>  </td><td class="markdownTableBodyNone">EPS tank time series and run summary  </td></tr>
-<tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">PREFIX.h5</span>  </td><td class="markdownTableBodyNone">Chunked <span class="tt">STACI EPS OUTPUT v1</span> data for visualization  </td></tr>
-<tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">PREFIX.meta.json</span>  </td><td class="markdownTableBodyNone">EPS run metadata, dimensions, status codes, warnings, and value ranges  </td></tr>
-</table>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md25"></a>
-Non-standard SuiteSparse installations</h1>
+</div><!-- fragment --><p>The installed executables are <span class="tt">staci</span>, <span class="tt">staci_flush</span>, <span class="tt">staci_calibrate</span>, and <span class="tt">staci_split</span> (with <span class="tt">.exe</span> suffixes on Windows). The two optimizer programs are omitted when <span class="tt">STACI_BUILD_OPTIMIZERS=OFF</span>. Installation copies the enabled application executables; it does not package every shared dependency, project settings file or example. Keep the required runtime libraries available, and prepare project inputs separately. A staging directory can be removed to uninstall its copied executables; remove its <span class="tt">bin</span> entry from <span class="tt">PATH</span> if present.</p>
+<h2 class="doxsection"><a class="anchor" id="non-standard-suitesparse-installations"></a>
+Non-standard SuiteSparse installations</h2>
 <p>For a custom SuiteSparse prefix, pass it through CMake's standard search path:</p>
 <div class="fragment"><div class="line">cmake -S . -B build \</div>
 <div class="line">  -DCMAKE_BUILD_TYPE=Release \</div>
 <div class="line">  -DCMAKE_PREFIX_PATH=/path/to/suitesparse</div>
-</div><!-- fragment --><p>The fallback finder also recognizes the <span class="tt">SUITESPARSE_ROOT</span> environment variable. Ensure the matching SuiteSparse shared libraries are on the runtime library search path when using a dynamically linked build. </p>
+</div><!-- fragment --><p>The fallback finder also recognizes the <span class="tt">SUITESPARSE_ROOT</span> environment variable. Ensure the matching SuiteSparse shared libraries are on the runtime library search path when using a dynamically linked build.</p>
+<h1 class="doxsection"><a class="anchor" id="usage"></a>
+Usage</h1>
+<p>The examples below run from the repository root with a single-configuration build in <span class="tt">build/</span>, unless another working directory is shown. On Windows with Visual Studio, use <span class="tt">build\Release\PROGRAM.exe</span> in place of <span class="tt">build/PROGRAM</span>. Installed executables can be called directly when their <span class="tt">bin</span> directory is on <span class="tt">PATH</span>.</p>
+<h2 class="doxsection"><a class="anchor" id="staci-hydraulic-solver"></a>
+staci hydraulic solver</h2>
+<p>Use <span class="tt">staci</span> to solve steady hydraulics, calculate transport and sensitivities, inspect or modify network properties, and convert networks. It also supports EPANET extended-period hydraulics and steady water-quality calculations.</p>
+<div class="fragment"><div class="line">./build/staci --help</div>
+<div class="line"> </div>
+<div class="line"># Copy a sample: a steady solve writes results back into the native SPR file.</div>
+<div class="line">cp tests/anytown_1med.spr network.spr</div>
+<div class="line">./build/staci -s network.spr</div>
+<div class="line"> </div>
+<div class="line"># List nodes and edges, then export the network to EPANET.</div>
+<div class="line">./build/staci -l network.spr</div>
+<div class="line">./build/staci --export-epanet network.spr -o network.inp</div>
+</div><!-- fragment --><p>Common commands:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Command  </th><th class="markdownTableHeadNone">Operation  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">staci -s FILE</span>  </td><td class="markdownTableBodyNone">Solve steady hydraulics  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">staci -l FILE</span>  </td><td class="markdownTableBodyNone">List elements; also write <span class="tt">element_list.txt</span>  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">staci -g FILE -e ID -p PROPERTY</span>  </td><td class="markdownTableBodyNone">Read a property; write its value to <span class="tt">tmp.dat</span>  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">staci -m FILE -e ID -p PROPERTY -n VALUE -o NEW.spr</span>  </td><td class="markdownTableBodyNone">Change a property and save a new network  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">staci --export-epanet FILE -o NEW.inp</span>  </td><td class="markdownTableBodyNone">Export an EPANET network  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">staci --epanet-eps FILE.inp -o PREFIX</span>  </td><td class="markdownTableBodyNone">Run extended-period hydraulics; write HDF5, metadata and CSV results  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">staci -t FILE</span>  </td><td class="markdownTableBodyNone">Calculate residence time  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">staci -c FILE</span>  </td><td class="markdownTableBodyNone">Calculate concentration transport  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">staci -r FILE -e ID -p PROPERTY</span>  </td><td class="markdownTableBodyNone">Calculate parameter sensitivity  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">staci --steady-quality FILE.inp -o PREFIX</span>  </td><td class="markdownTableBodyNone">Solve asymptotic water quality for fixed hydraulics  </td></tr>
+</table>
+<p>An INP initial-state solve and an EPS run can be launched as follows:</p>
+<div class="fragment"><div class="line">./build/staci -s tests/epanet_eps_smoke.inp</div>
+<div class="line">./build/staci --epanet-eps tests/epanet_eps_smoke.inp -o /absolute/path/results/smoke</div>
+</div><!-- fragment --><p>Create the output parent directory first. INP hydraulic solves preserve input bytes and write SI results in <span class="tt">&lt;network&gt;.inp.hydraulics.json</span>. Native SPR solves can update results inside the input file; work on a copy when preserving an original model. EPS uses a result prefix and writes CSV/JSON metadata plus HDF5 when enabled. Use network IDs exactly as listed by <span class="tt">-l</span>. Property units are command/property-specific: native demand properties use m³/h, while machine-readable hydraulic exports use SI m³/s.</p>
+<p>Hydraulic runs produce <span class="tt">.ros</span> logs, <span class="tt">.rps</span> progress files and <span class="tt">.rrs</span> convergence markers beside the input. See the <a class="el" href="md_doc_2staci__usage.html" title="STACI usage reference">full usage reference</a> for property names and units, transport settings, EPS controls, quality calculations, EPANET compatibility, all options and output files.</p>
+<h2 class="doxsection"><a class="anchor" id="staci_split"></a>
+staci_split</h2>
+<p>Use <span class="tt">staci_split</span> to divide a network into communities or select sensor locations. Use <b><span class="tt">--settings file.xml</span> or <span class="tt">--settings file.json</span></b> to choose settings; the network path is set by <span class="tt">fname</span> inside that file. The optional <span class="tt">--seed</span> argument makes the optimizer's random choices reproducible. Without <span class="tt">--settings</span>, it loads <span class="tt">staci_split_settings.xml</span>, or <span class="tt">staci_split_settings.json</span> if XML is absent. See <a class="el" href="md_doc_2json__inputs.html" title="JSON auxiliary inputs">JSON input formats</a> for all auxiliary input schemas.</p>
+<div class="fragment"><div class="line"># Run inside a project directory containing staci_split_settings.xml.</div>
+<div class="line">/path/to/staci_split --seed 12345</div>
+</div><!-- fragment --><p>A small partitioning config is:</p>
+<div class="fragment"><div class="line">&lt;<span class="keywordtype">settings</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">global_debug_level</span>&gt;1&lt;/<span class="keywordtype">global_debug_level</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">n_comm</span>&gt;2&lt;/<span class="keywordtype">n_comm</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">weight_type</span>&gt;<span class="keyword">topology</span>&lt;/<span class="keywordtype">weight_type</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">weight_type_mod</span>&gt;<span class="keyword">diameter</span>&lt;/<span class="keywordtype">weight_type_mod</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">fname</span>&gt;<span class="keyword">network.spr</span>&lt;/<span class="keywordtype">fname</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">logfilename</span>&gt;<span class="keyword">split.log</span>&lt;/<span class="keywordtype">logfilename</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">obj_type</span>&gt;<span class="keyword">modularity</span>&lt;/<span class="keywordtype">obj_type</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">popsize</span>&gt;4&lt;/<span class="keywordtype">popsize</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">ngen</span>&gt;2&lt;/<span class="keywordtype">ngen</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">pmut</span>&gt;0.25&lt;/<span class="keywordtype">pmut</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">pcross</span>&gt;0.8&lt;/<span class="keywordtype">pcross</span>&gt;</div>
+<div class="line">&lt;/<span class="keywordtype">settings</span>&gt;</div>
+</div><!-- fragment --><p><span class="tt">modularity</span> partitions the graph into <span class="tt">n_comm</span> communities. Its weights can be <span class="tt">topology</span>, <span class="tt">dp</span> or <span class="tt">sensitivity</span>; sensitivity weighting additionally uses <span class="tt">weight_type_mod</span>. The alternative objectives <span class="tt">A-optimality</span> and <span class="tt">D-optimality</span> select sensor locations using sensitivity-based criteria, with <span class="tt">weight_type</span> set to <span class="tt">friction_coeff</span>, <span class="tt">diameter</span> or <span class="tt">demand</span>. The population size, generation count and mutation/crossover probabilities above are demonstration settings, not a convergence recommendation.</p>
+<p>Results include <span class="tt">membership.txt</span> and the configured optimization log; sensitivity modes also write matrix files. Use a separate working directory for each project because these output names are reused.</p>
+<p>With optimizers and testing enabled, CMake prepares a runnable example:</p>
+<div class="fragment"><div class="line">(cd build/optimizer-tests/split &amp;&amp; ../../staci_split --seed 12345)</div>
+</div><!-- fragment --><p>See the <a href="tests/staci_split_settings.xml.in">settings template</a> and <a class="el" href="md_doc_2staci__split__manual.html" title="Hidraulikus hálózat részekre bontása">splitter manual (Hungarian)</a> for further details. CMake resolves the <span class="tt">@...@</span> paths in the template when generating the example.</p>
+<h2 class="doxsection"><a class="anchor" id="staci_calibrate"></a>
+staci_calibrate</h2>
+<p>Use <span class="tt">staci_calibrate</span> to fit selected <b>pipe diameters</b> to measured node pressures and pool levels over one or more periods. Each active diameter varies between 0.5 and 2 times its original value. It reads <b><span class="tt">--settings file.xml</span> or <span class="tt">--settings file.json</span></b>; without this option it searches the current directory for <span class="tt">staci_calibrate_settings.xml</span>, then <span class="tt">.json</span>.</p>
+<div class="fragment"><div class="line"># Run inside a project directory containing staci_calibrate_settings.xml.</div>
+<div class="line">/path/to/staci_calibrate --seed 12345</div>
+</div><!-- fragment --><p>A minimal single-period example is:</p>
+<div class="fragment"><div class="line">&lt;<span class="keywordtype">settings</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">global_debug_level</span>&gt;1&lt;/<span class="keywordtype">global_debug_level</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">Staci_debug_level</span>&gt;0&lt;/<span class="keywordtype">Staci_debug_level</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">dir_name</span>&gt;./&lt;/<span class="keywordtype">dir_name</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">fname_prefix</span>&gt;<span class="keyword">calibrate_network_</span>&lt;/<span class="keywordtype">fname_prefix</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">logfilename</span>&gt;<span class="keyword">calibrate.log</span>&lt;/<span class="keywordtype">logfilename</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">best_logfilename</span>&gt;<span class="keyword">calibrate-best.log</span>&lt;/<span class="keywordtype">best_logfilename</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">sollwert_dfile</span>&gt;<span class="keyword">calibrate_targets.csv</span>&lt;/<span class="keywordtype">sollwert_dfile</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">Start_of_Periods</span>&gt;0&lt;/<span class="keywordtype">Start_of_Periods</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">Num_of_Periods</span>&gt;1&lt;/<span class="keywordtype">Num_of_Periods</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">Spoil_Active_Pipes</span>&gt;<span class="keyword">no</span>&lt;/<span class="keywordtype">Spoil_Active_Pipes</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">dt</span>&gt;1.0&lt;/<span class="keywordtype">dt</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">weight_p_err</span>&gt;1.0&lt;/<span class="keywordtype">weight_p_err</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">type_of_pipe_selection</span>&gt;<span class="keyword">largest_diameter</span>&lt;/<span class="keywordtype">type_of_pipe_selection</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">num_of_active_pipes</span>&gt;1&lt;/<span class="keywordtype">num_of_active_pipes</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">popsize</span>&gt;4&lt;/<span class="keywordtype">popsize</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">ngen</span>&gt;1&lt;/<span class="keywordtype">ngen</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">pmut</span>&gt;0.2&lt;/<span class="keywordtype">pmut</span>&gt;</div>
+<div class="line">  &lt;<span class="keywordtype">pcross</span>&gt;0.8&lt;/<span class="keywordtype">pcross</span>&gt;</div>
+<div class="line">&lt;/<span class="keywordtype">settings</span>&gt;</div>
+</div><!-- fragment --><p>This loads <span class="tt">./calibrate_network_0.spr</span> and <span class="tt">./calibrate_targets.csv</span>. Subsequent periods increment the network filename suffix. Keep a trailing separator in <span class="tt">dir_name</span>; <span class="tt">dt</span> is the period length in hours. Target rows have the form <span class="tt">NODE_ID;node;VALUE;</span> or <span class="tt">POOL_ID;pool;VALUE;</span>, with one value per period and a trailing semicolon. Node pressures are in bar and pool levels in metres.</p>
+<p><span class="tt">weight_p_err</span> weights the pressure error against the pool-level error (1 selects pressure only). Active pipes can be selected by <span class="tt">largest_diameter</span>, <span class="tt">most_sensitive</span>, or <span class="tt">Dmin</span>; the first two use <span class="tt">num_of_active_pipes</span>, while <span class="tt">Dmin</span> uses a diameter cutoff named <span class="tt">Dmin</span>. Use larger optimization runs and assess convergence for a real calibration.</p>
+<p>Outputs include <span class="tt">best.dat</span> with fitted diameter ratios and target comparisons, <span class="tt">bog.dat</span> with optimization progress, the configured logs, and final sensitivity files. Treat these as calibration results to review; the program does not provide a command-line option to save a calibrated network under a new filename.</p>
+<p>With optimizers and testing enabled, run the generated example:</p>
+<div class="fragment"><div class="line">(cd build/optimizer-tests/calibrate &amp;&amp; ../../staci_calibrate --seed 12345)</div>
+</div><!-- fragment --><p>See the <a href="tests/staci_calibrate_settings.xml.in">settings template</a> and <a href="tests/calibrate_targets.csv">sample targets</a>. JSON settings and measurement examples are in <a href="examples/config">examples/config</a>. Select a configuration with <span class="tt">--settings</span>; relative paths inside it use the working directory.</p>
+<h2 class="doxsection"><a class="anchor" id="staci_flush"></a>
+staci_flush</h2>
+<p>Use <span class="tt">staci_flush</span> to assess opening <b>one hydrant at a time</b>, without changing valve positions, and construct a flushing sequence. Inputs are an EPANET network and a JSON config containing the hydrant junction IDs and global outlet settings.</p>
+<div class="fragment"><div class="line">./build/staci_flush --inp /path/to/network.inp --config /path/to/flushing_config.json</div>
+</div><!-- fragment --><p>Example <span class="tt">flushing_config.json</span>:</p>
+<div class="fragment"><div class="line">{</div>
+<div class="line">  &quot;hydrant_node_ids&quot;: [&quot;J1&quot;, &quot;J2&quot;],</div>
+<div class="line">  &quot;hydrant_area_m2&quot;: 0.002,</div>
+<div class="line">  &quot;total_loss_coefficient&quot;: 2.0,</div>
+<div class="line">  &quot;velocity_threshold_mps&quot;: 0.5,</div>
+<div class="line">  &quot;min_pressure_head_m&quot;: 0.0,</div>
+<div class="line">  &quot;output_dir&quot;: &quot;results/flushing&quot;,</div>
+<div class="line">  &quot;write_network_files&quot;: true</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>Use exact junction IDs from the INP file. Area is in m², velocity in m/s and pressure head in m. The total coefficient includes outlet kinetic head: <span class="tt">K = 1 + zeta</span> for a local loss coefficient <span class="tt">zeta</span>. Discharge is calculated from junction pressure using <span class="tt">Q = A * sqrt(2*g*max(h,0)/K)</span>. <span class="tt">output_dir</span> is relative to the config file and must be new or empty.</p>
+<p>For each valid scenario, pipes qualify when their absolute velocity is strictly above the threshold. The plan first selects the hydrant covering the largest pipe volume, then repeatedly selects the largest <b>additional uncovered volume</b>. It reports cumulative coverage as a percentage of all original pipe volume. Each hydrant has two time estimates: the longest directed travel time from a qualifying pipe to the hydrant using actual velocities (including slower connecting pipes), and total qualifying volume divided by hydrant discharge. Undetermined travel times are flagged. Plan volumes use two decimal places and times use minutes with one decimal place.</p>
+<p>Main results are <span class="tt">flushing_plan.txt</span>, <span class="tt">flushing_plan.csv</span>, <span class="tt">summary.txt</span> and per-pipe/scenario CSV tables. With <span class="tt">write_network_files: true</span>, exported networks are named <span class="tt">&lt;original_name&gt;_hydrant_&lt;nodeID&gt;.inp</span>, contain the open-hydrant emitter, and tag qualifying pipes <span class="tt">FLUSHED</span> for inspection. These are independent steady scenarios; the tool does not simulate sediment removal.</p>
+<p>Run the complete <a class="el" href="dir_d2e741a8a412b7f201cde4c97a4d3aac.html" title="/Users/hoscsaba/Documents/GitHub/staci/examples/flushing/README.md">worked example</a>:</p>
+<div class="fragment"><div class="line">./build/staci_flush --inp examples/flushing/network.inp --config examples/flushing/flushing_config.json</div>
+</div><!-- fragment --><p>Without a config file, a junction list can be supplied with <span class="tt">--hydrants</span> using a text or JSON file and explicit outlet parameters:</p>
+<div class="fragment"><div class="line">./build/staci_flush --inp network.inp --hydrants hydrants.txt --hydrant-area-m2 0.002 --loss-coefficient 2 --velocity-threshold-mps 0.5 --min-pressure-head-m 0 --output-dir /absolute/path/new-flushing-results</div>
+</div><!-- fragment --><p>The destination must be new or empty. Use <span class="tt">--help</span> for the exact supported argument names. All four executables accept the common diagnostics and solver options described below.</p>
+<p>See the <a class="el" href="md_doc_2flushing.html" title="STACI flushing reference">flushing reference</a> for the full output schema, pressure filtering, timing assumptions, alternative inputs and EPANET inspection.</p>
+<h1 class="doxsection"><a class="anchor" id="project-directories-and-launching-programs"></a>
+Project directories and launching programs</h1>
+<p>Use a separate working directory for each model, optimization or flushing job. The optimizer settings filenames are fixed and selected by the process working directory; several legacy outputs also have fixed names. A typical layout is:</p>
+<div class="fragment"><div class="line">project/</div>
+<div class="line">  network.inp                  # or a copied native network.spr</div>
+<div class="line">  staci_split_settings.xml     # only for a split job</div>
+<div class="line">  staci_calibrate_settings.xml # only for a calibration job</div>
+<div class="line">  calibrate_network_0.spr      # calibration period 0, when configured</div>
+<div class="line">  calibrate_targets.csv        # measured targets, when configured</div>
+<div class="line">  flushing_config.json        # only for a flushing job</div>
+<div class="line">  results/</div>
+</div><!-- fragment --><table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Program  </th><th class="markdownTableHeadNone">How inputs are selected  </th><th class="markdownTableHeadNone">Main outputs  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">staci</span>  </td><td class="markdownTableBodyNone">Network path and mode on the command line  </td><td class="markdownTableBodyNone">Hydraulic JSON for INP, native results, <span class="tt">.ros</span>/<span class="tt">.rps</span>/<span class="tt">.rrs</span>; EPS/quality files according to mode  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">staci_split</span>  </td><td class="markdownTableBodyNone">XML/JSON settings selected by <span class="tt">--settings</span> (or the default filename); <span class="tt">fname</span> selects the network  </td><td class="markdownTableBodyNone"><span class="tt">membership.txt</span>, configured log and sensitivity matrices when applicable  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">staci_calibrate</span>  </td><td class="markdownTableBodyNone">XML/JSON settings selected by <span class="tt">--settings</span> (or the default filename), period-specific SPR files and measured targets  </td><td class="markdownTableBodyNone"><span class="tt">best.dat</span>, <span class="tt">bog.dat</span>, configured logs and sensitivity files  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">staci_flush</span>  </td><td class="markdownTableBodyNone"><span class="tt">--inp</span> plus JSON config or explicit hydrant/outlet arguments  </td><td class="markdownTableBodyNone">Plan TXT/CSV, summary, per-pipe/scenario tables and optional inspection INP files  </td></tr>
+</table>
+<p><span class="tt">staci_split</span> and <span class="tt">staci_calibrate</span> accept <span class="tt">--settings path.xml|path.json</span>. Without it, the program uses <span class="tt">staci_&lt;name&gt;_settings.xml</span>, or the <span class="tt">.json</span> sibling if XML is absent. Use the example configurations, replace all model paths and IDs, then launch from the project directory. CMake's <span class="tt">.in</span> templates contain substitution placeholders; use the generated examples or replace the placeholders before running. Calibration currently assembles period filenames with <span class="tt">.spr</span>, so shared INP support in the hydraulic core is not a promise that this calibration input convention accepts INP periods.</p>
+<p>For a GUI, configure the executable path, working directory and arguments as separate process-launch fields. Supply the same absolute diagnostics path to all applications and a separate result directory/prefix per job. For example:</p>
+<div class="fragment"><div class="line">cd /absolute/path/project</div>
+<div class="line">/absolute/path/bin/staci_split --seed 12345 --max-iterations 100 --diagnostics-file /absolute/path/project/results/staci-diagnostics.jsonl</div>
+</div><!-- fragment --><p>Wait for process completion, inspect its exit code and the matching JSONL <span class="tt">run_end</span>, then load the output files. Warnings can accompany successful results. Exit code 3 indicates incomplete flushing/EPS results that require inspection. Retain diagnostics when presenting failures to the user. The complete protocol and exit-code table are included later in this README.</p>
+<h1 class="doxsection"><a class="anchor" id="installation-and-execution-troubleshooting"></a>
+Installation and execution troubleshooting</h1>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Symptom  </th><th class="markdownTableHeadNone">Check/action  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Executable not found  </td><td class="markdownTableBodyNone">Use its full path, or add the installed <span class="tt">bin</span> directory to <span class="tt">PATH</span>; on Windows check <span class="tt">build\Release</span> and <span class="tt">.exe</span>  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Split/calibrate executable absent  </td><td class="markdownTableBodyNone">Configure with <span class="tt">STACI_BUILD_OPTIMIZERS=ON</span> and install the optimizer dependencies  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">CMake cannot find a package  </td><td class="markdownTableBodyNone">Install development packages; use the matching compiler architecture and <span class="tt">CMAKE_PREFIX_PATH</span>/package paths where needed  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Shared-library/DLL load failure  </td><td class="markdownTableBodyNone">Keep the required runtime libraries installed; CMake installation alone does not bundle them all  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Settings not found  </td><td class="markdownTableBodyNone">Supply <span class="tt">--settings path.xml</span> or <span class="tt">--settings path.json</span>, or use the default filename in the working directory  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Missing model/measurement file  </td><td class="markdownTableBodyNone">Verify settings paths, period suffixes and IDs; use absolute paths when launched by a GUI  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Flushing refuses its output directory  </td><td class="markdownTableBodyNone">Select a new or empty directory  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">EPS does not produce HDF5  </td><td class="markdownTableBodyNone">Check configure output for HDF5 detection; enable <span class="tt">STACI_ENABLE_HDF5</span> and install its development package  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Solver does not converge  </td><td class="markdownTableBodyNone">Read the common diagnostics, worst residuals and network-specific <span class="tt">.ros</span> log; check physical feasibility before changing limits  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Reference tests skip  </td><td class="markdownTableBodyNone">Provision official EPANET and set the library/executable paths; use <span class="tt">--require-reference</span> when comparison is mandatory  </td></tr>
+</table>
+<p>On macOS, a compiler/SDK selection problem should be checked with <span class="tt">xcode-select -p</span>; use a valid installed Command Line Tools or Xcode toolchain. For an Xcode installation, configure/build with the appropriate <span class="tt">DEVELOPER_DIR</span> if necessary. If CMake still selects a different SDK, set <span class="tt">-DCMAKE_OSX_SYSROOT="$(DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcrun --sdk macosx --show-sdk-path)"</span> at configuration time, with the actual installed Xcode path. Build and runtime architecture must match the installed dependency architecture.</p>
+<h1 class="doxsection"><a class="anchor" id="tests"></a>
+Tests</h1>
+<p>The <a class="el" href="md_doc_2package__validation.html" title="Package validation — 2026-10-02">2026-10-02 package audit</a> records the complete CTest, portable-runner, MATLAB and installation checks, along with known limits.</p>
+<p>Build first, then run:</p>
+<div class="fragment"><div class="line">ctest --test-dir build --output-on-failure</div>
+<div class="line"># Only the flushing regression tests:</div>
+<div class="line">ctest --test-dir build -R flushing --output-on-failure</div>
+</div><!-- fragment --><p>Add <span class="tt">-C Release</span> for Visual Studio builds. The flushing tests cover the outlet law, ranking and timing, input validation, network exports and the worked example. See the <a class="el" href="md_doc_2testing.html" title="STACI testing reference">testing reference</a> for the full suite, optional official EPANET comparisons and channel reference cases. The suite also includes <a class="el" href="dir_50a2aaf16926734421f021d7ec4de7b5.html" title="/Users/hoscsaba/Documents/GitHub/staci/tests/public_networks/README.md">97 public EPANET networks</a> for standalone hydraulic snapshots and explicit compatibility diagnostics.</p>
+<h1 class="doxsection"><a class="anchor" id="further-documentation-and-examples"></a>
+Further documentation and examples</h1>
+<ul>
+<li><a class="el" href="md__r_e_a_d_m_e___d_e_v.html" title="STACI developer integration guide">Developer integration guide: web backends, Python, MATLAB and error handling</a></li>
+<li><a class="el" href="md_doc_2staci__usage.html" title="STACI usage reference">Full staci usage and command-line reference</a></li>
+<li><a class="el" href="md_doc_2flushing.html" title="STACI flushing reference">Flushing configuration, planning and output reference</a></li>
+<li><a class="el" href="dir_d2e741a8a412b7f201cde4c97a4d3aac.html" title="/Users/hoscsaba/Documents/GitHub/staci/examples/flushing/README.md">Worked flushing example with expected results</a></li>
+<li><a class="el" href="md_doc_2testing.html" title="STACI testing reference">Testing and reference comparisons</a></li>
+<li><a class="el" href="dir_8976e5d03119516083eaca3ddca61311.html" title="/Users/hoscsaba/Documents/GitHub/staci/examples/cpp/README.md">Native C++ examples</a></li>
+<li><a class="el" href="dir_d28a4824dc47e487b107a5db32ef43c4.html" title="/Users/hoscsaba/Documents/GitHub/staci/examples/README.md">Examples and MATLAB demonstrations</a></li>
+<li><a class="el" href="dir_b94f9f0c034b39d5d6d39e3a6fbfd3e1.html" title="/Users/hoscsaba/Documents/GitHub/staci/dist/README.md">Binary packaging and runtime dependencies</a></li>
+</ul>
+<h1 class="doxsection"><a class="anchor" id="epanet-hydraulic-support-and-current-validation"></a>
+EPANET hydraulic support and current validation</h1>
+<p>This section collects the implementation, GUI integration, numerical settings, public-network validation and remaining issues in one place. Results below are from the 2026-10-01 validation on macOS. The shared hydraulic core is used by <span class="tt">staci</span>, <span class="tt">staci_split</span>, <span class="tt">staci_calibrate</span> and <span class="tt">staci_flush</span>; the public-network corpus exercises standalone <span class="tt">staci</span>.</p>
+<h2 class="doxsection"><a class="anchor" id="supported-hydraulic-models"></a>
+Supported hydraulic models</h2>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Feature  </th><th class="markdownTableHeadNone">Implementation and behavior  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Pipes  </td><td class="markdownTableBodyNone">EPANET H-W and D-W equations, minor losses, viscosity/transition treatment, low-flow regularization and check valves  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">HEAD pumps  </td><td class="markdownTableBodyNone">Head curves, operating speed/patterns and reverse-flow closure  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">POWER pumps  </td><td class="markdownTableBodyNone">Constant hydraulic power, EPANET unit conversion and cubic speed scaling  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Reservoirs and tanks  </td><td class="markdownTableBodyNone">Fixed boundary at the initial level in steady mode; tank storage/levels and limits in EPS  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">TCV  </td><td class="markdownTableBodyNone">Throttle valve with setting and minor-loss coefficient  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">PRV  </td><td class="markdownTableBodyNone">Regulates downstream pressure, opens when supply pressure is insufficient and closes against reverse flow  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">PSV  </td><td class="markdownTableBodyNone">Regulates upstream pressure, opens when downstream pressure prevents regulation and closes against reverse flow  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">PBV  </td><td class="markdownTableBodyNone">Imposes a head drop; uses open-valve minor loss if it exceeds the setting  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">FCV  </td><td class="markdownTableBodyNone">Regulates forward flow; opens and warns when the requested flow cannot be maintained  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">GPV  </td><td class="markdownTableBodyNone">Named flow/headloss curve with piecewise interpolation and endpoint extrapolation  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Emitters  </td><td class="markdownTableBodyNone">New single-junction atmospheric outlet element with pressure-dependent discharge  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">PDA  </td><td class="markdownTableBodyNone">Pressure-dependent positive demand, integrated into the continuity equation and its Jacobian  </td></tr>
+</table>
+<p>PSV and PBV extend the existing <span class="tt"><a class="el" href="class_epanet_valve.html">EpanetValve</a></span> class, which derives from <span class="tt"><a class="el" href="class_jelleggorbes_fojtas.html">JelleggorbesFojtas</a></span>. All control valves share the existing setting, status, control, EPS and export interfaces. Explicit OPEN/CLOSED overrides are supported. Pressure settings include input pressure-unit and specific-gravity conversion. GPV settings identify curves; arbitrary numeric GPV settings are rejected. Malformed curves and invalid coefficients produce informative diagnostics.</p>
+<p><span class="tt"><a class="el" href="class_epanet_emitter.html">EpanetEmitter</a></span> derives from <span class="tt"><a class="el" href="class_agelem.html">Agelem</a></span>. Its signed discharge law is <span class="tt">Q = C * sign(p) * abs(p)^exponent</span>, where <span class="tt">p</span> is junction pressure head and the coefficient is converted to SI. The inverse relation and analytic derivative supply the branch equation. Negative-pressure atmospheric inflow reproduces EPANET behavior and generates <span class="tt">EPANET.EMITTER_BACKFLOW</span>; the model author should check whether that inflow is physical for the intended network.</p>
+<p>PDA delivers zero positive demand below minimum pressure, full demand at or above required pressure, and a fraction <span class="tt">((p - pmin) / (preq - pmin))^exponent</span> between them. Negative demands remain fixed injections. Demand patterns update nominal demand. Hydraulic outputs report delivered demand plus emitter discharge. Exponents must be positive; required pressure must exceed minimum pressure. Input validation follows EPANET's minimum 0.1 difference in input pressure units.</p>
+<p>For the new pressure-dependent models, the solver initializes emitter flow consistently with pressure, rebuilds the nonlinear Jacobian and backtracks Newton steps. These steps prevent running POWER pumps from crossing zero flow and selecting an unphysical reverse-flow root. Final convergence tolerances and explicit iteration limits remain unchanged.</p>
+<p>Initial-state demand and pump patterns, supported initial controls and tank limits are applied before steady comparison. Time-dependent tank behavior, patterns and controls require EPS mode. Importing a network for steady mode does not establish equivalence of its entire time-dependent simulation or water-quality calculation.</p>
+<h2 class="doxsection"><a class="anchor" id="common-gui-diagnostics"></a>
+Common GUI diagnostics</h2>
+<p>All four applications append warnings and errors to the same JSON Lines file. The default is <span class="tt">staci-diagnostics.jsonl</span> in the process working directory. A GUI should pass an absolute <span class="tt">--diagnostics-file PATH</span> on every invocation. The <span class="tt">STACI_DIAGNOSTICS_FILE</span> environment variable is an alternative; the CLI option has precedence.</p>
+<p>Each line is one JSON object with <span class="tt">schema_version</span>, UTC <span class="tt">timestamp</span>, <span class="tt">program</span>, <span class="tt">run_id</span>, <span class="tt">sequence</span>, <span class="tt">event</span>, <span class="tt">severity</span>, <span class="tt">code</span> and <span class="tt">message</span>. Where available, import errors also identify the network, section, element and input line. A run has <span class="tt">run_start</span> and <span class="tt">run_end</span>; the latter includes <span class="tt">exit_code</span>, <span class="tt">error_count</span> and <span class="tt">warning_count</span>. Group records by <span class="tt">run_id</span>, show the human-readable messages and check the process exit code. A killed process may have no <span class="tt">run_end</span>. Writes are locked across processes; complete records can interleave. Consumers should tolerate additional fields.</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Exit code  </th><th class="markdownTableHeadNone">Meaning  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">0  </td><td class="markdownTableBodyNone">Successful operation, possibly with warnings  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">1  </td><td class="markdownTableBodyNone">Calculation or execution failure  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">2  </td><td class="markdownTableBodyNone">Invalid input/configuration or unsupported feature  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">3  </td><td class="markdownTableBodyNone">Partial result: some frames or scenarios failed  </td></tr>
+</table>
+<p>Errors also appear on stderr. A diagnostics-file open failure reports <span class="tt">DIAGNOSTICS_OPEN</span> and exits with code 1. Numerical failures of discarded calibration candidates are warnings; failure of the initial calibration baseline is an error.</p>
+<p>Useful hydraulic codes include <span class="tt">EPANET.COMPATIBILITY</span>, <span class="tt">HYDRAULICS.NONCONVERGENCE</span>, <span class="tt">HYDRAULICS.ILL_CONDITIONED</span>, <span class="tt">EPANET.FCV_UNATTAINABLE</span>, <span class="tt">EPANET.NO_AVAILABLE_SUPPLY</span>, <span class="tt">EPANET.EMITTER_BACKFLOW</span> and <span class="tt">EPANET.POWER_PUMP_DEAD_END</span>. Nonconvergence messages include RMS residuals with units/limits and the worst node/link. Unsupported or malformed physical definitions are rejected instead of being silently dropped from the network.</p>
+<p>Successful steady INP runs write <span class="tt">&lt;network&gt;.inp.hydraulics.json</span>, containing convergence and SI node/link results. A new steady solve removes a previous hydraulic export before validating the input, preventing stale GUI results. Existing console output and network-specific result files remain available. See <a class="el" href="md_doc_2diagnostics.html" title="Common application diagnostics">the full diagnostic protocol</a>.</p>
+<h2 class="doxsection"><a class="anchor" id="solver-settings"></a>
+Solver settings</h2>
+<p>All four applications accept these common options, including <span class="tt">--option=value</span>:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Option  </th><th class="markdownTableHeadNone">Meaning  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">--head-tolerance-m VALUE</span>  </td><td class="markdownTableBodyNone">RMS head-equation residual limit in metres  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">--mass-tolerance-kg-s VALUE</span>  </td><td class="markdownTableBodyNone">RMS junction-continuity residual limit in kg/s  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">--max-iterations INTEGER</span>  </td><td class="markdownTableBodyNone">Maximum nonlinear iterations  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><span class="tt">--diagnostics-file PATH</span>  </td><td class="markdownTableBodyNone">Shared machine-readable warning/error log  </td></tr>
+</table>
+<p>CLI settings override input/application settings. Numeric values must be positive and finite, and iteration counts must be integers. Invalid values produce <span class="tt">CLI_ARGUMENT</span> and exit code 2.</p>
+<p>The INP defaults are <b>0.0001 m (0.1 mm)</b> RMS head residual and <b>1e-8 kg/s</b> RMS continuity residual. The iteration limit comes from the input setting; without a specified INP trial limit it defaults to 100. Native SPR settings remain in effect unless overridden. RMS convergence is not a bound on the largest individual residual or on the difference from EPANET: nearly stagnant branches can amplify small head errors into flow differences.</p>
+<div class="fragment"><div class="line">staci -s network.inp --head-tolerance-m 0.0001 --mass-tolerance-kg-s 1e-8 --max-iterations 100 --diagnostics-file /absolute/path/staci-diagnostics.jsonl</div>
+<div class="line">staci --epanet-eps ky16.inp -o ky16 --head-tolerance-m 0.0001 --max-iterations 100</div>
+</div><!-- fragment --><p>The ky16 regression passes all 25 EPS report frames at the default 0.1 mm setting. A failure at much tighter precision is a separate numerical issue.</p>
+<h2 class="doxsection"><a class="anchor" id="public-networks-and-independent-comparison"></a>
+Public networks and independent comparison</h2>
+<p>The corpus contains <b>97 retained INP files</b>: 96 unchanged upstream files and one intentionally adapted physical Anytown model. Inputs span small targeted fixtures through large networks, including a 57,460-pipe case. Sources, revisions, hashes, element counts and expected outcomes are recorded in <a href="tests/public_networks/manifest.json">the manifest</a>. Tests verify input hashes and do not rewrite the corpus inputs during execution.</p>
+<p>The independent reference is the official OWA EPANET 2.2 C API, pinned to revision <span class="tt">4d8d82ddc260fce216af9321fc3d9a4646ac6827</span>. It supplies double-precision initial-state (<span class="tt">t = 0</span>) results, avoiding text-report rounding. Reference settings use 1000 trials and relative accuracy 1e-6, with a fresh 1e-5 retry for unreliable convergence. Nonfinite results and failed independent junction continuity audits are rejected. An unavailable reference is a skip, never an agreement pass; <span class="tt">--require-reference</span> makes availability mandatory.</p>
+<p>The comparison checks heads, junction pressure, delivered demand, source/tank exchange, signed flow, velocity, endpoint head difference and enabled state. Limits are common to every model, not tuned per network:</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Quantity  </th><th class="markdownTableHeadNone">Absolute tolerance  </th><th class="markdownTableHeadNone">Relative tolerance  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Total head / junction pressure head  </td><td class="markdownTableBodyNone">0.01 m  </td><td class="markdownTableBodyNone">1e-6  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Junction demand  </td><td class="markdownTableBodyNone">1e-8 m³/s  </td><td class="markdownTableBodyNone">1e-4  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Reservoir/tank net exchange  </td><td class="markdownTableBodyNone">1e-6 m³/s  </td><td class="markdownTableBodyNone">1e-4  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Signed link flow  </td><td class="markdownTableBodyNone">1e-6 m³/s  </td><td class="markdownTableBodyNone">1e-4  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Velocity magnitude  </td><td class="markdownTableBodyNone">max(1e-5 m/s, absolute flow limit / area)  </td><td class="markdownTableBodyNone">1e-4  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Endpoint head difference  </td><td class="markdownTableBodyNone">0.02 m  </td><td class="markdownTableBodyNone">1e-5  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">Enabled/closed state  </td><td class="markdownTableBodyNone">Exact  </td><td class="markdownTableBodyNone">Exact  </td></tr>
+</table>
+<p>A numeric value passes against the larger of the absolute and relative limits. The 1e-12 m head / 1e-8 kg/s continuity profile used by the standard reference corpus is deliberately stricter than the normal runtime default.</p>
+<p>Current initial-state results: <b>88 numerical matches</b> across 97 retained networks; three inputs are rejected by EPANET and six references are physically unreliable. Standalone strict execution is 89 solved, four compatibility/input rejections and four hydraulic failures. Expected diagnostic cases are regression passes, not solved/equivalent networks. See <a class="el" href="md_doc_2epanet__reference.html" title="EPANET numerical equivalence">current validation</a> for the full scope and reproducible commands.</p>
+<p>Net1 and Net2 now pass full-period hydraulic and chemical comparison, including MIXED tank storage, first-order reactions and wall mass transfer. Full-corpus EPS equivalence remains incomplete. Unsupported chemical mixing/reaction laws produce explicit errors; steady hydraulics remains available for those inputs.</p>
+<p>Seven formerly rejected models now solve and match EPANET: <span class="tt">Net6_plus</span>, <span class="tt">epanet_leaks</span>, <span class="tt">NET1emit</span>, <span class="tt">NET1negemit</span>, <span class="tt">psv_open_no_downstream_sources</span>, <span class="tt">NET1-PBV</span> and <span class="tt">cheung</span>.</p>
+<h2 class="doxsection"><a class="anchor" id="remaining-issues-and-model-adaptations"></a>
+Remaining issues and model adaptations</h2>
+<ul>
+<li><b>io.inp:</b> all its element types are supported. Running POWER pump <span class="tt">pump2</span> feeds terminal zero-demand junction <span class="tt">j4</span>, with no outlet. Continuity requires zero flow, incompatible with finite head at nonzero constant power. <span class="tt">EPANET.POWER_PUMP_DEAD_END</span> explains this and suggests stopping the pump or providing a physical discharge path. The input was not changed.</li>
+<li><b>JEP5-13.inp:</b> negative PRV settings are supported and the reference matches.</li>
+<li><b>bad_syntax.inp / bad_values.inp:</b> retained negative fixtures for an unknown section and an unknown endpoint.</li>
+<li><b>conditional_controls_2.inp / control_comb.inp:</b> initial source/connectivity compatibility failures; their EPANET references are also unreliable.</li>
+<li><b>NW_Model.inp / NW_Model1.inp / GES4-9.inp:</b> now match under the strict reference profile.</li>
+<li><b>fcv_open_no_downstream_sources.inp / prv_closed_no_upstream_sources.inp / 2fcvs.inp:</b> physical regulation/supply conflicts, now identified by <span class="tt">HYDRAULICS.VALVE_CONSTRAINT</span>; their EPANET references are also unreliable.</li>
+<li><b>cv_controls.inp:</b> solves in STACI, but EPANET rejects the fixture under its minimum junction-count requirement, so no independent agreement is claimed.</li>
+<li><b>ky10.inp:</b> now matches the reliable reference operating point; the earlier false-convergence investigation is retained in <span class="tt">doc/ky10_convergence.md</span>.</li>
+</ul>
+<p>Anytown was intentionally converted into a physical model with user-approved input changes. All three pump speeds and their 24-value speed patterns are 1.0. Six 0.0001-inch candidate pipes (<span class="tt">110</span>, <span class="tt">113</span>, <span class="tt">114</span>, <span class="tt">115</span>, <span class="tt">116</span>, <span class="tt">125</span>) were resized to 16 inches, trunks <span class="tt">1</span>, <span class="tt">2</span>, <span class="tt">3</span> to 24 inches, and the other 8/10/12/16-inch distribution pipes to 12/16/18/24 inches respectively; existing 30-inch pipes were retained. Topology, demands, demand patterns, pump curves, roughness, lengths, elevations, tank definitions and time steps were preserved. Both the original and adapted hashes are recorded, and the original is retained at <a href="doc/model_sources/Anytown_upstream.inp">doc/model_sources/Anytown_upstream.inp</a>. The adapted model converges at normal/strict tolerances and matches the initial EPANET state. Its 24-hour run passes physical pressure, velocity and tank-limit checks; this is not a claim of full EPS numerical equivalence.</p>
+<p>Zero-speed HEAD and POWER pumps are supported and tested for direct <span class="tt">SPEED 0</span>, zero speed patterns and numeric status settings, including EPS stop/start transitions. The Anytown and zero-speed regressions are part of <span class="tt">epanet_physical_models</span>.</p>
+<h2 class="doxsection"><a class="anchor" id="reproduce-and-inspect-results"></a>
+Reproduce and inspect results</h2>
+<div class="fragment"><div class="line">python3 tests/setup_epanet_reference.py</div>
+<div class="line">cmake -S . -B build -DSTACI_EPANET_LIBRARY=/absolute/path/libepanet2.so -DSTACI_EPANET_EXECUTABLE=/absolute/path/runepanet</div>
+<div class="line">cmake --build build</div>
+<div class="line">ctest --test-dir build --output-on-failure</div>
+<div class="line">python3 tests/test_public_networks.py --binary build/staci --reference-library /absolute/path/libepanet2.so --require-reference --output-dir build/public-network-reference-tests</div>
+<div class="line">python3 tests/test_epanet_pressure_elements.py --binary build/staci --reference-library /absolute/path/libepanet2.so</div>
+</div><!-- fragment --><p>Use <span class="tt">libepanet2.dylib</span> on macOS or <span class="tt">epanet2.dll</span> on Windows, with the actual paths printed by setup. Multi-configuration builds need the appropriate configuration and executable subdirectory. The standard suite includes <span class="tt">application_diagnostics</span>, <span class="tt">solver_options</span>, <span class="tt">public_epanet_networks</span>, <span class="tt">public_epanet_reference</span>, <span class="tt">epanet_reference_units</span>, <span class="tt">epanet_reference_valves</span>, <span class="tt">epanet_pressure_elements</span> and <span class="tt">epanet_physical_models</span>.</p>
+<p>Saved results from this development are in <span class="tt">tests/test-results/pressure-elements/</span>: <span class="tt">summary.json</span>, <span class="tt">ctest.log</span>, <span class="tt">targeted-tests.log</span>, <span class="tt">public-execution/report.json</span> and <span class="tt">public-reference/report.json</span>, with per-network diagnostic logs. Reported errors include the affected asset and measured differences. Reports contain local execution paths; reproduce the commands above on another machine.</p>
+<p>Detailed implementation notes remain available in <a class="el" href="md_doc_2epanet__pressure__elements.html" title="PSV, PBV, emitters and pressure-dependent demand">pressure elements</a>, <a class="el" href="md_doc_2epanet__valves.html" title="EPANET valves">EPANET valves</a>, <a class="el" href="md_doc_2epanet__reference.html" title="EPANET numerical equivalence">reference comparisons</a>, <a class="el" href="md_doc_2error__classification.html" title="Current public-network error classification">error classification</a>, <a class="el" href="md_doc_2anytown__physical__model.html" title="Physical Anytown test model">Anytown adaptation</a> and <a class="el" href="md_doc_2testing.html" title="STACI testing reference">the test reference</a>. </p>
 </div></div><!-- PageDoc -->
 <a href="doxygen_crawl.html"></a>
 </div><!-- contents -->

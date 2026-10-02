@@ -1,15 +1,17 @@
 var searchData=
 [
-  ['save_20a_20new_20network_0',['Modify a property and save a new network',['../index.html#autotoc_md19',1,'']]],
-  ['sensitivity_20calculations_1',['Sensitivity calculations',['../index.html#autotoc_md21',1,'']]],
-  ['simulation_2',['simulation',['../index.html#autotoc_md17',1,'Run a steady-state hydraulic simulation'],['../index.html#autotoc_md15',1,'Run an EPANET extended-period simulation']]],
-  ['staci_3',['STACI',['../index.html',1,'']]],
-  ['staci_20network_20to_20epanet_4',['Export a STACI network to EPANET',['../index.html#autotoc_md13',1,'']]],
-  ['staci_5fsplit_5fsettings_20xml_20felépítése_5',['A &lt;span class=&quot;tt&quot;&gt;staci_split_settings.xml&lt;/span&gt; felépítése',['../md_doc_2staci__split__manual.html#autotoc_md31',1,'']]],
-  ['staging_20directory_6',['Install to a staging directory',['../index.html#autotoc_md9',1,'']]],
-  ['standard_20suitesparse_20installations_7',['Non-standard SuiteSparse installations',['../index.html#autotoc_md25',1,'']]],
-  ['start_8',['start',['../index.html#autotoc_md11',1,'Quick start'],['../md_doc_2staci__split__manual.html#autotoc_md30',1,'Quick start']]],
-  ['state_20hydraulic_20simulation_9',['Run a steady-state hydraulic simulation',['../index.html#autotoc_md17',1,'']]],
-  ['steady_20state_20hydraulic_20simulation_10',['Run a steady-state hydraulic simulation',['../index.html#autotoc_md17',1,'']]],
-  ['suitesparse_20installations_11',['Non-standard SuiteSparse installations',['../index.html#autotoc_md25',1,'']]]
+  ['native_20c_20examples_0',['Native C++ examples',['../md_doc_2staci__usage.html#native-c-examples',1,'']]],
+  ['native_20c_20examples_1',['STACI native C++ examples',['../dir_8976e5d03119516083eaca3ddca61311.html#staci-native-c-examples',1,'']]],
+  ['network_2',['network',['../md_doc_2staci__usage.html#import-an-epanet-network',1,'Import an EPANET network'],['../md_doc_2staci__usage.html#modify-a-property-and-save-a-new-network',1,'Modify a property and save a new network'],['../md_tests_2_c_h_a_n_n_e_l___t_e_s_t_s.html#stationary-multi-channel-network',1,'Stationary multi-channel network'],['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#worked-example-three-hydrants-on-a-branched-network',1,'Worked example: three hydrants on a branched network']]],
+  ['network_20and_20settings_3',['Network and settings',['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#network-and-settings',1,'']]],
+  ['network_20elements_4',['List network elements',['../md_doc_2staci__usage.html#list-network-elements',1,'']]],
+  ['network_20error_20classification_5',['Current public-network error classification',['../md_doc_2error__classification.html',1,'']]],
+  ['network_20to_20epanet_6',['Export a STACI network to EPANET',['../md_doc_2staci__usage.html#export-a-staci-network-to-epanet',1,'']]],
+  ['networks_20and_20independent_20comparison_7',['Public networks and independent comparison',['../index.html#public-networks-and-independent-comparison',1,'']]],
+  ['new_20network_8',['Modify a property and save a new network',['../md_doc_2staci__usage.html#modify-a-property-and-save-a-new-network',1,'']]],
+  ['nominal_20convergence_20is_20unreliable_20here_9',['EPANET&apos;s nominal convergence is unreliable here',['../md_doc_2anytown__convergence.html#epanets-nominal-convergence-is-unreliable-here',1,'']]],
+  ['non_20standard_20suitesparse_20installations_10',['Non-standard SuiteSparse installations',['../index.html#non-standard-suitesparse-installations',1,'']]],
+  ['numerical_20equivalence_11',['EPANET numerical equivalence',['../md_doc_2epanet__reference.html',1,'']]],
+  ['numerical_20experiments_12',['Numerical experiments',['../md_doc_2anytown__convergence.html#numerical-experiments',1,'']]],
+  ['numerical_20verification_202026_2010_2002_13',['Current numerical verification (2026-10-02)',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#current-numerical-verification-2026-10-02',1,'']]]
 ];

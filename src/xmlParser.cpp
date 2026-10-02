@@ -1,3 +1,4 @@
+#include "diagnostics.h"
 /**
  ****************************************************************************
  * <P> XML.c - implementation file for basic XML parser written in ANSI C++
@@ -354,13 +355,7 @@ XMLNode XMLNode::openFileHelper(XMLCSTR filename, XMLCSTR tag)
 #endif
             ,filename,XMLNode::getError(pResults.error),pResults.nLine,pResults.nColumn,s1,s2,s3);
 
-        // display message
-#if defined(WIN32) && !defined(UNDER_CE) && !defined(_XMLPARSER_NO_MESSAGEBOX_)
-        MessageBoxA(NULL,message,"XML Parsing error",MB_OK|MB_ICONERROR|MB_TOPMOST);
-#else
-        printf("%s",message);
-#endif
-        exit(255);
+        throw diagnostics::Error("INPUT.XML", message);
     }
     return xnode;
 }

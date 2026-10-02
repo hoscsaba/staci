@@ -11,6 +11,9 @@ private:
     double headloss; // Megoszló, teljes hossz mentén és m-enként
     int friction_model_type; // 0 - Darcy-Weisbach (DW az adatfajlban), 1 - Hazen-Williams (HW)
     bool check_valve;
+    bool epanet_hydraulics = false;
+    double epanet_viscosity = 1.1e-5 * 0.3048 * 0.3048;
+    double EpanetHeadloss(double flow) const;
     bool CheckValveClosed(const vector<double> &state) const;
 public:
     Cso(const string &nev, const string &a_cspe_nev, const string &a_cspv_nev, const double a_ro,
@@ -32,6 +35,7 @@ public:
     double ComputeHeadloss();
     double ComputeHeadlossDerivative();
     void Set_friction_model(const string &friction_model) override;
+    void SetEpanetHydraulics(double viscosity_multiplier = 1.0) { epanet_hydraulics = true; epanet_viscosity *= viscosity_multiplier; }
     void SetCheckValve(bool value) { check_valve = value; }
     bool IsCheckValve() const { return check_valve; }
 };

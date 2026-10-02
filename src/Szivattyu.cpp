@@ -114,8 +114,14 @@ The function evaluates the curve fit by the constructor \sa Szivattyu()
 and elevations in positions 0 through 3.
 \return (double) function error (should be zero)
 \sa PumpCharCurve()
-*/double Szivattyu::f(const vector<double> &x) {
-    if (!enabled || operating_speed <= 0.0)
+*/bool Szivattyu::reverse_closed(const vector<double>& x) {
+    if(metadata.definition!="HEAD" || metadata.head_curve_points.empty()) return false;
+    return mp < -2.8316846592e-8*ro || (mp<=0 && x[1]+x[3]-x[0]-x[2] > PumpCharCurve(0)+0.0001524);
+}
+
+double Szivattyu::f(const vector<double> &x) {
+    hydraulic_closed_=reverse_closed(x);
+    if (!enabled || operating_speed <= 0.0 || reverse_closed(x))
         return mp;
     double ere;
     double pe = x[0] * ro * g;
@@ -143,6 +149,24 @@ double Szivattyu::PumpCharCurve(double qq) {
 }
 
 double Szivattyu::BasePumpCharCurve(double qq) {
+    if (metadata.definition == "HEAD" && !metadata.head_curve_points.empty()) {
+        auto points = metadata.head_curve_points;
+        if (points.size() == 1) {
+            const double q1 = points[0].first, h1 = points[0].second;
+            points = {{0.0, 1.33334*h1}, {q1, h1}, {2*q1, 0.0}};
+        }
+        if (points.size() == 3 && points[0].first == 0.0) {
+            const double h0 = points[0].second;
+            const double exponent = std::log((h0-points[2].second)/(h0-points[1].second)) /
+                std::log(points[2].first/points[1].first);
+            const double resistance = (h0-points[1].second)/std::pow(points[1].first, exponent);
+            return h0 - resistance * std::pow(std::max(0.0, qq), exponent);
+        }
+        std::size_t upper = 1;
+        while (upper+1 < points.size() && qq > points[upper].first) ++upper;
+        const auto a = points[upper-1], b = points[upper];
+        return a.second + (qq-a.first)*(b.second-a.second)/(b.first-a.first);
+    }
 
     double He = 0.0;
     double qmax = q.at(q.size() - 1);
@@ -169,7 +193,7 @@ double Szivattyu::BasePumpCharCurve(double qq) {
 //--------------------------------------------------------------
 vector<double> Szivattyu::df(const vector<double> &x) {
     vector<double> ere;
-    if (!enabled || operating_speed <= 0.0) {
+    if (!enabled || operating_speed <= 0.0 || reverse_closed(x)) {
         ere.push_back(0.0);
         ere.push_back(0.0);
         ere.push_back(1.0);
@@ -243,7 +267,7 @@ double Szivattyu::Get_dprop(const string &mit) {
     else if (mit == "head_curve_points")
         out = static_cast<double>(metadata.head_curve_points.size());
     else if (mit == "status")
-        out = enabled && operating_speed > 0.0 ? 1.0 : 0.0;
+        out = enabled && operating_speed > 0.0 && !hydraulic_closed_ ? 1.0 : 0.0;
     else if ((mit == "concentration") || (mit == "konc_atlag"))
         out = konc_atlag;
     else if (mit == "headloss")
@@ -260,6 +284,23 @@ double Szivattyu::Get_dprop(const string &mit) {
 
 //--------------------------------------------------------------
 double Szivattyu::BasePumpCharCurveDerivative(double qq) const {
+    if (metadata.definition == "HEAD" && !metadata.head_curve_points.empty()) {
+        auto points = metadata.head_curve_points;
+        if (points.size() == 1) {
+            const double q1 = points[0].first, h1 = points[0].second;
+            points = {{0.0, 1.33334*h1}, {q1, h1}, {2*q1, 0.0}};
+        }
+        if (points.size() == 3 && points[0].first == 0.0) {
+            const double h0 = points[0].second;
+            const double exponent = std::log((h0-points[2].second)/(h0-points[1].second)) /
+                std::log(points[2].first/points[1].first);
+            return -(h0-points[1].second)/std::pow(points[1].first, exponent) * exponent *
+                std::pow(std::max(1e-12, qq), exponent-1);
+        }
+        std::size_t upper = 1;
+        while (upper+1 < points.size() && qq > points[upper].first) ++upper;
+        return (points[upper].second-points[upper-1].second)/(points[upper].first-points[upper-1].first);
+    }
     const double qmax = q.at(q.size() - 1);
     if (qq < 0.0 || qq > qmax)
         return -mer_szorzo * p[0] / qmax;

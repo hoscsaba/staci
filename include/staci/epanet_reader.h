@@ -1,7 +1,13 @@
 #ifndef STACI_EPANET_READER_H
 #define STACI_EPANET_READER_H
 
+#include <stdexcept>
 #include <cstddef>
+
+class EpanetCompatibilityError : public std::runtime_error {
+public:
+    using std::runtime_error::runtime_error;
+};
 #include <map>
 #include <memory>
 #include <string>
@@ -15,6 +21,9 @@ class Csomopont;
 class EpanetReader {
 public:
     explicit EpanetReader(const std::string &filename, bool extended_period = false);
+
+    // Reject unsupported hydraulic features rather than solving a changed topology.
+    void validate_hydraulic_compatibility() const;
 
     void load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
                      std::vector<std::unique_ptr<Agelem> > &edges);

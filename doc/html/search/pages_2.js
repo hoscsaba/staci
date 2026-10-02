@@ -1,9 +1,6 @@
 var searchData=
 [
-  ['calculations_0',['calculations',['../index.html#autotoc_md21',1,'Sensitivity calculations'],['../index.html#autotoc_md20',1,'Transport calculations']]],
-  ['capabilities_1',['Capabilities',['../index.html#autotoc_md1',1,'']]],
-  ['command_20line_20reference_2',['Command-line reference',['../index.html#autotoc_md23',1,'']]],
-  ['compatibility_20todo_20easiest_20first_3',['EPANET–STACI compatibility TODO (easiest first)',['../index.html#autotoc_md14',1,'']]],
-  ['connectivity_4',['Export connectivity',['../index.html#autotoc_md22',1,'']]],
-  ['creating_20artifacts_5',['Creating artifacts',['../dir_b94f9f0c034b39d5d6d39e3a6fbfd3e1.html#autotoc_md27',1,'']]]
+  ['2_0',['Validate STACI against official EPANET 2.2',['../md_doc_2testing.html#validate-staci-against-official-epanet-22',1,'']]],
+  ['2_202_1',['Validate STACI against official EPANET 2.2',['../md_doc_2testing.html#validate-staci-against-official-epanet-22',1,'']]],
+  ['2026_2010_2002_2',['2026 10 02',['../md_doc_2testing.html#chemical-eps-and-integration-regressions-2026-10-02',1,'Chemical EPS and integration regressions (2026-10-02)'],['../dir_50a2aaf16926734421f021d7ec4de7b5.html#current-numerical-verification-2026-10-02',1,'Current numerical verification (2026-10-02)'],['../md_doc_2epanet__valves.html#current-verification-2026-10-02',1,'Current verification (2026-10-02)'],['../md_doc_2package__validation.html',1,'Package validation — 2026-10-02']]]
 ];

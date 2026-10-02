@@ -113,8 +113,8 @@ Public Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight"><b>export_connected_nodes</b> ()</td></tr>
 <tr class="memitem:a6f7ee7b08cba6b9a84a2472610fc9b30" id="r_a6f7ee7b08cba6b9a84a2472610fc9b30"><td class="memItemLeft"><a id="a6f7ee7b08cba6b9a84a2472610fc9b30" name="a6f7ee7b08cba6b9a84a2472610fc9b30"></a>
 &#160;</td><td class="memItemRight"><b>Staci</b> (int argc, char *argv[])</td></tr>
-<tr class="memitem:ae470e416c7900fe47a198deb48faa173" id="r_ae470e416c7900fe47a198deb48faa173"><td class="memItemLeft"><a id="ae470e416c7900fe47a198deb48faa173" name="ae470e416c7900fe47a198deb48faa173"></a>
-&#160;</td><td class="memItemRight"><b>Staci</b> (string spr_filename)</td></tr>
+<tr class="memitem:a2047a215c25bc8172eb00044ff65a6f5" id="r_a2047a215c25bc8172eb00044ff65a6f5"><td class="memItemLeft"><a id="a2047a215c25bc8172eb00044ff65a6f5" name="a2047a215c25bc8172eb00044ff65a6f5"></a>
+&#160;</td><td class="memItemRight"><b>Staci</b> (string spr_filename, bool quiet=false)</td></tr>
 <tr class="memitem:a2117f1e1e2e526ffa0c25d5deaf49816" id="r_a2117f1e1e2e526ffa0c25d5deaf49816"><td class="memItemLeft"><a id="a2117f1e1e2e526ffa0c25d5deaf49816" name="a2117f1e1e2e526ffa0c25d5deaf49816"></a>
 &#160;</td><td class="memItemRight"><b>Staci</b> (const <a class="el" href="class_staci.html">Staci</a> &amp;)=delete</td></tr>
 <tr class="memitem:abf0b7c5a5bba10ff727daabcd5a012ef" id="r_abf0b7c5a5bba10ff727daabcd5a012ef"><td class="memItemLeft"><a id="abf0b7c5a5bba10ff727daabcd5a012ef" name="abf0b7c5a5bba10ff727daabcd5a012ef"></a>
@@ -151,10 +151,14 @@ void&#160;</td><td class="memItemRight"><b>save_mod_prop</b> (bool is_general_pr
 void&#160;</td><td class="memItemRight"><b>save_mod_prop_all_elements</b> (string property_ID)</td></tr>
 <tr class="memitem:ad920e5d321b8bcd5946cbd9e1b1853bb" id="r_ad920e5d321b8bcd5946cbd9e1b1853bb"><td class="memItemLeft"><a id="ad920e5d321b8bcd5946cbd9e1b1853bb" name="ad920e5d321b8bcd5946cbd9e1b1853bb"></a>
 void&#160;</td><td class="memItemRight"><b>save_modified_network</b> ()</td></tr>
+<tr class="memitem:a6871b9130b774b3ad1a737387daf3815" id="r_a6871b9130b774b3ad1a737387daf3815"><td class="memItemLeft"><a id="a6871b9130b774b3ad1a737387daf3815" name="a6871b9130b774b3ad1a737387daf3815"></a>
+bool&#160;</td><td class="memItemRight"><b>is_epanet_input</b> () const</td></tr>
 <tr class="memitem:a5178cb073cb7dfdc96733a9f1af96d73" id="r_a5178cb073cb7dfdc96733a9f1af96d73"><td class="memItemLeft"><a id="a5178cb073cb7dfdc96733a9f1af96d73" name="a5178cb073cb7dfdc96733a9f1af96d73"></a>
 void&#160;</td><td class="memItemRight"><b>export_epanet</b> (const string &amp;filename)</td></tr>
 <tr class="memitem:a86917fe19f9c274dac7fbf5fd86e44ba" id="r_a86917fe19f9c274dac7fbf5fd86e44ba"><td class="memItemLeft"><a id="a86917fe19f9c274dac7fbf5fd86e44ba" name="a86917fe19f9c274dac7fbf5fd86e44ba"></a>
 bool&#160;</td><td class="memItemRight"><b>solve_system</b> ()</td></tr>
+<tr class="memitem:aa2b62975391f96d0716b52ce63029ac5" id="r_aa2b62975391f96d0716b52ce63029ac5"><td class="memItemLeft"><a id="aa2b62975391f96d0716b52ce63029ac5" name="aa2b62975391f96d0716b52ce63029ac5"></a>
+void&#160;</td><td class="memItemRight"><b>set_solver_tolerances</b> (double head_m, double mass_kgs)</td></tr>
 <tr class="memitem:a884616aaebef6a088c562e56c0f68525" id="r_a884616aaebef6a088c562e56c0f68525"><td class="memItemLeft"><a id="a884616aaebef6a088c562e56c0f68525" name="a884616aaebef6a088c562e56c0f68525"></a>
 void&#160;</td><td class="memItemRight"><b>solve_residence_time</b> ()</td></tr>
 <tr class="memitem:aa17b48b01b412a2b0e5908c6e7617739" id="r_aa17b48b01b412a2b0e5908c6e7617739"><td class="memItemLeft"><a id="aa17b48b01b412a2b0e5908c6e7617739" name="aa17b48b01b412a2b0e5908c6e7617739"></a>
@@ -219,6 +223,8 @@ void&#160;</td><td class="memItemRight"><b>Print_dfdmu</b> ()</td></tr>
 void&#160;</td><td class="memItemRight"><b>Print_dxdmu</b> ()</td></tr>
 <tr class="memitem:abf31b6f78c548e42970b98941d35aba9" id="r_abf31b6f78c548e42970b98941d35aba9"><td class="memItemLeft"><a id="abf31b6f78c548e42970b98941d35aba9" name="abf31b6f78c548e42970b98941d35aba9"></a>
 void&#160;</td><td class="memItemRight"><b>Compute_dxdmu</b> ()</td></tr>
+<tr class="memitem:aa42ae52203eeab0f4146012d47934cc3" id="r_aa42ae52203eeab0f4146012d47934cc3"><td class="memItemLeft"><a id="aa42ae52203eeab0f4146012d47934cc3" name="aa42ae52203eeab0f4146012d47934cc3"></a>
+const vector&lt; double &gt; &amp;&#160;</td><td class="memItemRight"><b>Get_dxdmu</b> () const</td></tr>
 <tr class="memitem:afc29a7cbf16da192dfdece5f689546e5" id="r_afc29a7cbf16da192dfdece5f689546e5"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#afc29a7cbf16da192dfdece5f689546e5">Compute_Sensitivity_Matrix</a> (string parameter, int scale)</td></tr>
 <tr class="memitem:a76630bc67fbdbd891272a19718f871e6" id="r_a76630bc67fbdbd891272a19718f871e6"><td class="memItemLeft"><a id="a76630bc67fbdbd891272a19718f871e6" name="a76630bc67fbdbd891272a19718f871e6"></a>
 void&#160;</td><td class="memItemRight"><b>Print_matrix</b> (vector&lt; vector&lt; double &gt; &gt; M)</td></tr>
@@ -332,6 +338,10 @@ double&#160;</td><td class="memItemRight"><b>SM_arp_MassFlowRates</b></td></tr>
 double&#160;</td><td class="memItemRight"><b>SM_arp_Pressures</b></td></tr>
 <tr class="memitem:af564b21aa6738559f3489fdadc080349" id="r_af564b21aa6738559f3489fdadc080349"><td class="memItemLeft"><a id="af564b21aa6738559f3489fdadc080349" name="af564b21aa6738559f3489fdadc080349"></a>
 bool&#160;</td><td class="memItemRight"><b>perform_demand_sensitivity_analysis</b></td></tr>
+<tr class="memitem:aabfcdfb34983e21cb2b126d38c4f2ee3" id="r_aabfcdfb34983e21cb2b126d38c4f2ee3"><td class="memItemLeft"><a id="aabfcdfb34983e21cb2b126d38c4f2ee3" name="aabfcdfb34983e21cb2b126d38c4f2ee3"></a>
+bool&#160;</td><td class="memItemRight"><b>perform_steady_quality_sensitivity_analysis</b> = false</td></tr>
+<tr class="memitem:a4cbb0e3dcc2c05c802afa65325d43c3f" id="r_a4cbb0e3dcc2c05c802afa65325d43c3f"><td class="memItemLeft"><a id="a4cbb0e3dcc2c05c802afa65325d43c3f" name="a4cbb0e3dcc2c05c802afa65325d43c3f"></a>
+string&#160;</td><td class="memItemRight"><b>steady_quality_mode</b></td></tr>
 </table>
 <a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
 <a id="afc29a7cbf16da192dfdece5f689546e5" name="afc29a7cbf16da192dfdece5f689546e5"></a>

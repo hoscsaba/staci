@@ -1,3 +1,5 @@
+#include "diagnostics.h"
+#include "input_config.h"
 #include <stdio.h>
 #include <pagmo/algorithm.hpp>
 #include <pagmo/algorithms/sga.hpp>
@@ -121,7 +123,15 @@ struct CalibrationProblem {
     }
 };
 
-int main(int argc, char **argv) {
+
+std::string settings_file;
+int run_application(int argc, char **argv) {
+    if (argc == 2 && std::string(argv[1]) == "--help") {
+        std::cout << "Usage: staci_calibrate [--settings FILE.xml|FILE.json] [--seed N] [--diagnostics-file PATH]\n"
+                  << "Default: staci_calibrate_settings.xml, or .json if XML is absent; relative paths use the working directory.\n";
+        return 0;
+    }
+    settings_file = input_config::settings_path(argc, argv, "staci_calibrate_settings");
 
     Obj_Eval = 0;
     best_obj = 1.e10;
@@ -157,8 +167,8 @@ int main(int argc, char **argv) {
             stringstream msg;
             msg.str("");
             msg << "\n\n ERROR: wds.at(" << i << ") could not be solved!";
-            logfile_write(msg.str(), 0);
-            exit(-1);
+            throw diagnostics::Error("CALIBRATION.BASELINE", "Network '" + wds.at(i)->get_def_file() +
+                "' at period " + std::to_string(i) + " did not converge. Inspect HYDRAULICS diagnostics.", diagnostics::calculation_error);
         }
     }
 
@@ -289,6 +299,7 @@ double Objective(const pagmo::vector_double &genome) {
                 wds.at(i)->set_dprop(pipe_name.at(j), "diameter", genome.at(k));
                 k++;
             }
+        diagnostics::CandidateScope candidate;
         last_computation_OK = wds.at(i)->solve_system();
         if (last_computation_OK) {
             if (i > 0)
@@ -751,16 +762,34 @@ void Load_Sollwert_Datafiles() {
     tmp.str("");
     tmp << dir_name << sollwert_dfile;
 
-    std::ifstream in(tmp.str().c_str());
-
-    if (in.fail()) {
-        cout << endl << "Load_Sollwert_Datafiles() -> CANNOT FIND DATAFILE " << tmp.str() << "!!!!" << endl;
-        exit(-1);
+    if (input_config::extension(tmp.str()) == ".json") {
+        auto root = input_config::read_json(tmp.str());
+        input_config::keys(root, {"measurements"}, tmp.str());
+        if (!root.contains("measurements") || !root["measurements"].is_array() || root["measurements"].empty())
+            input_config::fail(tmp.str(), "measurements must be a nonempty array.");
+        for (const auto &item : root["measurements"]) {
+            input_config::keys(item, {"id", "type", "values"}, tmp.str());
+            if (!item.contains("id") || !item["id"].is_string() || item["id"].get<std::string>().empty() ||
+                !item.contains("type") || !item["type"].is_string() ||
+                !item.contains("values") || !item["values"].is_array())
+                input_config::fail(tmp.str(), "each measurement requires string id/type and a values array.");
+            std::vector<std::string> row{item["id"].get<std::string>(), item["type"].get<std::string>()};
+            for (const auto &value : item["values"]) {
+                input_config::number(value, tmp.str(), "values");
+                row.push_back(value.dump());
+            }
+            lines.push_back(std::move(row));
+        }
     } else {
-        while (in.good())
-            lines.push_back(csv_read_row(in, ';'));
+        std::ifstream in(tmp.str());
+        if (!in) input_config::fail(tmp.str(), "cannot open measurement file.");
+        while (in.good()) {
+            auto row = csv_read_row(in, ';');
+            if (std::any_of(row.begin(), row.end(), [](const std::string &value) { return !value.empty(); }))
+                lines.push_back(std::move(row));
+        }
     }
-    in.close();
+    if (lines.empty()) input_config::fail(tmp.str(), "measurement file is empty.");
 
     stringstream tmpstr;
     vector<double> tmp_double_vec;
@@ -769,22 +798,18 @@ void Load_Sollwert_Datafiles() {
     tmpstr << "\nReading sollwert file " << sollwert_dfile << " ... \n";
 
     for (unsigned int i = 0; i < lines.size(); i++) {
-        if (lines.at(i).size() < (Start_of_Periods + Num_of_Periods + 2 + 1)) {
-            tmpstr << endl << endl << "!!! ERROR !!!" << endl;
-            tmpstr << "\t in Sollwert file " << sollwert_dfile << ", line " << i << endl;
-            tmpstr << "\t The line contains " << lines.at(i).size()
-                   << " data (separated by ';'), but should be minimum "
-                   << Start_of_Periods + Num_of_Periods + 2 << ", " << endl;
-            tmpstr << " because Start_of_Periods is " << Start_of_Periods;
-            tmpstr << " and Num_of_Periods is " << Num_of_Periods << ". " << endl << endl;
-            logfile_write(tmpstr.str(), 0);
-            exit(-1);
+        if (lines.at(i).size() < (Start_of_Periods + Num_of_Periods + 2)) {
+            input_config::fail(tmp.str(), "measurement row " + std::to_string(i + 1) +
+                " has too few values for Start_of_Periods=" + std::to_string(Start_of_Periods) +
+                " and Num_of_Periods=" + std::to_string(Num_of_Periods) + ".");
         }
 
         string name = lines.at(i).at(0);
         string type = lines.at(i).at(1);
         std::transform(type.begin(), type.end(), type.begin(), ::tolower);
 
+        if (type != "node" && type != "pool")
+            input_config::fail(tmp.str(), "measurement type must be node or pool for '" + name + "'.");
         tmp_double_vec.clear();
 
         // POOL:
@@ -852,7 +877,7 @@ double get_A(string PoolName) {
         msg.str("");
         msg << "\n\n get_A(): could not find " << PoolName << "\n\n";
         logfile_write(msg.str(), 0);
-        exit(-1);
+        diagnostics::fail_legacy(__FILE__, __LINE__);
     }
 
     return A;
@@ -877,7 +902,7 @@ int Find_Pool_Index(string PoolName) {
         msg.str("");
         msg << "\nFind_Pool_Index -> ERROR: " << PoolName << " was not found!!!\n\n";
         logfile_write(msg.str(), 0);
-        exit(-1);
+        diagnostics::fail_legacy(__FILE__, __LINE__);
     }
     return idx;
 }
@@ -898,7 +923,7 @@ int Find_Pressure_Index(string PressureName) {
         msg.str("");
         msg << "\nFind_Pressure_Index -> ERROR: " << PressureName << " was not found!!!\n\n";
         logfile_write(msg.str(), 0);
-        exit(-1);
+        diagnostics::fail_legacy(__FILE__, __LINE__);
     }
     return idx;
 }
@@ -979,41 +1004,44 @@ vector<string> csv_read_row(istream &in, char delimiter) {
 
 string Load_Settings() {
 
-    XMLNode xMainNode = XMLNode::openFileHelper("staci_calibrate_settings.xml", "settings");
+    input_config::Settings settings(settings_file);
 
-    global_debug_level = atoi(xMainNode.getChildNode("global_debug_level").getText());
-    Staci_debug_level = atoi(xMainNode.getChildNode("Staci_debug_level").getText());
-    dir_name = xMainNode.getChildNode("dir_name").getText();
-    fname_prefix = xMainNode.getChildNode("fname_prefix").getText();
-    logfilename = xMainNode.getChildNode("logfilename").getText();
-    best_logfilename = xMainNode.getChildNode("best_logfilename").getText();
-    sollwert_dfile = xMainNode.getChildNode("sollwert_dfile").getText();
-    Start_of_Periods = atoi(xMainNode.getChildNode("Start_of_Periods").getText());
-    Num_of_Periods = atoi(xMainNode.getChildNode("Num_of_Periods").getText());
-    string Text_Spoil_Active_Pipes = xMainNode.getChildNode("Spoil_Active_Pipes").getText();
-    dt = atof(xMainNode.getChildNode("dt").getText());
+    global_debug_level = settings.integer("global_debug_level");
+    Staci_debug_level = settings.integer("Staci_debug_level");
+    dir_name = settings.text("dir_name");
+    fname_prefix = settings.text("fname_prefix");
+    logfilename = settings.text("logfilename");
+    best_logfilename = settings.text("best_logfilename");
+    sollwert_dfile = settings.text("sollwert_dfile");
+    Start_of_Periods = settings.integer("Start_of_Periods");
+    Num_of_Periods = settings.integer("Num_of_Periods");
+    if (Start_of_Periods < 0 || Num_of_Periods < 1 ||
+        Start_of_Periods > std::numeric_limits<int>::max() - Num_of_Periods - 2)
+        input_config::fail(settings_file, "Start_of_Periods must be nonnegative and Num_of_Periods positive (within integer range).");
+    string Text_Spoil_Active_Pipes = settings.text("Spoil_Active_Pipes");
+    dt = settings.real("dt");
 
-    weight_p_err = atof(xMainNode.getChildNode("weight_p_err").getText());
+    weight_p_err = settings.real("weight_p_err");
     if (weight_p_err < 0.)
         weight_p_err = 0.;
     if (weight_p_err > 1.)
         weight_p_err = 1.;
 
-    string text_type_of_pipe_selection = xMainNode.getChildNode("type_of_pipe_selection").getText();
+    string text_type_of_pipe_selection = settings.text("type_of_pipe_selection");
 
     bool type_of_pipe_selection_is_set = false;
     if (0 == strcmp(text_type_of_pipe_selection.c_str(), "Dmin")) {
-        Dmin = atof(xMainNode.getChildNode("Dmin").getText());
+        Dmin = settings.real("Dmin");
         type_of_pipe_selection_is_set = true;
         type_of_pipe_selection = 0;
     }
     if (0 == strcmp(text_type_of_pipe_selection.c_str(), "most_sensitive")) {
-        num_of_active_pipes = atoi(xMainNode.getChildNode("num_of_active_pipes").getText());
+        num_of_active_pipes = settings.integer("num_of_active_pipes");
         type_of_pipe_selection_is_set = true;
         type_of_pipe_selection = 1;
     }
     if (0 == strcmp(text_type_of_pipe_selection.c_str(), "largest_diameter")) {
-        num_of_active_pipes = atoi(xMainNode.getChildNode("num_of_active_pipes").getText());
+        num_of_active_pipes = settings.integer("num_of_active_pipes");
         type_of_pipe_selection_is_set = true;
         type_of_pipe_selection = 2;
     }
@@ -1023,14 +1051,14 @@ string Load_Settings() {
         msg.str("");
         msg << endl << " Load_Settings() -> text_type_of_pipe_selection???" << endl;
         logfile_write(msg.str(), 0);
-        exit(-1);
+        diagnostics::fail_legacy(__FILE__, __LINE__);
     }
 
 
-    popsize = atoi(xMainNode.getChildNode("popsize").getText());
-    ngen = atoi(xMainNode.getChildNode("ngen").getText());
-    pmut = atof(xMainNode.getChildNode("pmut").getText());
-    pcross = atof(xMainNode.getChildNode("pcross").getText());
+    popsize = settings.integer("popsize");
+    ngen = settings.integer("ngen");
+    pmut = settings.real("pmut");
+    pcross = settings.real("pcross");
 
     if (0 == strcmp(Text_Spoil_Active_Pipes.c_str(), "yes"))
         bool_Spoil_Active_Pipes = true;
@@ -1070,4 +1098,8 @@ string Load_Settings() {
     msg << "\t pcross  : " << pcross << endl << endl;
 
     return msg.str();
+}
+
+int main(int argc, char **argv) {
+    return diagnostics::run("staci_calibrate", argc, argv, run_application);
 }

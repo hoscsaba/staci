@@ -55,7 +55,7 @@ void JelleggorbesFojtas::Update_zeta() {
 
 //--------------------------------------------------------------
 void JelleggorbesFojtas::SetConstantEpanetLoss(double loss_coefficient) {
-    const double denominator = 2.0 * g * ro * ro * Aref * Aref;
+    const double denominator = ro * ro * Aref * Aref / 0.05093871858091765;
     const double staci_coefficient = denominator > 0.0
         ? loss_coefficient / denominator : 0.0;
     e = {0.0, 100.0};

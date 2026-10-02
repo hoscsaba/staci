@@ -69,5 +69,31 @@ int main() {
     ok = close_to(reservoir_source.node_concentration_kgm3()[1], 0.003, 1.0e-12,
                   "zero-volume chemical link") && ok;
 
+    // A 100 m3 tank at 1 mg/L receives 10 m3 at 0 mg/L and
+    // releases 20 m3: mixed concentration is 100/110 mg/L.
+    EpanetChemicalModel tank(
+        {{0.0, true}, {0.001, false, 100.0, 0.0}, {0.0, false}},
+        {{0, 1, 0.0, 0.0, 0.0}, {1, 2, 0.0, 0.0, 0.0}}, 10.0);
+    tank.advance(10.0, {1.0, 2.0}, {0.0, 0.0, 0.0}, {{}, {}, {}});
+    ok = close_to(tank.node_concentration_kgm3()[1], 0.1 / 110.0, 1e-12,
+                  "stored tank dilution") && ok;
+    ok = close_to(tank.node_concentration_kgm3()[2], 0.1 / 110.0, 1e-12,
+                  "tank outlet mass") && ok;
+    EpanetChemicalModel batch(
+        {{0.001, false, 100.0, -0.01}}, {}, 10.0);
+    batch.advance(10.0, {}, {0.0}, {{}});
+    ok = close_to(batch.node_concentration_kgm3()[0], 0.0009, 1e-12,
+                  "isolated tank reaction") && ok;
+    EpanetChemicalModel terminal_source(
+        {{0.001, true}, {0.0, false}}, {{0, 1, 0.0, 0.0, 0.0}}, 1.0);
+    terminal_source.advance(1.0, {1.0}, {0.0, -1.0},
+        {{}, {EpanetChemicalSourceType::Mass, 0.001}});
+    ok = close_to(terminal_source.node_concentration_kgm3()[1], 0.002, 1e-12,
+                  "mass source includes consumed flow") && ok;
+    EpanetChemicalModel inert_stagnant(
+        {{0.001, false}, {0.001, false}}, {{0, 1, 10.0, 0.0, 0.002}}, 1.0);
+    inert_stagnant.advance(10.0, {0.0}, {0.0, 0.0}, {{}, {}});
+    ok = close_to(inert_stagnant.node_concentration_kgm3()[0], 0.001, 1e-12,
+                  "inert stagnant node retains initial value") && ok;
     return ok ? 0 : 1;
 }

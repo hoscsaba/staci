@@ -1,3 +1,4 @@
+#include "diagnostics.h"
 #include <algorithm>
 //using namespace std;
 #include <cmath>
@@ -321,22 +322,22 @@ double Csatorna::f(const vector<double> &x) {
 	// Some checking...
 	if (isnan(ff)) {
 		cout << endl << nev << ", eset:" << eset << ", ff=nan!" << endl;
-		exit(-1);
+		diagnostics::fail_legacy(__FILE__, __LINE__);
 	}
 	for (int ii = 0; ii < 3; ii++)
 		if (isnan(jac[ii])) {
 			cout << endl << nev << ", eset:" << eset << ", jac[" << ii << "]=nan!" << endl;
-			exit(-1);
+			diagnostics::fail_legacy(__FILE__, __LINE__);
 		}
 
 	if (isinf(ff)) {
 		cout << endl << nev << ", eset:" << eset << ", ff=inf!" << endl;
-		exit(-1);
+		diagnostics::fail_legacy(__FILE__, __LINE__);
 	}
 	for (int ii = 0; ii < 3; ii++)
 		if (isinf(jac[ii])) {
 			cout << endl << nev << ", eset:" << eset << ", jac[" << ii << "]=inf!" << endl;
-			exit(-1);
+			diagnostics::fail_legacy(__FILE__, __LINE__);
 		}
 
 	double jac_sum, jac_sum_tol = 1e-5;
@@ -344,19 +345,19 @@ double Csatorna::f(const vector<double> &x) {
 	jac_sum = fabs(jac[0]) + fabs(jac[1]);
 	if (jac_sum < jac_sum_tol) {
 		cout << endl << nev << ", eset:" << eset << ", jac[0]+jac[1]<" << jac_sum_tol << " !" << endl;
-		exit(-1);
+		diagnostics::fail_legacy(__FILE__, __LINE__);
 	}
 
 	jac_sum = fabs(jac[1]) + fabs(jac[2]);
 	if (jac_sum < jac_sum_tol) {
 		cout << endl << nev << ", eset:" << eset << ", jac[1]+jac[2]<" << jac_sum_tol << " !" << endl;
-		exit(-1);
+		diagnostics::fail_legacy(__FILE__, __LINE__);
 	}
 
 	jac_sum = fabs(jac[0]) + fabs(jac[2]);
 	if (jac_sum < jac_sum_tol) {
 		cout << endl << nev << ", eset:" << eset << ", jac[0]+jac[2]<" << jac_sum_tol << " !" << endl;
-		exit(-1);
+		diagnostics::fail_legacy(__FILE__, __LINE__);
 	}
 
 	return ff;
@@ -2101,7 +2102,7 @@ void Csatorna::error(string fv, string msg) {
 	strstrm << "\n\tuzenet   : " << msg << "\n\n";
 	logfile_write(strstrm.str(), 0);
 	cout << strstrm.str();
-	exit(0);
+	throw diagnostics::Error("INPUT.CHANNEL", strstrm.str());
 }
 
 //--------------------------------------------------------------

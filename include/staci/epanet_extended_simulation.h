@@ -5,6 +5,8 @@
 
 class Staci;
 
+bool solve_epanet_initial_hydraulics(Staci &system, const std::string &input_filename);
+
 class EpanetExtendedSimulation {
 public:
     EpanetExtendedSimulation(const std::string &input_filename,

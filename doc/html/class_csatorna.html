@@ -124,8 +124,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a24a82ad21dec253b0d658e798a6471bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Konstruktor user-defined km. eset�n.  <br /></td></tr>
 <tr class="memitem:aa95738a92b7158901e8ad29644915655" id="r_aa95738a92b7158901e8ad29644915655"><td class="memItemLeft">string&#160;</td><td class="memItemRight"><a class="el" href="#aa95738a92b7158901e8ad29644915655">Info</a> () override</td></tr>
 <tr class="memdesc:aa95738a92b7158901e8ad29644915655"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inform�ci�  <br /></td></tr>
+<tr class="memitem:a67e93b59060a1a2d7b3189280d8c1a35" id="r_a67e93b59060a1a2d7b3189280d8c1a35"><td class="memItemLeft"><a id="a67e93b59060a1a2d7b3189280d8c1a35" name="a67e93b59060a1a2d7b3189280d8c1a35"></a>
+void&#160;</td><td class="memItemRight"><b>set_diffusive_initialization</b> (bool enabled)</td></tr>
+<tr class="memdesc:a67e93b59060a1a2d7b3189280d8c1a35"><td class="mdescLeft">&#160;</td><td class="mdescRight">�gegyenlet �rt�ke <br /></td></tr>
 <tr class="memitem:a4cbef5f4033eb7d0ab2884f36e0a7041" id="r_a4cbef5f4033eb7d0ab2884f36e0a7041"><td class="memItemLeft">double&#160;</td><td class="memItemRight"><a class="el" href="#a4cbef5f4033eb7d0ab2884f36e0a7041">f</a> (const vector&lt; double &gt; &amp;state) override</td></tr>
-<tr class="memdesc:a4cbef5f4033eb7d0ab2884f36e0a7041"><td class="mdescLeft">&#160;</td><td class="mdescRight">�gegyenlet �rt�ke  <br /></td></tr>
+<tr class="memdesc:a4cbef5f4033eb7d0ab2884f36e0a7041"><td class="mdescLeft">&#160;</td><td class="mdescRight">�gegyenlet �s deriv�ltak sz�m�t�sa  <br /></td></tr>
 <tr class="memitem:afc0c83e0449ec527f8abf6fc1d3debe7" id="r_afc0c83e0449ec527f8abf6fc1d3debe7"><td class="memItemLeft">vector&lt; double &gt;&#160;</td><td class="memItemRight"><a class="el" href="#afc0c83e0449ec527f8abf6fc1d3debe7">df</a> (const vector&lt; double &gt; &amp;state) override</td></tr>
 <tr class="memdesc:afc0c83e0449ec527f8abf6fc1d3debe7"><td class="mdescLeft">&#160;</td><td class="mdescRight">�gegyenlet derv�ltja  <br /></td></tr>
 <tr class="memitem:ae0265e98ca0d12c4bfe4685d1390938a" id="r_ae0265e98ca0d12c4bfe4685d1390938a"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae0265e98ca0d12c4bfe4685d1390938a">Ini</a> (int mode, double value) override</td></tr>
@@ -135,8 +138,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af30a5d124d26bd31548cf243c4a95178" id="r_af30a5d124d26bd31548cf243c4a95178"><td class="memItemLeft"><a id="af30a5d124d26bd31548cf243c4a95178" name="af30a5d124d26bd31548cf243c4a95178"></a>
 void&#160;</td><td class="memItemRight"><b>norm_krit</b> (const double Q)</td></tr>
 <tr class="memdesc:af30a5d124d26bd31548cf243c4a95178"><td class="mdescLeft">&#160;</td><td class="mdescRight">Norm�l- �s kritikus szint sz�m�t�sa adott t�rfogat�ramhoz. <br /></td></tr>
-<tr class="memitem:aacea0461de03c4592e89cee026c2e1d5" id="r_aacea0461de03c4592e89cee026c2e1d5"><td class="memItemLeft">double&#160;</td><td class="memItemRight"><a class="el" href="#aacea0461de03c4592e89cee026c2e1d5">nyf_ode</a> (const double x, const double y, const double mp)</td></tr>
-<tr class="memdesc:aacea0461de03c4592e89cee026c2e1d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">A ny�ltfelsz�n� �raml�s le�r� DE.  <br /></td></tr>
+<tr class="memitem:aacea0461de03c4592e89cee026c2e1d5" id="r_aacea0461de03c4592e89cee026c2e1d5"><td class="memItemLeft"><a id="aacea0461de03c4592e89cee026c2e1d5" name="aacea0461de03c4592e89cee026c2e1d5"></a>
+double&#160;</td><td class="memItemRight"><b>nyf_ode</b> (const double x, const double y, const double mp)</td></tr>
+<tr class="memdesc:aacea0461de03c4592e89cee026c2e1d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">A ny�ltfelsz�n� �raml�s le�r� DE. <br /></td></tr>
 <tr class="memitem:a17e55cbde88d58985f7e315e7069ba3a" id="r_a17e55cbde88d58985f7e315e7069ba3a"><td class="memItemLeft">double&#160;</td><td class="memItemRight"><a class="el" href="#a17e55cbde88d58985f7e315e7069ba3a">ode_megoldo</a> (double ystart, double dx, double xstart, double mp)</td></tr>
 <tr class="memdesc:a17e55cbde88d58985f7e315e7069ba3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">ODE integr�l�s.  <br /></td></tr>
 <tr class="memitem:a2ad82029529f1aa2b4da3122b608eb6c" id="r_a2ad82029529f1aa2b4da3122b608eb6c"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a2ad82029529f1aa2b4da3122b608eb6c">compute_distr</a> ()</td></tr>
@@ -221,8 +225,8 @@ void&#160;</td><td class="memItemRight"><b>Set_tt_end</b> (double tmp)</td></tr>
 <tr class="memdesc:a9ff9bdd8cfd642c697cde656576315a6 pub_methods_class_agelem"><td class="mdescLeft">&#160;</td><td class="mdescRight">vizkor a cso vegen - beallitas <br /></td></tr>
 <tr class="memitem:a0c6ee94ed5706b9d40651d69f495da51 pub_methods_class_agelem" id="r_a0c6ee94ed5706b9d40651d69f495da51"><td class="memItemLeft">
 void&#160;</td><td class="memItemRight"><b>Set_enabled</b> (bool value)</td></tr>
-<tr class="memitem:a8ca0ae50344237cca93f951ae81dd00f pub_methods_class_agelem" id="r_a8ca0ae50344237cca93f951ae81dd00f"><td class="memItemLeft">
-bool&#160;</td><td class="memItemRight"><b>Is_enabled</b> () const</td></tr>
+<tr class="memitem:ae15a64229c9ddc1b4b09b8e5b5803c1c pub_methods_class_agelem" id="r_ae15a64229c9ddc1b4b09b8e5b5803c1c"><td class="memItemLeft">
+virtual bool&#160;</td><td class="memItemRight"><b>Is_enabled</b> () const</td></tr>
 <tr class="memitem:a0fe1b2066bfd416f6568a4e09e6375b6 pub_methods_class_agelem" id="r_a0fe1b2066bfd416f6568a4e09e6375b6"><td class="memItemLeft">
 vector&lt; double &gt;&#160;</td><td class="memItemRight"><b>interp</b> (const vector&lt; double &gt; &amp;x, const vector&lt; double &gt; &amp;y, const vector&lt; double &gt; &amp;xg)</td></tr>
 <tr class="memdesc:a0fe1b2066bfd416f6568a4e09e6375b6 pub_methods_class_agelem"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matlab-szeru linearis interpolacio. <br /></td></tr>
@@ -517,7 +521,7 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
 
 <p>�gegyenlet derv�ltja </p>
 <p>�gegyenlet deriv�ltjai (sz�m�t�s:</p>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a4cbef5f4033eb7d0ab2884f36e0a7041" title="�gegyenlet �rt�ke">f</a>) </dd></dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="#a4cbef5f4033eb7d0ab2884f36e0a7041" title="�gegyenlet �s deriv�ltak sz�m�t�sa">f</a>) </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>df �rt�ke </dd></dl>
 
 <p>Implements <a class="el" href="class_agelem.html#a5212b26dce23a7aea2b57956d4fc45da">Agelem</a>.</p>
@@ -578,8 +582,7 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>�gegyenlet �rt�ke </p>
-<p>�gegyenlet �s deriv�ltak sz�m�t�sa</p>
+<p>�gegyenlet �s deriv�ltak sz�m�t�sa </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">x</td><td>State vector: x[0] and x[1] are the upstream and downstream pressure heads; x[2] and x[3] are the corresponding node elevations. </td></tr>
@@ -851,44 +854,6 @@ bool&#160;</td><td class="memItemRight"><b>enabled</b></td></tr>
   </table>
   </dd>
 </dl>
-
-</div>
-</div>
-<a id="aacea0461de03c4592e89cee026c2e1d5" name="aacea0461de03c4592e89cee026c2e1d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aacea0461de03c4592e89cee026c2e1d5">&#9670;&#160;</a></span>nyf_ode()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">double Csatorna::nyf_ode </td>
-          <td>(</td>
-          <td class="paramtype">const double</td>          <td class="paramname"><span class="paramname"><em>x</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const double</td>          <td class="paramname"><span class="paramname"><em>y</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const double</td>          <td class="paramname"><span class="paramname"><em>mp</em></span>&#160;)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>A ny�ltfelsz�n� �raml�s le�r� DE. </p>
-<p>Folyad�kfelsz�nt le�r� dy/dx=f(x,y) KDE jobboldala.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">x</td><td>x koordin�ta </td></tr>
-    <tr><td class="paramname">y</td><td>y koordin�ta </td></tr>
-    <tr><td class="paramname">mp</td><td>t�meg�ram </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>dy/dx �rt�ke </dd></dl>
 
 </div>
 </div>

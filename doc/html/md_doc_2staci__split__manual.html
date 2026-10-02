@@ -102,8 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
   <div class="headertitle"><div class="title">Hidraulikus hálózat részekre bontása </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md28"></a></p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md29"></a>
+<div class="textblock"><p><a class="anchor" id="hidraulikus-hálózat-részekre-bontása"></a></p>
+<h1 class="doxsection"><a class="anchor" id="bevezetés"></a>
 Bevezetés</h1>
 <p>A <span class="tt">staci_split</span> program segítségével egy hidraulikus hálózat részhálózatokra bontható a következő szempontok szerint:</p>
 <ul>
@@ -111,22 +111,24 @@ Bevezetés</h1>
 <li>Érzékenység: ez esetben olyan csoportokat keresünk, melyeknek hasonló az össz-érzékenysége.</li>
 <li>Nyomásesés: ekkor a csoportok kumulált nyomásesése hasonló lesz.</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md30"></a>
+<h1 class="doxsection"><a class="anchor" id="quick-start"></a>
 Quick start</h1>
 <p>A program futtatásához szükséges</p>
 <ul>
 <li>a hidraulikus modellt tartalmazó <span class="tt">.spr</span> fájl, valamint</li>
-<li>a beállításokat tartalmazó <span class="tt">staci_split_settings.xml</span> fájl</li>
+<li>a beállításokat tartalmazó XML- vagy JSON-fájl</li>
 </ul>
-<p>A számítás maga a <span class="tt">staci_split</span> parancs kiadásával történik abban a könyvtárban, ahol a fenti két fájl is található.</p>
+<p>A beállításfájl explicit kiválasztása:</p>
+<div class="fragment"><div class="line">staci_split --settings beallitasok.json --seed 12345</div>
+</div><!-- fragment --><p>A kiterjesztés választja ki a formátumot. <span class="tt">--settings</span> nélkül a program a munkakönyvtárban lévő <span class="tt">staci_split_settings.xml</span> fájlt, annak hiányában a <span class="tt">staci_split_settings.json</span> fájlt használja. A relatív útvonalak mindkét esetben a munkakönyvtárhoz képest értendők. <a href="../examples/config/staci_split_settings.json">JSON-minta</a> és <a class="el" href="md_doc_2json__inputs.html" title="JSON auxiliary inputs">formátumleírás</a>.</p>
 <p>A program futtatása után keletkező eredmények:</p>
 <ul>
-<li><span class="tt">bog.dat</span>: az optimalizáló eljárás (genetikus algoritmus) kimenete (statisztika),</li>
-<li><span class="tt">staci_split.log</span>: a staci_split üzenetei.</li>
+<li>a <span class="tt">logfilename</span> beállítással megadott napló: a staci_split üzenetei;</li>
+<li><span class="tt">staci-diagnostics.jsonl</span>: a közös hibák és figyelmeztetések (felülírható a <span class="tt">--diagnostics-file</span> opcióval).</li>
 <li><span class="tt">sensitivity_matrix_&lt;...&gt;.csv</span>: az érzékenységeket tartalmazó fájl.</li>
 <li><span class="tt">membership.txt</span>: a csomópontok és ágak tagsága.</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md31"></a>
+<h1 class="doxsection"><a class="anchor" id="a-staci_split_settingsxml-felépítése"></a>
 A <span class="tt">staci_split_settings.xml</span> felépítése</h1>
 <p>Egy tipikus beállításokat tartalmazó fájl alább látható.</p>
 <div class="fragment"><div class="line">&lt;<span class="keywordtype">settings</span>&gt;</div>

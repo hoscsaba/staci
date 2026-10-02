@@ -1,0 +1,2158 @@
+{
+  "description": "Pinned upstream EPANET networks; 96 files unmodified, Anytown.inp intentionally adapted into a physical model. Manifest records both upstream and adapted hashes. Outcomes apply to STACI steady snapshot (-s), not full-corpus EPS.",
+  "networks": [
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "examples/data/coastal_ky4.inp",
+      "path": "wntr/examples/data/coastal_ky4.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/examples/data/coastal_ky4.inp",
+      "sha256": "5f2009ec5029b58545ba105e11663c98cddb3b83a3b23b9c5f34937d51e9e0c6",
+      "counts": {
+        "junctions": 959,
+        "reservoirs": 1,
+        "tanks": 4,
+        "pipes": 1156,
+        "pumps": 2,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "examples/networks/Net1.inp",
+      "path": "wntr/examples/networks/Net1.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/examples/networks/Net1.inp",
+      "sha256": "607510a01287d60d27b280a39df31a001363175a438a5de1b39e749cec6ddbc8",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 12,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "examples/networks/Net2.inp",
+      "path": "wntr/examples/networks/Net2.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/examples/networks/Net2.inp",
+      "sha256": "7c140a40f9d43ec54c155783085f9f6403df6ea7e93df1f9ad4bbf35b6c28fb0",
+      "counts": {
+        "junctions": 35,
+        "reservoirs": 0,
+        "tanks": 1,
+        "pipes": 40,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "examples/networks/Net3.inp",
+      "path": "wntr/examples/networks/Net3.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/examples/networks/Net3.inp",
+      "sha256": "ea3e825c4fef0b5cba47fb06301bc85253f18b6364dc96c44d9fb492c40faa52",
+      "counts": {
+        "junctions": 92,
+        "reservoirs": 2,
+        "tanks": 3,
+        "pipes": 117,
+        "pumps": 2,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "examples/networks/Net6.inp",
+      "path": "wntr/examples/networks/Net6.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/examples/networks/Net6.inp",
+      "sha256": "9a2ac6412469d4a5dc6352fc249f0c9841047ad1b908e0b7051faf1b55dcafab",
+      "counts": {
+        "junctions": 3323,
+        "reservoirs": 1,
+        "tanks": 32,
+        "pipes": 3829,
+        "pumps": 61,
+        "valves": 2
+      },
+      "valve_types": [
+        "PRV"
+      ],
+      "expected": "nonconvergence",
+      "reason": "Valve model is supported; known hydraulic solver convergence limitation under the strict reference profile. A successful numerical match is accepted as an improvement.",
+      "reference_expected": "staci_numerical_failure",
+      "accept_solved_improvement": true
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "examples/networks/ky10.inp",
+      "path": "wntr/examples/networks/ky10.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/examples/networks/ky10.inp",
+      "sha256": "2474592fd190421368645c83e2f322d583334e047c259947316d9a5c0893f3fa",
+      "counts": {
+        "junctions": 920,
+        "reservoirs": 2,
+        "tanks": 13,
+        "pipes": 1043,
+        "pumps": 13,
+        "valves": 5
+      },
+      "valve_types": [
+        "PRV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "examples/networks/ky4.inp",
+      "path": "wntr/examples/networks/ky4.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/examples/networks/ky4.inp",
+      "sha256": "ca137e2cfa21faf32bf6115979e04387439db9abb1144860d6a9b5eb9a020bfc",
+      "counts": {
+        "junctions": 959,
+        "reservoirs": 1,
+        "tanks": 4,
+        "pipes": 1156,
+        "pumps": 2,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/data_for_testing/wn1.inp",
+      "path": "wntr/wntr/tests/data_for_testing/wn1.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/data_for_testing/wn1.inp",
+      "sha256": "f6351e46359a2f379601ef3e6ba0ab862322fb430ab3d0a21434804878bbd326",
+      "counts": {
+        "junctions": 959,
+        "reservoirs": 1,
+        "tanks": 4,
+        "pipes": 1156,
+        "pumps": 2,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/data_for_testing/wn2.inp",
+      "path": "wntr/wntr/tests/data_for_testing/wn2.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/data_for_testing/wn2.inp",
+      "sha256": "725e35244de474ffd329a1261663b3fa3f6a80400b03f9a994da3d4e8c79385e",
+      "counts": {
+        "junctions": 908,
+        "reservoirs": 1,
+        "tanks": 4,
+        "pipes": 1107,
+        "pumps": 2,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/Anytown.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/Anytown.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/Anytown.inp",
+      "sha256": "7d0fa34da8f23608cbc4de56e4176f158e7726b01797aaa7df1c2cd6f453e74f",
+      "counts": {
+        "junctions": 22,
+        "reservoirs": 1,
+        "tanks": 2,
+        "pipes": 43,
+        "pumps": 3,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Locally adapted physical Anytown model: nominal pump speeds, realistic candidate pipes and resized distribution/inlet pipes. Positive pressure throughout the 24-hour STACI simulation; initial hydraulic state agrees with EPANET.",
+      "reference_expected": "match",
+      "upstream_sha256": "32be4b1e24db077cf33871d4bfb6869a9ac59366c3b9a2539e64ccfbe8c95d4d",
+      "local_modifications": {
+        "authorization": "User explicitly requested a reasonable physical INP model.",
+        "pump_speed": "Pumps 78/79/80 explicitly SPEED 1.0; all 24 multipliers in patterns 2/3/4 changed from 0 to 1.0.",
+        "candidate_pipe_diameter_inches": {
+          "110": 16,
+          "113": 16,
+          "114": 16,
+          "115": 16,
+          "116": 16,
+          "125": 16
+        },
+        "inlet_trunk_diameter_inches": {
+          "1": 24,
+          "2": 24,
+          "3": 24
+        },
+        "distribution_pipe_diameter_inches": "Original 8 -> 12, 10 -> 16, 12 -> 18, 16 -> 24 inches; trunks and candidate overrides above. Existing 30-inch pipe retained.",
+        "unchanged_parameters": "Topology, demands and demand patterns, pump curves, roughness, lengths, elevations, tank levels/limits/dimensions and timestep settings retained."
+      },
+      "upstream_copy": "doc/model_sources/Anytown_upstream.inp"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/Anytown_multipointcurves.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/Anytown_multipointcurves.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/Anytown_multipointcurves.inp",
+      "sha256": "738d4efe326c1fba6f87878680080514194479f2459aa5465149e7d5a4d1617c",
+      "counts": {
+        "junctions": 22,
+        "reservoirs": 1,
+        "tanks": 2,
+        "pipes": 43,
+        "pumps": 3,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/Awumah_layout1.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/Awumah_layout1.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/Awumah_layout1.inp",
+      "sha256": "93fc344ce26a1d95065400eb9be293ea0f0aa1000b87ea00ebdb6a394f3002c6",
+      "counts": {
+        "junctions": 11,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 12,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/Awumah_layout8.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/Awumah_layout8.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/Awumah_layout8.inp",
+      "sha256": "2888b6971899f37e4e0cb72cbd720014d3b8111b83f83c5173614faa49dd7c21",
+      "counts": {
+        "junctions": 11,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 16,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/CCWI17-HermanMahmoud.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/CCWI17-HermanMahmoud.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/CCWI17-HermanMahmoud.inp",
+      "sha256": "22f891c876b9efd4195081a283d3a04b3d89490e38946c67ecb8a9c6c86e471e",
+      "counts": {
+        "junctions": 6,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 8,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/Net6_plus.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/Net6_plus.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/Net6_plus.inp",
+      "sha256": "9dbea8f652f4f465b377dad4c4fce717e33ff53c886e711474149a04b7da65a3",
+      "counts": {
+        "junctions": 3326,
+        "reservoirs": 1,
+        "tanks": 34,
+        "pipes": 3829,
+        "pumps": 61,
+        "valves": 5
+      },
+      "valve_types": [
+        "PRV",
+        "TCV"
+      ],
+      "expected": "nonconvergence",
+      "reason": "Emitter is supported. 1e-9 m snapshot matches EPANET; the corpus 1e-12 m profile may reach the numerical floor.",
+      "reference_expected": "staci_numerical_failure",
+      "accept_solved_improvement": true
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/Todini_Fig2_optCost_CMH.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/Todini_Fig2_optCost_CMH.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/Todini_Fig2_optCost_CMH.inp",
+      "sha256": "18609b24e057e9055fcd2a7252407f0a8f68897d407a7257f57658d4ea0c73af",
+      "counts": {
+        "junctions": 6,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 8,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/Todini_Fig2_optCost_GPM.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/Todini_Fig2_optCost_GPM.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/Todini_Fig2_optCost_GPM.inp",
+      "sha256": "c6839a030b33cb54cd3067ef4a00bc823a5cb5b431e7da86ced019c5afd0d95b",
+      "counts": {
+        "junctions": 6,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 8,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/Todini_Fig2_solA_CMH.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/Todini_Fig2_solA_CMH.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/Todini_Fig2_solA_CMH.inp",
+      "sha256": "c2b7debcd4fd7b7a20e2a8223f3c406602803083ed4ed5ebad4e46393f994fb0",
+      "counts": {
+        "junctions": 6,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 8,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/Todini_Fig2_solA_GPM.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/Todini_Fig2_solA_GPM.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/Todini_Fig2_solA_GPM.inp",
+      "sha256": "09484ab32e9692d707b82c27f4dd0cc70aaf33149e80c2a6bcda65f3ac6a501b",
+      "counts": {
+        "junctions": 6,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 8,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/bad_syntax.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/bad_syntax.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/bad_syntax.inp",
+      "sha256": "cd85aae5035c480fd1d2753a3eb963ea61551df0bc0cf5367cfc18b3051e5f0b",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "compatibility",
+      "diagnostic_contains": [
+        "[FOO]",
+        "Unknown EPANET section"
+      ],
+      "reason": "Upstream intentional syntax-error fixture contains unknown [FOO] section.",
+      "reference_expected": "invalid_input",
+      "reference_reason": "Official EPANET rejects this original input; it is not a numerical equivalence case.",
+      "reference_error_code": 200
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/bad_times.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/bad_times.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/bad_times.inp",
+      "sha256": "fe592de6d54e1ffc32eea346d4cd1f3d1df3ab288444b02acfab82388040ef3b",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Upstream invalid time-syntax fixture: hydraulic snapshot is valid; [TIMES] is unused by -s. This does not assert EPS compatibility.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/bad_values.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/bad_values.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/bad_values.inp",
+      "sha256": "83102a988d17d6f01f1a859f744a4e058610f57045ae5f3de000d657906bac30",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "compatibility",
+      "reason": "[PIPES] element 'pipe2' line 56: Unknown endpoint node 'node1'.",
+      "diagnostic_contains": [
+        "[PIPES] element 'pipe2' line 56: Unknown endpoint node 'node1'."
+      ],
+      "reference_expected": "invalid_input",
+      "reference_reason": "Official EPANET rejects this original input; it is not a numerical equivalence case.",
+      "reference_error_code": 200
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/conditional_controls_1.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/conditional_controls_1.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/conditional_controls_1.inp",
+      "sha256": "d7dcc874a65067c15640356183911384e552c9e12d47233ca51f46b0863ecc4c",
+      "counts": {
+        "junctions": 1,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 1,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/conditional_controls_2.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/conditional_controls_2.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/conditional_controls_2.inp",
+      "sha256": "2b63bef96295474d575c9798e3d6cb62ea6783df2f14771d45ec9249a63a9800",
+      "counts": {
+        "junctions": 3,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 3,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "compatibility",
+      "reason": "[TOPOLOGY] Component containing node 'junction1' (2 nodes) has no reservoir or tank connected through initially open links. No reference head/water supply is available.",
+      "diagnostic_contains": [
+        "[TOPOLOGY] Component containing node 'junction1' (2 nodes) has no reservoir or tank connected through initially open links. No reference head/water supply is available."
+      ],
+      "reference_expected": "reference_numerical_failure",
+      "reference_reason": "EPANET nominal convergence fails the independent junction-continuity audit at both reference accuracy settings; no numerical agreement can be claimed."
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/control_comb.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/control_comb.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/control_comb.inp",
+      "sha256": "f046563bf3c9901eb356b4b1066ac4006ac7399af11d6e06240af15cdfa86168",
+      "counts": {
+        "junctions": 1,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 1,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "compatibility",
+      "reason": "[TOPOLOGY] Component containing node 'j1' (1 nodes) has no reservoir or tank connected through initially open links. No reference head/water supply is available.",
+      "diagnostic_contains": [
+        "[TOPOLOGY] Component containing node 'j1' (1 nodes) has no reservoir or tank connected through initially open links. No reference head/water supply is available."
+      ],
+      "reference_expected": "reference_numerical_failure",
+      "reference_reason": "EPANET nominal convergence fails the independent junction-continuity audit at both reference accuracy settings; no numerical agreement can be claimed."
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/cv_controls.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/cv_controls.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/cv_controls.inp",
+      "sha256": "01bf4f85e5b7c534e5771a5443e88baef826dabd1db4ef17a31f7b63694a7521",
+      "counts": {
+        "junctions": 0,
+        "reservoirs": 0,
+        "tanks": 2,
+        "pipes": 1,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "invalid_input",
+      "reference_reason": "EPANET 2.2 requires at least two junctions and rejects this smaller fixture with code 223; STACI solves it, but no EPANET numerical reference is available.",
+      "reference_error_code": 223
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/epanet_leaks.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/epanet_leaks.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/epanet_leaks.inp",
+      "sha256": "e0c5a77658683d4122264a2c5711789932e7a2fc5735563715679cd23d3d2f45",
+      "counts": {
+        "junctions": 3,
+        "reservoirs": 0,
+        "tanks": 1,
+        "pipes": 3,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Pressure-dependent outlet / PSV / PBV support implemented; initial snapshot is checked against EPANET.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/fcv_open_no_downstream_sources.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/fcv_open_no_downstream_sources.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/fcv_open_no_downstream_sources.inp",
+      "sha256": "b85221a736cff7b2411dc83301aceab133c61eef3f71225ab7080f8f7aed09cd",
+      "counts": {
+        "junctions": 6,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 6,
+        "pumps": 1,
+        "valves": 1
+      },
+      "valve_types": [
+        "FCV"
+      ],
+      "expected": "nonconvergence",
+      "reason": "Valve model is supported; known hydraulic solver convergence limitation under the strict reference profile. A successful numerical match is accepted as an improvement.",
+      "reference_expected": "reference_numerical_failure",
+      "accept_solved_improvement": true,
+      "reference_reason": "EPANET nominal convergence fails the independent junction-continuity audit at both reference accuracy settings; no numerical agreement can be claimed."
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/fcv_open_no_upstream_sources.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/fcv_open_no_upstream_sources.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/fcv_open_no_upstream_sources.inp",
+      "sha256": "9b74c85f19f24357da558f35bb799f0746fcbe4ef279e1f94a93c5615063f0d4",
+      "counts": {
+        "junctions": 6,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 6,
+        "pumps": 1,
+        "valves": 1
+      },
+      "valve_types": [
+        "FCV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/io.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/io.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/io.inp",
+      "sha256": "f74edae22a7e98b773857b278fddfd8c4545ed7c027ee33bac9938b81710b273",
+      "counts": {
+        "junctions": 4,
+        "reservoirs": 0,
+        "tanks": 1,
+        "pipes": 1,
+        "pumps": 2,
+        "valves": 3
+      },
+      "valve_types": [
+        "GPV",
+        "PSV",
+        "TCV"
+      ],
+      "expected": "nonconvergence",
+      "reason": "POWER pump2 feeds a zero-demand terminal node; reference physics audit rejects its near-zero-flow false convergence.",
+      "reference_expected": "reference_numerical_failure"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/latin1.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/latin1.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/latin1.inp",
+      "sha256": "6b2954d7351c26e3f4e8af908ddea638b736100a0c84eefcf7c6e3d341a8d71e",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 12,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/leaks.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/leaks.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/leaks.inp",
+      "sha256": "1b3e2f9304c5e4f17f0c8a6ae9845f8a462b2f715d690e0f3d7a0a3f250b9982",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 0,
+        "tanks": 1,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/msx_example.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/msx_example.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/msx_example.inp",
+      "sha256": "a9864c9efd22929284eaf5b437c65ce3e5e791abf9194d347a07e821348e7061",
+      "counts": {
+        "junctions": 4,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 5,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/prv_closed_no_upstream_sources.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/prv_closed_no_upstream_sources.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/prv_closed_no_upstream_sources.inp",
+      "sha256": "0cba574cac11fc689b02f365865dd67906898061999b510aa5d28e8f0049aff7",
+      "counts": {
+        "junctions": 6,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 6,
+        "pumps": 1,
+        "valves": 1
+      },
+      "valve_types": [
+        "PRV"
+      ],
+      "expected": "nonconvergence",
+      "reason": "Valve model is supported; known hydraulic solver convergence limitation under the strict reference profile. A successful numerical match is accepted as an improvement.",
+      "reference_expected": "reference_numerical_failure",
+      "accept_solved_improvement": true,
+      "reference_reason": "EPANET nominal convergence fails the independent junction-continuity audit at both reference accuracy settings; no numerical agreement can be claimed."
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/prv_open_no_upstream_sources.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/prv_open_no_upstream_sources.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/prv_open_no_upstream_sources.inp",
+      "sha256": "d9329bde1f017e845284381add0b64ba08c5b9fe3eb4b52a28667888d7575c80",
+      "counts": {
+        "junctions": 6,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 6,
+        "pumps": 1,
+        "valves": 1
+      },
+      "valve_types": [
+        "PRV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/psv_open_no_downstream_sources.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/psv_open_no_downstream_sources.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/psv_open_no_downstream_sources.inp",
+      "sha256": "5dd474f08783134a4394db02314edb6d963d792dddedc3c2a1fbbf4a1d80974d",
+      "counts": {
+        "junctions": 6,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 6,
+        "pumps": 1,
+        "valves": 1
+      },
+      "valve_types": [
+        "PSV"
+      ],
+      "expected": "solved",
+      "reason": "Pressure-dependent outlet / PSV / PBV support implemented; initial snapshot is checked against EPANET.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/simulator.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/simulator.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/simulator.inp",
+      "sha256": "b43d076634e574b42debe7c72b39b956a5ee16c0b8f4a2a57c46bad9957590e3",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/skeletonize.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/skeletonize.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/skeletonize.inp",
+      "sha256": "d32534dfd2b4c8df310cd82887b2fd269b607999939ece2d81ba92d9a170f97d",
+      "counts": {
+        "junctions": 34,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 42,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/tank_controls_1.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/tank_controls_1.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/tank_controls_1.inp",
+      "sha256": "a5fc6ae4e3e910ecb5af10e2635dad6fc4f44666927eb199cec6369e5265833b",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 0,
+        "tanks": 1,
+        "pipes": 1,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/tank_controls_2.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/tank_controls_2.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/tank_controls_2.inp",
+      "sha256": "906f3168d73bc5d0a6bdf63cf1e343b542687c75ca0997aae54cc7c900981b38",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 2,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/time_controls.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/time_controls.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/time_controls.inp",
+      "sha256": "e5738be0718f52d97523a7c73773adbe4d81a593b588c7fbcec49ad5fbf84be0",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "wntr",
+      "repository": "USEPA/WNTR",
+      "revision": "11eec7d5bf0a9367ffe04d75707918f0c0a890a1",
+      "upstream_path": "wntr/tests/networks_for_testing/times.inp",
+      "path": "wntr/wntr/tests/networks_for_testing/times.inp",
+      "url": "https://raw.githubusercontent.com/USEPA/WNTR/11eec7d5bf0a9367ffe04d75707918f0c0a890a1/wntr/tests/networks_for_testing/times.inp",
+      "sha256": "9006519a801f89dfdf83e202429f7692732deed29915df1187ef34c50182861b",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/examples/example1.inp",
+      "path": "owa/epanet-tests/examples/example1.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/examples/example1.inp",
+      "sha256": "67251af1d0e5b9f1a90a1d12f22fc9e4ca957dda87e65f9a596b9b834f4d3ff1",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 12,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/examples/example2.inp",
+      "path": "owa/epanet-tests/examples/example2.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/examples/example2.inp",
+      "sha256": "603fe828868dac36afd18188fcdc0a45bc4abc9e511c86529ff30f87b0391fa2",
+      "counts": {
+        "junctions": 35,
+        "reservoirs": 0,
+        "tanks": 1,
+        "pipes": 40,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/exeter/anytown-3.inp",
+      "path": "owa/epanet-tests/exeter/anytown-3.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/exeter/anytown-3.inp",
+      "sha256": "6e0c5126b14306b4f6cdd30df7f146d08778ca030ad575e1f1456c897b998f6f",
+      "counts": {
+        "junctions": 22,
+        "reservoirs": 1,
+        "tanks": 2,
+        "pipes": 43,
+        "pumps": 3,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/exeter/exnet-3.inp",
+      "path": "owa/epanet-tests/exeter/exnet-3.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/exeter/exnet-3.inp",
+      "sha256": "1d7b0ddd5ed6d6d858e958d17cd0d8bad04b9832398f5b827bc37342d6f27da6",
+      "counts": {
+        "junctions": 1891,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 2465,
+        "pumps": 0,
+        "valves": 2
+      },
+      "valve_types": [
+        "PRV",
+        "TCV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/exeter/exnet-3H.inp",
+      "path": "owa/epanet-tests/exeter/exnet-3H.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/exeter/exnet-3H.inp",
+      "sha256": "10ab69f55b8dcd70efad066aee5777efd89f92ee3617539d07e5f7750300cd58",
+      "counts": {
+        "junctions": 1891,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 2465,
+        "pumps": 0,
+        "valves": 2
+      },
+      "valve_types": [
+        "PRV",
+        "TCV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/exeter/exnet-3Q.inp",
+      "path": "owa/epanet-tests/exeter/exnet-3Q.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/exeter/exnet-3Q.inp",
+      "sha256": "bfdc3833f034c4a3d088ef045a6880984625633059394f7fc2d7313b0511e545",
+      "counts": {
+        "junctions": 1891,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 2465,
+        "pumps": 0,
+        "valves": 2
+      },
+      "valve_types": [
+        "PRV",
+        "TCV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/exeter/hanoi-3.inp",
+      "path": "owa/epanet-tests/exeter/hanoi-3.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/exeter/hanoi-3.inp",
+      "sha256": "0d46a70d4253cd1dbdb970007dc678a5dae1e8fd4208d831a5977fabfd62073d",
+      "counts": {
+        "junctions": 31,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 34,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/exeter/mod_anytown-3.inp",
+      "path": "owa/epanet-tests/exeter/mod_anytown-3.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/exeter/mod_anytown-3.inp",
+      "sha256": "4f5a7581b303f9e9e26d8899e8fb8ea8d7d7107964a15b054b5953bb02c960b8",
+      "counts": {
+        "junctions": 22,
+        "reservoirs": 1,
+        "tanks": 2,
+        "pipes": 43,
+        "pumps": 3,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/exeter/mod_anytown-3a.inp",
+      "path": "owa/epanet-tests/exeter/mod_anytown-3a.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/exeter/mod_anytown-3a.inp",
+      "sha256": "248aef53bcce7e0ab97c820ae7f59f48e5267e91cdfd51cf899d08fb76ddae2d",
+      "counts": {
+        "junctions": 22,
+        "reservoirs": 1,
+        "tanks": 2,
+        "pipes": 43,
+        "pumps": 3,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/large/57460.inp",
+      "path": "owa/epanet-tests/large/57460.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/large/57460.inp",
+      "sha256": "816714c2ec93a1a5fde112727eba5d61b9101fa4f28af168f82bc2087e906189",
+      "counts": {
+        "junctions": 28899,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 57460,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Legacy SI units and viscosity now match EPANET 2.2; large steady snapshot is numerically verified.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/large/NW_Model.inp",
+      "path": "owa/epanet-tests/large/NW_Model.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/large/NW_Model.inp",
+      "sha256": "f44353f963f6149b289fe806564e380838dc35826639e8a9312f7146c7dc31a6",
+      "counts": {
+        "junctions": 8566,
+        "reservoirs": 3,
+        "tanks": 0,
+        "pipes": 9979,
+        "pumps": 3,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "nonconvergence",
+      "reason": "Negative pressure settings are supported; strict snapshots verified with the common 1000-iteration reference profile.",
+      "accept_solved_improvement": true,
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/large/NW_Model1.inp",
+      "path": "owa/epanet-tests/large/NW_Model1.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/large/NW_Model1.inp",
+      "sha256": "0aa2d75f97214048e9d066a5fa05fd2288995df6c321aa7578f5b0b6af424517",
+      "counts": {
+        "junctions": 8566,
+        "reservoirs": 3,
+        "tanks": 0,
+        "pipes": 9978,
+        "pumps": 3,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "nonconvergence",
+      "reason": "Negative pressure settings are supported; strict snapshots verified with the common 1000-iteration reference profile.",
+      "accept_solved_improvement": true,
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/network_one/NET1-3.inp",
+      "path": "owa/epanet-tests/network_one/NET1-3.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/network_one/NET1-3.inp",
+      "sha256": "e084cf35e3d6464d377a9cd2c53d2a4299040b1ff631394ba4f8aac033784106",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 12,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/network_one/NET1-PBV.inp",
+      "path": "owa/epanet-tests/network_one/NET1-PBV.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/network_one/NET1-PBV.inp",
+      "sha256": "d9f2ef22a43920fb6c9b55ef256b20b2fb7ee387048d52203c0c0497b015731a",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 11,
+        "pumps": 1,
+        "valves": 1
+      },
+      "valve_types": [
+        "PBV"
+      ],
+      "expected": "solved",
+      "reason": "Pressure-dependent outlet / PSV / PBV support implemented; initial snapshot is checked against EPANET.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/network_one/NET1.inp",
+      "path": "owa/epanet-tests/network_one/NET1.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/network_one/NET1.inp",
+      "sha256": "36c98bcb7c25844b7675ed57bb0b1635ee84c1c9518caf071cd14eeadc1209a2",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 12,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/network_one/NET1cv.inp",
+      "path": "owa/epanet-tests/network_one/NET1cv.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/network_one/NET1cv.inp",
+      "sha256": "87dbb177dbbfc295bc741ddd2d048f6e560470a723cadf17459da595e250a4f5",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 12,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/network_one/NET1np.inp",
+      "path": "owa/epanet-tests/network_one/NET1np.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/network_one/NET1np.inp",
+      "sha256": "72b90e6f4191ccb5850c3fb4c55c4c2e993fc3b9e12b009e77cad549e37c4a57",
+      "counts": {
+        "junctions": 8,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 12,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/network_one/NET1para.inp",
+      "path": "owa/epanet-tests/network_one/NET1para.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/network_one/NET1para.inp",
+      "sha256": "6ad34cff99c7c87186676567786f548ddc5b0cfd147152b91e6cd6f10269ae0a",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 13,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/press_depend/NET1emit.inp",
+      "path": "owa/epanet-tests/press_depend/NET1emit.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/press_depend/NET1emit.inp",
+      "sha256": "362c7ed5ef2678da34e44f472b85c00b012cccca317d9a0584dfc2e9fa1173a5",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 12,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Pressure-dependent outlet / PSV / PBV support implemented; initial snapshot is checked against EPANET.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/press_depend/NET1negemit.inp",
+      "path": "owa/epanet-tests/press_depend/NET1negemit.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/press_depend/NET1negemit.inp",
+      "sha256": "2d509e90c5d7d6f33c4469415d1fc1e0984a76db72c8831e020a6f4725a5130c",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 12,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Pressure-dependent outlet / PSV / PBV support implemented; initial snapshot is checked against EPANET.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/press_depend/cheung.inp",
+      "path": "owa/epanet-tests/press_depend/cheung.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/press_depend/cheung.inp",
+      "sha256": "0c6f7c43c3883684e132cc0270cef07efdb91879fe2de036d0dfd1905da85870",
+      "counts": {
+        "junctions": 4,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 4,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Pressure-dependent outlet / PSV / PBV support implemented; initial snapshot is checked against EPANET.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/6848-68nodes.inp",
+      "path": "owa/epanet-tests/small/6848-68nodes.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/6848-68nodes.inp",
+      "sha256": "24fe087a484adc843582d363c2384e883b98f9f052acd94fd8bf0d5667ac2fde",
+      "counts": {
+        "junctions": 69,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 104,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/Elhay-ZeroFlow.inp",
+      "path": "owa/epanet-tests/small/Elhay-ZeroFlow.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/Elhay-ZeroFlow.inp",
+      "sha256": "a605f06d36fd66567133863bad35566e707ac5f9349ca27888c490861f3c6c32",
+      "counts": {
+        "junctions": 7,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 11,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/GES4-9.inp",
+      "path": "owa/epanet-tests/small/GES4-9.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/GES4-9.inp",
+      "sha256": "585e2ac7ad391418fabca87b7249bcae8561003b9ff535461eaf4f1399d2550d",
+      "counts": {
+        "junctions": 11,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 11,
+        "pumps": 0,
+        "valves": 3
+      },
+      "valve_types": [
+        "PRV"
+      ],
+      "expected": "nonconvergence",
+      "reason": "Negative pressure settings are supported; strict snapshots verified with the common 1000-iteration reference profile.",
+      "reference_expected": "match",
+      "accept_solved_improvement": true
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/Gorev2.inp",
+      "path": "owa/epanet-tests/small/Gorev2.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/Gorev2.inp",
+      "sha256": "338a2c40edb216f9d7b895430dd162ef746f3fe5ee72b779ef5d80dca3d27e59",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 3,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/JEP5-13.inp",
+      "path": "owa/epanet-tests/small/JEP5-13.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/JEP5-13.inp",
+      "sha256": "87160de047b7dc136fba627dd96c73b1d2cc6a9c64c8d5b0e9a0a16a1ec1b43a",
+      "counts": {
+        "junctions": 8,
+        "reservoirs": 0,
+        "tanks": 2,
+        "pipes": 10,
+        "pumps": 0,
+        "valves": 2
+      },
+      "valve_types": [
+        "PRV"
+      ],
+      "expected": "solved",
+      "reason": "Negative pressure settings are supported; strict snapshots verified with the common 1000-iteration reference profile.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/noflow.inp",
+      "path": "owa/epanet-tests/small/noflow.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/noflow.inp",
+      "sha256": "097d40bb3b18588500f76c4d2a88c3e9042fa6c9055e7f676fe7e596781835af",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 3,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/sampletown.inp",
+      "path": "owa/epanet-tests/small/sampletown.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/sampletown.inp",
+      "sha256": "cd96cd3aa93d507f74050c8ee32ca67a501e195b1210e41698d7dd82ac648f6b",
+      "counts": {
+        "junctions": 6,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 7,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/simplenet.inp",
+      "path": "owa/epanet-tests/small/simplenet.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/simplenet.inp",
+      "sha256": "95c73e6a9768bfcaf494b3f30140be0c3fa49106226c9f2c55f5bc59cc051f46",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/simpson_test.inp",
+      "path": "owa/epanet-tests/small/simpson_test.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/simpson_test.inp",
+      "sha256": "6e010dbaed6c07ec55fea9e497f7e161c523c6d63b98fa5c71dda0f3ba1c4c88",
+      "counts": {
+        "junctions": 4,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 3,
+        "pumps": 0,
+        "valves": 2
+      },
+      "valve_types": [
+        "FCV",
+        "PRV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/simpson_test_2-12.inp",
+      "path": "owa/epanet-tests/small/simpson_test_2-12.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/simpson_test_2-12.inp",
+      "sha256": "20c84607d214e8b3204db8d229511f9983a85967deecd184301688a6c1896919",
+      "counts": {
+        "junctions": 4,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 3,
+        "pumps": 0,
+        "valves": 2
+      },
+      "valve_types": [
+        "FCV",
+        "PRV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/st-net3-3.inp",
+      "path": "owa/epanet-tests/small/st-net3-3.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/st-net3-3.inp",
+      "sha256": "ba9f34957ac186d9e48a9f46a45451509440a6535ae981a595afc92b6de4fbe0",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 9,
+        "pumps": 2,
+        "valves": 1
+      },
+      "valve_types": [
+        "PRV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/st-net3.inp",
+      "path": "owa/epanet-tests/small/st-net3.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/st-net3.inp",
+      "sha256": "d1e8196a16ad5371b1f71b4b39c63e3e909bea14593d2a12a01492ed5f79289c",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 9,
+        "pumps": 2,
+        "valves": 1
+      },
+      "valve_types": [
+        "PRV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/test101-3.inp",
+      "path": "owa/epanet-tests/small/test101-3.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/test101-3.inp",
+      "sha256": "c4317bfbcd6451ba99d83f07808bd39ddee68c6419fdb08e4b0284d4132cf426",
+      "counts": {
+        "junctions": 15,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 16,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/test101.inp",
+      "path": "owa/epanet-tests/small/test101.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/test101.inp",
+      "sha256": "15b36f1b4ba1b4b162ee4deb43ba3714e517d23e89138012205ff4a7599b2ae3",
+      "counts": {
+        "junctions": 15,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 16,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/small/todinitest.inp",
+      "path": "owa/epanet-tests/small/todinitest.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/small/todinitest.inp",
+      "sha256": "78450b0cf55cd09cabfc6a950547fd5600604300f4663ec7762dc5e7d2c76bf4",
+      "counts": {
+        "junctions": 4,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 7,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/tanks/2Tanks.inp",
+      "path": "owa/epanet-tests/tanks/2Tanks.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/tanks/2Tanks.inp",
+      "sha256": "78f78737d7936c085aafbf34854aaccc8608a375b7236bb4fcbbaf4637d5a9bc",
+      "counts": {
+        "junctions": 1,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/tanks/example1_2comp.inp",
+      "path": "owa/epanet-tests/tanks/example1_2comp.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/tanks/example1_2comp.inp",
+      "sha256": "a142e2ad2a8d4b924051d5087197e30694e3adf520efcf13cc85e27a3f7a96af",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 12,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/tanks/example1_LIFO.inp",
+      "path": "owa/epanet-tests/tanks/example1_LIFO.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/tanks/example1_LIFO.inp",
+      "sha256": "0ae520f98b0981ddcc92b558aa0c4daee3a49a09043d890ae977135f04a48ad7",
+      "counts": {
+        "junctions": 9,
+        "reservoirs": 1,
+        "tanks": 1,
+        "pipes": 12,
+        "pumps": 1,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/tanks/gestar1.inp",
+      "path": "owa/epanet-tests/tanks/gestar1.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/tanks/gestar1.inp",
+      "sha256": "2271a402d33817716e94c19c673784b2ffe48573344c3a1e29adb02c2e68272a",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 4,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/tanks/gestar1mod.inp",
+      "path": "owa/epanet-tests/tanks/gestar1mod.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/tanks/gestar1mod.inp",
+      "sha256": "c58477457c41ec8f9afc44d9cfd4ad11c55662ecefaad09e36df025a39377365",
+      "counts": {
+        "junctions": 1,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/tanks/gestar1modHW.inp",
+      "path": "owa/epanet-tests/tanks/gestar1modHW.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/tanks/gestar1modHW.inp",
+      "sha256": "79e0b75ef0f88eff43ea11133ce2a3fe0cb4f545761adeccfe6367cc00e30a8d",
+      "counts": {
+        "junctions": 1,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/valves/2PRVs-a.inp",
+      "path": "owa/epanet-tests/valves/2PRVs-a.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/valves/2PRVs-a.inp",
+      "sha256": "a9d34b53838eee1f05c6ae2b3e465c541a4e2e3607ef653da383942aade5c8e9",
+      "counts": {
+        "junctions": 5,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 4,
+        "pumps": 0,
+        "valves": 2
+      },
+      "valve_types": [
+        "PRV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/valves/2PRVs-aquis.inp",
+      "path": "owa/epanet-tests/valves/2PRVs-aquis.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/valves/2PRVs-aquis.inp",
+      "sha256": "0f5d3ad3e61dae197056a5909b6fd1265884a845ce0ebbfe403b1ee701532e08",
+      "counts": {
+        "junctions": 6,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 5,
+        "pumps": 0,
+        "valves": 2
+      },
+      "valve_types": [
+        "GPV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/valves/2PRVs.inp",
+      "path": "owa/epanet-tests/valves/2PRVs.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/valves/2PRVs.inp",
+      "sha256": "52616e07a760cebe37f8d790323cdde4b2ad36c80f4c051ff84d5eb2c37596f6",
+      "counts": {
+        "junctions": 4,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 3,
+        "pumps": 0,
+        "valves": 2
+      },
+      "valve_types": [
+        "PRV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/valves/2fcvs.inp",
+      "path": "owa/epanet-tests/valves/2fcvs.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/valves/2fcvs.inp",
+      "sha256": "83adf2b42d0b5ca84f214a395b963e43299f8f14d0ca24c84dc352a3ae224056",
+      "counts": {
+        "junctions": 19,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 16,
+        "pumps": 2,
+        "valves": 2
+      },
+      "valve_types": [
+        "FCV"
+      ],
+      "expected": "nonconvergence",
+      "reason": "Valve model is supported; known hydraulic solver convergence limitation under the strict reference profile. A successful numerical match is accepted as an improvement.",
+      "reference_expected": "reference_numerical_failure",
+      "accept_solved_improvement": true,
+      "reference_reason": "EPANET nominal convergence fails the independent junction-continuity audit at both reference accuracy settings; no numerical agreement can be claimed."
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/valves/5fcvs.inp",
+      "path": "owa/epanet-tests/valves/5fcvs.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/valves/5fcvs.inp",
+      "sha256": "694c6ffbd1f133eaddadbda082dacd2c5532c1bf921d55afb5365a6511e5ffd4",
+      "counts": {
+        "junctions": 31,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 25,
+        "pumps": 5,
+        "valves": 5
+      },
+      "valve_types": [
+        "FCV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/valves/fcv-noflow.inp",
+      "path": "owa/epanet-tests/valves/fcv-noflow.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/valves/fcv-noflow.inp",
+      "sha256": "bfa9d9939d5952384170bef21b1760ebb2cd602a02a770cff0298c8aff8b0c81",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 1
+      },
+      "valve_types": [
+        "FCV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/valves/fcv.inp",
+      "path": "owa/epanet-tests/valves/fcv.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/valves/fcv.inp",
+      "sha256": "1c96f38135624cb60a5fbec54b0b8539580eac9fd7a182136d7622e66ec28159",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 1
+      },
+      "valve_types": [
+        "FCV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "epanet-tests/valves/fcv2.inp",
+      "path": "owa/epanet-tests/valves/fcv2.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/epanet-tests/valves/fcv2.inp",
+      "sha256": "acac066328bae9ea582fe976dca981f0baacdcefd87ceaaf3285625ca64ce281",
+      "counts": {
+        "junctions": 2,
+        "reservoirs": 2,
+        "tanks": 0,
+        "pipes": 2,
+        "pumps": 0,
+        "valves": 1
+      },
+      "valve_types": [
+        "FCV"
+      ],
+      "expected": "solved",
+      "reason": "PRV/FCV/GPV model is supported. A solved snapshot must also numerically match the independent reference; mismatches remain failing tests.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "msx-examples/As5Adsorb/example.inp",
+      "path": "owa/msx-examples/As5Adsorb/example.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/msx-examples/As5Adsorb/example.inp",
+      "sha256": "a9864c9efd22929284eaf5b437c65ce3e5e791abf9194d347a07e821348e7061",
+      "counts": {
+        "junctions": 4,
+        "reservoirs": 1,
+        "tanks": 0,
+        "pipes": 5,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "msx-examples/Batch-NH2Cl/batch-nh2cl.inp",
+      "path": "owa/msx-examples/Batch-NH2Cl/batch-nh2cl.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/msx-examples/Batch-NH2Cl/batch-nh2cl.inp",
+      "sha256": "6124460e6efea407296e6a82c021aa68d56c73c7941998b59068d1174b9d14d9",
+      "counts": {
+        "junctions": 1,
+        "reservoirs": 0,
+        "tanks": 1,
+        "pipes": 1,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "msx-examples/Net2-CL2/net2-cl2.inp",
+      "path": "owa/msx-examples/Net2-CL2/net2-cl2.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/msx-examples/Net2-CL2/net2-cl2.inp",
+      "sha256": "219ee99f4becf60f8c45ba61abe979476556a65efd9885826af84a96418a597d",
+      "counts": {
+        "junctions": 35,
+        "reservoirs": 0,
+        "tanks": 1,
+        "pipes": 40,
+        "pumps": 0,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "msx-examples/Net3-Bio/net3-bio.inp",
+      "path": "owa/msx-examples/Net3-Bio/net3-bio.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/msx-examples/Net3-Bio/net3-bio.inp",
+      "sha256": "e59b2195138a4c6f8d6b62cfc58b054d2883b3b7c1dbfb8560c92bb14949a2b0",
+      "counts": {
+        "junctions": 92,
+        "reservoirs": 2,
+        "tanks": 3,
+        "pipes": 117,
+        "pumps": 2,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    },
+    {
+      "source": "owa",
+      "repository": "OpenWaterAnalytics/epanet-example-networks",
+      "revision": "4f0ceb2641c35adece59145881f10232c40c26b7",
+      "upstream_path": "msx-examples/Net3-NH2Cl/Net3-NH2CL.inp",
+      "path": "owa/msx-examples/Net3-NH2Cl/Net3-NH2CL.inp",
+      "url": "https://raw.githubusercontent.com/OpenWaterAnalytics/epanet-example-networks/4f0ceb2641c35adece59145881f10232c40c26b7/msx-examples/Net3-NH2Cl/Net3-NH2CL.inp",
+      "sha256": "e59b2195138a4c6f8d6b62cfc58b054d2883b3b7c1dbfb8560c92bb14949a2b0",
+      "counts": {
+        "junctions": 92,
+        "reservoirs": 2,
+        "tanks": 3,
+        "pipes": 117,
+        "pumps": 2,
+        "valves": 0
+      },
+      "valve_types": [],
+      "expected": "solved",
+      "reason": "Converged initial-state hydraulic snapshot; dynamic controls, EPS and water quality are outside this corpus test.",
+      "reference_expected": "match"
+    }
+  ],
+  "reference_description": "All original files are opened by the pinned EPANET 2.2 C API. Initial-time hydraulic outputs are compared with standalone staci -s. Unsupported, invalid and nonconvergent cases are recorded separately and never counted as numerical matches."
+}

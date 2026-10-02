@@ -252,3 +252,71 @@ python3 tests/plot_channel_profiles.py \
   --output tests/test-results/channel-network/channel-profile.svg \
   --pdf-output tests/test-results/channel-network/channel-profile.pdf
 ```
+
+### Public EPANET steady-snapshot regression corpus
+
+The normal CTest suite and portable Python runner include 97 public INP models (96 unchanged upstream files and one intentionally
+adapted physical Anytown model) from WNTR and OpenWaterAnalytics. These new cases run only
+`staci -s`, with isolated inputs and explicit expectations for convergence,
+compatibility rejection and known numerical limitations. The corpus spans
+one to 57,460 pipes and includes the standard Net1/2/3/6 and Kentucky networks,
+Anytown, Hanoi and targeted valve/pump/tank/control cases.
+
+```sh
+ctest --test-dir build -R 'public_epanet_networks|epanet_hydraulic_diagnostics' --output-on-failure
+```
+
+The report separates solved networks from diagnostic cases; a passing diagnostic
+case does not mean the network was solved. Compatibility errors identify the
+network, section, element, line and unsupported feature. Numerical failures
+report residuals, limits and worst node/link IDs. See
+[the corpus README](../tests/public_networks/README.md) and its manifest for
+provenance, exact expectations, snapshot limitations and report locations.
+
+Common GUI diagnostics and exit codes are documented in [diagnostics.md](diagnostics.md). See [error_classification.md](error_classification.md) for compatibility categories and remaining development work. The `application_diagnostics` CTest checks the shared protocol across all four executables.
+
+The public corpus includes [independent EPANET numerical verification](epanet_reference.md): configure `STACI_EPANET_LIBRARY` and run `public_epanet_reference` and `epanet_reference_units`. The strict initial-state comparison includes 88 matching networks, three reference input rejections and six unreliable references. `ky10` now matches; see [valve implementation and validation](epanet_valves.md) for the physical constraints behind the remaining failed solves.
+
+The [Anytown initialization/relaxation investigation](anytown_convergence.md) explains the original unavailable initial supply and unreliable nominal EPANET result. The [adapted physical model](anytown_physical_model.md) now converges and is checked by `epanet_physical_models`, including zero-speed HEAD/POWER shutdown and restart. wolf-3 is excluded; the reference extractor independently audits junction conservation.
+
+The `epanet_pressure_elements` CTest checks PSV/PBV operating states, emitter/PDA pressure laws, INP export round trips and changing-pressure EPS output against EPANET. Results from the implementation are retained in `tests/test-results/pressure-elements/`.
+
+## Chemical EPS and integration regressions (2026-10-02)
+
+The package audit reran the complete configured CTest suite successfully. All 97 public
+network hashes matched the manifest. See the audit record linked below for counts and build options. Expected rejection/partial-result tests
+validate diagnostics and do not establish numerical equivalence.
+
+`epanet_eps_chemical_reference` requires the official shared EPANET library and
+compares Net1, Net2 and Net2-CL2 across every configured report frame, including
+unchanged chemical tolerances. `epanet_water_age_model` additionally checks tank
+stored-mass dilution, outgoing concentration and isolated-tank reaction.
+
+`epanet_infeasible_valve_diagnostics` checks the three supply/regulation conflicts
+and the `io` power-pump dead end at 0.1 mm and 1e-12 m; expected errors are not
+equivalence passes. `python_cli_adapter` exercises the documented external-call
+example on steady/EPS success, invalid input and timeout. The separate MATLAB
+CLI adapter regression was run successfully in MATLAB R2026a on macOS, covering
+the same cases and paths with spaces:
+
+```matlab
+addpath('tests/matlab');
+test_staci_cli_adapter('/absolute/path/build/staci');
+```
+
+This standalone MATLAB test is additional to CTest. The optional MEX module was
+also built and all six `run_matlab_tests` interface tests passed in MATLAB R2026a.
+
+## JSON auxiliary inputs
+
+The suite includes `json_auxiliary_inputs`; the shared diagnostic regression
+checks the XML/JSON field diagnostic. The complete suite was rerun successfully
+during the [package audit](package_validation.md), including the independent
+EPANET reference tests.
+
+`json_auxiliary_inputs` compares seeded XML/JSON optimizer output, retains the
+legacy CSV regression, exercises JSON measurements and default discovery,
+case-insensitive extensions, invalid settings/measurements and `staci -i` JSON
+initialization. The initial-value regression also verifies that unknown IDs
+produce an input error, so a silently ignored `-i` cannot pass the test.
+See [JSON input formats](json_inputs.md) and [examples/config](../examples/config).

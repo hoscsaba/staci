@@ -1,4 +1,27 @@
 var searchData=
 [
-  ['ubuntu_0',['Debian or Ubuntu',['../index.html#autotoc_md5',1,'']]]
+  ['package_20validation_20—_202026_2010_2002_0',['Package validation — 2026-10-02',['../md_doc_2package__validation.html',1,'']]],
+  ['pbv_20emitters_20and_20pressure_20dependent_20demand_1',['PSV, PBV, emitters and pressure-dependent demand',['../md_doc_2epanet__pressure__elements.html',1,'']]],
+  ['pda_20support_2',['Historical first-error categories (before valve/emitter/PDA support)',['../md_doc_2error__classification.html#historical-first-error-categories-before-valveemitterpda-support',1,'']]],
+  ['period_20simulation_3',['Run an EPANET extended-period simulation',['../md_doc_2staci__usage.html#run-an-epanet-extended-period-simulation',1,'']]],
+  ['periods_20and_20chemistry_4',['Extended periods and chemistry',['../md_doc_2epanet__reference.html#extended-periods-and-chemistry',1,'']]],
+  ['physical_20anytown_20test_20model_5',['Physical Anytown test model',['../md_doc_2anytown__physical__model.html',1,'']]],
+  ['physical_20diagnostics_6',['Infeasible regulation and physical diagnostics',['../md_doc_2epanet__valves.html#infeasible-regulation-and-physical-diagnostics',1,'']]],
+  ['physical_20failures_20and_20integration_7',['Physical failures and integration',['../md_doc_2epanet__reference.html#physical-failures-and-integration',1,'']]],
+  ['precompiled_20executables_8',['Precompiled executables',['../index.html#precompiled-executables',1,'']]],
+  ['pressure_20dependent_20demand_9',['PSV, PBV, emitters and pressure-dependent demand',['../md_doc_2epanet__pressure__elements.html',1,'']]],
+  ['process_20alternative_10',['Validation and external-process alternative',['../dir_363c7dd63633bc0b67762e7ff7b5a8f6.html#validation-and-external-process-alternative',1,'']]],
+  ['process_20contract_11',['Process contract',['../md__r_e_a_d_m_e___d_e_v.html#process-contract',1,'']]],
+  ['programs_12',['programs',['../index.html#project-directories-and-launching-programs',1,'Project directories and launching programs'],['../index.html#standalone-programs',1,'Standalone programs']]],
+  ['project_20directories_20and_20launching_20programs_13',['Project directories and launching programs',['../index.html#project-directories-and-launching-programs',1,'']]],
+  ['property_14',['Read a property',['../md_doc_2staci__usage.html#read-a-property',1,'']]],
+  ['property_20and_20save_20a_20new_20network_15',['Modify a property and save a new network',['../md_doc_2staci__usage.html#modify-a-property-and-save-a-new-network',1,'']]],
+  ['prv_20fcv_20gpv_20implementation_20stage_16',['Historical PRV/FCV/GPV implementation stage',['../md_doc_2error__classification.html#historical-prvfcvgpv-implementation-stage',1,'']]],
+  ['psv_20pbv_20emitters_20and_20pressure_20dependent_20demand_17',['PSV, PBV, emitters and pressure-dependent demand',['../md_doc_2epanet__pressure__elements.html',1,'']]],
+  ['public_20epanet_20hydraulic_20regression_20corpus_18',['Public EPANET hydraulic regression corpus',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#public-epanet-hydraulic-regression-corpus',1,'']]],
+  ['public_20epanet_20steady_20snapshot_20regression_20corpus_19',['Public EPANET steady-snapshot regression corpus',['../md_doc_2testing.html#public-epanet-steady-snapshot-regression-corpus',1,'']]],
+  ['public_20network_20error_20classification_20',['Current public-network error classification',['../md_doc_2error__classification.html',1,'']]],
+  ['public_20networks_20and_20independent_20comparison_21',['Public networks and independent comparison',['../index.html#public-networks-and-independent-comparison',1,'']]],
+  ['pump_20speed_22',['Zero pump speed',['../md_doc_2anytown__physical__model.html#zero-pump-speed',1,'']]],
+  ['python_23',['Python',['../md__r_e_a_d_m_e___d_e_v.html#python',1,'']]]
 ];

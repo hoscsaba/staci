@@ -1,6 +1,9 @@
+#include "EpanetEmitter.h"
+#include "diagnostics.h"
 #include "epanet_extended_simulation.h"
 
 #include "Agelem.h"
+#include "Cso.h"
 #include "Csomopont.h"
 #include "EpanetPump.h"
 #include "JelleggorbesFojtas.h"
@@ -288,6 +291,11 @@ long long parse_time_seconds(const std::string &value) {
             break;
         begin = separator + 1;
     }
+    if (components.size() == 4 && components[3] == "00") {
+        diagnostics::warning("INPUT.LEGACY_TIME", "Time value '" + value +
+            "': redundant trailing zero field ignored, matching EPANET's first three time fields.");
+        components.resize(3);
+    }
     if (components.size() < 2 || components.size() > 3 ||
         components[0].empty() || components[1].empty() ||
         (components.size() == 3 && components[2].empty()))
@@ -409,13 +417,14 @@ double interpolate_curve(const std::vector<std::pair<double, double> > &points,
 double tank_volume_at_level(const TankState &tank, double level_m) {
     if (!tank.volume_curve.empty())
         return interpolate_curve(tank.volume_curve, level_m);
-    return tank.min_volume_m3 + tank.area_m2 * (level_m - tank.min_level_m);
+    const double minimum = tank.min_volume_m3 > 0.0 ? tank.min_volume_m3 : tank.area_m2 * tank.min_level_m;
+    return minimum + tank.area_m2 * (level_m - tank.min_level_m);
 }
 
 double tank_level_at_volume(const TankState &tank, double volume_m3) {
     if (tank.volume_curve.empty())
         return tank.min_level_m +
-            (volume_m3 - tank.min_volume_m3) / tank.area_m2;
+            (volume_m3 - (tank.min_volume_m3 > 0.0 ? tank.min_volume_m3 : tank.area_m2 * tank.min_level_m)) / tank.area_m2;
     auto upper_point = std::upper_bound(
         tank.volume_curve.begin(), tank.volume_curve.end(), volume_m3,
         [](double value, const std::pair<double, double> &point) {
@@ -436,7 +445,9 @@ double projected_tank_level(const TankState &tank, double elapsed_s) {
     const double volume = tank_volume_at_level(tank, tank.level_m) +
         tank.boundary->Get_Q() * elapsed_s;
     return std::max(tank.min_level_m, std::min(
-        tank.max_level_m, tank_level_at_volume(tank, volume)));
+        tank.max_level_m, tank.volume_curve.empty()
+            ? tank.level_m + tank.boundary->Get_Q() * elapsed_s / tank.area_m2
+            : tank_level_at_volume(tank, volume)));
 }
 
 std::string csv(const std::string &value) {
@@ -467,12 +478,109 @@ public:
         parse_options();
         parse_times();
         parse_patterns();
+        if (default_pattern_.empty() && patterns_.count("1")) default_pattern_ = "1";
         parse_demands();
         parse_quality();
         parse_boundaries();
         parse_controls();
         parse_rules();
         parse_status();
+    }
+
+    bool solve_initial(Staci &system) {
+        std::map<std::string, Csomopont *> nodes;
+        std::map<std::string, Agelem *> links;
+        for (auto *node : system.cspok) nodes[node->Get_nev()] = node;
+        for (auto *link : system.agelemek) links[link->Get_nev()] = link;
+        std::vector<ReservoirState> reservoirs;
+        for (auto reservoir : reservoir_definitions_) {
+            const auto found = links.find("EPANET_RESERVOIR_" + reservoir.id);
+            if (found != links.end()) { reservoir.boundary = found->second; reservoirs.push_back(reservoir); }
+        }
+        std::vector<TankState> tanks;
+        for (auto tank : tank_definitions_) {
+            const auto found = links.find("EPANET_TANK_" + tank.id);
+            if (found != links.end()) {
+                tank.boundary = found->second;
+                if (tank.boundary) tanks.push_back(tank);
+            }
+        }
+        apply_demands(nodes, 0); apply_reservoir_heads(reservoirs, 0);
+        apply_pump_speeds(links, 0); apply_time_controls(links, 0);
+        // A conservative connectivity audit: undirected reachability ignores
+        // one-way restrictions, so a missing path proves unavailable supply.
+        // A tank at minimum level can transmit supplied water but cannot be
+        // counted as an independent source of usable stored water.
+        std::map<std::string, std::vector<std::string>> adjacency;
+        for (const auto &item : links) {
+            auto *link = item.second;
+            if (link->Get_Csp_db() != 2 || !link->Is_enabled()) continue;
+            auto *pump = dynamic_cast<EpanetPumpConfigurable *>(link);
+            if (pump && pump->GetOperatingSpeed() <= 0.0) continue;
+            adjacency[link->Get_Cspe_Nev()].push_back(link->Get_Cspv_Nev());
+            adjacency[link->Get_Cspv_Nev()].push_back(link->Get_Cspe_Nev());
+        }
+        std::vector<std::string> reachable;
+        std::set<std::string> visited;
+        for (const auto &reservoir : reservoirs)
+            if (reservoir.boundary->Is_enabled() && visited.insert(reservoir.id).second)
+                reachable.push_back(reservoir.id);
+        for (const auto &tank : tanks)
+            if (tank.boundary->Is_enabled() && tank.level_m > tank.min_level_m + 1e-10
+                && visited.insert(tank.id).second) reachable.push_back(tank.id);
+        // Negative prescribed demands are external water injections.
+        for (const auto &item : nodes)
+            if (item.second->Get_fogy() < 0.0 && visited.insert(item.first).second)
+                reachable.push_back(item.first);
+        for (std::size_t i = 0; i < reachable.size(); ++i)
+            for (const auto &next : adjacency[reachable[i]])
+                if (visited.insert(next).second) reachable.push_back(next);
+        double unserved_mass_demand = 0.0;
+        std::size_t unserved_nodes = 0;
+        std::string first_unserved;
+        for (const auto &item : nodes)
+            if (item.second->Get_fogy() > 0.0 && !visited.count(item.first)) {
+                unserved_mass_demand += item.second->Get_fogy();
+                if (++unserved_nodes == 1) first_unserved = item.first;
+            }
+        if (unserved_nodes) {
+            std::ostringstream message;
+            message << "Network '" << filename_ << "' at t=0: " << unserved_nodes
+                    << " nodes with positive demand (" << unserved_mass_demand
+                    << " kg/s total; first node '" << first_unserved
+                    << "') have no path to a reservoir, a tank with usable stored water or a prescribed inflow. "
+                    << "Closed links and zero-speed pumps are excluded; tanks at their minimum level cannot supply water. "
+                    << "Check pump speed patterns, initial tank levels and source connectivity. "
+                    << "Initial guesses or relaxation cannot replace the missing supply.";
+            diagnostics::warning("EPANET.NO_AVAILABLE_SUPPLY", message.str());
+        }
+        system.ini();
+        bool converged = system.solve_system();
+        for (std::size_t i = 0; i <= controls_.size(); ++i) {
+            if (!apply_node_controls(links, nodes, tanks)) break;
+            converged = system.solve_system();
+        }
+        bool constrained = false;
+        for (auto &tank : tanks) {
+            const double flow = tank.boundary->Get_Q();
+            if ((tank.level_m <= tank.min_level_m + 1e-10 && flow < 0) ||
+                (tank.level_m >= tank.max_level_m - 1e-10 && flow > 0)) {
+                // Keep tank head fixed; close only links that would drain/fill
+                // beyond its limit. Disabling the boundary lets its node float.
+                for (const auto &item : links) {
+                    auto *link = item.second;
+                    if (link->Get_Csp_db() != 2) continue;
+                    const double signed_outflow = link->Get_Cspe_Nev() == tank.id ? link->Get_Q() :
+                        (link->Get_Cspv_Nev() == tank.id ? -link->Get_Q() : 0.0);
+                    if ((tank.level_m <= tank.min_level_m + 1e-10 && signed_outflow > 0) ||
+                        (tank.level_m >= tank.max_level_m - 1e-10 && signed_outflow < 0)) {
+                        link->Set_enabled(false); constrained = true;
+                    }
+                }
+            }
+        }
+        if (constrained) converged = system.solve_system();
+        return converged;
     }
 
     void run(Staci &system, const std::string &prefix) {
@@ -597,7 +705,7 @@ public:
             if (from == node_indices.end() || to == node_indices.end())
                 continue;
             const bool pipe = link->GetType() == "Cso";
-            const bool tcv = link->GetType() == "JelleggorbesFojtas";
+            const bool tcv = dynamic_cast<JelleggorbesFojtas*>(link) != nullptr;
             std::string output_type = upper(std::string(link->GetType()));
             if (pipe)
                 output_type = "PIPE";
@@ -653,6 +761,19 @@ public:
 
         std::unique_ptr<EpanetChemicalModel> chemical;
         if (quality_chemical_) {
+        for (const auto &record : records("MIXING"))
+            if (quality_chemical_ && record.fields.size() > 1 && upper(record.fields[1]) != "MIXED")
+                throw diagnostics::Error("EPANET.QUALITY_MIXING", "Tank '" + record.fields[0] +
+                    "': chemical EPS currently supports MIXED storage; requested " + record.fields[1] +
+                    " requires a different tank mixing model.", diagnostics::input_error);
+            for (const auto &record : records("REACTIONS")) {
+                if (record.fields.size() < 3) continue;
+                const auto option = upper(record.fields[0]);
+                const double value = parse_number(record.fields[2], "reaction option");
+                if ((option == "ORDER" && value != 1.0) ||
+                    ((option == "LIMITING" || option == "ROUGHNESS") && value != 0.0))
+                    throw diagnostics::Error("EPANET.QUALITY_REACTION", "Chemical EPS supports first-order reactions without limiting potential or roughness correlation. Unsupported [REACTIONS] option at line " + std::to_string(record.line_number) + ".");
+            }
             std::vector<EpanetChemicalNode> chemical_nodes;
             chemical_nodes.reserve(result_nodes.size());
             for (const EpsNodeInfo &node : result_nodes) {
@@ -661,11 +782,33 @@ public:
                     initial == initial_quality_kgm3_.end() ? 0.0 : initial->second,
                     node.type == "RESERVOIR"});
             }
+            for (const auto &tank : tanks) {
+                auto &node = chemical_nodes.at(node_indices.at(tank.id));
+                node.tank_volume_m3 = tank_volume_at_level(tank, tank.level_m);
+                const auto coefficient = tank_bulk_per_s_.find(tank.id);
+                node.tank_reaction_per_s = coefficient == tank_bulk_per_s_.end()
+                    ? global_bulk_per_s_ : coefficient->second;
+            }
+            double concentration_tolerance = concentration_to_si(0.01);
+            double viscosity = 1.1e-5 * 0.3048 * 0.3048;
+            double diffusivity = 1.3e-8 * 0.3048 * 0.3048;
+            for (const auto &record : records("OPTIONS")) {
+                if (record.fields.size() < 2) continue;
+                if (upper(record.fields[0]) == "TOLERANCE")
+                    concentration_tolerance = concentration_to_si(parse_number(record.fields[1], "quality tolerance"));
+                if (upper(record.fields[0]) == "VISCOSITY")
+                    viscosity *= parse_number(record.fields[1], "viscosity");
+                if (upper(record.fields[0]) == "DIFFUSIVITY")
+                    diffusivity *= parse_number(record.fields[1], "diffusivity");
+            }
+            if (!(viscosity > 0.0) || diffusivity < 0.0 || concentration_tolerance < 0.0)
+                throw diagnostics::Error("EPANET.QUALITY_OPTIONS", "Viscosity must be positive; diffusivity and quality tolerance must be non-negative.");
             std::vector<EpanetChemicalLink> chemical_links;
             chemical_links.reserve(result_links.size());
             for (const EpsLinkInfo &link : result_links) {
                 double volume = 0.0;
                 double reaction = 0.0;
+                double wall_mps = 0.0;
                 if (link.type == "PIPE" && std::isfinite(link.length_m) &&
                     std::isfinite(link.diameter_m) && link.length_m > 0.0 &&
                     link.diameter_m > 0.0) {
@@ -676,22 +819,19 @@ public:
                     const auto wall = pipe_wall_mps_.find(link.id);
                     reaction = bulk == pipe_bulk_per_s_.end()
                         ? global_bulk_per_s_ : bulk->second;
-                    const double wall_mps = wall == pipe_wall_mps_.end()
+                    wall_mps = wall == pipe_wall_mps_.end()
                         ? global_wall_mps_ : wall->second;
-                    reaction += 4.0 * wall_mps / link.diameter_m;
+
                 }
-                const double from = chemical_nodes[link.from_node].initial_concentration_kgm3;
                 const double to = chemical_nodes[link.to_node].initial_concentration_kgm3;
                 chemical_links.push_back(EpanetChemicalLink{
                     link.from_node, link.to_node, volume, reaction,
-                    0.5 * (from + to)});
+                    to, link.diameter_m, link.length_m, wall_mps, viscosity, diffusivity});
             }
             chemical = std::make_unique<EpanetChemicalModel>(
                 std::move(chemical_nodes), std::move(chemical_links),
-                static_cast<double>(quality_timestep_s_));
-            if (!tanks.empty())
-                warn("QUALITY", chemical_name_, 0,
-                     "Tank chemical storage is not yet represented; tank nodes use instantaneous junction mixing.");
+                static_cast<double>(quality_timestep_s_), concentration_tolerance);
+
         }
 
         std::ofstream node_output((prefix + "-nodes.csv").c_str(), std::ios::trunc);
@@ -733,8 +873,47 @@ public:
 
         std::size_t state_count = 0;
         std::size_t failed_count = 0;
+        std::map<Agelem *, bool> tank_closed_links;
+        const std::size_t control_iterations =
+            std::max<std::size_t>(1, controls_.size() + 1);
+        auto settle_tank_link_limits = [&](bool &converged) {
+            for (std::size_t pass = 0; pass < system.agelemek.size(); ++pass) {
+                bool constrained_links = false;
+                for (const TankState &tank : tanks) {
+                    const bool at_min = tank.level_m <= tank.min_level_m + 1.0e-10;
+                    const bool at_max = tank.level_m >= tank.max_level_m - 1.0e-10;
+                    if (!at_min && !at_max) continue;
+                    for (Agelem *link : system.agelemek) {
+                        if (link->Get_Csp_db() != 2 || !link->Is_enabled() ||
+                            link->Get_nev().rfind("EPANET_TANK_", 0) == 0 ||
+                            link->Get_nev().rfind("EPANET_RESERVOIR_", 0) == 0)
+                            continue;
+                        const bool from_tank = link->Get_Cspe_Nev() == tank.id;
+                        const bool to_tank = link->Get_Cspv_Nev() == tank.id;
+                        if (!from_tank && !to_tank) continue;
+                        const double flow = link->Get_Q();
+                        const bool into_tank = from_tank ? flow < 0.0 : flow > 0.0;
+                        if (!((at_max && into_tank) || (at_min && !into_tank)))
+                            continue;
+                        tank_closed_links.emplace(link, link->Is_enabled());
+                        link->Set_enabled(false);
+                        constrained_links = true;
+                    }
+                }
+                if (!constrained_links) break;
+                converged = system.solve_system() && converged;
+                for (std::size_t control_pass = 0;
+                     control_pass < control_iterations; ++control_pass) {
+                    if (!apply_node_controls(links, nodes, tanks)) break;
+                    converged = system.solve_system() && converged;
+                }
+            }
+        };
         long long time_s = 0;
         while (time_s <= duration_s_) {
+            for (const auto &entry : tank_closed_links)
+                entry.first->Set_enabled(entry.second);
+            tank_closed_links.clear();
             apply_demands(nodes, time_s);
             apply_reservoir_heads(reservoirs, time_s);
             apply_pump_speeds(links, time_s);
@@ -745,8 +924,6 @@ public:
             apply_time_controls(links, time_s);
 
             bool converged = system.solve_system();
-            const std::size_t control_iterations =
-                std::max<std::size_t>(1, controls_.size() + 1);
             std::size_t control_iteration = 0;
             for (; control_iteration < control_iterations; ++control_iteration) {
                 if (!apply_node_controls(links, nodes, tanks))
@@ -757,17 +934,7 @@ public:
                 warn("CONTROLS", "", 0,
                      "Node-based controls did not reach a stable state; the last state was retained.");
 
-            bool constrained_tank = false;
-            for (TankState &tank : tanks) {
-                const double flow = tank.boundary->Get_Q();
-                if ((tank.level_m <= tank.min_level_m + 1.0e-10 && flow < 0.0) ||
-                    (tank.level_m >= tank.max_level_m - 1.0e-10 && flow > 0.0)) {
-                    tank.boundary->Set_enabled(false);
-                    constrained_tank = true;
-                }
-            }
-            if (constrained_tank)
-                converged = system.solve_system() && converged;
+            settle_tank_link_limits(converged);
             ++state_count;
             if (!converged)
                 ++failed_count;
@@ -789,8 +956,7 @@ public:
                     std::vector<double> external(result_nodes.size(), 0.0);
                     std::vector<EpanetChemicalSource> sources(result_nodes.size());
                     for (std::size_t index = 0; index < system.cspok.size(); ++index)
-                        external[index] = std::max(
-                            0.0, -system.cspok[index]->Get_dprop("demand") / 3600.0);
+                        external[index] = -system.cspok[index]->Get_dprop("demand") / 3600.0;
                     for (const auto &entry : chemical_sources_) {
                         const auto node = node_indices.find(entry.first);
                         if (node == node_indices.end())
@@ -823,6 +989,7 @@ public:
             const long long control_event_s = next_time_control_event(time_s);
             if (control_event_s > time_s && control_event_s <= duration_s_)
                 next_state_s = std::min(next_state_s, control_event_s);
+            next_state_s = next_tank_event(tanks, time_s, next_state_s);
             if (!rule_engine_.empty())
                 next_state_s = scan_rules(links, nodes, tanks, time_s, next_state_s);
             const long long step_s = next_state_s - time_s;
@@ -841,8 +1008,7 @@ public:
                 std::vector<double> external(result_nodes.size(), 0.0);
                 std::vector<EpanetChemicalSource> sources(result_nodes.size());
                 for (std::size_t index = 0; index < system.cspok.size(); ++index)
-                    external[index] = std::max(
-                        0.0, -system.cspok[index]->Get_dprop("demand") / 3600.0);
+                    external[index] = -system.cspok[index]->Get_dprop("demand") / 3600.0;
                 for (const auto &entry : chemical_sources_) {
                     const auto node = node_indices.find(entry.first);
                     if (node == node_indices.end())
@@ -888,6 +1054,11 @@ public:
         else
         std::cout << "Results: " << prefix
                       << ".meta.json and SI CSV files (HDF5 unavailable).\n";
+        if (failed_count)
+            throw diagnostics::Error("EPANET.EPS_PARTIAL_FAILURE", "Network '" + filename_ +
+                "': " + std::to_string(failed_count) + " of " + std::to_string(state_count) +
+                " hydraulic states failed. Partial results were retained at '" + prefix +
+                "'. Inspect HYDRAULICS diagnostics for affected elements and residuals.", diagnostics::partial_failure);
     }
 
     void run_steady_quality(Staci &system, const std::string &prefix,
@@ -1205,6 +1376,7 @@ private:
     std::map<std::string, std::vector<DemandComponent> > demands_;
     std::map<std::string, double> initial_quality_kgm3_;
     std::map<std::string, ChemicalSourceDefinition> chemical_sources_;
+    std::map<std::string, double> tank_bulk_per_s_;
     std::map<std::string, double> pipe_bulk_per_s_;
     std::map<std::string, double> pipe_wall_mps_;
     std::vector<TankState> tank_definitions_;
@@ -1273,7 +1445,7 @@ private:
                 continue;
             const std::string key = upper(record.fields[0]);
             if (key == "UNITS")
-                flow_units_ = upper(record.fields[1]);
+                flow_units_ = upper(record.fields[1]) == "SI" ? "LPS" : upper(record.fields[1]);
             else if (key == "PATTERN")
                 default_pattern_ = record.fields[1];
             else if (record.fields.size() > 2 && key == "DEMAND" &&
@@ -1284,12 +1456,13 @@ private:
             else if (key == "QUALITY") {
                 const std::string mode = upper(record.fields[1]);
                 quality_age_ = mode == "AGE";
-                quality_chemical_ = mode == "CHEMICAL";
+                quality_chemical_ = mode != "NONE" && mode != "AGE" && mode != "TRACE";
                 if (quality_chemical_) {
-                    chemical_name_ = record.fields.size() > 2
-                        ? record.fields[2] : "CHEMICAL";
-                    chemical_units_ = record.fields.size() > 3
-                        ? record.fields[3] : "mg/L";
+                    const std::size_t name_index = mode == "CHEMICAL" ? 2 : 1;
+                    chemical_name_ = record.fields.size() > name_index
+                        ? record.fields[name_index] : "CHEMICAL";
+                    chemical_units_ = record.fields.size() > name_index + 1
+                        ? record.fields[name_index + 1] : "mg/L";
                 }
             }
             else if (record.fields.size() > 2 && key == "SPECIFIC" &&
@@ -1308,25 +1481,25 @@ private:
                 continue;
             const std::string first = upper(record.fields[0]);
             if (first == "DURATION")
-                duration_s_ = parse_time_seconds(record.fields[1]);
+                duration_s_ = parse_duration_seconds(record.fields, 1, "[TIMES]");
             else if (record.fields.size() > 2 && first == "HYDRAULIC" &&
                      upper(record.fields[1]) == "TIMESTEP")
-                hydraulic_step_s_ = parse_time_seconds(record.fields[2]);
+                hydraulic_step_s_ = parse_duration_seconds(record.fields, 2, "[TIMES]");
             else if (record.fields.size() > 2 && first == "PATTERN" &&
                      upper(record.fields[1]) == "TIMESTEP")
-                pattern_step_s_ = parse_time_seconds(record.fields[2]);
+                pattern_step_s_ = parse_duration_seconds(record.fields, 2, "[TIMES]");
             else if (record.fields.size() > 2 && first == "PATTERN" &&
                      upper(record.fields[1]) == "START")
-                pattern_start_s_ = parse_time_seconds(record.fields[2]);
+                pattern_start_s_ = parse_duration_seconds(record.fields, 2, "[TIMES]");
             else if (record.fields.size() > 2 && first == "REPORT" &&
                      upper(record.fields[1]) == "TIMESTEP")
-                report_step_s_ = parse_time_seconds(record.fields[2]);
+                report_step_s_ = parse_duration_seconds(record.fields, 2, "[TIMES]");
             else if (record.fields.size() > 2 && first == "REPORT" &&
                      upper(record.fields[1]) == "START")
-                report_start_s_ = parse_time_seconds(record.fields[2]);
+                report_start_s_ = parse_duration_seconds(record.fields, 2, "[TIMES]");
             else if (record.fields.size() > 2 && first == "QUALITY" &&
                      upper(record.fields[1]) == "TIMESTEP")
-                quality_timestep_s_ = parse_time_seconds(record.fields[2]);
+                quality_timestep_s_ = parse_duration_seconds(record.fields, 2, "[TIMES]");
             else if (record.fields.size() > 2 && first == "RULE" &&
                      upper(record.fields[1]) == "TIMESTEP")
                 rule_step_s_ = parse_duration_seconds(record.fields, 2, "[TIMES] RULE TIMESTEP");
@@ -1450,6 +1623,8 @@ private:
                 global_bulk_per_s_ = value / 86400.0;
             else if (first == "GLOBAL" && second == "WALL")
                 global_wall_mps_ = length_to_metres(value, us_units(flow_units_)) / 86400.0;
+            else if (first == "TANK")
+                tank_bulk_per_s_[record.fields[1]] = value / 86400.0;
             else if (first == "BULK")
                 pipe_bulk_per_s_[record.fields[1]] = value / 86400.0;
             else if (first == "WALL")
@@ -1460,9 +1635,6 @@ private:
             std::abs(wall_order_ - 1.0) > 1.0e-12)
             warn("REACTIONS", "ORDER", 0,
                  "STACI chemical EPS currently applies first-order bulk and wall reactions.");
-        if (!records("MIXING").empty())
-            warn("MIXING", "", records("MIXING").front().line_number,
-                 "Tank chemical mixing is not yet supported; junction-style instantaneous mixing is used.");
     }
 
     void parse_boundaries() {
@@ -1551,7 +1723,7 @@ private:
                 action = ControlAction::Active;
             else {
                 setting = parse_number(record.fields[2], "[CONTROLS] link setting");
-                if (setting < 0.0) {
+                if (setting < 0.0 && !pressure_valve_setting(record.fields[1])) {
                     warn("CONTROLS", record.fields[1], record.line_number,
                          "Negative link setting was ignored.");
                     continue;
@@ -1722,6 +1894,13 @@ private:
         return premise;
     }
 
+    bool pressure_valve_setting(const std::string& id) const {
+        for(const auto& valve:records("VALVES"))
+            if(valve.fields.size()>4 && valve.fields[0]==id)
+                return upper(valve.fields[4])=="PRV" || upper(valve.fields[4])=="PSV";
+        return false;
+    }
+
     RuleAction parse_rule_action(const Record &record) const {
         if (record.fields.size() != 6 ||
             (upper(record.fields[4]) != "IS" && record.fields[4] != "="))
@@ -1740,8 +1919,8 @@ private:
         if (value == "ACTIVE")
             return RuleAction{record.fields[2], ControlAction::Active, 0.0, record.line_number};
         const double setting = parse_number(record.fields[5], "[RULES] action setting");
-        if (setting < 0.0)
-            throw std::runtime_error("Negative rule settings are not supported.");
+        if (setting < 0.0 && !pressure_valve_setting(record.fields[2]))
+            throw std::runtime_error("Negative rule settings are supported only for PRV/PSV pressure valves.");
         return RuleAction{record.fields[2], ControlAction::Setting, setting,
                           record.line_number};
     }
@@ -1825,7 +2004,7 @@ private:
                 initial_status_[record.fields[0]] = RuleStatus::Active;
             else {
                 const double setting = parse_number(record.fields[1], "[STATUS]");
-                if (setting < 0.0)
+                if (setting < 0.0 && !pressure_valve_setting(record.fields[0]))
                     warn("STATUS", record.fields[0], record.line_number,
                          "Negative link settings are not supported.");
                 else
@@ -1919,7 +2098,7 @@ private:
         } else if (control.action == ControlAction::Active) {
             if (valve == nullptr) {
                 warn(section, control.link_id, control.line_number,
-                     "ACTIVE status requires an imported EPANET TCV; the control was ignored.");
+                     "ACTIVE status requires an imported EPANET valve; the control was ignored.");
                 return false;
             }
             valve->SetEpanetTcvStatus(EpanetTcvStatus::Active);
@@ -2062,8 +2241,10 @@ private:
                             : (status == EpanetTcvStatus::Open ? RuleStatus::Open
                                                                : RuleStatus::Closed);
                     } else {
-                        value = link->second->Is_enabled() ? RuleStatus::Open
-                                                           : RuleStatus::Closed;
+                        const bool open = is_pump(link->second)
+                            ? link->second->Get_dprop("status") != 0.0
+                            : link->second->Is_enabled();
+                        value = open ? RuleStatus::Open : RuleStatus::Closed;
                     }
                     return true;
                 };
@@ -2122,6 +2303,37 @@ private:
         return next;
     }
 
+    long long next_tank_event(const std::vector<TankState> &tanks,
+                              long long time_s, long long next_s) const {
+        for (const TankState &tank : tanks) {
+            const double q = tank.boundary->Get_Q();
+            if (std::abs(q) < 1.0e-12) continue;
+            const double volume = tank_volume_at_level(tank, tank.level_m);
+            auto consider = [&](double level) {
+                const double dt = (tank.volume_curve.empty() ? tank.area_m2 * (level - tank.level_m)
+                    : tank_volume_at_level(tank, level) - volume) / q;
+                if (dt > 0.0) {
+                    // Rounding to nearest can place the event just before the
+                    // tank reaches its limit. The remaining fractional second
+                    // is then lost at the next event check, delaying the
+                    // hydraulic status change until the next full time step.
+                    const long long seconds = static_cast<long long>(std::ceil(dt - 1.0e-9));
+                    if (seconds > 0) next_s = std::min(next_s, time_s + seconds);
+                }
+            };
+            consider(q > 0.0 ? tank.max_level_m : tank.min_level_m);
+            for (const SimpleControl &control : controls_) {
+                if (control.node_id != tank.id) continue;
+                if ((control.trigger == ControlTrigger::NodeAbove && q > 0.0 &&
+                     tank.level_m < control.threshold_si) ||
+                    (control.trigger == ControlTrigger::NodeBelow && q < 0.0 &&
+                     tank.level_m > control.threshold_si))
+                    consider(control.threshold_si);
+            }
+        }
+        return next_s;
+    }
+
     bool apply_node_controls(const std::map<std::string, Agelem *> &links,
                              const std::map<std::string, Csomopont *> &nodes,
                              const std::vector<TankState> &tanks) {
@@ -2164,8 +2376,18 @@ private:
                 value = node->second->Get_p();
             }
 
-            const bool condition = control.trigger == ControlTrigger::NodeBelow
+            bool condition = control.trigger == ControlTrigger::NodeBelow
                 ? value < control.threshold_si : value > control.threshold_si;
+            if (level != levels.end()) {
+                const auto tank = std::find_if(tanks.begin(), tanks.end(),
+                    [&](const TankState &item) { return item.id == control.node_id; });
+                const double volume = tank_volume_at_level(*tank, value);
+                const double target = tank_volume_at_level(*tank, control.threshold_si);
+                // EPANET allows one second of flow at rounded events.
+                const double allowance = std::abs(tank->boundary->Get_Q());
+                condition = control.trigger == ControlTrigger::NodeBelow
+                    ? volume <= target + allowance : volume >= target - allowance;
+            }
             if (condition)
                 apply_control_action(control, links);
         }
@@ -2192,7 +2414,9 @@ private:
         for (TankState &tank : tanks) {
             const double next_volume = tank_volume_at_level(tank, tank.level_m) +
                 tank.boundary->Get_Q() * step_s;
-            const double next = tank_level_at_volume(tank, next_volume);
+            const double next = tank.volume_curve.empty()
+                ? tank.level_m + tank.boundary->Get_Q() * step_s / tank.area_m2
+                : tank_level_at_volume(tank, next_volume);
             if (next < tank.min_level_m) {
                 tank.level_m = tank.min_level_m;
                 warn("TANKS", tank.id, 0, "Minimum level reached; level was clamped.");
@@ -2230,13 +2454,17 @@ private:
         frame.iterations = 0; // The legacy solver does not expose this counter yet.
         const double missing = std::numeric_limits<double>::quiet_NaN();
         std::map<std::string, double> total_head;
+        std::map<std::string,double> external_flows;
+        for(auto* edge:system.agelemek) if(edge->Get_Csp_db()==1) external_flows[edge->Get_Cspe_Nev()]+=edge->Get_Q();
         for (std::size_t index = 0; index < system.cspok.size(); ++index) {
             Csomopont *node = system.cspok[index];
             const double head = node->Get_p() + node->Get_h();
             total_head[node->Get_nev()] = head;
             frame.node_head_m.push_back(head);
             frame.node_pressure_head_m.push_back(head - node_info[index].elevation_m);
-            frame.node_demand_m3s.push_back(node->Get_dprop("demand") / 3600.0);
+            double demand=node->DeliveredDemand()/node->Get_dprop("ro");
+            demand+=external_flows[node->Get_nev()];
+            frame.node_demand_m3s.push_back(demand);
             frame.node_water_age_s.push_back(
                 node_age_s.size() == system.cspok.size() ? node_age_s[index] : missing);
             frame.node_chlorine_kgm3.push_back(
@@ -2256,6 +2484,14 @@ private:
                 total_head[link->Get_Cspe_Nev()] - total_head[link->Get_Cspv_Nev()]);
             if (is_pump(link))
                 frame.link_status.push_back(link->Get_dprop("status") != 0.0 ? 1 : 0);
+            else if (const auto *pipe = dynamic_cast<const Cso *>(link);
+                     pipe != nullptr && pipe->IsCheckValve()) {
+                const bool closed_against_flow = flow <= 0.0 &&
+                    total_head[link->Get_Cspe_Nev()] <=
+                    total_head[link->Get_Cspv_Nev()];
+                frame.link_status.push_back(
+                    link->Is_enabled() && !closed_against_flow ? 1 : 0);
+            }
             else
                 frame.link_status.push_back(link->Is_enabled() ? 1 : 0);
             frame.link_water_age_s.push_back(
@@ -2323,6 +2559,11 @@ private:
 };
 
 } // namespace
+
+bool solve_epanet_initial_hydraulics(Staci &system, const std::string &filename) {
+    SimulationModel model(filename);
+    return model.solve_initial(system);
+}
 
 EpanetExtendedSimulation::EpanetExtendedSimulation(
     const std::string &input_filename, const std::string &output_prefix)

@@ -1,3 +1,5 @@
+#include "EpanetEmitter.h"
+#include "EpanetValve.h"
 #include "epanet_writer.h"
 
 #include "Agelem.h"
@@ -282,15 +284,21 @@ void EpanetWriter::write(const std::string &filename,
             ExportedPump{link_id, edge, configuration, curve_pump, curve_id});
     }
 
+    std::set<std::string> used_curve_ids;
+    for(const auto& pump : exported_pumps) {
+        if(!pump.curve_id.empty()) used_curve_ids.insert(pump.curve_id);
+        if(pump.configuration) used_curve_ids.insert(pump.configuration->GetEpanetPumpMetadata().efficiency_curve_id);
+    }
     struct ExportedTcv {
         std::string id;
         JelleggorbesFojtas *valve;
+        std::string curve_id;
     };
     std::vector<ExportedTcv> exported_tcvs;
     output << "\n[VALVES]\n;ID\tNode1\tNode2\tDiameter\tType\tSetting\tMinorLoss\n";
     for (Agelem *edge : edges) {
         auto *valve = dynamic_cast<JelleggorbesFojtas *>(edge);
-        if (valve == nullptr || !valve->CanExportAsEpanetTcv())
+        if (valve == nullptr || (!dynamic_cast<EpanetValve*>(edge) && !valve->CanExportAsEpanetTcv()))
             continue;
         const std::string from = edge->Get_Cspe_Nev();
         const std::string to = edge->Get_Cspv_Nev();
@@ -302,14 +310,26 @@ void EpanetWriter::write(const std::string &filename,
         const std::string link_id = safe_id(edge->Get_nev(), used_link_ids);
         const double diameter_mm =
             std::sqrt(4.0 * edge->Get_Aref() / 3.14159265358979323846) * 1000.0;
+        std::string gpv_curve_id;
+        if(auto* control=dynamic_cast<EpanetValve*>(edge))
+            if(!control->curve_id().empty()) gpv_curve_id=safe_id("STACI_GPV_"+link_id,used_curve_ids);
         output << link_id << '\t' << node_ids[from] << '\t' << node_ids[to]
-               << '\t' << diameter_mm << "\tTCV\t"
-               << valve->GetEpanetTcvSetting() << '\t'
-               << valve->GetEpanetTcvMinorLoss() << '\n';
-        exported_tcvs.push_back(ExportedTcv{link_id, valve});
+               << '\t' << diameter_mm << '\t';
+        if(auto* control=dynamic_cast<EpanetValve*>(edge)) {
+            output << control->valve_type() << '\t';
+            if(control->curve_id().empty()) output << control->setting_si() * (std::string(control->valve_type())=="FCV" ? 1000.0 : 1.0);
+            else output << gpv_curve_id;
+        } else output << "TCV\t" << valve->GetEpanetTcvSetting();
+        output << '\t' << valve->GetEpanetTcvMinorLoss() << '\n';
+        exported_tcvs.push_back(ExportedTcv{link_id, valve, gpv_curve_id});
     }
 
     output << "\n[CURVES]\n;ID\tFlow\tHead\n";
+    for(const auto& item : exported_tcvs)
+        if(auto* valve=dynamic_cast<EpanetValve*>(item.valve))
+            if(!valve->curve_id().empty())
+                for(const auto& point : valve->curve_points())
+                    output << item.curve_id << '\t' << point.first*1000.0 << '\t' << point.second << '\n';
     std::set<std::string> written_curve_ids;
     for (const ExportedPump &pump : exported_pumps) {
         if (pump.curve_pump == nullptr)
@@ -400,6 +420,7 @@ void EpanetWriter::write(const std::string &filename,
             output << pump.id << '\t' << metadata->initial_setting << '\n';
     }
     for (const ExportedTcv &tcv : exported_tcvs) {
+        if(auto* valve=dynamic_cast<EpanetValve*>(tcv.valve)) if(!valve->fixed_status()) continue;
         const EpanetTcvStatus status = tcv.valve->GetEpanetTcvStatus();
         if (status == EpanetTcvStatus::Closed)
             output << tcv.id << "\tClosed\n";
@@ -475,8 +496,8 @@ void EpanetWriter::write(const std::string &filename,
                           << "). Only a constant non-negative STACI loss curve can be exported "
                           << "losslessly as an EPANET TCV.\n";
         } else if (type != "Cso" && type != "Szivattyu" &&
-                   type != "EpanetPowerPump" && type != "KonstNyomas" &&
-                   type != "Vegakna") {
+                   type != "EpanetValve" && type != "EpanetPowerPump" && type != "KonstNyomas" &&
+                   type != "Vegakna" && type != "EpanetEmitter") {
             std::cerr << "WARNING [EPANET][EXPORT][" << edge->Get_nev() << "]: STACI type '"
                       << type << "' has no lossless EPANET mapping and was skipped.\n";
         }
@@ -495,8 +516,22 @@ void EpanetWriter::write(const std::string &filename,
              node->GetEpanetInitialQuality().mode != "NONE"))
             quality_metadata = &node->GetEpanetInitialQuality();
     }
+    double emitter_exponent=0.5;bool have_emitter=false;
+    output << "\n[EMITTERS]\n";
+    for(auto* edge:edges) if(auto* emitter=dynamic_cast<EpanetEmitter*>(edge)) {
+        if(have_emitter && emitter_exponent!=emitter->Get_dprop("exponent")) throw std::runtime_error("EPANET export requires one common emitter exponent.");
+        have_emitter=true;emitter_exponent=emitter->Get_dprop("exponent");
+        output << node_ids.at(emitter->Get_Cspe_Nev()) << '\t' << (emitter->Is_enabled()?emitter->Get_dprop("coefficient")*1000:0) << '\n';
+    }
     output << "\n[OPTIONS]\nUNITS\tLPS\nHEADLOSS\t"
            << (headloss == "HW" ? "H-W" : "D-W") << '\n';
+    if(have_emitter) output << "EMITTER EXPONENT\t" << emitter_exponent << '\n';
+    const Csomopont* pressure_model=nullptr;
+    for(auto* node:nodes) if(node->HasPressureDemand()) {
+        if(pressure_model && (pressure_model->MinimumPressure()!=node->MinimumPressure() || pressure_model->RequiredPressure()!=node->RequiredPressure() || pressure_model->PressureExponent()!=node->PressureExponent())) throw std::runtime_error("EPANET export requires common PDA settings for all junctions.");
+        pressure_model=node;
+    }
+    if(pressure_model) output << "DEMAND MODEL\tPDA\nMINIMUM PRESSURE\t" << pressure_model->MinimumPressure() << "\nREQUIRED PRESSURE\t" << pressure_model->RequiredPressure() << "\nPRESSURE EXPONENT\t" << pressure_model->PressureExponent() << '\n';
     if (quality_metadata == nullptr) {
         output << "QUALITY\tCHEMICAL\tSTACI\tmg/L\n";
     } else if (quality_metadata->mode == "CHEMICAL") {
@@ -586,8 +621,16 @@ void EpanetWriter::write_modified_copy(const std::string &input_filename,
     } else if (property == "tcv_setting") {
         target_section = "VALVES";
         target_field = 5;
-        if (value_si < 0.0)
-            throw std::runtime_error("TCV setting cannot be negative.");
+        bool pressure_valve=false;
+        std::string scan_section;
+        for(const auto& source_line:lines) {
+            const auto data=trim(source_line.substr(0,source_line.find(';')));
+            if(!data.empty() && data.front()=='[') {scan_section=upper(trim(data.substr(1,data.size()-2)));continue;}
+            const auto row=fields(data);
+            if(scan_section=="VALVES" && row.size()>4 && row[0]==element_id) pressure_valve=upper(row[4])=="PRV" || upper(row[4])=="PSV";
+        }
+        if (value_si < 0.0 && !pressure_valve)
+            throw std::runtime_error("Negative valve settings are supported only for PRV/PSV pressure settings.");
     } else if (property == "tcv_minor_loss") {
         target_section = "VALVES";
         target_field = 6;

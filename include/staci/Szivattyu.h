@@ -9,6 +9,8 @@ private:
 	double mer_szorzo;
 	double operating_speed;
 	EpanetPumpMetadata metadata;
+    bool hydraulic_closed_ = false;
+    bool reverse_closed(const vector<double>& state);
 	double BasePumpCharCurve(double flow_m3s);
 	double BasePumpCharCurveDerivative(double flow_m3s) const;
 public:
