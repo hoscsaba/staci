@@ -19,6 +19,16 @@ ctest --test-dir build --output-on-failure
 The test configurations use very small populations and generation counts; they
 verify integration and file output, not optimization quality.
 
+`calibration_state_and_measurements` also checks repeated and interleaved
+candidate evaluations, tank storage balance and agreement between solved heads
+and tank levels, with both zero and nonzero `Start_of_Periods`. It verifies
+that malformed node/pool CSV measurements produce exit code 2 and an informative
+`INPUT.CONFIG` diagnostic. Run this regression separately with:
+
+```bash
+ctest --test-dir build -R calibration_state_and_measurements --output-on-failure
+```
+
 The focused steady-quality checks can be run separately:
 
 ```bash

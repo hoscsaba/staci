@@ -61,6 +61,18 @@ at least `Start_of_Periods + Num_of_Periods` values are required. JSON has no
 trailing empty CSV column. Select it with `"sollwert_dfile": "targets.json"`.
 XML settings may reference JSON measurements and JSON settings may reference CSV.
 
+Selected CSV values must be finite numbers. Empty cells, nonnumeric text,
+trailing junk, `nan`, `inf` and out-of-range values are rejected with exit code
+2 and an `INPUT.CONFIG` diagnostic identifying the file, measurement row,
+element ID and zero-based period. Surrounding whitespace and scientific notation
+are accepted; invalid measurements are never silently replaced with zero.
+
+For multi-period calibration, each candidate starts with the measured initial
+pool levels. Each following period's pool level is calculated from that
+candidate's preceding solved flow and `dt`, before solving the new period.
+`Start_of_Periods` selects the input window; storage updates still begin with
+the second period within that window.
+
 ## Hydraulic initial values
 
 ```sh

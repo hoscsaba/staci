@@ -156,6 +156,7 @@ Process contract</h1>
 <div class="line">  --head-tolerance-m 0.0001 --mass-tolerance-kg-s 1e-8 --max-iterations 1000</div>
 </div><!-- fragment --><p>The INP default head-equation tolerance is 0.1 mm <b>RMS residual</b>, not a bound on every head value or on the difference from EPANET. Explicit SPR settings are retained unless overridden. Reference tests use a stricter profile.</p>
 <p>Auxiliary files also have JSON variants: optimizer settings, calibration measurements, <span class="tt">staci -i</span> initial values, flushing configuration and hydrant lists. See <a class="el" href="md_doc_2json__inputs.html" title="JSON auxiliary inputs">JSON input formats</a> for schemas, units and examples. Network definitions remain SPR/XML or EPANET INP.</p>
+<p>Calibration CSV measurements are checked as finite numbers in the selected period window. Invalid cells return exit code 2 and <span class="tt">INPUT.CONFIG</span> with the file, measurement row, element ID and zero-based period; clients must not treat these runs as fitted results. See the <a class="el" href="md_doc_2json__inputs.html#calibration-measurements" title="Calibration measurements">measurement contract</a>measurement contract for the multi-period pool-state update convention.</p>
 <h1 class="doxsection"><a class="anchor" id="completion-and-errors"></a>
 Completion and errors</h1>
 <table class="markdownTable">

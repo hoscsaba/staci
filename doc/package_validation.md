@@ -7,7 +7,7 @@ These results do not certify Windows/Linux builds or full-corpus EPS equivalence
 
 | Check | Result |
 |---|---|
-| Complete CTest suite, including optional C++ EPANET EPS example | **84 passed, 0 failed, 0 skipped** |
+| Complete CTest suite, including optional C++ EPANET EPS example and calibration regression | **85 passed, 0 failed, 0 skipped** |
 | Portable `tests/run_tests.py` with required independent reference | **46 passed, 0 failed** |
 | Large native SPR solves omitted by the portable runner's default size limit | **2 passed**, exit 0 and `OK` markers |
 | MATLAB MEX interface | **6 passed, 0 failed, 0 incomplete** |
@@ -17,7 +17,9 @@ These results do not certify Windows/Linux builds or full-corpus EPS equivalence
 | Maintained Markdown links and JSON examples | Local file links resolve; example JSON parses |
 | Generated HTML/API documentation | Regenerated with Doxygen 1.17.0 from current sources and guides |
 
-The extra C++ toolkit example raises the configured CTest count from 83 to 84.
+The extra C++ toolkit example and calibration regression raise the configured
+CTest count from 83 to 85. The full CTest suite was rerun after the calibration
+fixes below; the other checks retain their results from the earlier package audit.
 Python integration, JSON auxiliary inputs, common application diagnostics,
 optimization, hydraulic/quality models and independent comparisons are included
 in CTest. Expected diagnostic failures are regression passes, not solved models.
@@ -28,6 +30,18 @@ the corpus and original models were preserved.
 
 ## Fixes made during this audit
 
+- Corrected multi-period calibration tank updates: each candidate resets its
+  measured initial levels and updates later levels from its own preceding
+  solved flows before solving the next period. This also fixes windows with
+  nonzero `Start_of_Periods`. A reproduced history-dependent objective returned
+  approximately 81.238 on the first evaluation and 81.041 on the second before
+  the fix; the new regression requires repeated/interleaved evaluations to agree
+  within 1e-7 and checks tank storage balance and hydraulic boundary consistency.
+- Replaced silent CSV `atof` conversion with finite-number validation for the
+  selected measurement window. Invalid node or pool values now return exit code
+  2 and `INPUT.CONFIG` identifying the file, measurement row, element and period.
+  Regression cases cover empty/nonnumeric values, trailing junk, NaN, infinity
+  and overflow, plus valid whitespace/scientific notation.
 - Linked the optional `staci_matlab_core` target to
   `nlohmann_json::nlohmann_json`. A clean MEX build previously failed to find the
   JSON header even though ordinary application builds succeeded.

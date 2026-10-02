@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Check  </th><th class="markdownTableHeadNone">Result  </th></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone">Complete CTest suite, including optional C++ EPANET EPS example  </td><td class="markdownTableBodyNone"><b>84 passed, 0 failed, 0 skipped</b>  </td></tr>
+<td class="markdownTableBodyNone">Complete CTest suite, including optional C++ EPANET EPS example and calibration regression  </td><td class="markdownTableBodyNone"><b>85 passed, 0 failed, 0 skipped</b>  </td></tr>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Portable <span class="tt">tests/run_tests.py</span> with required independent reference  </td><td class="markdownTableBodyNone"><b>46 passed, 0 failed</b>  </td></tr>
 <tr class="markdownTableRowOdd">
@@ -126,11 +126,13 @@ document.addEventListener('DOMContentLoaded', () => {
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone">Generated HTML/API documentation  </td><td class="markdownTableBodyNone">Regenerated with Doxygen 1.17.0 from current sources and guides  </td></tr>
 </table>
-<p>The extra C++ toolkit example raises the configured CTest count from 83 to 84. Python integration, JSON auxiliary inputs, common application diagnostics, optimization, hydraulic/quality models and independent comparisons are included in CTest. Expected diagnostic failures are regression passes, not solved models.</p>
+<p>The extra C++ toolkit example and calibration regression raise the configured CTest count from 83 to 85. The full CTest suite was rerun after the calibration fixes below; the other checks retain their results from the earlier package audit. Python integration, JSON auxiliary inputs, common application diagnostics, optimization, hydraulic/quality models and independent comparisons are included in CTest. Expected diagnostic failures are regression passes, not solved models.</p>
 <p>The two additional large native solves were <span class="tt">LOV-LOVOTV-2-input_mod2.spr</span> and <span class="tt">VIZ-SOPTVR-2-660-input.spr</span>. Tests ran on copies; the corpus and original models were preserved.</p>
 <h1 class="doxsection"><a class="anchor" id="fixes-made-during-this-audit"></a>
 Fixes made during this audit</h1>
 <ul>
+<li>Corrected multi-period calibration tank updates: each candidate resets its measured initial levels and updates later levels from its own preceding solved flows before solving the next period. This also fixes windows with nonzero <span class="tt">Start_of_Periods</span>. A reproduced history-dependent objective returned approximately 81.238 on the first evaluation and 81.041 on the second before the fix; the new regression requires repeated/interleaved evaluations to agree within 1e-7 and checks tank storage balance and hydraulic boundary consistency.</li>
+<li>Replaced silent CSV <span class="tt">atof</span> conversion with finite-number validation for the selected measurement window. Invalid node or pool values now return exit code 2 and <span class="tt">INPUT.CONFIG</span> identifying the file, measurement row, element and period. Regression cases cover empty/nonnumeric values, trailing junk, NaN, infinity and overflow, plus valid whitespace/scientific notation.</li>
 <li>Linked the optional <span class="tt">staci_matlab_core</span> target to <span class="tt">nlohmann_json::nlohmann_json</span>. A clean MEX build previously failed to find the JSON header even though ordinary application builds succeeded.</li>
 <li>Updated the detailed usage guide, Hungarian split manual, corpus README, Anytown status, historical error classification, MATLAB guide and testing documentation. Removed outdated current claims that ky10 failed, valves and emitters were missing, tank chemistry was absent, or settings required XML.</li>
 <li>Corrected the developer guide's table formatting and documented explicit SDK selection for macOS installations with mismatched Command Line Tools/Xcode.</li>

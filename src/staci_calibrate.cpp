@@ -158,11 +158,12 @@ int run_application(int argc, char **argv) {
     // Initial computation
     for (unsigned i = 0; i < (wds.size()); i++) {
         wds.at(i)->Set_debug_level(Staci_debug_level);
+        // i is local to the selected window, irrespective of Start_of_Periods.
+        if (i > 0)
+            Update_Reservoirs(i);
         bool success = wds.at(i)->solve_system();
         if (success) {
             wds.at(i)->Compute_Sensitivity_Matrix("diameter", 1);
-            if (i > Start_of_Periods)
-                Update_Reservoirs(i);
         } else {
             stringstream msg;
             msg.str("");
@@ -286,7 +287,8 @@ void PrintBestDataFile(const pagmo::vector_double &genome) {
 
 double Objective(const pagmo::vector_double &genome) {
 
-    bool success = false;
+    // Every candidate starts from the same measured initial storage state.
+    Set_Initial_Pool_Levels();
 
     for (unsigned int i = 0; i < wds.size(); i++) {
         int k = 0;
@@ -299,12 +301,13 @@ double Objective(const pagmo::vector_double &genome) {
                 wds.at(i)->set_dprop(pipe_name.at(j), "diameter", genome.at(k));
                 k++;
             }
+        // Derive this period's boundary from the previous solved period of
+        // THIS candidate before solving, never from a previous evaluation.
+        if (i > 0)
+            Update_Reservoirs(i);
         diagnostics::CandidateScope candidate;
         last_computation_OK = wds.at(i)->solve_system();
-        if (last_computation_OK) {
-            if (i > 0)
-                Update_Reservoirs(i);
-        } else {
+        if (!last_computation_OK) {
             break;
         }
     }
@@ -811,13 +814,29 @@ void Load_Sollwert_Datafiles() {
         if (type != "node" && type != "pool")
             input_config::fail(tmp.str(), "measurement type must be node or pool for '" + name + "'.");
         tmp_double_vec.clear();
+        for (int period = Start_of_Periods; period < Start_of_Periods + Num_of_Periods; ++period) {
+            const auto &text = lines.at(i).at(2 + period);
+            double value = 0.0;
+            bool valid = false;
+            try {
+                std::size_t consumed = 0;
+                value = std::stod(text, &consumed);
+                valid = std::isfinite(value) &&
+                    text.find_first_not_of(" \t\r\n", consumed) == std::string::npos;
+            } catch (const std::invalid_argument &) {
+            } catch (const std::out_of_range &) {
+            }
+            if (!valid)
+                input_config::fail(tmp.str(), "measurement row " + std::to_string(i + 1) +
+                    ", element '" + name + "', period " + std::to_string(period) +
+                    ": expected a finite number, received '" + text + "'.");
+            tmp_double_vec.push_back(value);
+        }
 
         // POOL:
         if (0 == strcmp(type.c_str(), "pool")) {
             Sollwert_Pool_Staci_ID.push_back(name);
             Sollwert_Pool_Staci_Idx.push_back(Find_Pool_Index(name));
-            for (unsigned int j = Start_of_Periods; j < Start_of_Periods + Num_of_Periods; j++)
-                tmp_double_vec.push_back(atof(lines.at(i).at(2 + j).c_str()));
             Sollwert_Pool_Values.push_back(tmp_double_vec);
 
             // Add surface
@@ -836,8 +855,6 @@ void Load_Sollwert_Datafiles() {
         if (0 == strcmp(type.c_str(), "node")) {
             Sollwert_Node_Staci_ID.push_back(name);
             Sollwert_Node_Staci_Idx.push_back(Find_Pressure_Index(name));
-            for (unsigned int j = Start_of_Periods; j < Start_of_Periods + Num_of_Periods; j++)
-                tmp_double_vec.push_back(atof(lines.at(i).at(2 + j).c_str()));
             Sollwert_Node_Values.push_back(tmp_double_vec);
 
             // Info

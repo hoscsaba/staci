@@ -75,6 +75,12 @@ Auxiliary files also have JSON variants: optimizer settings, calibration measure
 [JSON input formats](doc/json_inputs.md) for schemas, units and examples. Network
 definitions remain SPR/XML or EPANET INP.
 
+Calibration CSV measurements are checked as finite numbers in the selected
+period window. Invalid cells return exit code 2 and `INPUT.CONFIG` with the
+file, measurement row, element ID and zero-based period; clients must not treat
+these runs as fitted results. See the [measurement contract](doc/json_inputs.md#calibration-measurements)
+for the multi-period pool-state update convention.
+
 ## Completion and errors
 
 | Process exit code | Meaning | Consumer behavior |

@@ -1056,6 +1056,15 @@ if(BUILD_TESTING)
     add_test(NAME flushing_outlet_law COMMAND staci_hydrant_test)
     find_package(Python3 COMPONENTS Interpreter REQUIRED)
     if(STACI_BUILD_OPTIMIZERS)
+        add_executable(staci_calibration_state_test tests/test_calibration_state.cpp)
+        target_link_libraries(staci_calibration_state_test PRIVATE
+            staci_core Pagmo::pagmo nlohmann_json::nlohmann_json)
+        add_test(NAME calibration_state_and_measurements
+            COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_calibration_regression.py"
+                --binary $<TARGET_FILE:staci_calibrate>
+                --state-test $<TARGET_FILE:staci_calibration_state_test>)
+        set_tests_properties(calibration_state_and_measurements PROPERTIES
+            LABELS "calibration;integration" TIMEOUT 180)
         add_test(NAME solver_options
             COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_solver_options.py"
                 --staci $<TARGET_FILE:staci> --split $<TARGET_FILE:staci_split>
