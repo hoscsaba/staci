@@ -20,6 +20,10 @@
 #include <streambuf>
 #include <vector>
 #ifdef _WIN32
+// Keep Windows min/max macros from colliding with the C++ standard library.
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <windows.h>
 #include <process.h>
 #else
