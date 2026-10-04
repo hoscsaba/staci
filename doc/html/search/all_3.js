@@ -54,10 +54,11 @@ var searchData=
   ['anytown_20test_20model_51',['Physical Anytown test model',['../md_doc_2anytown__physical__model.html',1,'']]],
   ['application_20diagnostics_52',['Common application diagnostics',['../md_doc_2diagnostics.html',1,'']]],
   ['application_20remote_20calls_53',['Web application / remote calls',['../md__r_e_a_d_m_e___d_e_v.html#web-application--remote-calls',1,'']]],
-  ['aref_54',['Aref',['../class_agelem.html#a3f8668febc2958fd539997d537552f17',1,'Agelem']]],
-  ['arithcode_55',['arithcode',['../classarithcode.html',1,'']]],
-  ['artifacts_56',['Creating artifacts',['../dir_b94f9f0c034b39d5d6d39e3a6fbfd3e1.html#creating-artifacts',1,'']]],
-  ['audit_57',['Fixes made during this audit',['../md_doc_2package__validation.html#fixes-made-during-this-audit',1,'']]],
-  ['automated_20regression_58',['Automated regression',['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#automated-regression',1,'']]],
-  ['auxiliary_20inputs_59',['auxiliary inputs',['../md_doc_2json__inputs.html',1,'JSON auxiliary inputs'],['../md_doc_2testing.html#json-auxiliary-inputs-1',1,'JSON auxiliary inputs']]]
+  ['applications_54',['Hydraulic output for transport applications',['../md_doc_2staci__usage.html#hydraulic-output-for-transport-applications',1,'']]],
+  ['aref_55',['Aref',['../class_agelem.html#a3f8668febc2958fd539997d537552f17',1,'Agelem']]],
+  ['arithcode_56',['arithcode',['../classarithcode.html',1,'']]],
+  ['artifacts_57',['Creating artifacts',['../dir_b94f9f0c034b39d5d6d39e3a6fbfd3e1.html#creating-artifacts',1,'']]],
+  ['audit_58',['Fixes made during this audit',['../md_doc_2package__validation.html#fixes-made-during-this-audit',1,'']]],
+  ['automated_20regression_59',['Automated regression',['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#automated-regression',1,'']]],
+  ['auxiliary_20inputs_60',['auxiliary inputs',['../md_doc_2json__inputs.html',1,'JSON auxiliary inputs'],['../md_doc_2testing.html#json-auxiliary-inputs-1',1,'JSON auxiliary inputs']]]
 ];

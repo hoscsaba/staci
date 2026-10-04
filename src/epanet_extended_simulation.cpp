@@ -13,6 +13,7 @@
 #include "eps_result_writer.h"
 
 #include <algorithm>
+#include <nlohmann/json.hpp>
 #include <cctype>
 #include <cmath>
 #include <cstdlib>
@@ -848,6 +849,48 @@ public:
         link_output << std::setprecision(15);
         tank_output << std::setprecision(15);
 
+        // Transport consumers need EVERY solved hydraulic state, not only
+        // report frames (controls/tank events can occur between report times).
+        std::ofstream transport_output(prefix + "-transport.jsonl", std::ios::trunc);
+        if (!transport_output) throw std::runtime_error("Cannot create EPS transport output: " + prefix);
+        nlohmann::json transport_metadata = {{"transport_metadata_version", 1},
+            {"mode", "eps"}, {"duration_s", duration_s_},
+            {"nodes", nlohmann::json::object()}, {"links", nlohmann::json::object()}};
+        for (const auto &node : result_nodes) {
+            const std::string kind = node.type == "TANK" ? "tank" :
+                node.type == "RESERVOIR" ? "reservoir" : "junction";
+            transport_metadata["nodes"][node.id] = {{"kind", kind}};
+        }
+        for (const auto &link : result_links) {
+            const std::string kind = link.type == "PIPE" ? "pipe" : link.type == "PUMP" ? "pump" : "valve";
+            auto &record = transport_metadata["links"][link.id];
+            record = {{"kind", kind}, {"from", result_nodes[link.from_node].id},
+                      {"to", result_nodes[link.to_node].id}};
+            if (kind == "pipe") {
+                record["length_m"] = link.length_m; record["diameter_m"] = link.diameter_m;
+            }
+        }
+        transport_output << transport_metadata.dump() << '\n';
+        const auto write_transport = [&](const EpsResultFrame &frame, long long end_s) {
+            nlohmann::json state = {{"activation_time_s", frame.time_s}, {"end_time_s", end_s},
+                {"duration_s", end_s - frame.time_s}, {"converged", frame.converged},
+                {"nodes", nlohmann::json::object()}, {"links", nlohmann::json::object()}};
+            for (size_t i = 0; i < result_nodes.size(); ++i)
+                state["nodes"][result_nodes[i].id] = {{"head_m", frame.node_head_m[i]},
+                    {"pressure_m", frame.node_pressure_head_m[i]}, {"demand_m3s", frame.node_demand_m3s[i]}};
+            for (size_t i = 0; i < result_links.size(); ++i) {
+                auto &link = state["links"][result_links[i].id];
+                link = {{"flow_m3s", frame.link_flow_rate_m3s[i]}, {"enabled", frame.link_status[i] != 0}};
+                if (result_links[i].type == "PIPE") link["velocity_signed_mps"] = frame.link_velocity_ms[i];
+            }
+            for (size_t i = 0; i < result_tanks.size(); ++i) {
+                auto &node = state["nodes"][result_tanks[i].id];
+                node["level_m"] = frame.tank_level_m[i]; node["volume_m3"] = frame.tank_volume_m3[i];
+            }
+            transport_output << state.dump() << '\n';
+            if (!transport_output) throw std::runtime_error("Failed writing EPS transport period");
+        };
+
         const int previous_debug_level = system.Get_debug_level();
         system.Set_debug_level(0);
         system.ini();
@@ -981,8 +1024,13 @@ public:
                             result_links, result_tanks, frame);
             }
 
-            if (time_s == duration_s_)
+            // Capture before scan_rules: it may schedule future link statuses.
+            const auto transport_frame = collect_frame(system, result_nodes, result_links,
+                result_link_objects, tanks, time_s, converged, {}, {}, {}, {});
+            if (time_s == duration_s_) {
+                write_transport(transport_frame, time_s); // terminal snapshot, zero duration
                 break;
+            }
             const long long next_grid_s =
                 (time_s / simulation_step_s + 1) * simulation_step_s;
             long long next_state_s = std::min(next_grid_s, duration_s_);
@@ -993,6 +1041,8 @@ public:
             if (!rule_engine_.empty())
                 next_state_s = scan_rules(links, nodes, tanks, time_s, next_state_s);
             const long long step_s = next_state_s - time_s;
+            if (step_s <= 0) throw std::runtime_error("EPS hydraulic time integration stalled");
+            write_transport(transport_frame, next_state_s);
             if (water_age) {
                 std::vector<double> flows;
                 flows.reserve(result_link_objects.size());
@@ -1025,6 +1075,8 @@ public:
         }
         system.Set_debug_level(previous_debug_level);
 
+        transport_output.close();
+        if (!transport_output) throw std::runtime_error("Failed closing EPS transport output");
         result_writer.finish(state_count, failed_count, warnings_);
 
         summary_output << "property,value\n"

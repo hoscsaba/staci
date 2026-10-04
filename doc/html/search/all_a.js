@@ -17,11 +17,12 @@ var searchData=
   ['hydrants_20together_14',['Open all three hydrants together',['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#open-all-three-hydrants-together',1,'']]],
   ['hydraulic_20initial_20values_15',['Hydraulic initial values',['../md_doc_2json__inputs.html#hydraulic-initial-values',1,'']]],
   ['hydraulic_20models_16',['Supported hydraulic models',['../index.html#supported-hydraulic-models',1,'']]],
-  ['hydraulic_20reference_20tests_17',['Channel-only hydraulic reference tests',['../md_doc_2testing.html#channel-only-hydraulic-reference-tests',1,'']]],
-  ['hydraulic_20regression_20corpus_18',['Public EPANET hydraulic regression corpus',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#public-epanet-hydraulic-regression-corpus',1,'']]],
-  ['hydraulic_20simulation_19',['Run a steady-state hydraulic simulation',['../md_doc_2staci__usage.html#run-a-steady-state-hydraulic-simulation',1,'']]],
-  ['hydraulic_20solver_20',['staci hydraulic solver',['../index.html#staci-hydraulic-solver',1,'']]],
-  ['hydraulic_20solver_20options_21',['Hydraulic solver options',['../md_doc_2diagnostics.html#hydraulic-solver-options',1,'']]],
-  ['hydraulic_20support_20and_20current_20validation_22',['EPANET hydraulic support and current validation',['../index.html#epanet-hydraulic-support-and-current-validation',1,'']]],
-  ['hydraulics_23',['Basic SPR hydraulics',['../dir_8976e5d03119516083eaca3ddca61311.html#basic-spr-hydraulics',1,'']]]
+  ['hydraulic_20output_20for_20transport_20applications_17',['Hydraulic output for transport applications',['../md_doc_2staci__usage.html#hydraulic-output-for-transport-applications',1,'']]],
+  ['hydraulic_20reference_20tests_18',['Channel-only hydraulic reference tests',['../md_doc_2testing.html#channel-only-hydraulic-reference-tests',1,'']]],
+  ['hydraulic_20regression_20corpus_19',['Public EPANET hydraulic regression corpus',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#public-epanet-hydraulic-regression-corpus',1,'']]],
+  ['hydraulic_20simulation_20',['Run a steady-state hydraulic simulation',['../md_doc_2staci__usage.html#run-a-steady-state-hydraulic-simulation',1,'']]],
+  ['hydraulic_20solver_21',['staci hydraulic solver',['../index.html#staci-hydraulic-solver',1,'']]],
+  ['hydraulic_20solver_20options_22',['Hydraulic solver options',['../md_doc_2diagnostics.html#hydraulic-solver-options',1,'']]],
+  ['hydraulic_20support_20and_20current_20validation_23',['EPANET hydraulic support and current validation',['../index.html#epanet-hydraulic-support-and-current-validation',1,'']]],
+  ['hydraulics_24',['Basic SPR hydraulics',['../dir_8976e5d03119516083eaca3ddca61311.html#basic-spr-hydraulics',1,'']]]
 ];

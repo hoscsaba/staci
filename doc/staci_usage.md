@@ -233,6 +233,10 @@ for interoperability and manual inspection:
 - `PREFIX-summary.csv`: duration, timestep, state count, failed states, and
   warning count.
 
+`PREFIX-transport.jsonl` additionally contains every solved hydraulic state,
+including states between report times, for external transport applications
+(see [transport export](#hydraulic-output-for-transport-applications)).
+
 All physical quantities in the HDF5, JSON, and CSV outputs use SI units:
 seconds, metres, cubic metres, cubic metres per second, and metres per second.
 The CSV files use one observation per row and can be read directly by Excel,
@@ -651,6 +655,44 @@ input filename, depending on the command:
 | `PREFIX-tanks.csv`, `PREFIX-summary.csv` | EPS tank time series and run summary |
 | `PREFIX.h5` | Chunked `STACI EPS OUTPUT v1` data for visualization |
 | `PREFIX.meta.json` | EPS run metadata, dimensions, status codes, warnings, and value ranges |
+| `PREFIX-transport.jsonl` | Every hydraulic state with activation/end/duration for external transport solvers |
 | `PREFIX-steady-nodes.csv`, `PREFIX-steady-links.csv` | Steady-quality SI node and link results |
 | `PREFIX-steady-summary.csv` | Steady-quality mode and dimensions |
 | `PREFIX-steady-sensitivity.csv` | Optional water-quality and hydraulic-flow derivatives per SI parameter |
+
+### Hydraulic output for transport applications
+
+`staci -s network.inp` computes the initial steady state even if the INP contains
+a nonzero EPS duration. It writes `network.inp.hydraulics.json`. Consumers must
+check the process exit status and `converged` before using a result.
+
+The additive `transport_metadata_version: 1` fields support PSToolboxReactRunner
+without another INP parser. Nodes include `kind` (`junction`, `reservoir`, `tank`).
+Links include `kind` (`pipe`, `pump`, `valve`, `boundary`), `from`, and, for two-node
+links, `to`. Pipes additionally include `length_m` and `diameter_m`.
+`velocity_signed_mps` follows `from` → `to`; the existing `velocity_mps` remains
+a nonnegative magnitude for compatibility. Pump velocities use their reference
+area, not a physical quality-transport volume. One-node boundary links remain in
+the export for existing clients. All geometry and hydraulic quantities are SI.
+
+
+`staci --epanet-eps network.inp -o PREFIX` also writes
+`PREFIX-transport.jsonl`. Unlike report-sampled CSV/HDF5 data, this export contains
+**every solved hydraulic period**, including off-report control, rule and tank
+events. The first line is topology metadata with `transport_metadata_version: 1`,
+`mode: "eps"`, `duration_s`, node kinds, link kinds/endpoints, and pipe lengths and
+diameters. Every subsequent line contains:
+
+- `activation_time_s`, `end_time_s`, `duration_s`, and `converged`;
+- `nodes` keyed by ID: `head_m`, `pressure_m`, `demand_m3s`; tanks also have
+  `level_m` and `volume_m3`;
+- `links` keyed by ID: signed `flow_m3s`, `enabled`, and, for pipes,
+  `velocity_signed_mps` positive from `from` to `to`.
+
+Intervals are contiguous and apply on `[activation_time_s, end_time_s)`. The final
+line at `DURATION` has zero duration and is an informational terminal sample.
+Node demand includes delivered withdrawals and external one-port flows represented
+by the solver. Consumers must check the process exit status, convergence of every
+period, continuity and interval coverage before using the schedule. A failed run
+may leave a partial export. Use `QUALITY NONE` when an external application owns
+the chemistry; this does not disable hydraulic demand patterns or controls.

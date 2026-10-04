@@ -15,5 +15,6 @@ var searchData=
   ['options_12',['options',['../md_doc_2diagnostics.html#hydraulic-solver-options',1,'Hydraulic solver options'],['../index.html#quick-start-and-build-options',1,'Quick start and build options']]],
   ['or_20ubuntu_13',['Debian or Ubuntu',['../index.html#debian-or-ubuntu',1,'']]],
   ['original_20input_14',['Supply deficit in the original input',['../md_doc_2anytown__convergence.html#supply-deficit-in-the-original-input',1,'']]],
-  ['outcomes_15',['Scope and expected outcomes',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#scope-and-expected-outcomes',1,'']]]
+  ['outcomes_15',['Scope and expected outcomes',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#scope-and-expected-outcomes',1,'']]],
+  ['output_20for_20transport_20applications_16',['Hydraulic output for transport applications',['../md_doc_2staci__usage.html#hydraulic-output-for-transport-applications',1,'']]]
 ];

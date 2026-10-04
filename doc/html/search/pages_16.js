@@ -20,6 +20,7 @@ var searchData=
   ['todo_20list_17',['Todo List',['../todo.html',1,'']]],
   ['together_18',['Open all three hydrants together',['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#open-all-three-hydrants-together',1,'']]],
   ['tolerances_19',['Quantities and tolerances',['../md_doc_2epanet__reference.html#quantities-and-tolerances',1,'']]],
-  ['transport_20calculations_20',['Transport calculations',['../md_doc_2staci__usage.html#transport-calculations',1,'']]],
-  ['troubleshooting_21',['Installation and execution troubleshooting',['../index.html#installation-and-execution-troubleshooting',1,'']]]
+  ['transport_20applications_20',['Hydraulic output for transport applications',['../md_doc_2staci__usage.html#hydraulic-output-for-transport-applications',1,'']]],
+  ['transport_20calculations_21',['Transport calculations',['../md_doc_2staci__usage.html#transport-calculations',1,'']]],
+  ['troubleshooting_22',['Installation and execution troubleshooting',['../index.html#installation-and-execution-troubleshooting',1,'']]]
 ];

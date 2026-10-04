@@ -214,6 +214,7 @@ Run an EPANET extended-period simulation</h2>
 <li><span class="tt">PREFIX-tanks.csv</span>: tank level, volume, inflow, and limits;</li>
 <li><span class="tt">PREFIX-summary.csv</span>: duration, timestep, state count, failed states, and warning count.</li>
 </ul>
+<p><span class="tt">PREFIX-transport.jsonl</span> additionally contains every solved hydraulic state, including states between report times, for external transport applications (see <a class="el" href="#hydraulic-output-for-transport-applications" title="Hydraulic output for transport applications">transport export</a>transport export).</p>
 <p>All physical quantities in the HDF5, JSON, and CSV outputs use SI units: seconds, metres, cubic metres, cubic metres per second, and metres per second. The CSV files use one observation per row and can be read directly by Excel, LibreOffice, pandas, R, MATLAB, or plotting tools.</p>
 <p>The HDF5 dynamic arrays use <span class="tt">[time, element]</span> order:</p>
 <div class="fragment"><div class="line">/time                       int64   [T]    s</div>
@@ -450,12 +451,25 @@ Generated files</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">PREFIX.meta.json</span>  </td><td class="markdownTableBodyNone">EPS run metadata, dimensions, status codes, warnings, and value ranges  </td></tr>
 <tr class="markdownTableRowOdd">
-<td class="markdownTableBodyNone"><span class="tt">PREFIX-steady-nodes.csv</span>, <span class="tt">PREFIX-steady-links.csv</span>  </td><td class="markdownTableBodyNone">Steady-quality SI node and link results  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">PREFIX-transport.jsonl</span>  </td><td class="markdownTableBodyNone">Every hydraulic state with activation/end/duration for external transport solvers  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">PREFIX-steady-summary.csv</span>  </td><td class="markdownTableBodyNone">Steady-quality mode and dimensions  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">PREFIX-steady-nodes.csv</span>, <span class="tt">PREFIX-steady-links.csv</span>  </td><td class="markdownTableBodyNone">Steady-quality SI node and link results  </td></tr>
 <tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><span class="tt">PREFIX-steady-summary.csv</span>  </td><td class="markdownTableBodyNone">Steady-quality mode and dimensions  </td></tr>
+<tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone"><span class="tt">PREFIX-steady-sensitivity.csv</span>  </td><td class="markdownTableBodyNone">Optional water-quality and hydraulic-flow derivatives per SI parameter  </td></tr>
 </table>
+<h2 class="doxsection"><a class="anchor" id="hydraulic-output-for-transport-applications"></a>
+Hydraulic output for transport applications</h2>
+<p><span class="tt">staci -s network.inp</span> computes the initial steady state even if the INP contains a nonzero EPS duration. It writes <span class="tt">network.inp.hydraulics.json</span>. Consumers must check the process exit status and <span class="tt">converged</span> before using a result.</p>
+<p>The additive <span class="tt">transport_metadata_version: 1</span> fields support PSToolboxReactRunner without another INP parser. Nodes include <span class="tt">kind</span> (<span class="tt">junction</span>, <span class="tt">reservoir</span>, <span class="tt">tank</span>). Links include <span class="tt">kind</span> (<span class="tt">pipe</span>, <span class="tt">pump</span>, <span class="tt">valve</span>, <span class="tt">boundary</span>), <span class="tt">from</span>, and, for two-node links, <span class="tt">to</span>. Pipes additionally include <span class="tt">length_m</span> and <span class="tt">diameter_m</span>. <span class="tt">velocity_signed_mps</span> follows <span class="tt">from</span> → <span class="tt">to</span>; the existing <span class="tt">velocity_mps</span> remains a nonnegative magnitude for compatibility. Pump velocities use their reference area, not a physical quality-transport volume. One-node boundary links remain in the export for existing clients. All geometry and hydraulic quantities are SI.</p>
+<p><span class="tt">staci --epanet-eps network.inp -o PREFIX</span> also writes <span class="tt">PREFIX-transport.jsonl</span>. Unlike report-sampled CSV/HDF5 data, this export contains <b>every solved hydraulic period</b>, including off-report control, rule and tank events. The first line is topology metadata with <span class="tt">transport_metadata_version: 1</span>, <span class="tt">mode: "eps"</span>, <span class="tt">duration_s</span>, node kinds, link kinds/endpoints, and pipe lengths and diameters. Every subsequent line contains:</p>
+<ul>
+<li><span class="tt">activation_time_s</span>, <span class="tt">end_time_s</span>, <span class="tt">duration_s</span>, and <span class="tt">converged</span>;</li>
+<li><span class="tt">nodes</span> keyed by ID: <span class="tt">head_m</span>, <span class="tt">pressure_m</span>, <span class="tt">demand_m3s</span>; tanks also have <span class="tt">level_m</span> and <span class="tt">volume_m3</span>;</li>
+<li><span class="tt">links</span> keyed by ID: signed <span class="tt">flow_m3s</span>, <span class="tt">enabled</span>, and, for pipes, <span class="tt">velocity_signed_mps</span> positive from <span class="tt">from</span> to <span class="tt">to</span>.</li>
+</ul>
+<p>Intervals are contiguous and apply on <span class="tt">[activation_time_s, end_time_s)</span>. The final line at <span class="tt">DURATION</span> has zero duration and is an informational terminal sample. Node demand includes delivered withdrawals and external one-port flows represented by the solver. Consumers must check the process exit status, convergence of every period, continuity and interval coverage before using the schedule. A failed run may leave a partial export. Use <span class="tt">QUALITY NONE</span> when an external application owns the chemistry; this does not disable hydraulic demand patterns or controls. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

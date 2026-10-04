@@ -13,5 +13,6 @@ var searchData=
   ['flushing_20reference_10',['STACI flushing reference',['../md_doc_2flushing.html',1,'']]],
   ['flushing_20sequence_20and_20opening_20times_11',['Flushing sequence and opening times',['../md_doc_2flushing.html#flushing-sequence-and-opening-times',1,'']]],
   ['for_20the_20test_20harness_12',['Consequence for the test harness',['../md_doc_2ky10__convergence.html#consequence-for-the-test-harness',1,'']]],
-  ['further_20documentation_20and_20examples_13',['Further documentation and examples',['../index.html#further-documentation-and-examples',1,'']]]
+  ['for_20transport_20applications_13',['Hydraulic output for transport applications',['../md_doc_2staci__usage.html#hydraulic-output-for-transport-applications',1,'']]],
+  ['further_20documentation_20and_20examples_14',['Further documentation and examples',['../index.html#further-documentation-and-examples',1,'']]]
 ];

@@ -15,6 +15,7 @@ var searchData=
   ['flushing_20sequence_20and_20opening_20times_12',['Flushing sequence and opening times',['../md_doc_2flushing.html#flushing-sequence-and-opening-times',1,'']]],
   ['folyterf_13',['FolyTerf',['../class_agelem.html#ab235bccddd3f04b9f4e991ee8f3dd8ff',1,'Agelem']]],
   ['for_20the_20test_20harness_14',['Consequence for the test harness',['../md_doc_2ky10__convergence.html#consequence-for-the-test-harness',1,'']]],
-  ['frictionmodelconfigurable_15',['FrictionModelConfigurable',['../class_friction_model_configurable.html',1,'']]],
-  ['further_20documentation_20and_20examples_16',['Further documentation and examples',['../index.html#further-documentation-and-examples',1,'']]]
+  ['for_20transport_20applications_15',['Hydraulic output for transport applications',['../md_doc_2staci__usage.html#hydraulic-output-for-transport-applications',1,'']]],
+  ['frictionmodelconfigurable_16',['FrictionModelConfigurable',['../class_friction_model_configurable.html',1,'']]],
+  ['further_20documentation_20and_20examples_17',['Further documentation and examples',['../index.html#further-documentation-and-examples',1,'']]]
 ];

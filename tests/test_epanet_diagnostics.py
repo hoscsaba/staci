@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check CLI diagnostics for unsupported physics and malformed hydraulic inputs."""
 import argparse
+import json
 from pathlib import Path
 import subprocess
 import tempfile
@@ -75,6 +76,15 @@ def main():
                                  capture_output=True, text=True, timeout=15)
         assert process.returncode == 0, process.stdout + process.stderr
         assert Path(str(path) + '.rrs').read_text().strip() == 'OK'
+        result = json.loads(Path(str(path)+'.hydraulics.json').read_text())
+        assert result['transport_metadata_version'] == 1
+        assert result['nodes']['R1']['kind'] == 'reservoir'
+        assert result['nodes']['J1']['kind'] == 'junction'
+        pipe = result['links']['J1']
+        assert pipe['kind'] == 'pipe' and pipe['from'] == 'R1' and pipe['to'] == 'J1'
+        assert pipe['length_m'] == 100 and pipe['diameter_m'] == .15
+        assert pipe['velocity_signed_mps'] > 0
+        assert pipe['velocity_signed_mps'] == pipe['velocity_mps']
         print('PASS independent_namespaces')
         for value in ('0', '0.0', '0e0'):
             path = work / ('zero-emitter-' + value + '.inp')

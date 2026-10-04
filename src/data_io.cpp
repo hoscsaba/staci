@@ -648,11 +648,12 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
                            bool conv_reached, int staci_debug_level) {
 
     if (is_epanet_input) {
-        nlohmann::json results = {{"schema_version", 1}, {"converged", conv_reached},
+        nlohmann::json results = {{"schema_version", 1}, {"transport_metadata_version", 1}, {"converged", conv_reached},
             {"nodes", nlohmann::json::object()}, {"links", nlohmann::json::object()}};
         for (auto *n : cspok) {
             results["nodes"][n->Get_nev()] = {{"head_m", n->Get_p() + n->Get_h()},
-                {"pressure_m", n->Get_p()}, {"demand_m3s", n->DeliveredDemand() / n->Get_dprop("ro")}};
+                {"pressure_m", n->Get_p()}, {"demand_m3s", n->DeliveredDemand() / n->Get_dprop("ro")},
+                {"kind", "junction"}};
         }
         for (auto *edge : agelemek) {
             if(dynamic_cast<EpanetEmitter*>(edge)) {
@@ -664,11 +665,30 @@ void data_io::save_results(double FolyMenny, double sum_of_inflow, double sum_of
                 {"velocity_mps", std::abs(edge->Get_mp() / edge->Get_ro() / edge->Get_Aref())},
                 {"enabled", edge->Is_enabled() && !(dynamic_cast<EpanetPumpConfigurable*>(edge) && edge->Get_dprop("status")==0) &&
                     !(dynamic_cast<Cso *>(edge) && static_cast<Cso *>(edge)->IsCheckValve() && edge->Get_mp() <= 0.0)}};
+            // Additive transport metadata: consumers need neither a second INP
+            // parser nor an EPANET toolkit to reconstruct the quality network.
+            auto &link = results["links"][edge->Get_nev()];
+            link["velocity_signed_mps"] = edge->Get_Q() / edge->Get_Aref();
+            link["from"] = edge->Get_Cspe_Nev();
+            if (edge->Get_Csp_db() == 2) {
+                link["to"] = edge->Get_Cspv_Nev();
+                if (auto *pipe = dynamic_cast<Cso *>(edge)) {
+                    link["kind"] = "pipe";
+                    link["length_m"] = pipe->Get_dprop("length");
+                    link["diameter_m"] = pipe->Get_dprop("diameter");
+                } else {
+                    link["kind"] = dynamic_cast<EpanetPumpConfigurable *>(edge) ? "pump" : "valve";
+                }
+            } else link["kind"] = "boundary";
         }
         for (auto *edge : agelemek) {
             if (edge->Get_Csp_db() == 1 && (edge->Get_nev().find("EPANET_RESERVOIR_") == 0 ||
                 edge->Get_nev().find("EPANET_TANK_") == 0))
-                results["nodes"][edge->Get_Cspe_Nev()]["demand_m3s"] = edge->Get_mp() / edge->Get_ro();
+            {
+                auto &node = results["nodes"][edge->Get_Cspe_Nev()];
+                node["demand_m3s"] = edge->Get_mp() / edge->Get_ro();
+                node["kind"] = edge->Get_nev().find("EPANET_TANK_") == 0 ? "tank" : "reservoir";
+            }
         }
         std::ofstream output(std::string(xml_fnev) + ".hydraulics.json");
         output << results.dump(2) << '\n';

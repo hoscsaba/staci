@@ -48,8 +48,9 @@ var searchData=
   ['anytown_20test_20model_45',['Physical Anytown test model',['../md_doc_2anytown__physical__model.html',1,'']]],
   ['application_20diagnostics_46',['Common application diagnostics',['../md_doc_2diagnostics.html',1,'']]],
   ['application_20remote_20calls_47',['Web application / remote calls',['../md__r_e_a_d_m_e___d_e_v.html#web-application--remote-calls',1,'']]],
-  ['artifacts_48',['Creating artifacts',['../dir_b94f9f0c034b39d5d6d39e3a6fbfd3e1.html#creating-artifacts',1,'']]],
-  ['audit_49',['Fixes made during this audit',['../md_doc_2package__validation.html#fixes-made-during-this-audit',1,'']]],
-  ['automated_20regression_50',['Automated regression',['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#automated-regression',1,'']]],
-  ['auxiliary_20inputs_51',['auxiliary inputs',['../md_doc_2json__inputs.html',1,'JSON auxiliary inputs'],['../md_doc_2testing.html#json-auxiliary-inputs-1',1,'JSON auxiliary inputs']]]
+  ['applications_48',['Hydraulic output for transport applications',['../md_doc_2staci__usage.html#hydraulic-output-for-transport-applications',1,'']]],
+  ['artifacts_49',['Creating artifacts',['../dir_b94f9f0c034b39d5d6d39e3a6fbfd3e1.html#creating-artifacts',1,'']]],
+  ['audit_50',['Fixes made during this audit',['../md_doc_2package__validation.html#fixes-made-during-this-audit',1,'']]],
+  ['automated_20regression_51',['Automated regression',['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#automated-regression',1,'']]],
+  ['auxiliary_20inputs_52',['auxiliary inputs',['../md_doc_2json__inputs.html',1,'JSON auxiliary inputs'],['../md_doc_2testing.html#json-auxiliary-inputs-1',1,'JSON auxiliary inputs']]]
 ];
