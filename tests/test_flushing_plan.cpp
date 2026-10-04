@@ -37,13 +37,34 @@ int main() {
   check(timing.status == "advective_estimate" && timing.seconds == 85 &&
         timing.critical_pipe == "first");
   check(opening_time(arcs, {}, "H", {}).seconds == 0);
-  // Downstream connecting pipes are counted even when they do not qualify.
+  // Allowed downstream connecting pipes are included.
   check(opening_time(arcs, {"p"}, "H", {}).seconds == 80);
   auto blocked = opening_time(arcs, {"p"}, "H", {"B"});
-  check(blocked.status == "undetermined" && !std::isfinite(blocked.seconds));
+  check(blocked.status == "no_connected_qualifying_pipes" && blocked.seconds == 0);
   auto unreachable = opening_time(arcs, {"p", "away"}, "H", {});
-  check(unreachable.status == "undetermined" &&
-        unreachable.pipes[0].status == "no_path_to_hydrant");
+  check(unreachable.status == "advective_estimate" && unreachable.seconds == 80 &&
+        unreachable.pipes[0].status == "ignored_no_qualifying_path");
+  check(timing.pipes.front().route.size() == 4);
+  check(timing.pipes.front().route[2].id == "slow1");
+  // A below-threshold connector cuts off the remote qualifying pipe.
+  auto slow = opening_time({{"fast", "R", "A", 100},
+                            {"slow", "A", "H", 100000, false}}, {"fast"}, "H", {"R"});
+  check(slow.seconds == 0 && slow.status == "no_connected_qualifying_pipes" &&
+        slow.pipes[0].status == "ignored_no_qualifying_path" && slow.pipes[0].route.empty());
+  auto filtered = arcs;
+  filtered[3].timing_allowed = false;
+  auto alternate = opening_time(filtered, {"first", "p", "away"}, "H", {"R"});
+  check(alternate.seconds == 35 && alternate.status == "advective_estimate");
+  check(alternate.pipes[1].route.back().id == "short");
+  // Two independently fed outlets; keep the longest reachable route.
+  const std::set<std::string> both{"H1", "H2"};
+  auto multi = opening_time({{"a", "R", "H1", 10},
+                             {"b", "R", "H2", 20}}, {"a", "b"}, both, {"R"});
+  check(multi.seconds == 20 && multi.critical_pipe == "b");
+  // Withdrawal at H1 need not consume all incoming water: some reaches H2.
+  multi = opening_time({{"a", "R", "H1", 10}, {"b", "H1", "H2", 20}},
+                       {"a", "b"}, both, {"R"});
+  check(multi.seconds == 30 && multi.pipes[0].route.back().to == "H2");
   arcs.push_back({"return", "C", "B", 1});
   auto cyclic = opening_time(arcs, {"p"}, "H", {});
   check(cyclic.status == "undetermined" &&

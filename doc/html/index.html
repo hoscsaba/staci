@@ -157,7 +157,7 @@ Table of contents</h1>
 <li><a class="el" href="#staci_calibrate" title="staci_calibrate">staci_calibrate: pipe diameter calibration</a>staci_calibrate: pipe diameter calibration</li>
 </ul>
 <ul>
-<li><a class="el" href="#staci_flush" title="staci_flush">staci_flush: single-hydrant flushing plans</a>staci_flush: single-hydrant flushing plans</li>
+<li><a class="el" href="#staci_flush" title="staci_flush">staci_flush: single and simultaneous flushing plans</a>staci_flush: single and simultaneous flushing plans</li>
 </ul>
 <ul>
 <li><a class="el" href="#project-directories-and-launching-programs" title="Project directories and launching programs">Project directories and launching programs</a>Project directories and launching programs</li>
@@ -186,7 +186,7 @@ Standalone programs</h1>
 <tr class="markdownTableRowOdd">
 <td class="markdownTableBodyNone"><span class="tt">staci_calibrate</span>  </td><td class="markdownTableBodyNone">Fit selected pipe diameters to measured pressures and pool levels  </td><td class="markdownTableBodyNone">XML/JSON settings (<span class="tt">--settings</span>), period-specific <span class="tt">.spr</span> networks and measured data  </td></tr>
 <tr class="markdownTableRowEven">
-<td class="markdownTableBodyNone"><span class="tt">staci_flush</span>  </td><td class="markdownTableBodyNone">Evaluate hydrants individually and rank a flushing sequence  </td><td class="markdownTableBodyNone">EPANET <span class="tt">.inp</span> network and JSON flushing config  </td></tr>
+<td class="markdownTableBodyNone"><span class="tt">staci_flush</span>  </td><td class="markdownTableBodyNone">Evaluate hydrants individually or simultaneously  </td><td class="markdownTableBodyNone">EPANET <span class="tt">.inp</span> network and JSON flushing config  </td></tr>
 </table>
 <p>Each program runs independently. A model-specific project needs only its inputs and a command or launcher that calls the appropriate executable. The optimizer tools use pagmo2; <span class="tt">staci_split</span> also uses Eigen3 and igraph. The build also provides the internal <span class="tt">staci_core</span> target and C++ examples, but does not install a separate C++ link library or promise a stable public API.</p>
 <h1 class="doxsection"><a class="anchor" id="installation"></a>
@@ -420,10 +420,11 @@ staci_calibrate</h2>
 </div><!-- fragment --><p>See the <a href="tests/staci_calibrate_settings.xml.in">settings template</a> and <a href="tests/calibrate_targets.csv">sample targets</a>. JSON settings and measurement examples are in <a href="examples/config">examples/config</a>. Select a configuration with <span class="tt">--settings</span>; relative paths inside it use the working directory.</p>
 <h2 class="doxsection"><a class="anchor" id="staci_flush"></a>
 staci_flush</h2>
-<p>Use <span class="tt">staci_flush</span> to assess opening <b>one hydrant at a time</b>, without changing valve positions, and construct a flushing sequence. Inputs are an EPANET network and a JSON config containing the hydrant junction IDs and global outlet settings.</p>
+<p>Use <span class="tt">staci_flush</span> to assess opening <b>one hydrant at a time</b> (<span class="tt">mode: single</span>, the default) or <b>all listed hydrants simultaneously</b> (<span class="tt">mode: multi</span>). Valve positions stay fixed. Inputs are an EPANET network and a JSON config containing the hydrant junction IDs and global outlet settings.</p>
 <div class="fragment"><div class="line">./build/staci_flush --inp /path/to/network.inp --config /path/to/flushing_config.json</div>
 </div><!-- fragment --><p>Example <span class="tt">flushing_config.json</span>:</p>
 <div class="fragment"><div class="line">{</div>
+<div class="line">  &quot;mode&quot;: &quot;single&quot;,</div>
 <div class="line">  &quot;hydrant_node_ids&quot;: [&quot;J1&quot;, &quot;J2&quot;],</div>
 <div class="line">  &quot;hydrant_area_m2&quot;: 0.002,</div>
 <div class="line">  &quot;total_loss_coefficient&quot;: 2.0,</div>
@@ -433,7 +434,8 @@ staci_flush</h2>
 <div class="line">  &quot;write_network_files&quot;: true</div>
 <div class="line">}</div>
 </div><!-- fragment --><p>Use exact junction IDs from the INP file. Area is in m², velocity in m/s and pressure head in m. The total coefficient includes outlet kinetic head: <span class="tt">K = 1 + zeta</span> for a local loss coefficient <span class="tt">zeta</span>. Discharge is calculated from junction pressure using <span class="tt">Q = A * sqrt(2*g*max(h,0)/K)</span>. <span class="tt">output_dir</span> is relative to the config file and must be new or empty.</p>
-<p>For each valid scenario, pipes qualify when their absolute velocity is strictly above the threshold. The plan first selects the hydrant covering the largest pipe volume, then repeatedly selects the largest <b>additional uncovered volume</b>. It reports cumulative coverage as a percentage of all original pipe volume. Each hydrant has two time estimates: the longest directed travel time from a qualifying pipe to the hydrant using actual velocities (including slower connecting pipes), and total qualifying volume divided by hydrant discharge. Undetermined travel times are flagged. Plan volumes use two decimal places and times use minutes with one decimal place.</p>
+<p>For each valid scenario, pipes qualify when their absolute velocity is strictly above the threshold. The plan first selects the hydrant covering the largest pipe volume, then repeatedly selects the largest <b>additional uncovered volume</b>. It reports cumulative coverage as a percentage of all original pipe volume. Each hydrant has two time estimates: the longest directed travel time from a qualifying pipe to the hydrant using only above-threshold pipes, and total qualifying volume divided by hydrant discharge. Undetermined travel times are flagged. Plan volumes use two decimal places and times use minutes with one decimal place.</p>
+<p>In <span class="tt">multi</span> mode, a valid combined scenario produces one plan row. Flow is the sum of all outlet discharges, and pipe volume is counted once. Individual outlet flows/pressures appear in <span class="tt">scenario_hydrants.csv</span>; the optional INP is named <span class="tt">&lt;original_name&gt;_multi.inp</span>. <span class="tt">pipe_travel_times.csv</span> includes the controlling route with per-link transit times. Remote pipes separated from all open hydrants by below-threshold pipes are ignored for route timing. See <a class="el" href="md_doc_2flushing.html" title="STACI flushing reference">flushing modes and timing</a>.</p>
 <p>Main results are <span class="tt">flushing_plan.txt</span>, <span class="tt">flushing_plan.csv</span>, <span class="tt">summary.txt</span> and per-pipe/scenario CSV tables. With <span class="tt">write_network_files: true</span>, exported networks are named <span class="tt">&lt;original_name&gt;_hydrant_&lt;nodeID&gt;.inp</span>, contain the open-hydrant emitter, and tag qualifying pipes <span class="tt">FLUSHED</span> for inspection. These are independent steady scenarios; the tool does not simulate sediment removal.</p>
 <p>Run the complete <a class="el" href="dir_d2e741a8a412b7f201cde4c97a4d3aac.html" title="/Users/hoscsaba/Documents/GitHub/staci/examples/flushing/README.md">worked example</a>:</p>
 <div class="fragment"><div class="line">./build/staci_flush --inp examples/flushing/network.inp --config examples/flushing/flushing_config.json</div>

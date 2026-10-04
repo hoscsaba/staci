@@ -15,5 +15,6 @@ var searchData=
   ['models_12',['Supported hydraulic models',['../index.html#supported-hydraulic-models',1,'']]],
   ['modify_20a_20property_20and_20save_20a_20new_20network_13',['Modify a property and save a new network',['../md_doc_2staci__usage.html#modify-a-property-and-save-a-new-network',1,'']]],
   ['mp_14',['mp',['../class_agelem.html#a1377d80d8511cc4adacccba31d28282d',1,'Agelem']]],
-  ['multi_20channel_20network_15',['Stationary multi-channel network',['../md_tests_2_c_h_a_n_n_e_l___t_e_s_t_s.html#stationary-multi-channel-network',1,'']]]
+  ['multi_15',['Simultaneous opening (&lt;span class=&quot;tt&quot;&gt;multi&lt;/span&gt;)',['../md_doc_2flushing.html#simultaneous-opening-multi',1,'']]],
+  ['multi_20channel_20network_16',['Stationary multi-channel network',['../md_tests_2_c_h_a_n_n_e_l___t_e_s_t_s.html#stationary-multi-channel-network',1,'']]]
 ];

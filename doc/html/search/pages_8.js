@@ -9,7 +9,7 @@ var searchData=
   ['first_20error_20categories_20before_20valve_20emitter_20pda_20support_6',['Historical first-error categories (before valve/emitter/PDA support)',['../md_doc_2error__classification.html#historical-first-error-categories-before-valveemitterpda-support',1,'']]],
   ['fixes_20made_20during_20this_20audit_7',['Fixes made during this audit',['../md_doc_2package__validation.html#fixes-made-during-this-audit',1,'']]],
   ['flushing_8',['Flushing',['../md_doc_2json__inputs.html#flushing',1,'']]],
-  ['flushing_20analysis_9',['Single-hydrant flushing analysis',['../md_doc_2flushing.html#single-hydrant-flushing-analysis',1,'']]],
+  ['flushing_20analysis_9',['Single and simultaneous hydrant flushing analysis',['../md_doc_2flushing.html#single-and-simultaneous-hydrant-flushing-analysis',1,'']]],
   ['flushing_20reference_10',['STACI flushing reference',['../md_doc_2flushing.html',1,'']]],
   ['flushing_20sequence_20and_20opening_20times_11',['Flushing sequence and opening times',['../md_doc_2flushing.html#flushing-sequence-and-opening-times',1,'']]],
   ['for_20the_20test_20harness_12',['Consequence for the test harness',['../md_doc_2ky10__convergence.html#consequence-for-the-test-harness',1,'']]],

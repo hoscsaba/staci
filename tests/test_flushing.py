@@ -125,6 +125,22 @@ with tempfile.TemporaryDirectory(prefix='staci flushing ') as d:
     assert [r['node_id'] for r in rows(reverse,'flushing_plan.csv')] == ['J2','J1']
     assert rows(low,'flushing_plan.csv') == []
     assert float(plan[-1]['cumulative_volume_m3']) == float(plan[0]['qualifying_volume_m3'])
+    # A large-diameter, slow connector separates two fast pipes. Only the
+    # downstream fast pipe contributes to travel time; volume coverage is unchanged.
+    disconnected = root/'slow-connector.inp'
+    disconnected.write_text(original.decode().replace('J2 0 0', 'J2 0 0\nJ3 0 0').replace(
+        'P2 J2 J1 100 100 120 0 Open',
+        'P2 J2 J1 100 1000 120 0 Open\nP3 J2 J3 100 100 120 0 Open'))
+    last = root/'last.txt'; last.write_text('J3\n')
+    disconnected_out = run('slow-connector-result', model=disconnected, hydrants=last)
+    travel = {p['pipe_id']: p for p in rows(disconnected_out,'pipe_travel_times.csv')}
+    assert travel['P1']['status'] == 'ignored_no_qualifying_path'
+    assert travel['P1']['travel_time_s'] == '' and json.loads(travel['P1']['route_json']) == []
+    assert travel['P3']['status'] == 'ok'
+    step = rows(disconnected_out,'flushing_plan.csv')[0]
+    assert step['critical_pipe_id'] == 'P3'
+    assert step['opening_time_min'] == f"{float(travel['P3']['travel_time_s'])/60:.1f}"
+    assert step['qualifying_volume_m3'] == f"{2*math.pi*.1**2/4*100:.2f}"
     # Unknown node, duplicate node/asset, unsupported hydraulic inputs.
     nodes.write_text('unknown\n');run('unknown',expected=2)
     nodes.write_text('J1\nJ1\n');run('duplicate',expected=2)
@@ -222,6 +238,62 @@ with tempfile.TemporaryDirectory(prefix='staci flushing ') as d:
     for entry in rows(config_dir/'invalid-exports', 'networks.csv'):
         doc = sections(config_dir/'invalid-exports'/entry['network_file'])
         assert all(row[2]=='INVALID_SCENARIO' for row in doc['TAGS'] if row[0]=='LINK')
+    # Explicit single keeps all existing hydraulic/ranking output unchanged.
+    inline_run(dict(inline, output_dir='explicit-single', mode='single'))
+    for name in ('flushing_plan.csv', 'scenarios.csv', 'scenario_pipes.csv'):
+        assert (config_dir/'explicit-single'/name).read_bytes() == (export_dir/name).read_bytes()
+    inline_run(dict(inline, output_dir='multi', mode='multi'))
+    multi_dir = config_dir/'multi'
+    multi_scenarios = rows(multi_dir, 'scenarios.csv')
+    multi_plan = rows(multi_dir, 'flushing_plan.csv')
+    assert len(multi_scenarios) == len(multi_plan) == 1
+    scenario = multi_scenarios[0]
+    assert scenario['hydrant_id'] == 'multi' and json.loads(scenario['node_id']) == ['J1', 'J2']
+    assert scenario['status'] == 'ok'
+    outlets = {row['node_id']: row for row in rows(multi_dir, 'scenario_hydrants.csv')}
+    q1, q2 = [float(outlets[n]['flow_m3s']) for n in ('J1','J2')]
+    h1, h2 = [float(outlets[n]['pressure_head_m']) for n in ('J1','J2')]
+    assert q1 > 0 and q2 > 0
+    # Independently verify both outlet laws, both pipe head losses and continuity.
+    resistance = 100/120**1.852/.1**4.871*(4.727*.3048**4.871/.028316846592**1.852)
+    assert math.isclose(40-h1, resistance*(q1+q2)**1.852, abs_tol=1e-5)
+    assert math.isclose(h1-h2, resistance*q2**1.852, abs_tol=1e-5)
+    for q,h in ((q1,h1),(q2,h2)):
+        assert math.isclose(h, 2*(q/.002)**2/(2*9.81), abs_tol=1e-5)
+    assert math.isclose(float(scenario['flow_m3s']), q1+q2, rel_tol=1e-9)
+    assert math.isclose(float(scenario['hydrant_pressure_head_m']), min(h1,h2), abs_tol=1e-8)
+    mpipes = {p['pipe_id']: p for p in rows(multi_dir, 'scenario_pipes.csv')}
+    assert math.isclose(float(mpipes['P1']['flow_m3s']), q1+q2, rel_tol=1e-6)
+    assert math.isclose(float(mpipes['P2']['flow_m3s']), -q2, rel_tol=1e-6)
+    # Both pipes qualify, but common volume is counted only once.
+    assert multi_plan[0]['qualifying_volume_m3'] == f"{2*math.pi*.1**2/4*100:.2f}"
+    expected = sum(100/abs(float(p['velocity_mps'])) for p in mpipes.values())
+    assert multi_plan[0]['opening_time_min'] == f"{expected/60:.1f}"
+    assert multi_plan[0]['volume_over_flow_time_min'] == f"{2*math.pi*.1**2/4*100/(q1+q2)/60:.1f}"
+    for row in rows(multi_dir, 'pipe_travel_times.csv'):
+        route = json.loads(row['route_json'])
+        assert route[0]['link_id'] == row['pipe_id'] and route[-1]['to'] == 'J2'
+        assert math.isclose(sum(a['travel_time_s'] for a in route), float(row['travel_time_s']), rel_tol=1e-10)
+    index = rows(multi_dir, 'networks.csv')
+    assert len(index) == 1 and index[0]['network_file'] == 'networks/network_multi.inp'
+    assert {e[0] for e in sections(multi_dir/index[0]['network_file'])['EMITTERS']} == {'J1','J2'}
+    manifest = json.loads((multi_dir/'run.json').read_text())
+    assert manifest['mode'] == 'multi' and manifest['scenario_count'] == 1
+    inline_run(dict(inline, output_dir='multi-reverse', MODE='multi', hydrant_node_ids=['J2','J1']))
+    assert rows(config_dir/'multi-reverse','scenarios.csv') == multi_scenarios
+    inline_run(dict(inline, output_dir='multi-one', mode='multi', hydrant_node_ids=['J1']))
+    one = rows(config_dir/'multi-one', 'scenarios.csv')[0]
+    assert math.isclose(float(one['flow_m3s']), float(scenarios[0]['flow_m3s']), rel_tol=1e-6)
+    inline_run(dict(inline, output_dir='multi-invalid', mode='multi', min_pressure_head_m=35), expected=3)
+    assert len(rows(config_dir/'multi-invalid', 'scenarios.csv')) == 1
+    assert rows(config_dir/'multi-invalid', 'flushing_plan.csv') == []
+    for change in (dict(mode='bad'), dict(mode=1), dict(mode='single', MODE='multi')):
+        inline_run(dict(inline, output_dir='bad-mode', **change), expected=2)
+    # External asset lists cannot silently merge two outlets at one junction.
+    config_path.write_text(json.dumps(dict(config, output_dir='multi-shared', mode='multi')))
+    bad = subprocess.run([exe, '--inp', str(inp), '--hydrants', str(js),
+                          '--config', str(config_path)], capture_output=True, text=True)
+    assert bad.returncode == 2 and 'distinct hydrant nodes' in bad.stderr
     # Supplying both node IDs and an external list is ambiguous and rejected.
     config_run(inline, expected=2)
 

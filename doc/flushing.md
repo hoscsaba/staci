@@ -4,7 +4,7 @@
 
 Commands below assume the repository root as the working directory unless stated otherwise.
 
-## Single-hydrant flushing analysis
+## Single and simultaneous hydrant flushing analysis
 
 `staci_flush` solves a baseline with every added hydrant closed, then opens one
 hydrant at a time, restoring the baseline before each independent steady-state
@@ -19,10 +19,15 @@ opening times from directed flow travel times. It does not simulate sediment rem
   --config /path/to/flushing_config.json
 ```
 
+The default `mode` is `single`, preserving independent one-at-a-time scenarios.
+Set `"mode": "multi"` to open all listed junctions in one hydraulic solve.
+`MODE` is accepted as an alias; specifying both keys is an error.
+
 Put the flushing settings in `flushing_config.json`:
 
 ```json
 {
+  "mode": "single",
   "hydrant_area_m2": 0.002,
   "total_loss_coefficient": 2.0,
   "velocity_threshold_mps": 0.5,
@@ -65,7 +70,8 @@ JSON format:
 ```
 
 All entries must be matched to existing junctions. Asset IDs must be unique;
-distinct assets may share a junction and are evaluated separately. Without
+distinct assets may share a junction and are evaluated separately in `single`
+mode. In `multi` mode, repeated junctions are rejected to avoid ambiguous outlet areas. Without
 `dxf_handle`, the node ID is used as the asset ID. Unknown nodes, duplicate
 assets and unmatched entries are errors.
 
@@ -83,17 +89,44 @@ Outputs are:
 | `config.json` | Copy of the supplied configuration |
 | `flushing_plan.csv`, `flushing_plan.txt` | Greedy activation sequence, additional/cumulative volume, coverage percentage and both opening-time estimates |
 | `pipe_travel_times.csv` | Per-pipe transport diagnostics, in seconds |
+| `scenario_hydrants.csv` | Individual active-outlet flow and pressure for each scenario |
 | `scenario_pipes.csv` | Every original pipe for each valid scenario, signed/absolute velocity and threshold flags |
 | `pipes_above_threshold.csv` | Only qualifying pipe–hydrant pairs from valid scenarios |
 | `pipe_coverage.csv` | Every pipe, covering hydrants, maximum valid absolute velocity and corresponding hydrant |
 | `work/network.inp`, `hydrants.*` | Copies of the inputs, alongside solver working files |
+
+### Simultaneous opening (`multi`)
+
+The area and loss coefficient apply **to each outlet**, and all outlet flows
+are solved together with the network. This is not a sum of single-hydrant runs.
+`scenarios.csv` has one combined row, with `hydrant_id` equal to `multi` and
+`node_id` containing a JSON array of active junction IDs. Discharge is the sum
+of outlet discharges; `hydrant_pressure_head_m` is their minimum pressure head.
+`scenario_hydrants.csv` gives each outlet's individual flow and pressure.
+`run.json` records the mode and `scenario_count: 1`.
+
+For a valid scenario, `flushing_plan.csv` and the numbered plan in
+`flushing_plan.txt` contain one result row. Each qualifying pipe's volume is
+counted once, so total, additional and cumulative volumes coincide. The
+volume/flow estimate divides this volume by **total** outlet discharge.
+The travel-time estimate takes the longest reachable route to any active
+outlet. It also considers routes passing through an open junction toward
+another outlet: the first outlet may withdraw only part of the incoming flow.
+Pipes unable to reach any active outlet through above-threshold pipes are
+ignored in the travel-time estimate.
+
+Invalid simultaneous hydraulics produce one diagnostic row in `scenarios.csv`,
+exit code 3, and no actionable plan rows, following the existing invalid-scenario
+convention. With `write_network_files: true`, one `<original_name>_multi.inp`
+contains all open-hydrant emitters. In coverage tables, `multi` identifies the
+combined scenario; `hydrant_count` consequently counts covering scenarios.
 
 ### Flushing sequence and opening times
 
 Each run also writes `flushing_plan.csv`, `flushing_plan.txt` and
 `pipe_travel_times.csv`. The console prints the ordered plan.
 
-The first hydrant covers the largest qualifying pipe volume. After each
+In `single` mode, the first hydrant covers the largest qualifying pipe volume. After each
 selection, the remaining hydrants are rescored using **only pipe volume not
 covered by any earlier selected hydrant**. Exact ties use lexicographic hydrant
 ID order. Every hydraulically valid hydrant is ranked; zero-additional-volume
@@ -103,21 +136,41 @@ excluded. Coverage here is a bookkeeping assumption, not a measured cleaning sta
 For each scenario, flow direction defines a directed graph. A pipe's transit time
 is `length / abs(velocity)`. Starting at the upstream end of **every qualifying
 pipe**, the code finds the longest route to the active hydrant and takes the
-maximum travel time. Connecting pipes below the velocity threshold are included.
+maximum travel time. **Every pipe on the route must satisfy `abs(v) > threshold`.**
+A below-threshold (or exactly-at-threshold) connector breaks the route. Remote
+qualifying pipes without another fully qualifying route are ignored for timing.
 Previously covered pipes are still included when calculating a later hydrant's
 opening time. Pump transit is approximated as zero; tank and reservoir nodes
 terminate transport routes. Links with `abs(Q) <= 1e-12 m³/s` are treated as stagnant.
+
+The reported value is a **maximum route time** over the remaining paths, not
+first arrival along the shortest route or a flow-weighted mean. Slow connectors
+are excluded rather than assigned an artificial higher velocity. If another
+fully qualifying path exists, that path can still contribute. This rule applies
+to both `single` and `multi` modes.
+
+`pipe_travel_times.csv` appends `route_json`: an ordered array of link IDs,
+flow-directed `from`/`to` nodes and `travel_time_s` for the controlling route of
+each qualifying pipe. Summing those segment times reproduces the row's total.
+Use the plan's `critical_pipe_id` to locate the route responsible for a large
+time. Ignored pipes have status `ignored_no_qualifying_path`, a blank time and
+an empty route array. If none of the qualifying pipes remains connected, the
+plan reports zero time with `no_connected_qualifying_pipes`. This is distinct
+from a scenario having no qualifying pipes at all (`no_qualifying_pipes`).
 
 The plan includes total, additional and cumulative pipe volumes, followed by
 cumulative volume as a percentage of **all original network pipe volume**
 (including pipes no hydrant covers). Volume outputs in m³ use two decimal places;
 ranking and percentage calculations retain full precision internally. It also includes newly covered
 pipe IDs, opening time in minutes (one decimal place), timing status, and the controlling
-pipe ID. `pipe_travel_times.csv` gives the underlying per-pipe times. An unreachable
-qualifying pipe or a directed cycle along a route to the hydrant makes that
+pipe ID. `pipe_travel_times.csv` gives the underlying per-pipe times. A directed cycle along an otherwise eligible route to the hydrant makes that
 hydrant's opening time **undetermined**, left blank in the CSV. The volume rank
 is retained. A scenario with no qualifying pipes gets zero time. `run.json`
 records the number of undetermined times separately from hydraulic failures.
+
+**Only the route-based time is filtered this way.** Velocity coverage, pipe-volume
+ranking and the separate volume/flow estimate continue to include all qualifying
+pipes, including those ignored for route timing.
 
 A second timing is reported alongside the travel-time estimate:
 `volume_over_flow_time_min = total qualifying pipe volume / hydrant discharge / 60`.
@@ -190,8 +243,9 @@ or pressure-dependent demands are rejected. H-W and D-W headloss are supported
 with positive roughness; non-default viscosity is rejected. Models requiring
 these features need additional flushing-specific support before use here.
 
-Exit codes: `0` all scenarios valid; `1` input, baseline or fatal error; `2` one
-or more invalid scenarios (valid scenarios are still exported). Run
+Exit codes: `0` all scenarios valid; `1` calculation/baseline failure;
+`2` invalid input/configuration; `3` one or more invalid scenarios
+(valid scenarios are still exported). Run
 `staci_flush --help` for the argument list.
 
 Implementation lives in `src/staci_flush.cpp`, `src/flushing.cpp`,

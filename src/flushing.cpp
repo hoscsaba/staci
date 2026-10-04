@@ -29,6 +29,7 @@ constexpr double head_tolerance = 1e-6, mass_tolerance = 1e-6;
 struct Options {
   fs::path inp, hydrants, output, config;
   std::vector<std::string> hydrant_nodes;
+  std::string mode = "single";
   bool write_network_files = false;
   double area = 0, k = 0, velocity = 0, min_pressure = 0;
 };
@@ -135,6 +136,14 @@ Options parse(int argc, char **argv) {
         {"output_dir", "--output-dir"},
         {"min_pressure_head_m", "--min-pressure-head-m"}};
     for (auto it = config.begin(); it != config.end(); ++it) {
+      if (it.key() == "mode" || it.key() == "MODE") {
+        require(!(config.contains("mode") && config.contains("MODE")),
+                "Specify only one of mode and MODE");
+        require(it.value().is_string(), "mode must be single or multi");
+        o.mode = it.value().get<std::string>();
+        require(o.mode == "single" || o.mode == "multi", "mode must be single or multi");
+        continue;
+      }
       if (it.key() == "hydrant_node_ids") {
         require(it.value().is_array() && !it.value().empty(),
                 "hydrant_node_ids must be a nonempty array");
@@ -499,7 +508,8 @@ void verify_supply(Staci &s, const Input &in) {
 }
 // EPANET emitter coefficient uses flow units per sqrt(metre or psi).
 void export_network(const fs::path &path, const Options &o, const Input &in,
-                    const Hydrant &h, const std::string &state,
+                    const Hydrant &h, const std::set<std::string> &active_nodes,
+                    const std::string &state,
                     const std::map<std::string, Csomopont *> &nodes,
                     const std::set<std::string> &flushed) {
   std::string units = "LPS";
@@ -567,8 +577,9 @@ void export_network(const fs::path &path, const Options &o, const Input &in,
       << "\nDEMAND MULTIPLIER 1\nDEMAND MODEL DDA\nEMITTER EXPONENT "
          "0.5\nQUALITY "
          "NONE\n"
-      << "\n[TIMES]\nDURATION 0\n\n[EMITTERS]\n"
-      << h.node << ' '
+      << "\n[TIMES]\nDURATION 0\n\n[EMITTERS]\n";
+  for (const auto &node : active_nodes)
+    out << node << ' '
       << o.area * std::sqrt(2 * 9.81 * head_per_pressure / o.k) *
              flow_factor.at(units)
       << '\n';
@@ -603,6 +614,12 @@ int execute(const Options &o) {
       hydrants.push_back({node, node});
     }
   }
+  if (o.mode == "multi") {
+    std::set<std::string> seen;
+    for (const auto &h : hydrants)
+      require(seen.insert(h.node).second,
+              "multi mode requires distinct hydrant nodes: " + h.node);
+  }
   if (o.write_network_files)
     for (const auto &h : hydrants)
       require(h.node.find_first_of("/\\") == std::string::npos,
@@ -625,6 +642,7 @@ int execute(const Options &o) {
       {"hydrants_fnv1a64", o.hydrants.empty() ? "" : fingerprint(o.hydrants)},
       {"hydrant_node_ids", o.hydrant_nodes},
       {"write_network_files", o.write_network_files},
+      {"mode", o.mode},
       {"snapshot", "initial"},
       {"hydrant_area_m2", o.area},
       {"total_loss_coefficient", o.k},
@@ -761,23 +779,46 @@ int execute(const Options &o) {
     if (!in.junctions.count(id))
       storage_nodes.insert(id);
   auto travel_out = output(o.output / "pipe_travel_times.csv");
-  travel_out << "hydrant_id,node_id,pipe_id,status,travel_time_s\n";
+  travel_out << "hydrant_id,node_id,pipe_id,status,travel_time_s,route_json\n";
+  auto outlet_report = output(o.output / "scenario_hydrants.csv");
+  outlet_report << "scenario_id,node_id,status,flow_m3s,pressure_head_m\n";
+  std::vector<Hydrant> scenarios = hydrants;
+  if (o.mode == "multi") {
+    std::vector<std::string> ids(outlet_nodes.begin(), outlet_nodes.end());
+    scenarios = {{"multi", json(ids).dump()}};
+  }
   int failures = 0;
   size_t count = 0;
-  for (const auto &h : hydrants) {
+  for (const auto &h : scenarios) {
+    const std::set<std::string> active_nodes = o.mode == "multi"
+        ? outlet_nodes : std::set<std::string>{h.node};
     baseline.restore(s);
     for (const auto &outlet : outlets) {
       outlet.second->Set_enabled(false);
       outlet.second->Set_mp(0);
     }
-    auto *outlet = outlets.at(h.node);
-    outlet->Set_enabled(true);
-    outlet->Set_mp(in.density * outlet->discharge(nodes.at(h.node)->Get_p()));
+    for (const auto &node : active_nodes) {
+      auto *outlet = outlets.at(node);
+      outlet->Set_enabled(true);
+      outlet->Set_mp(in.density * outlet->discharge(nodes.at(node)->Get_p()));
+    }
     solved = s.solve_system();
     auto c = check(s, in);
     std::string state = status(solved, c, o.min_pressure);
-    if (state == "ok" && outlet->Get_Q() < 0)
-      state = "reverse_hydrant_flow";
+    double total_flow = 0, outlet_head = std::numeric_limits<double>::infinity();
+    for (const auto &node : active_nodes) {
+      const double flow = outlets.at(node)->Get_Q();
+      total_flow += flow;
+      outlet_head = std::min(outlet_head, nodes.at(node)->Get_p());
+      if (state == "ok" && flow < 0) state = "reverse_hydrant_flow";
+    }
+    for (const auto &node : active_nodes) {
+      outlet_report << csv(h.asset) << ',' << csv(node) << ',' << state << ',';
+      if (solved && c.finite)
+        outlet_report << outlets.at(node)->Get_Q() << ',' << nodes.at(node)->Get_p();
+      else outlet_report << ',';
+      outlet_report << '\n';
+    }
     size_t qualifying = 0;
     double length = 0, volume = 0;
     std::set<std::string> flushed;
@@ -825,24 +866,28 @@ int execute(const Options &o) {
         const double seconds =
             in.pipes.count(id) ? e->Get_dprop("length") / std::abs(e->Get_v())
                                : 0;
-        arcs.push_back({id, from, to, seconds});
+        arcs.push_back({id, from, to, seconds, !in.pipes.count(id) || flushed.count(id) != 0});
       }
-      auto timing = opening_time(arcs, flushed, h.node, storage_nodes);
+      auto timing = opening_time(arcs, flushed, active_nodes, storage_nodes);
       for (const auto &p : timing.pipes) {
         travel_out << csv(h.asset) << ',' << csv(h.node) << ',' << csv(p.pipe)
                    << ',' << p.status << ',';
         if (p.status == "ok")
           travel_out << p.seconds;
-        travel_out << '\n';
+        json route = json::array();
+        for (const auto &arc : p.route)
+          route.push_back({{"link_id", arc.id}, {"from", arc.from},
+                           {"to", arc.to}, {"travel_time_s", arc.seconds}});
+        travel_out << ',' << csv(route.dump()) << '\n';
       }
       candidates.push_back(
-          {h.asset, h.node, flushed, std::move(timing), outlet->Get_Q()});
+          {h.asset, h.node, flushed, std::move(timing), total_flow});
     }
     summary << csv(h.asset) << ',' << csv(h.node) << ',' << state << ','
             << solved << ',';
     if (solved && c.finite)
-      summary << outlet->Get_Q() << ',' << 1000 * outlet->Get_Q() << ','
-              << nodes.at(h.node)->Get_p() << ',' << c.min_head << ','
+      summary << total_flow << ',' << 1000 * total_flow << ','
+              << outlet_head << ',' << c.min_head << ','
               << csv(c.min_node) << ',' << c.balance << ',' << c.residual;
     else
       summary << ",,,,,,";
@@ -853,8 +898,9 @@ int execute(const Options &o) {
     ++count;
     if (o.write_network_files) {
       const std::string name =
-          "networks/" + o.inp.stem().string() + "_hydrant_" + h.node + ".inp";
-      export_network(o.output / name, o, in, h, state, nodes, flushed);
+          "networks/" + o.inp.stem().string() +
+          (o.mode == "multi" ? "_multi" : "_hydrant_" + h.node) + ".inp";
+      export_network(o.output / name, o, in, h, active_nodes, state, nodes, flushed);
       network_index << csv(h.asset) << ',' << csv(h.node) << ',' << state << ','
                     << csv(name) << '\n';
     }
@@ -864,7 +910,7 @@ int execute(const Options &o) {
     text_summary << "Hydrant " << h.asset << " (" << h.node << "): " << state
                  << ", " << qualifying
                  << " pipes; qualifying pipe volume: " << volume_text << '\n';
-    std::cout << "Hydrant " << count << '/' << hydrants.size() << ' ' << h.asset
+    std::cout << "Hydrant " << count << '/' << scenarios.size() << ' ' << h.asset
               << " (" << h.node << "): " << state << ", " << qualifying
               << " pipes; qualifying pipe volume: " << volume_text << "\n"
               << std::flush;
@@ -904,13 +950,15 @@ int execute(const Options &o) {
           "volume_over_flow_time_min,volume_over_flow_status,critical_pipe_id,"
           "redundant\n";
   plan_text
-      << "Greedy volume ranking; each step credits only previously uncovered "
-         "qualifying pipes.\n"
-      << "Opening time: longest advective pipe travel time to the active "
-         "hydrant.\n"
-      << "All qualifying pipes are timed, including previously covered pipes.\n"
-      << "Volume/flow time: total qualifying pipe volume for this hydrant "
-         "divided by its discharge.\n"
+      << (o.mode == "multi" ? "Simultaneous opening: one combined scenario.\n"
+          : "Greedy volume ranking; each step credits only previously uncovered qualifying pipes.\n")
+      << (o.mode == "multi"
+          ? "Opening time: longest advective route to any active hydrant, including through-flow routes.\n"
+          : "Opening time: longest advective pipe travel time to the active hydrant.\n")
+      << "Only pipes connected to an active hydrant by above-threshold pipes are timed.\n"
+      << (o.mode == "multi"
+          ? "Volume/flow time: qualifying pipe volume divided by total hydrant discharge.\n"
+          : "Volume/flow time: total qualifying pipe volume for this hydrant divided by its discharge.\n")
       << "These are transport estimates, not sediment-cleaning completion "
          "guarantees.\n"
       << "Branches may carry contamination to consumers; storage terminates "
@@ -977,11 +1025,11 @@ int execute(const Options &o) {
   plan_text << "\nHydraulically invalid scenarios excluded: " << failures
             << '\n';
   manifest["plan"] = {
-      {"method", "greedy_additional_pipe_volume"},
+      {"method", o.mode == "multi" ? "simultaneous_opening" : "greedy_additional_pipe_volume"},
       {"tie_break", "hydrant_id_lexicographic"},
       {"ranked_hydrants", candidates.size()},
       {"undetermined_opening_times", undetermined},
-      {"timing", "longest_directed_advective_path_all_qualifying_pipes"},
+      {"timing", "longest_directed_advective_path_above_threshold_pipes"},
       {"minimum_transport_flow_m3s", 1e-12},
       {"additional_timing",
        "total_qualifying_pipe_volume_divided_by_hydrant_discharge"}};
@@ -994,15 +1042,15 @@ int execute(const Options &o) {
           ? std::round(10000 * unique_volume / total_network_volume) / 100
           : 0;
   manifest["status"] = failures ? "partial_failure" : "complete";
-  manifest["scenario_count"] = hydrants.size();
+  manifest["scenario_count"] = scenarios.size();
   manifest["failed_scenarios"] = failures;
   manifest["pipe_count"] = in.pipes.size();
   manifest["baseline_min_pressure_head_m"] = initial.min_head;
   write_json(o.output / "run.json", manifest);
-  std::cout << "Flushing complete: " << hydrants.size() << " scenarios, "
+  std::cout << "Flushing complete: " << scenarios.size() << " scenarios, "
             << failures << " failed. Results: " << o.output << '\n';
   if (failures) diagnostics::error("FLUSH.PARTIAL_FAILURE", std::to_string(failures) +
-      " of " + std::to_string(hydrants.size()) + " hydrant scenarios were excluded; inspect FLUSH.SCENARIO warnings and " +
+      " of " + std::to_string(scenarios.size()) + " hydrant scenarios were excluded; inspect FLUSH.SCENARIO warnings and " +
       (o.output / "scenarios.csv").string());
   return failures ? diagnostics::partial_failure : diagnostics::success;
 }
@@ -1012,7 +1060,7 @@ int run(int argc, char **argv) {
     std::cout << "Usage: staci_flush --inp network.inp --config "
                  "flushing_config.json\n"
                  "Config: hydrant_node_ids array, optional write_network_files "
-                 "boolean.\n"
+                 "boolean; mode: single (default) or multi.\n"
                  "Alternatively use --hydrants nodes.txt|hydrants.json.\n"
                  "Legacy usage without --config:\n"
                  "  --hydrant-area-m2 A --loss-coefficient K "
@@ -1021,7 +1069,8 @@ int run(int argc, char **argv) {
                  "[--snapshot initial]\n"
                  "K is TOTAL resistance: h=K*(Q/A)^2/(2g), including outlet "
                  "kinetic head.\n"
-                 "Each scenario opens one hydrant; network valve/pump states "
+                 "single opens one hydrant per scenario; multi opens all together. "
+                 "Network valve/pump states "
                  "remain fixed.\n"
                  "Exit codes: 0 complete; 1 calculation error; 2 input error; "
                  "3 partial scenario failure.\n";

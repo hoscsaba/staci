@@ -117,50 +117,58 @@ document.addEventListener('DOMContentLoaded', () => {
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno"><a class="line" href="structflushing_1_1_travel_arc.html">    8</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structflushing_1_1_travel_arc.html">TravelArc</a> {</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>  std::string id, from, to;</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>  <span class="keywordtype">double</span> seconds;</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>};</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>  <span class="keywordtype">bool</span> timing_allowed = <span class="keyword">true</span>; <span class="comment">// Pipes require abs(v) &gt; threshold; pumps may connect.</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>};</div>
 </div>
-<div class="foldopen" id="foldopen00012" data-start="{" data-end="};">
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="structflushing_1_1_pipe_travel.html">   12</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structflushing_1_1_pipe_travel.html">PipeTravel</a> {</div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>  std::string pipe, status;</div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>  <span class="keywordtype">double</span> seconds = 0;</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>};</div>
+<div class="foldopen" id="foldopen00013" data-start="{" data-end="};">
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno"><a class="line" href="structflushing_1_1_pipe_travel.html">   13</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structflushing_1_1_pipe_travel.html">PipeTravel</a> {</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>  std::string pipe, status;</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>  <span class="keywordtype">double</span> seconds = 0;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>  std::vector&lt;TravelArc&gt; route;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>};</div>
 </div>
-<div class="foldopen" id="foldopen00016" data-start="{" data-end="};">
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno"><a class="line" href="structflushing_1_1_opening_time.html">   16</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structflushing_1_1_opening_time.html">OpeningTime</a> {</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>  std::string status = <span class="stringliteral">&quot;no_qualifying_pipes&quot;</span>, critical_pipe;</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>  <span class="keywordtype">double</span> seconds = 0;</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>  std::vector&lt;PipeTravel&gt; pipes;</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>};</div>
+<div class="foldopen" id="foldopen00018" data-start="{" data-end="};">
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="structflushing_1_1_opening_time.html">   18</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structflushing_1_1_opening_time.html">OpeningTime</a> {</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>  std::string status = <span class="stringliteral">&quot;no_qualifying_pipes&quot;</span>, critical_pipe;</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>  <span class="keywordtype">double</span> seconds = 0;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>  std::vector&lt;PipeTravel&gt; pipes;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>};</div>
 </div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span><span class="comment">// Longest advective route, starting at each qualifying pipe&#39;s upstream end.</span></div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span><a class="code hl_struct" href="structflushing_1_1_opening_time.html">OpeningTime</a> opening_time(<span class="keyword">const</span> std::vector&lt;TravelArc&gt; &amp;arcs,</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>                         <span class="keyword">const</span> std::set&lt;std::string&gt; &amp;qualifying,</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>                         <span class="keyword">const</span> std::string &amp;hydrant,</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>                         <span class="keyword">const</span> std::set&lt;std::string&gt; &amp;storage_nodes);</div>
-<div class="foldopen" id="foldopen00026" data-start="{" data-end="};">
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno"><a class="line" href="structflushing_1_1_plan_candidate.html">   26</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structflushing_1_1_plan_candidate.html">PlanCandidate</a> {</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>  std::string hydrant, node;</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>  std::set&lt;std::string&gt; pipes;</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>  <a class="code hl_struct" href="structflushing_1_1_opening_time.html">OpeningTime</a> opening;</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>  <span class="keywordtype">double</span> hydrant_flow_m3s = 0;</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>};</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span><span class="comment">// Longest allowed advective route; disconnected qualifying pipes are ignored.</span></div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span><a class="code hl_struct" href="structflushing_1_1_opening_time.html">OpeningTime</a> opening_time(<span class="keyword">const</span> std::vector&lt;TravelArc&gt; &amp;arcs,</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>                         <span class="keyword">const</span> std::set&lt;std::string&gt; &amp;qualifying,</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>                         <span class="keyword">const</span> std::string &amp;hydrant,</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>                         <span class="keyword">const</span> std::set&lt;std::string&gt; &amp;storage_nodes);</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="comment">// Multiple outlets: include routes continuing through an open junction to</span></div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span><span class="comment">// another open outlet, because withdrawal need not consume all incoming flow.</span></div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span><a class="code hl_struct" href="structflushing_1_1_opening_time.html">OpeningTime</a> opening_time(<span class="keyword">const</span> std::vector&lt;TravelArc&gt; &amp;arcs,</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>                         <span class="keyword">const</span> std::set&lt;std::string&gt; &amp;qualifying,</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>                         <span class="keyword">const</span> std::set&lt;std::string&gt; &amp;hydrants,</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>                         <span class="keyword">const</span> std::set&lt;std::string&gt; &amp;storage_nodes);</div>
+<div class="foldopen" id="foldopen00034" data-start="{" data-end="};">
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="structflushing_1_1_plan_candidate.html">   34</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structflushing_1_1_plan_candidate.html">PlanCandidate</a> {</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>  std::string hydrant, node;</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>  std::set&lt;std::string&gt; pipes;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>  <a class="code hl_struct" href="structflushing_1_1_opening_time.html">OpeningTime</a> opening;</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>  <span class="keywordtype">double</span> hydrant_flow_m3s = 0;</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>};</div>
 </div>
-<div class="foldopen" id="foldopen00032" data-start="{" data-end="};">
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno"><a class="line" href="structflushing_1_1_plan_step.html">   32</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structflushing_1_1_plan_step.html">PlanStep</a> {</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>  <span class="keywordtype">size_t</span> candidate;</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>  <span class="keywordtype">double</span> total_volume, additional_volume, cumulative_volume;</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>  std::vector&lt;std::string&gt; added_pipes;</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>};</div>
+<div class="foldopen" id="foldopen00040" data-start="{" data-end="};">
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="structflushing_1_1_plan_step.html">   40</a></span><span class="keyword">struct </span><a class="code hl_struct" href="structflushing_1_1_plan_step.html">PlanStep</a> {</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>  <span class="keywordtype">size_t</span> candidate;</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>  <span class="keywordtype">double</span> total_volume, additional_volume, cumulative_volume;</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>  std::vector&lt;std::string&gt; added_pipes;</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>};</div>
 </div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>std::vector&lt;PlanStep&gt;</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>rank_hydrants(<span class="keyword">const</span> std::vector&lt;PlanCandidate&gt; &amp;candidates,</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>              <span class="keyword">const</span> std::map&lt;std::string, double&gt; &amp;volumes);</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>} <span class="comment">// namespace flushing</span></div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="preprocessor">#endif</span></div>
-<div class="ttc" id="astructflushing_1_1_opening_time_html"><div class="ttname"><a href="structflushing_1_1_opening_time.html">flushing::OpeningTime</a></div><div class="ttdef"><b>Definition</b> flushing_plan.h:16</div></div>
-<div class="ttc" id="astructflushing_1_1_pipe_travel_html"><div class="ttname"><a href="structflushing_1_1_pipe_travel.html">flushing::PipeTravel</a></div><div class="ttdef"><b>Definition</b> flushing_plan.h:12</div></div>
-<div class="ttc" id="astructflushing_1_1_plan_candidate_html"><div class="ttname"><a href="structflushing_1_1_plan_candidate.html">flushing::PlanCandidate</a></div><div class="ttdef"><b>Definition</b> flushing_plan.h:26</div></div>
-<div class="ttc" id="astructflushing_1_1_plan_step_html"><div class="ttname"><a href="structflushing_1_1_plan_step.html">flushing::PlanStep</a></div><div class="ttdef"><b>Definition</b> flushing_plan.h:32</div></div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>std::vector&lt;PlanStep&gt;</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>rank_hydrants(<span class="keyword">const</span> std::vector&lt;PlanCandidate&gt; &amp;candidates,</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>              <span class="keyword">const</span> std::map&lt;std::string, double&gt; &amp;volumes);</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>} <span class="comment">// namespace flushing</span></div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span><span class="preprocessor">#endif</span></div>
+<div class="ttc" id="astructflushing_1_1_opening_time_html"><div class="ttname"><a href="structflushing_1_1_opening_time.html">flushing::OpeningTime</a></div><div class="ttdef"><b>Definition</b> flushing_plan.h:18</div></div>
+<div class="ttc" id="astructflushing_1_1_pipe_travel_html"><div class="ttname"><a href="structflushing_1_1_pipe_travel.html">flushing::PipeTravel</a></div><div class="ttdef"><b>Definition</b> flushing_plan.h:13</div></div>
+<div class="ttc" id="astructflushing_1_1_plan_candidate_html"><div class="ttname"><a href="structflushing_1_1_plan_candidate.html">flushing::PlanCandidate</a></div><div class="ttdef"><b>Definition</b> flushing_plan.h:34</div></div>
+<div class="ttc" id="astructflushing_1_1_plan_step_html"><div class="ttname"><a href="structflushing_1_1_plan_step.html">flushing::PlanStep</a></div><div class="ttdef"><b>Definition</b> flushing_plan.h:40</div></div>
 <div class="ttc" id="astructflushing_1_1_travel_arc_html"><div class="ttname"><a href="structflushing_1_1_travel_arc.html">flushing::TravelArc</a></div><div class="ttdef"><b>Definition</b> flushing_plan.h:8</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

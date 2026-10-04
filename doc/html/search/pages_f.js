@@ -13,5 +13,6 @@ var searchData=
   ['model_20choices_10',['Model choices',['../md_doc_2anytown__physical__model.html#model-choices',1,'']]],
   ['models_11',['Supported hydraulic models',['../index.html#supported-hydraulic-models',1,'']]],
   ['modify_20a_20property_20and_20save_20a_20new_20network_12',['Modify a property and save a new network',['../md_doc_2staci__usage.html#modify-a-property-and-save-a-new-network',1,'']]],
-  ['multi_20channel_20network_13',['Stationary multi-channel network',['../md_tests_2_c_h_a_n_n_e_l___t_e_s_t_s.html#stationary-multi-channel-network',1,'']]]
+  ['multi_13',['Simultaneous opening (&lt;span class=&quot;tt&quot;&gt;multi&lt;/span&gt;)',['../md_doc_2flushing.html#simultaneous-opening-multi',1,'']]],
+  ['multi_20channel_20network_14',['Stationary multi-channel network',['../md_tests_2_c_h_a_n_n_e_l___t_e_s_t_s.html#stationary-multi-channel-network',1,'']]]
 ];

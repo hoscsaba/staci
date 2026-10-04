@@ -8,20 +8,28 @@ namespace flushing {
 struct TravelArc {
   std::string id, from, to;
   double seconds;
+  bool timing_allowed = true; // Pipes require abs(v) > threshold; pumps may connect.
 };
 struct PipeTravel {
   std::string pipe, status;
   double seconds = 0;
+  std::vector<TravelArc> route;
 };
 struct OpeningTime {
   std::string status = "no_qualifying_pipes", critical_pipe;
   double seconds = 0;
   std::vector<PipeTravel> pipes;
 };
-// Longest advective route, starting at each qualifying pipe's upstream end.
+// Longest allowed advective route; disconnected qualifying pipes are ignored.
 OpeningTime opening_time(const std::vector<TravelArc> &arcs,
                          const std::set<std::string> &qualifying,
                          const std::string &hydrant,
+                         const std::set<std::string> &storage_nodes);
+// Multiple outlets: include routes continuing through an open junction to
+// another open outlet, because withdrawal need not consume all incoming flow.
+OpeningTime opening_time(const std::vector<TravelArc> &arcs,
+                         const std::set<std::string> &qualifying,
+                         const std::set<std::string> &hydrants,
                          const std::set<std::string> &storage_nodes);
 struct PlanCandidate {
   std::string hydrant, node;

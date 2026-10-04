@@ -146,7 +146,13 @@ Inspect in EPANET</h1>
 <h1 class="doxsection"><a class="anchor" id="automated-regression"></a>
 Automated regression</h1>
 <div class="fragment"><div class="line">ctest --test-dir build -R flushing --output-on-failure</div>
-</div><!-- fragment --><p>Add <span class="tt">-C Release</span> for Visual Studio builds. The <span class="tt">flushing_worked_example</span> test runs this config in a temporary directory, checks the expected plan, independently solves the serial-pipe/outlet head balance, verifies reverse flow and emitter/tag exports, and checks that original example inputs are unchanged. Other flushing tests cover overlap reranking, slow connecting paths, cycles, unreachable pipes, pressure filtering and malformed inputs. GitHub runs them on all three platforms. </p>
+</div><!-- fragment --><p>Add <span class="tt">-C Release</span> for Visual Studio builds. The <span class="tt">flushing_worked_example</span> test runs this config in a temporary directory, checks the expected plan, independently solves the serial-pipe/outlet head balance, verifies reverse flow and emitter/tag exports, and checks that original example inputs are unchanged. Other flushing tests cover overlap reranking, slow connecting paths, cycles, unreachable pipes, pressure filtering and malformed inputs. GitHub runs them on all three platforms.</p>
+<h1 class="doxsection"><a class="anchor" id="open-all-three-hydrants-together"></a>
+Open all three hydrants together</h1>
+<p>Use the supplied <a href="flushing_config_multi.json">multi configuration</a>:</p>
+<div class="fragment"><div class="line">./build/staci_flush --inp examples/flushing/network.inp --config examples/flushing/flushing_config_multi.json</div>
+</div><!-- fragment --><p>It writes to <span class="tt">results_multi</span>, which must be new or empty. This produces one combined plan row, <span class="tt">scenario_hydrants.csv</span> with individual outlet flows and pressures, and <span class="tt">networks/network_multi.inp</span> containing all three emitters. Omitting <span class="tt">mode</span>, or using <span class="tt">"mode": "single"</span>, retains the supplied three-row <span class="tt">expected_plan.csv</span> reference. <span class="tt">MODE</span> is also accepted as a key alias.</p>
+<p>For unexpectedly large opening times, find <span class="tt">critical_pipe_id</span> in <span class="tt">pipe_travel_times.csv</span> and inspect <span class="tt">route_json</span>: each route segment includes its transit time in seconds. Only above-threshold pipes can form the route; remote pipes cut off by a slow connector are marked <span class="tt">ignored_no_qualifying_path</span> and omitted from route timing. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

@@ -9,11 +9,13 @@ var searchData=
   ['on_20macos_6',['Build on macOS',['../index.html#build-on-macos',1,'']]],
   ['on_20windows_7',['Build on Windows',['../index.html#build-on-windows',1,'']]],
   ['only_20hydraulic_20reference_20tests_8',['Channel-only hydraulic reference tests',['../md_doc_2testing.html#channel-only-hydraulic-reference-tests',1,'']]],
-  ['opening_20times_9',['Flushing sequence and opening times',['../md_doc_2flushing.html#flushing-sequence-and-opening-times',1,'']]],
-  ['openingtime_10',['OpeningTime',['../structflushing_1_1_opening_time.html',1,'flushing']]],
-  ['optimizer_20settings_11',['Optimizer settings',['../md_doc_2json__inputs.html#optimizer-settings',1,'']]],
-  ['options_12',['options',['../md_doc_2diagnostics.html#hydraulic-solver-options',1,'Hydraulic solver options'],['../index.html#quick-start-and-build-options',1,'Quick start and build options']]],
-  ['or_20ubuntu_13',['Debian or Ubuntu',['../index.html#debian-or-ubuntu',1,'']]],
-  ['original_20input_14',['Supply deficit in the original input',['../md_doc_2anytown__convergence.html#supply-deficit-in-the-original-input',1,'']]],
-  ['outcomes_15',['Scope and expected outcomes',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#scope-and-expected-outcomes',1,'']]]
+  ['open_20all_20three_20hydrants_20together_9',['Open all three hydrants together',['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#open-all-three-hydrants-together',1,'']]],
+  ['opening_20multi_10',['Simultaneous opening (&lt;span class=&quot;tt&quot;&gt;multi&lt;/span&gt;)',['../md_doc_2flushing.html#simultaneous-opening-multi',1,'']]],
+  ['opening_20times_11',['Flushing sequence and opening times',['../md_doc_2flushing.html#flushing-sequence-and-opening-times',1,'']]],
+  ['openingtime_12',['OpeningTime',['../structflushing_1_1_opening_time.html',1,'flushing']]],
+  ['optimizer_20settings_13',['Optimizer settings',['../md_doc_2json__inputs.html#optimizer-settings',1,'']]],
+  ['options_14',['options',['../md_doc_2diagnostics.html#hydraulic-solver-options',1,'Hydraulic solver options'],['../index.html#quick-start-and-build-options',1,'Quick start and build options']]],
+  ['or_20ubuntu_15',['Debian or Ubuntu',['../index.html#debian-or-ubuntu',1,'']]],
+  ['original_20input_16',['Supply deficit in the original input',['../md_doc_2anytown__convergence.html#supply-deficit-in-the-original-input',1,'']]],
+  ['outcomes_17',['Scope and expected outcomes',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#scope-and-expected-outcomes',1,'']]]
 ];

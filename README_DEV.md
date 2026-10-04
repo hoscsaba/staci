@@ -81,6 +81,12 @@ file, measurement row, element ID and zero-based period; clients must not treat
 these runs as fitted results. See the [measurement contract](doc/json_inputs.md#calibration-measurements)
 for the multi-period pool-state update convention.
 
+`staci_flush` accepts `"mode": "single"` (default) or `"mode": "multi"` in its
+JSON config (`MODE` is an alias). Multi opens all configured nodes in one solve;
+the aggregate report has one scenario row, while `scenario_hydrants.csv` holds
+individual outlet values. See the [flushing output contract](doc/flushing.md)
+for aggregate pressure/flow semantics and route diagnostics.
+
 ## Completion and errors
 
 | Process exit code | Meaning | Consumer behavior |

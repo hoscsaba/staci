@@ -91,3 +91,22 @@ solves the serial-pipe/outlet head balance, verifies reverse flow and emitter/ta
 exports, and checks that original example inputs are unchanged. Other flushing
 tests cover overlap reranking, slow connecting paths, cycles, unreachable pipes,
 pressure filtering and malformed inputs. GitHub runs them on all three platforms.
+
+## Open all three hydrants together
+
+Use the supplied [multi configuration](flushing_config_multi.json):
+
+```bash
+./build/staci_flush --inp examples/flushing/network.inp --config examples/flushing/flushing_config_multi.json
+```
+
+It writes to `results_multi`, which must be new or empty. This produces
+one combined plan row, `scenario_hydrants.csv` with individual outlet flows and
+pressures, and `networks/network_multi.inp` containing all three emitters.
+Omitting `mode`, or using `"mode": "single"`, retains the supplied three-row
+`expected_plan.csv` reference. `MODE` is also accepted as a key alias.
+
+For unexpectedly large opening times, find `critical_pipe_id` in
+`pipe_travel_times.csv` and inspect `route_json`: each route segment includes its
+transit time in seconds. Only above-threshold pipes can form the route; remote pipes cut off by a slow
+connector are marked `ignored_no_qualifying_path` and omitted from route timing.

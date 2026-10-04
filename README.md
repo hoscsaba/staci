@@ -35,7 +35,7 @@ Compared with EPANET's water-distribution focus, STACI additionally provides:
   - [staci: hydraulic and transport calculations](#staci-hydraulic-solver)
   - [staci_split: partitioning and sensor placement](#staci_split)
   - [staci_calibrate: pipe diameter calibration](#staci_calibrate)
-  - [staci_flush: single-hydrant flushing plans](#staci_flush)
+  - [staci_flush: single and simultaneous flushing plans](#staci_flush)
 - [Project directories and launching programs](#project-directories-and-launching-programs)
 - [Installation and execution troubleshooting](#installation-and-execution-troubleshooting)
 - [Tests](#tests)
@@ -49,7 +49,7 @@ Compared with EPANET's water-distribution focus, STACI additionally provides:
 | `staci` | Hydraulics, transport, sensitivity, network inspection and conversion | Native `.spr` or EPANET `.inp` network and command-line options |
 | `staci_split` | Network partitioning or sensor-placement optimization | XML/JSON settings (`--settings`) and a network |
 | `staci_calibrate` | Fit selected pipe diameters to measured pressures and pool levels | XML/JSON settings (`--settings`), period-specific `.spr` networks and measured data |
-| `staci_flush` | Evaluate hydrants individually and rank a flushing sequence | EPANET `.inp` network and JSON flushing config |
+| `staci_flush` | Evaluate hydrants individually or simultaneously | EPANET `.inp` network and JSON flushing config |
 
 Each program runs independently. A model-specific project needs only its inputs
 and a command or launcher that calls the appropriate executable. The optimizer
@@ -463,8 +463,9 @@ See the [settings template](tests/staci_calibrate_settings.xml.in) and
 
 ### staci_flush
 
-Use `staci_flush` to assess opening **one hydrant at a time**, without changing
-valve positions, and construct a flushing sequence. Inputs are an EPANET network
+Use `staci_flush` to assess opening **one hydrant at a time** (`mode: single`,
+the default) or **all listed hydrants simultaneously** (`mode: multi`).
+Valve positions stay fixed. Inputs are an EPANET network
 and a JSON config containing the hydrant junction IDs and global outlet settings.
 
 ```sh
@@ -475,6 +476,7 @@ Example `flushing_config.json`:
 
 ```json
 {
+  "mode": "single",
   "hydrant_node_ids": ["J1", "J2"],
   "hydrant_area_m2": 0.002,
   "total_loss_coefficient": 2.0,
@@ -496,10 +498,16 @@ above the threshold. The plan first selects the hydrant covering the largest
 pipe volume, then repeatedly selects the largest **additional uncovered volume**.
 It reports cumulative coverage as a percentage of all original pipe volume.
 Each hydrant has two time estimates: the longest directed travel time from a
-qualifying pipe to the hydrant using actual velocities (including slower
-connecting pipes), and total qualifying volume divided by hydrant discharge.
+qualifying pipe to the hydrant using only above-threshold pipes, and total qualifying volume divided by hydrant discharge.
 Undetermined travel times are flagged. Plan volumes use two decimal places and
 times use minutes with one decimal place.
+
+In `multi` mode, a valid combined scenario produces one plan row. Flow is the
+sum of all outlet discharges, and pipe volume is counted once. Individual outlet
+flows/pressures appear in `scenario_hydrants.csv`; the optional INP is named
+`<original_name>_multi.inp`. `pipe_travel_times.csv` includes the controlling
+route with per-link transit times. Remote pipes separated from all open
+hydrants by below-threshold pipes are ignored for route timing. See [flushing modes and timing](doc/flushing.md).
 
 Main results are `flushing_plan.txt`, `flushing_plan.csv`, `summary.txt` and
 per-pipe/scenario CSV tables. With `write_network_files: true`, exported networks
