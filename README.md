@@ -642,7 +642,9 @@ ctest --test-dir build -R flushing --output-on-failure
 Add `-C Release` for Visual Studio builds. The flushing tests cover the outlet
 law, ranking and timing, input validation, network exports and the worked example.
 See the [testing reference](doc/testing.md) for the full suite, optional official
-EPANET comparisons and channel reference cases.
+EPANET comparisons and channel reference cases. The GitHub CI installs the pinned
+EPANET reference on all three platforms and rejects skipped reference tests; see
+[CI reference setup and caching](doc/ci_performance.md#epanet-reference-in-hosted-ci).
 The suite also includes [97 public EPANET networks](tests/public_networks/README.md)
 for standalone hydraulic snapshots and explicit compatibility diagnostics.
 

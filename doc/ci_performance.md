@@ -57,10 +57,10 @@ rebuilding some packages. No fixed speedup is promised before measured runs.
    For Linux/macOS check `Report compiler cache statistics` (hits and misses).
 3. Confirm **all three** `Test hydraulics and flushing` steps, executable smoke
    tests and bundle uploads succeed. Timing improvements must not reduce coverage.
-4. Some reference tests skip on hosted CI without an official EPANET toolkit.
-   The full local reference suite needs the toolkit as documented in
-   [package validation](package_validation.md); a green CI run does not imply
-   those optional reference tests ran.
+4. Hosted CI now builds the pinned EPANET reference and requires all reference
+   comparisons to execute. `check_ci_test_results.py` rejects missing required
+   tests, skips or failures in the JUnit report. Local builds can still omit the
+   optional toolkit; see [package validation](package_validation.md).
 5. To force a cold cache, change the `v1` cache namespace in the workflow or
    delete the relevant cache through GitHub Actions. Do not disable vcpkg ABI
    checks or ccache compiler/header checks to manufacture hits.
@@ -70,3 +70,31 @@ Upstream references: [Actions cache](https://github.com/actions/cache),
 [vcpkg binary caching](https://learn.microsoft.com/en-us/vcpkg/reference/binarycaching),
 [ccache manual](https://ccache.dev/manual/latest.html),
 [CMake parallel builds](https://cmake.org/cmake/help/latest/manual/cmake.1.html#build-a-project).
+
+## EPANET reference in hosted CI
+
+All three platforms build official OWA EPANET 2.2 at commit
+`4d8d82ddc260fce216af9321fc3d9a4646ac6827` before configuring STACI.
+`tests/setup_epanet_reference.py --cmake-cache FILE` loads the shared library,
+checks `ENgetversion == 20200`, and writes explicit CLI/shared-library paths
+for CMake. Both CLI report comparisons and Python C API comparisons are enabled.
+
+The source and Release build are cached under `.epanet-reference`, keyed by
+OS, architecture, hosted-runner image version and setup-script hash (which
+contains the pinned revision). No cross-image fallback is used. On a hit,
+CMake still reconfigures/builds and the library version is checked. On a miss,
+the archive is downloaded and built. The cache is saved before STACI tests.
+
+EPANET's reference build uses CMake and the runner's native compiler; its own
+Boost-dependent unit tests and Python wrapper are disabled. It adds no external
+package dependencies. STACI's existing vcpkg and compiler caches remain active.
+
+The 18 previously skipped tests now run, and supplying the shared library also
+registers two EPS reference tests: 85 CTest cases in the hosted configuration.
+The optional C++ EPS demonstration remains outside this CI configuration (a
+local build with `STACI_EPANET_TOOLKIT_ROOT` can enable that 86th test). The
+reference is a test tool, not a new runtime dependency of the shipped programs.
+
+CTest writes `build/ctest-results.xml`. The post-test gate requires the 20
+reference cases by name and rejects any skipped/failed test. This prevents an
+unavailable reference or accidentally disabled registration from turning green.

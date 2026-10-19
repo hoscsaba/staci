@@ -6,7 +6,9 @@ in-memory MEX interface. The repository does not expose an HTTP server, a stable
 C ABI, a Python extension module or a separate `staci_eps` executable.
 
 For CI timing, cache behavior and troubleshooting, see
-[GitHub build performance](doc/ci_performance.md). For preparing user jobs, see
+[GitHub build performance](doc/ci_performance.md). Hosted CI also caches the pinned
+EPANET reference and enforces execution of its numerical comparisons.
+For preparing user jobs, see
 [the calibration walkthrough](doc/calibration_quickstart.md).
 
 ## Build and repository layout
