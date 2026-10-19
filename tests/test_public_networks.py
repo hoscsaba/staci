@@ -86,7 +86,7 @@ def run_case(binary, entry, output, timeout, reference_library=None, head_tolera
             result['reference_warnings'] = reference['warnings']
             if entry.get('reference_expected') == 'invalid_input': result['passed'] = False
             if result['outcome'] == 'solved':
-                actual = json.loads(Path(str(network) + '.hydraulics.json').read_text())
+                actual = json.loads(Path(str(network) + '.hydraulics.json').read_text(encoding='utf-8'))
                 result['comparison'] = compare(actual, reference)
                 if not actual.get('converged'): result['comparison']['passed'] = False
                 result['reference_outcome'] = 'match' if result['comparison']['passed'] else 'mismatch'
@@ -175,6 +175,11 @@ def main():
     print('\n'.join(lines[:4]), flush=True)
     for r in results:
         print(f"{'PASS' if r['passed'] else 'FAIL'} {r['network']}: {r['outcome']}", flush=True)
+        if not r['passed']:
+            # Keep actionable mismatch details visible in CTest/GitHub logs.
+            print(json.dumps({key: r[key] for key in
+                              ('comparison', 'reference_error', 'diagnostic') if key in r},
+                             ensure_ascii=True, indent=2), flush=True)
     print(f'Report: {output / "report.txt"}', flush=True)
     return int(failed != 0)
 

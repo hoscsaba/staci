@@ -154,6 +154,17 @@ jobs:
       - name: Require all EPANET reference tests to pass
         run: python tests/check_ci_test_results.py build/ctest-results.xml
 
+      - name: Upload numerical test reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports-${{ runner.os }}-${{ runner.arch }}
+          path: |
+            build/ctest-results.xml
+            build/public-network-reference-tests/report.json
+            build/Testing/Temporary/LastTest.log
+          if-no-files-found: warn
+
       - name: Install to package directory
         run: cmake --install build --config Release --prefix package
 
