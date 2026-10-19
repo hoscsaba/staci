@@ -22,6 +22,8 @@ int Staci_debug_level;
 
 string dir_name;
 string fname_prefix;
+string network_file, network_extension;
+vector<string> requested_pipe_ids;
 string logfilename;
 string best_logfilename;
 string sollwert_dfile;
@@ -128,7 +130,8 @@ std::string settings_file;
 int run_application(int argc, char **argv) {
     if (argc == 2 && std::string(argv[1]) == "--help") {
         std::cout << "Usage: staci_calibrate [--settings FILE.xml|FILE.json] [--seed N] [--diagnostics-file PATH]\n"
-                  << "Default: staci_calibrate_settings.xml, or .json if XML is absent; relative paths use the working directory.\n";
+                  << "Default: staci_calibrate_settings.xml, or .json if XML is absent; relative paths use the working directory.\n"
+                  << "Networks: network_file for one .spr/.inp snapshot, or fname_prefix + period + network_extension (.spr by default).\n";
         return 0;
     }
     settings_file = input_config::settings_path(argc, argv, "staci_calibrate_settings");
@@ -154,6 +157,10 @@ int run_application(int argc, char **argv) {
     Load_WDS_Systems();
     Load_Sollwert_Datafiles();
     Set_Initial_Pool_Levels();
+    if (Num_of_Periods == 1 && !Sollwert_Node_Staci_ID.empty() && weight_p_err > 0)
+        diagnostics::warning("CALIBRATION.UNINFORMATIVE_PRESSURE",
+            "Pressure errors are mean-centered over time: with one period their contribution is zero. "
+            "Use at least two distinct operating snapshots and corresponding measurements for pressure calibration.");
 
     // Initial computation
     for (unsigned i = 0; i < (wds.size()); i++) {
@@ -258,15 +265,17 @@ void PrintBestDataFile(const pagmo::vector_double &genome) {
     resfile.open("best.dat", ios::out);
     resfile << scientific << setprecision(5);
 
-    for (unsigned int j = 0; j < genome.size(); j++)
+    for (unsigned int j = 0; j < pipe_name.size(); j++)
         if (pipe_is_active.at(j))
             resfile << pipe_name.at(j) << " ; ";
     resfile << endl;
     for (double value : genome)
         resfile << value << " ; ";
     resfile << endl;
-    for (unsigned int j = 0; j < genome.size(); j++)
-        resfile << genome.at(j) / pipe_origD.at(j) << " ; ";
+    size_t active = 0;
+    for (size_t j = 0; j < pipe_name.size(); ++j)
+        if (pipe_is_active.at(j))
+            resfile << genome.at(active++) / pipe_origD.at(j) << " ; ";
     resfile << endl;
 
     for (unsigned int i = 0; i < Sollwert_Pool_Staci_ID.size(); i++)
@@ -490,6 +499,28 @@ void Set_Up_Active_Pipes() {
             pipe_is_active.push_back(true);
         }
 
+    if (pipe_name.empty())
+        input_config::fail(settings_file, "network contains no calibratable pipes.");
+    if (type_of_pipe_selection == 3 || type_of_pipe_selection == 4) {
+        if (type_of_pipe_selection == 3) {
+            std::fill(pipe_is_active.begin(), pipe_is_active.end(), false);
+            for (const auto &id : requested_pipe_ids) {
+                const auto found = std::find(pipe_name.begin(), pipe_name.end(), id);
+                if (found == pipe_name.end())
+                    input_config::fail(settings_file, "pipe_ids: '" + id +
+                        "' is not a calibratable pipe ID in network '" + wds.at(0)->get_def_file() + "'.");
+                pipe_is_active.at(static_cast<size_t>(found - pipe_name.begin())) = true;
+            }
+        }
+        num_of_active_pipes = Count_Active_Pipes();
+        std::ostringstream selected;
+        selected << "Selected " << num_of_active_pipes << " calibration pipes:";
+        for (size_t i = 0; i < pipe_name.size(); ++i)
+            if (pipe_is_active[i]) selected << ' ' << pipe_name[i];
+        logfile_write(selected.str() + "\n", 0);
+        return;
+    }
+
     // Selecting pipes based on diameter
     if (type_of_pipe_selection == 0) {
         num_of_active_pipes = 0;
@@ -658,7 +689,7 @@ double Compute_Error() {
             Staci_Node_Values.at(i).at(j) = p_Staci;
 
             char msg[100];
-            sprintf(msg, "\n\t %s (Staci name: %s): p(%2d)= FVM: %5.2f, Staci: %5.2f bar",
+            sprintf(msg, "\n\t %s (Staci name: %s): p(%2d)= FVM: %5.2f, Staci: %5.2f m",
                     Sollwert_Node_Staci_ID.at(i).c_str(),
                     wds.at(j)->cspok.at(Sollwert_Node_Staci_Idx.at(i))->Get_nev().c_str(),
                     j, p_Sollwert, p_Staci);
@@ -719,13 +750,37 @@ void Load_WDS_Systems() {
 
     for (unsigned int i = 0; i < Num_of_Periods; i++) {
         fname.str("");
-        fname << dir_name << fname_prefix << (Start_of_Periods + i) << ".spr";
+        if (!network_file.empty())
+            fname << (std::filesystem::path(dir_name) / network_file).string();
+        else
+            fname << (std::filesystem::path(dir_name) /
+                (fname_prefix + std::to_string(Start_of_Periods + i) + network_extension)).string();
+        if (!std::filesystem::is_regular_file(fname.str()))
+            input_config::fail(fname.str(), "calibration network file does not exist.");
 
         msg.str("");
         msg << "\n\t" << fname.str();
         logfile_write(msg.str(), 2);
 
         wds.push_back(make_unique<Staci>(fname.str()));
+        // Measurements, warm starts and tank updates use stable element indices.
+        if (i > 0) {
+            const auto &first = *wds.front();
+            const auto &current = *wds.at(i);
+            bool same = first.cspok.size() == current.cspok.size() &&
+                        first.agelemek.size() == current.agelemek.size();
+            if (same) {
+                for (size_t j = 0; j < first.cspok.size(); ++j)
+                    same = same && first.cspok[j]->Get_nev() == current.cspok[j]->Get_nev();
+                for (size_t j = 0; j < first.agelemek.size(); ++j)
+                    same = same && first.agelemek[j]->Get_nev() == current.agelemek[j]->Get_nev() &&
+                        first.agelemek[j]->GetType() == current.agelemek[j]->GetType() &&
+                        first.agelemek[j]->Get_Cspe_Nev() == current.agelemek[j]->Get_Cspe_Nev() &&
+                        first.agelemek[j]->Get_Cspv_Nev() == current.agelemek[j]->Get_Cspv_Nev();
+            }
+            if (!same) input_config::fail(fname.str(),
+                "calibration periods must have identical node/link IDs, ordering, types and connections.");
+        }
         wds.at(i)->build_system();
         wds.at(i)->ini();
     }
@@ -835,8 +890,10 @@ void Load_Sollwert_Datafiles() {
 
         // POOL:
         if (0 == strcmp(type.c_str(), "pool")) {
+            const int pool_index = Find_Pool_Index(name);
+            name = wds.at(0)->agelemek.at(pool_index)->Get_nev();
             Sollwert_Pool_Staci_ID.push_back(name);
-            Sollwert_Pool_Staci_Idx.push_back(Find_Pool_Index(name));
+            Sollwert_Pool_Staci_Idx.push_back(pool_index);
             Sollwert_Pool_Values.push_back(tmp_double_vec);
 
             // Add surface
@@ -907,7 +964,9 @@ int Find_Pool_Index(string PoolName) {
         const string_view type = wds.at(0)->agelemek.at(j)->GetType();
         if (type == "Vegakna") {
             string Name = wds.at(0)->agelemek.at(j)->Get_nev();
-            if (strcmp(Name.c_str(), PoolName.c_str()) == 0) {
+            if (Name == PoolName ||
+                (input_config::extension(wds.at(0)->get_def_file()) == ".inp" &&
+                 Name == "EPANET_TANK_" + PoolName)) {
                 found = true;
                 idx = j;
                 break;
@@ -1026,7 +1085,18 @@ string Load_Settings() {
     global_debug_level = settings.integer("global_debug_level");
     Staci_debug_level = settings.integer("Staci_debug_level");
     dir_name = settings.text("dir_name");
-    fname_prefix = settings.text("fname_prefix");
+    network_file = settings.contains("network_file") ? settings.text("network_file") : "";
+    fname_prefix = network_file.empty() ? settings.text("fname_prefix") : "";
+    network_extension = settings.contains("network_extension") ? settings.text("network_extension") : ".spr";
+    if (network_extension != ".spr" && network_extension != ".inp")
+        input_config::fail(settings_file, "network_extension must be .spr or .inp.");
+    if (!network_file.empty()) {
+        if (settings.contains("network_extension"))
+            input_config::fail(settings_file, "network_file and network_extension cannot be combined.");
+        const auto ext = input_config::extension(network_file);
+        if (ext != ".spr" && ext != ".inp")
+            input_config::fail(settings_file, "network_file must have .spr or .inp extension.");
+    }
     logfilename = settings.text("logfilename");
     best_logfilename = settings.text("best_logfilename");
     sollwert_dfile = settings.text("sollwert_dfile");
@@ -1035,8 +1105,12 @@ string Load_Settings() {
     if (Start_of_Periods < 0 || Num_of_Periods < 1 ||
         Start_of_Periods > std::numeric_limits<int>::max() - Num_of_Periods - 2)
         input_config::fail(settings_file, "Start_of_Periods must be nonnegative and Num_of_Periods positive (within integer range).");
+    if (!network_file.empty() && Num_of_Periods != 1)
+        input_config::fail(settings_file, "network_file selects one snapshot and requires Num_of_Periods=1; "
+            "use fname_prefix and network_extension for multiple operating periods.");
     string Text_Spoil_Active_Pipes = settings.text("Spoil_Active_Pipes");
     dt = settings.real("dt");
+    if (dt <= 0) input_config::fail(settings_file, "dt must be positive (hours).");
 
     weight_p_err = settings.real("weight_p_err");
     if (weight_p_err < 0.)
@@ -1046,7 +1120,19 @@ string Load_Settings() {
 
     string text_type_of_pipe_selection = settings.text("type_of_pipe_selection");
 
+    requested_pipe_ids.clear();
+    if (settings.contains("pipe_ids") && text_type_of_pipe_selection != "list")
+        input_config::fail(settings_file, "pipe_ids requires type_of_pipe_selection=list.");
     bool type_of_pipe_selection_is_set = false;
+    if (text_type_of_pipe_selection == "list") {
+        requested_pipe_ids = settings.string_list("pipe_ids");
+        type_of_pipe_selection_is_set = true;
+        type_of_pipe_selection = 3;
+    }
+    if (text_type_of_pipe_selection == "all") {
+        type_of_pipe_selection_is_set = true;
+        type_of_pipe_selection = 4;
+    }
     if (0 == strcmp(text_type_of_pipe_selection.c_str(), "Dmin")) {
         Dmin = settings.real("Dmin");
         type_of_pipe_selection_is_set = true;
@@ -1062,14 +1148,9 @@ string Load_Settings() {
         type_of_pipe_selection_is_set = true;
         type_of_pipe_selection = 2;
     }
-    if (!type_of_pipe_selection_is_set) {
-
-        stringstream msg;
-        msg.str("");
-        msg << endl << " Load_Settings() -> text_type_of_pipe_selection???" << endl;
-        logfile_write(msg.str(), 0);
-        diagnostics::fail_legacy(__FILE__, __LINE__);
-    }
+    if (!type_of_pipe_selection_is_set)
+        input_config::fail(settings_file,
+            "type_of_pipe_selection must be list, all, Dmin, most_sensitive or largest_diameter.");
 
 
     popsize = settings.integer("popsize");
@@ -1089,6 +1170,8 @@ string Load_Settings() {
     msg << "\t global_debug_level     : " << global_debug_level << endl;
     msg << "\t Staci_debug_level      : " << Staci_debug_level << endl << endl;
     msg << "\t dir_name               : " << dir_name << endl;
+    msg << "\t network_file           : " << network_file << endl;
+    msg << "\t network_extension      : " << network_extension << endl;
     msg << "\t fname_prefix           : " << fname_prefix << endl;
     msg << "\t logfilename            : " << logfilename << endl;
     msg << "\t best_logfilename       : " << best_logfilename << endl;

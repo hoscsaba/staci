@@ -50,7 +50,7 @@ separate input/configuration copies.
 | `staci` EPS | `--epanet-eps network.inp -o result` | `result.meta.json`, `result-{nodes,links,tanks,summary}.csv`, optional `result.h5` |
 | `staci` steady quality | `--steady-quality network.inp -o result` | `result-steady-{nodes,links,summary}.csv` |
 | `staci_split` | `--settings FILE.xml` or `FILE.json`; default `staci_split_settings.xml` then `.json`; optional `--seed N` | `membership.txt` and configured logs |
-| `staci_calibrate` | `--settings FILE.xml` or `FILE.json`; default `staci_calibrate_settings.xml` then `.json`; optional `--seed N` | Configured logs, fitted network and history files |
+| `staci_calibrate` | `--settings FILE.xml` or `FILE.json`; default `staci_calibrate_settings.xml` then `.json`; optional `--seed N` | Configured logs, fitted diameter table and history files |
 | `staci_flush` | See `staci_flush --help` and [flushing API](doc/flushing.md) for plan/options | Plan/scenario results and diagnostics |
 
 All four applications accept `--diagnostics-file /absolute/path/errors.jsonl`.
@@ -74,6 +74,11 @@ Auxiliary files also have JSON variants: optimizer settings, calibration measure
 `staci -i` initial values, flushing configuration and hydrant lists. See
 [JSON input formats](doc/json_inputs.md) for schemas, units and examples. Network
 definitions remain SPR/XML or EPANET INP.
+
+Calibration accepts SPR or INP snapshots via `network_file` (one period) or
+`fname_prefix`/`network_extension` (period series). See the
+[calibration input and objective contract](doc/calibration.md). It does not
+automatically run INP EPS or export a fitted network.
 
 Calibration CSV measurements are checked as finite numbers in the selected
 period window. Invalid cells return exit code 2 and `INPUT.CONFIG` with the

@@ -28,6 +28,11 @@ used when present, otherwise its `.json` sibling. If both exist, XML wins;
 explicit `--settings` always wins. An invalid selected XML never silently falls
 back to JSON.
 
+Calibration additionally accepts a `pipe_ids` string array when
+`type_of_pipe_selection` is `list`; `all` selects every pipe without a list.
+In XML, put the JSON array text inside `<pipe_ids>`. See
+[pipe selection](calibration.md#explicit-pipe-selection).
+
 JSON uses the same case-sensitive keys as the XML child names, without a
 `settings` wrapper. Numeric fields accept JSON numbers or numeric strings;
 nonfinite numbers and fractional integer settings are rejected. Paths and
@@ -37,9 +42,11 @@ fields are the same as in XML.
 
 Paths inside either format remain relative to the **process working directory**,
 including output logs. Selecting settings in another directory does not change
-this base. Calibration retains its `dir_name` + `fname_prefix` + period + `.spr`
-network naming convention; `dir_name` needs its trailing separator. Measurement
-paths are also formed as `dir_name` + `sollwert_dfile`.
+this base. Calibration supports `fname_prefix` + period + `network_extension`
+(`.spr` by default, or `.inp`) beneath `dir_name`. Alternatively, `network_file`
+selects one snapshot with `Num_of_Periods=1`. See [calibration](calibration.md).
+Measurement paths remain `dir_name` + `sollwert_dfile`; include a trailing
+separator in `dir_name`.
 
 Complete examples: [split](../examples/config/staci_split_settings.json),
 [calibrate](../examples/config/staci_calibrate_settings.json). Replace their

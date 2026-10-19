@@ -7,11 +7,12 @@ var searchData=
   ['network_20elements_4',['List network elements',['../md_doc_2staci__usage.html#list-network-elements',1,'']]],
   ['network_20error_20classification_5',['Current public-network error classification',['../md_doc_2error__classification.html',1,'']]],
   ['network_20to_20epanet_6',['Export a STACI network to EPANET',['../md_doc_2staci__usage.html#export-a-staci-network-to-epanet',1,'']]],
-  ['networks_20and_20independent_20comparison_7',['Public networks and independent comparison',['../index.html#public-networks-and-independent-comparison',1,'']]],
-  ['new_20network_8',['Modify a property and save a new network',['../md_doc_2staci__usage.html#modify-a-property-and-save-a-new-network',1,'']]],
-  ['nominal_20convergence_20is_20unreliable_20here_9',['EPANET&apos;s nominal convergence is unreliable here',['../md_doc_2anytown__convergence.html#epanets-nominal-convergence-is-unreliable-here',1,'']]],
-  ['non_20standard_20suitesparse_20installations_10',['Non-standard SuiteSparse installations',['../index.html#non-standard-suitesparse-installations',1,'']]],
-  ['numerical_20equivalence_11',['EPANET numerical equivalence',['../md_doc_2epanet__reference.html',1,'']]],
-  ['numerical_20experiments_12',['Numerical experiments',['../md_doc_2anytown__convergence.html#numerical-experiments',1,'']]],
-  ['numerical_20verification_202026_2010_2002_13',['Current numerical verification (2026-10-02)',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#current-numerical-verification-2026-10-02',1,'']]]
+  ['networks_7',['Calibration with SPR or EPANET INP networks',['../md_doc_2calibration.html',1,'']]],
+  ['networks_20and_20independent_20comparison_8',['Public networks and independent comparison',['../index.html#public-networks-and-independent-comparison',1,'']]],
+  ['new_20network_9',['Modify a property and save a new network',['../md_doc_2staci__usage.html#modify-a-property-and-save-a-new-network',1,'']]],
+  ['nominal_20convergence_20is_20unreliable_20here_10',['EPANET&apos;s nominal convergence is unreliable here',['../md_doc_2anytown__convergence.html#epanets-nominal-convergence-is-unreliable-here',1,'']]],
+  ['non_20standard_20suitesparse_20installations_11',['Non-standard SuiteSparse installations',['../index.html#non-standard-suitesparse-installations',1,'']]],
+  ['numerical_20equivalence_12',['EPANET numerical equivalence',['../md_doc_2epanet__reference.html',1,'']]],
+  ['numerical_20experiments_13',['Numerical experiments',['../md_doc_2anytown__convergence.html#numerical-experiments',1,'']]],
+  ['numerical_20verification_202026_2010_2002_14',['Current numerical verification (2026-10-02)',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#current-numerical-verification-2026-10-02',1,'']]]
 ];

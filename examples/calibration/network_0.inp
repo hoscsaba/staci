@@ -1,0 +1,15 @@
+[TITLE]
+Two-period calibration example (synthetic measurements)
+[JUNCTIONS]
+J1 0 1
+[RESERVOIRS]
+R1 40
+[TANKS]
+T1 0 30 0 100 20 0
+[PIPES]
+Small R1 J1 100 100 120 0 Open
+Large J1 T1 100 200 120 0 Open
+[OPTIONS]
+UNITS LPS
+HEADLOSS H-W
+[END]

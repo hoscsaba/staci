@@ -72,6 +72,7 @@ public:
             for (auto it = root.begin(); it != root.end(); ++it) {
                 if (it->is_string()) values_[it.key()] = it->get<std::string>();
                 else if (it->is_number()) values_[it.key()] = it->dump();
+                else if (it.key() == "pipe_ids" && it->is_array()) values_[it.key()] = it->dump();
                 else if (it->is_boolean() && it.key() == "Spoil_Active_Pipes")
                     values_[it.key()] = it->get<bool>() ? "yes" : "no";
                 else fail(path, "field '" + it.key() + "' must be a scalar string/number (Spoil_Active_Pipes also accepts boolean).");
@@ -86,10 +87,31 @@ public:
             }
         } else fail(path, "settings extension must be .xml or .json.");
     }
+    bool contains(const char *field) const { return values_.count(field) != 0; }
     const char *text(const char *field) const {
         auto it = values_.find(field);
         if (it == values_.end() || it->second.empty()) fail(path_, "missing or empty field '" + std::string(field) + "'.");
         return it->second.c_str();
+    }
+    std::vector<std::string> string_list(const char *field) const {
+        nlohmann::json list;
+        try { list = nlohmann::json::parse(text(field)); }
+        catch (const nlohmann::json::exception &) {
+            fail(path_, std::string(field) + " must be a JSON array of nonempty string IDs.");
+        }
+        if (!list.is_array() || list.empty())
+            fail(path_, std::string(field) + " must be a nonempty array of string IDs.");
+        std::vector<std::string> result;
+        std::set<std::string> seen;
+        for (const auto &id : list) {
+            if (!id.is_string() || id.get<std::string>().empty())
+                fail(path_, std::string(field) + " must contain nonempty string IDs.");
+            const auto name = id.get<std::string>();
+            if (!seen.insert(name).second)
+                fail(path_, std::string(field) + ": duplicate pipe ID '" + name + "'.");
+            result.push_back(name);
+        }
+        return result;
     }
     double real(const char *field) const {
         std::string value = text(field);

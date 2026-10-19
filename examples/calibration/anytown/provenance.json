@@ -1,0 +1,29 @@
+{
+  "source": "tests/public_networks/wntr/wntr/tests/networks_for_testing/Anytown.inp",
+  "source_sha256": "7d0fa34da8f23608cbc4de56e4176f158e7726b01797aaa7df1c2cd6f453e74f",
+  "measurements": "Synthetic STACI steady solutions with sequential constant-area tank balance; not independent validation or field data",
+  "demand_multipliers": [
+    0.75,
+    1.0,
+    1.15
+  ],
+  "initial_tank_level_m": {
+    "41": 6.096,
+    "42": 6.096
+  },
+  "true_diameters_m": {
+    "1": 0.6095999999999999,
+    "2": 0.6095999999999999
+  },
+  "input_diameter_factors": {
+    "1": 1.1,
+    "2": 0.9
+  },
+  "counts": {
+    "JUNCTIONS": 22,
+    "RESERVOIRS": 1,
+    "TANKS": 2,
+    "PIPES": 43,
+    "PUMPS": 3
+  }
+}

@@ -29,6 +29,12 @@ that malformed node/pool CSV measurements produce exit code 2 and an informative
 ctest --test-dir build -R calibration_state_and_measurements --output-on-failure
 ```
 
+`calibration_anytown_example` runs the three-period, 43-pipe Anytown example,
+regenerates its synthetic data in isolation, checks two explicitly selected
+diameters within 1% and measured/computed values within 0.1 m, and verifies
+source preservation. This checks calibration behavior, not independent EPANET
+agreement. See [the example](../examples/calibration/anytown/README.md).
+
 The focused steady-quality checks can be run separately:
 
 ```bash

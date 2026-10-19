@@ -127,7 +127,7 @@ Scope and expected outcomes</h1>
 <li><span class="tt">nonconvergence</span>: a known physical/numerical failure, exit 1, an <span class="tt">ERROR!</span> marker, RMS residuals with units and limits, and worst node/link IDs. A future converged result is accepted as an improvement. These cases are <b>not</b> counted as successful hydraulic solves.</li>
 </ul>
 <p>Timeouts, crashes, unexpected errors, changed inputs and degraded diagnostics always fail the regression suite. The intentionally malformed time record in WNTR <span class="tt">bad_times.inp</span> is unused by a snapshot; its successful snapshot does not assert that its EPS time configuration is valid.</p>
-<h1 class="doxsection"><a class="anchor" id="run-1"></a>
+<h1 class="doxsection"><a class="anchor" id="run-2"></a>
 Run</h1>
 <p>Included in the normal CTest suite and in <span class="tt">tests/run_tests.py</span>:</p>
 <div class="fragment"><div class="line">ctest --test-dir build --output-on-failure</div>

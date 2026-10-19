@@ -1065,6 +1065,13 @@ if(BUILD_TESTING)
                 --state-test $<TARGET_FILE:staci_calibration_state_test>)
         set_tests_properties(calibration_state_and_measurements PROPERTIES
             LABELS "calibration;integration" TIMEOUT 180)
+        add_test(NAME calibration_anytown_example
+            COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_calibration_example.py"
+                --binary $<TARGET_FILE:staci_calibrate>
+                --staci $<TARGET_FILE:staci>
+                --example "${PROJECT_SOURCE_DIR}/examples/calibration/anytown")
+        set_tests_properties(calibration_anytown_example PROPERTIES
+            LABELS "calibration;example;integration" TIMEOUT 180)
         add_test(NAME solver_options
             COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_solver_options.py"
                 --staci $<TARGET_FILE:staci> --split $<TARGET_FILE:staci_split>

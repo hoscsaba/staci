@@ -434,14 +434,23 @@ A minimal single-period example is:
 </settings>
 ```
 
+Set `network_extension` to `.inp` for numbered EPANET snapshots; omitting it
+retains `.spr`. Alternatively, `network_file` names one `.inp` or `.spr` file
+with `Num_of_Periods=1`. See the [calibration guide](doc/calibration.md) and
+[runnable INP example](examples/calibration/README.md). Pressure fitting uses
+mean-centered time series, so a one-period run has zero pressure error and is
+only an integration example.
+
 This loads `./calibrate_network_0.spr` and `./calibrate_targets.csv`. Subsequent
 periods increment the network filename suffix. Keep a trailing separator in
 `dir_name`; `dt` is the period length in hours. Target rows have the form
 `NODE_ID;node;VALUE;` or `POOL_ID;pool;VALUE;`, with one value per period and a
-trailing semicolon. Node pressures are in bar and pool levels in metres.
+trailing semicolon. Node pressure heads and pool levels are in metres (not bar).
 
 `weight_p_err` weights the pressure error against the pool-level error (1 selects
-pressure only). Active pipes can be selected by `largest_diameter`,
+pressure only). Use `type_of_pipe_selection: "list"` with `pipe_ids: ["P1", "P2"]`
+to choose pipes explicitly, or `type_of_pipe_selection: "all"` for every pipe.
+Active pipes can also be selected by `largest_diameter`,
 `most_sensitive`, or `Dmin`; the first two use `num_of_active_pipes`, while `Dmin`
 uses a diameter cutoff named `Dmin`. Use larger optimization runs and assess
 convergence for a real calibration.
