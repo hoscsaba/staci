@@ -27,7 +27,9 @@ with tempfile.TemporaryDirectory(prefix='staci anytown calibration ') as tmp:
                           '--output', str(regenerated)], cwd=job, capture_output=True, text=True, timeout=60)
     assert run.returncode == 0, run.stdout+run.stderr
     for name in ('network_0.inp', 'network_1.inp', 'network_2.inp'):
-        assert (job/name).read_bytes() == (regenerated/name).read_bytes(), name
+        generated_bytes = (regenerated/name).read_bytes()
+        assert b'\r' not in generated_bytes, f'{name}: generated INP must use LF line endings'
+        assert (job/name).read_bytes() == generated_bytes, name
     for name in ('settings.json', 'provenance.json'):
         assert json.loads((job/name).read_text()) == json.loads((regenerated/name).read_text()), name
     observed = json.loads((job/'measurements.json').read_text())['measurements']

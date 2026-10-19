@@ -63,7 +63,8 @@ def prepare(binary, source, output):
     with tempfile.TemporaryDirectory(prefix='anytown truth ') as tmp:
         for period, factor in enumerate(FACTORS):
             truth = Path(tmp)/f'truth_{period}.inp'
-            truth.write_text(snapshot(data, factor, levels, False))
+            # Keep INP bytes reproducible on Windows as well as Unix.
+            truth.write_bytes(snapshot(data, factor, levels, False).encode("utf-8"))
             run = subprocess.run([str(binary), '-s', str(truth)], cwd=tmp,
                                  capture_output=True, text=True, timeout=60)
             if run.returncode:
@@ -74,7 +75,7 @@ def prepare(binary, source, output):
             for row in measurements:
                 row['values'].append(result['nodes'][row['id']]['pressure_m']
                                      if row['type']=='node' else levels[row['id']])
-            (output/f'network_{period}.inp').write_text(snapshot(data, factor, initial, True))
+            (output/f'network_{period}.inp').write_bytes(snapshot(data, factor, initial, True).encode("utf-8"))
             for node in levels:
                 levels[node] += result['links']['EPANET_TANK_'+node]['flow_m3s'] * DT_HOURS*3600/areas[node]
     (output/'measurements.json').write_text(json.dumps({'measurements': measurements}, indent=2)+'\n')
