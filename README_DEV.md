@@ -5,6 +5,10 @@ command-line programs from a web backend, Python, or any GUI. MATLAB also has an
 in-memory MEX interface. The repository does not expose an HTTP server, a stable
 C ABI, a Python extension module or a separate `staci_eps` executable.
 
+For CI timing, cache behavior and troubleshooting, see
+[GitHub build performance](doc/ci_performance.md). For preparing user jobs, see
+[the calibration walkthrough](doc/calibration_quickstart.md).
+
 ## Build and repository layout
 
 CMake 3.16+, a C++17 compiler, nlohmann-json and a supported sparse linear solver
@@ -78,7 +82,11 @@ definitions remain SPR/XML or EPANET INP.
 Calibration accepts SPR or INP snapshots via `network_file` (one period) or
 `fname_prefix`/`network_extension` (period series). See the
 [calibration input and objective contract](doc/calibration.md). It does not
-automatically run INP EPS or export a fitted network.
+automatically run INP EPS or export a fitted network. `type_of_pipe_selection`
+accepts `list` plus `pipe_ids`, or `all`. Optional `min_diameter_m` and
+`max_diameter_m` are absolute SI diameter bounds; each missing side defaults
+to half/twice the original diameter. Invalid effective intervals return
+`INPUT.CONFIG` (exit 2).
 
 Calibration CSV measurements are checked as finite numbers in the selected
 period window. Invalid cells return exit code 2 and `INPUT.CONFIG` with the

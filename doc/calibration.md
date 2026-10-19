@@ -6,6 +6,9 @@ Default bounds are 0.5 to 2 times each original diameter; optional absolute
 bounds are described below. It does not fit roughness,
 demands, pump curves or chlorine parameters.
 
+New users: follow the [own-network walkthrough](calibration_quickstart.md)
+first, then use this page as the full input and objective reference.
+
 ## Inputs and invocation
 
 ```sh

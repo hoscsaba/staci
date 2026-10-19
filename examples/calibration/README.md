@@ -19,3 +19,7 @@ working directory; the input INP files are not replaced by fitted networks.
 
 For a larger looped network with pumps, two tanks and three operating periods,
 see the [Anytown example](anytown/README.md), which selects pipes explicitly.
+
+For your own measurements and network, follow the
+[calibration walkthrough](../../doc/calibration_quickstart.md). It includes explicit pipe selection,
+absolute diameter bounds, pressure/tank units and output checks.

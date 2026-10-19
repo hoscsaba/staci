@@ -12,20 +12,32 @@ on:
 permissions:
   contents: read
 
+# Superseded branch/PR builds need not consume another runner-hour.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      CCACHE_MAXSIZE: 500M
+      CCACHE_COMPILERCHECK: content
     strategy:
       fail-fast: false
       matrix:
         include:
           - name: Linux x64
             os: ubuntu-latest
+            parallel: 4
           - name: macOS
             os: macos-latest
+            parallel: 2
           - name: Windows x64
             os: windows-latest
+            parallel: 4
 
     steps:
       - name: Check out source
@@ -35,20 +47,63 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install --yes libsuitesparse-dev libhdf5-dev libpagmo-dev libeigen3-dev libigraph-dev nlohmann-json3-dev
+          sudo apt-get install --yes ccache libsuitesparse-dev libhdf5-dev libpagmo-dev libeigen3-dev libigraph-dev nlohmann-json3-dev
 
       - name: Install dependencies on macOS
         if: runner.os == 'macOS'
-        run: brew install suite-sparse hdf5 pagmo eigen igraph nlohmann-json
+        run: brew install ccache suite-sparse hdf5 pagmo eigen igraph nlohmann-json
+
+      - name: Restore compiler cache
+        if: runner.os != 'Windows'
+        id: ccache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ccache-v1-${{ runner.os }}-${{ runner.arch }}-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ccache-v1-${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Prepare Windows binary cache
+        if: runner.os == 'Windows'
+        id: vcpkg
+        shell: pwsh
+        run: |
+          $cachePath = Join-Path $env:RUNNER_TEMP 'staci-vcpkg-binaries'
+          New-Item -ItemType Directory -Force -Path $cachePath | Out-Null
+          "VCPKG_BINARY_SOURCES=clear;files,$cachePath,readwrite" >> $env:GITHUB_ENV
+          "cache-path=$cachePath" >> $env:GITHUB_OUTPUT
+          $revision = git -C $env:VCPKG_INSTALLATION_ROOT rev-parse HEAD
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "revision=$revision" >> $env:GITHUB_OUTPUT
+
+      - name: Restore Windows binary cache
+        if: runner.os == 'Windows'
+        id: vcpkg-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ steps.vcpkg.outputs.cache-path }}
+          key: vcpkg-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.vcpkg.outputs.revision }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            vcpkg-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.vcpkg.outputs.revision }}-
+            vcpkg-v1-${{ runner.os }}-${{ runner.arch }}-
 
       - name: Install dependencies on Windows
         if: runner.os == 'Windows'
         shell: pwsh
         run: vcpkg install suitesparse-umfpack:x64-windows hdf5:x64-windows pagmo2:x64-windows eigen3:x64-windows igraph:x64-windows nlohmann-json:x64-windows
 
+      # Save immediately, even if a subsequent application test fails.
+      # Always run vcpkg install above: vcpkg validates package ABI hashes.
+      - name: Save Windows binary cache
+        if: runner.os == 'Windows'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ steps.vcpkg.outputs.cache-path }}
+          key: ${{ steps.vcpkg-cache.outputs.cache-primary-key }}
+
       - name: Configure on Linux or macOS
         if: runner.os != 'Windows'
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
       - name: Configure on Windows
         if: runner.os == 'Windows'
@@ -58,7 +113,18 @@ jobs:
           -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
 
       - name: Build
-        run: cmake --build build --config Release --parallel
+        run: cmake --build build --config Release --parallel ${{ matrix.parallel }}
+
+      - name: Report compiler cache statistics
+        if: runner.os != 'Windows'
+        run: ccache --show-stats
+
+      - name: Save compiler cache
+        if: runner.os != 'Windows'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ steps.ccache.outputs.cache-primary-key }}
 
       - name: Test hydraulics and flushing
         run: ctest --test-dir build -C Release --output-on-failure

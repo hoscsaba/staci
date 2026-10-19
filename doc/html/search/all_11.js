@@ -1,24 +1,11 @@
 var searchData=
 [
-  ['objective_20and_20period_20handling_0',['Objective and period handling',['../md_doc_2calibration.html#objective-and-period-handling',1,'']]],
-  ['ode_5fmegoldo_1',['ode_megoldo',['../class_csatorna.html#a17e55cbde88d58985f7e315e7069ba3a',1,'Csatorna']]],
-  ['of_20contents_2',['Table of contents',['../index.html#table-of-contents',1,'']]],
-  ['official_20epanet_202_202_3',['Validate STACI against official EPANET 2.2',['../md_doc_2testing.html#validate-staci-against-official-epanet-22',1,'']]],
-  ['official_20epanet_20versus_20staci_20eps_4',['Official EPANET versus STACI EPS',['../dir_8976e5d03119516083eaca3ddca61311.html#official-epanet-versus-staci-eps',1,'']]],
-  ['on_20a_20branched_20network_5',['Worked example: three hydrants on a branched network',['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#worked-example-three-hydrants-on-a-branched-network',1,'']]],
-  ['on_20linux_6',['Build on Linux',['../index.html#build-on-linux',1,'']]],
-  ['on_20macos_7',['Build on macOS',['../index.html#build-on-macos',1,'']]],
-  ['on_20windows_8',['Build on Windows',['../index.html#build-on-windows',1,'']]],
-  ['only_20hydraulic_20reference_20tests_9',['Channel-only hydraulic reference tests',['../md_doc_2testing.html#channel-only-hydraulic-reference-tests',1,'']]],
-  ['open_20all_20three_20hydrants_20together_10',['Open all three hydrants together',['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#open-all-three-hydrants-together',1,'']]],
-  ['opening_20multi_11',['Simultaneous opening (&lt;span class=&quot;tt&quot;&gt;multi&lt;/span&gt;)',['../md_doc_2flushing.html#simultaneous-opening-multi',1,'']]],
-  ['opening_20times_12',['Flushing sequence and opening times',['../md_doc_2flushing.html#flushing-sequence-and-opening-times',1,'']]],
-  ['openingtime_13',['OpeningTime',['../structflushing_1_1_opening_time.html',1,'flushing']]],
-  ['optimizer_20settings_14',['Optimizer settings',['../md_doc_2json__inputs.html#optimizer-settings',1,'']]],
-  ['options_15',['options',['../md_doc_2diagnostics.html#hydraulic-solver-options',1,'Hydraulic solver options'],['../index.html#quick-start-and-build-options',1,'Quick start and build options']]],
-  ['or_20epanet_20inp_20networks_16',['Calibration with SPR or EPANET INP networks',['../md_doc_2calibration.html',1,'']]],
-  ['or_20ubuntu_17',['Debian or Ubuntu',['../index.html#debian-or-ubuntu',1,'']]],
-  ['original_20input_18',['Supply deficit in the original input',['../md_doc_2anytown__convergence.html#supply-deficit-in-the-original-input',1,'']]],
-  ['outcomes_19',['Scope and expected outcomes',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#scope-and-expected-outcomes',1,'']]],
-  ['output_20for_20transport_20applications_20',['Hydraulic output for transport applications',['../md_doc_2staci__usage.html#hydraulic-output-for-transport-applications',1,'']]]
+  ['launching_20programs_0',['Project directories and launching programs',['../index.html#project-directories-and-launching-programs',1,'']]],
+  ['layout_1',['Build and repository layout',['../md__r_e_a_d_m_e___d_e_v.html#build-and-repository-layout',1,'']]],
+  ['limitations_2',['Reference scope and remaining limitations',['../md_doc_2package__validation.html#reference-scope-and-remaining-limitations',1,'']]],
+  ['limits_3',['Validation and known limits',['../md__r_e_a_d_m_e___d_e_v.html#validation-and-known-limits',1,'']]],
+  ['line_20reference_4',['Command-line reference',['../md_doc_2staci__usage.html#command-line-reference',1,'']]],
+  ['linux_5',['Build on Linux',['../index.html#build-on-linux',1,'']]],
+  ['list_6',['Todo List',['../todo.html',1,'']]],
+  ['list_20network_20elements_7',['List network elements',['../md_doc_2staci__usage.html#list-network-elements',1,'']]]
 ];

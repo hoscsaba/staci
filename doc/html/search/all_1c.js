@@ -1,7 +1,12 @@
 var searchData=
 [
-  ['_7eagelem_0',['~Agelem',['../class_agelem.html#ab0b9fbc3bbe101673c02960bf7acc24a',1,'Agelem']]],
-  ['_7ebukomutargy_1',['~BukoMutargy',['../class_buko_mutargy.html#a09c7685a9aa1a87c86c947e807ccdede',1,'BukoMutargy']]],
-  ['_7ecsatorna_2',['~Csatorna',['../class_csatorna.html#a24a82ad21dec253b0d658e798a6471bf',1,'Csatorna']]],
-  ['_7ecsomopont_3',['~Csomopont',['../class_csomopont.html#a54cde5164ba96dc2898d345ebae8dc95',1,'Csomopont']]]
+  ['warning_0',['warning',['../class_csatorna.html#ac2000669171af7d8fa5f447cb8aa231d',1,'Csatorna']]],
+  ['water_20quality_20solution_1',['Steady water-quality solution',['../md_doc_2staci__usage.html#steady-water-quality-solution',1,'']]],
+  ['wavefilt_2',['wavefilt',['../classwavefilt.html',1,'']]],
+  ['web_20application_20remote_20calls_3',['Web application / remote calls',['../md__r_e_a_d_m_e___d_e_v.html#web-application--remote-calls',1,'']]],
+  ['windows_4',['Build on Windows',['../index.html#build-on-windows',1,'']]],
+  ['with_20spr_20or_20epanet_20inp_20networks_5',['Calibration with SPR or EPANET INP networks',['../md_doc_2calibration.html',1,'']]],
+  ['with_20your_20own_20network_6',['Start a calibration with your own network',['../md_doc_2calibration__quickstart.html',1,'']]],
+  ['work_7',['EPANET–STACI compatibility status and remaining work',['../md_doc_2staci__usage.html#epanetstaci-compatibility-status-and-remaining-work',1,'']]],
+  ['worked_20example_3a_20three_20hydrants_20on_20a_20branched_20network_8',['Worked example: three hydrants on a branched network',['../dir_d2e741a8a412b7f201cde4c97a4d3aac.html#worked-example-three-hydrants-on-a-branched-network',1,'']]]
 ];

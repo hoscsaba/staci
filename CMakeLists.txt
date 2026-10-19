@@ -25,18 +25,20 @@ add_library(staci_diagnostics STATIC src/diagnostics.cpp)
 target_compile_features(staci_diagnostics PUBLIC cxx_std_17)
 target_include_directories(staci_diagnostics PUBLIC "${PROJECT_SOURCE_DIR}/include/staci")
 
-add_executable(${PROJECT_NAME} ${MAIN_FILE} ${SRC_FILES})
+add_executable(${PROJECT_NAME} src/staci_main.cpp)
 
-# Flushing shares an internal solver target with its hydraulic regression tests.
-set(STACI_FLUSH_CORE_SOURCES ${SRC_FILES} ${MAIN_FILE})
-list(REMOVE_ITEM STACI_FLUSH_CORE_SOURCES "${PROJECT_SOURCE_DIR}/src/staci_main.cpp")
-add_library(staci_core STATIC ${STACI_FLUSH_CORE_SOURCES}
+# Compile the common hydraulic solver once for the CLI tools and C++ examples.
+# MATLAB retains its separate Eigen/PIC variant below.
+set(STACI_CORE_SOURCES ${SRC_FILES} ${MAIN_FILE})
+list(REMOVE_ITEM STACI_CORE_SOURCES "${PROJECT_SOURCE_DIR}/src/staci_main.cpp")
+add_library(staci_core STATIC ${STACI_CORE_SOURCES}
     src/HydrantOutlet.cpp src/flushing.cpp src/flushing_plan.cpp)
 target_compile_features(staci_core PUBLIC cxx_std_17)
 target_include_directories(staci_core PUBLIC "${PROJECT_SOURCE_DIR}/include/staci")
 find_package(nlohmann_json 3.2.0 CONFIG REQUIRED)
 target_link_libraries(staci_diagnostics PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(staci_core PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(${PROJECT_NAME} PRIVATE staci_core)
 add_executable(staci_flush src/staci_flush.cpp)
 target_link_libraries(staci_flush PRIVATE staci_core)
 
@@ -52,22 +54,15 @@ if(STACI_BUILD_OPTIMIZERS)
     find_package(Eigen3 CONFIG REQUIRED)
     find_package(igraph CONFIG REQUIRED)
 
-    set(STACI_OPTIMIZER_COMMON_SOURCES ${SRC_FILES} ${MAIN_FILE})
-    list(REMOVE_ITEM STACI_OPTIMIZER_COMMON_SOURCES
-        "${PROJECT_SOURCE_DIR}/src/staci_main.cpp"
-    )
-
     add_executable(staci_calibrate
         "${PROJECT_SOURCE_DIR}/src/staci_calibrate.cpp"
-        ${STACI_OPTIMIZER_COMMON_SOURCES}
     )
-    target_link_libraries(staci_calibrate PRIVATE Pagmo::pagmo)
+    target_link_libraries(staci_calibrate PRIVATE staci_core Pagmo::pagmo)
 
     add_executable(staci_split
         "${PROJECT_SOURCE_DIR}/src/staci_split.cpp"
-        ${STACI_OPTIMIZER_COMMON_SOURCES}
     )
-    target_link_libraries(staci_split PRIVATE Pagmo::pagmo Eigen3::Eigen igraph::igraph)
+    target_link_libraries(staci_split PRIVATE staci_core Pagmo::pagmo Eigen3::Eigen igraph::igraph)
 
     # Debian/Ubuntu place generated igraph headers in a multiarch directory
     # that some igraph CMake packages omit from their imported target.
@@ -85,18 +80,14 @@ if(STACI_BUILD_OPTIMIZERS)
 endif()
 
 if(STACI_BUILD_CPP_EXAMPLES)
-    set(STACI_EXAMPLE_COMMON_SOURCES ${SRC_FILES} ${MAIN_FILE})
-    list(REMOVE_ITEM STACI_EXAMPLE_COMMON_SOURCES
-        "${PROJECT_SOURCE_DIR}/src/staci_main.cpp"
-    )
     add_executable(staci_example_hydraulics
         "${PROJECT_SOURCE_DIR}/examples/cpp/basic_hydraulics.cpp"
-        ${STACI_EXAMPLE_COMMON_SOURCES}
     )
     add_executable(staci_example_epanet_inp
         "${PROJECT_SOURCE_DIR}/examples/cpp/epanet_inp_hydraulics.cpp"
-        ${STACI_EXAMPLE_COMMON_SOURCES}
     )
+    target_link_libraries(staci_example_hydraulics PRIVATE staci_core)
+    target_link_libraries(staci_example_epanet_inp PRIVATE staci_core)
     target_compile_definitions(staci_example_hydraulics PRIVATE
         STACI_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
     target_compile_definitions(staci_example_epanet_inp PRIVATE
@@ -129,13 +120,12 @@ if(STACI_BUILD_CPP_EXAMPLES)
     if(STACI_EPANET_TOOLKIT_INCLUDE_DIR AND STACI_EPANET_TOOLKIT_LIBRARY)
         add_executable(staci_example_epanet_eps_compare
             "${PROJECT_SOURCE_DIR}/examples/cpp/epanet_staci_eps_compare.cpp"
-            ${STACI_EXAMPLE_COMMON_SOURCES}
         )
         target_compile_definitions(staci_example_epanet_eps_compare PRIVATE
             STACI_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
         target_include_directories(staci_example_epanet_eps_compare PRIVATE
             "${STACI_EPANET_TOOLKIT_INCLUDE_DIR}")
-        target_link_libraries(staci_example_epanet_eps_compare PRIVATE
+        target_link_libraries(staci_example_epanet_eps_compare PRIVATE staci_core
             "${STACI_EPANET_TOOLKIT_LIBRARY}")
         get_filename_component(STACI_EPANET_TOOLKIT_LIBRARY_DIR
             "${STACI_EPANET_TOOLKIT_LIBRARY}" DIRECTORY)

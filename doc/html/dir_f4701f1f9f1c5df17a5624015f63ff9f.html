@@ -124,7 +124,8 @@ Source and synthetic-data construction</h1>
 <p><b>Measurements are synthetic STACI results, not field measurements or an independent EPANET validation.</b> The generator solves the unperturbed-diameter model for each period, updating tank levels from the preceding tank flow and constant area, exactly as the calibration period model does. It then writes calibration inputs with the two perturbed diameters. It does not fit an EPS simulation or claim contaminant/water-quality agreement.</p>
 <p>Regenerate into a new/empty directory (the source file is read-only):</p>
 <div class="fragment"><div class="line">python3 prepare.py --staci /absolute/path/to/staci --output /absolute/path/to/new-job</div>
-</div><!-- fragment --><p>The standard CTest case <span class="tt">calibration_anytown_example</span> regenerates the data in isolation, verifies topology and source preservation, runs the prepared example, and checks recovered diameters within 1% and pressure/level agreement within 0.1 m. See the <a class="el" href="md_doc_2calibration.html" title="Calibration with SPR or EPANET INP networks">calibration contract</a>. </p>
+</div><!-- fragment --><p>The standard CTest case <span class="tt">calibration_anytown_example</span> regenerates the data in isolation, verifies topology and source preservation, runs the prepared example, and checks recovered diameters within 1% and pressure/level agreement within 0.1 m. See the <a class="el" href="md_doc_2calibration.html" title="Calibration with SPR or EPANET INP networks">calibration contract</a>.</p>
+<p>For your own measurements and network, follow the <a class="el" href="md_doc_2calibration__quickstart.html" title="Start a calibration with your own network">calibration walkthrough</a>. It includes explicit pipe selection, absolute diameter bounds, pressure/tank units and output checks. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

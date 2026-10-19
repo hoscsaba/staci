@@ -48,7 +48,7 @@ Compared with EPANET's water-distribution focus, STACI additionally provides:
 | --- | --- | --- |
 | `staci` | Hydraulics, transport, sensitivity, network inspection and conversion | Native `.spr` or EPANET `.inp` network and command-line options |
 | `staci_split` | Network partitioning or sensor-placement optimization | XML/JSON settings (`--settings`) and a network |
-| `staci_calibrate` | Fit selected pipe diameters to measured pressures and pool levels | XML/JSON settings (`--settings`), period-specific `.spr` networks and measured data |
+| `staci_calibrate` | Fit selected pipe diameters to measured pressures and pool levels | XML/JSON settings (`--settings`), period-specific `.spr` or `.inp` networks and measured data |
 | `staci_flush` | Evaluate hydrants individually or simultaneously | EPANET `.inp` network and JSON flushing config |
 
 Each program runs independently. A model-specific project needs only its inputs
@@ -400,8 +400,8 @@ CMake resolves the `@...@` paths in the template when generating the example.
 ### staci_calibrate
 
 Use `staci_calibrate` to fit selected **pipe diameters** to measured node pressures
-and pool levels over one or more periods. Each active diameter varies between
-0.5 and 2 times its original value. It reads
+and pool levels over multiple operating periods. By default each active diameter
+varies between 0.5 and 2 times its original value; absolute bounds are optional. It reads
 **`--settings file.xml` or `--settings file.json`**; without this option it searches the current directory for `staci_calibrate_settings.xml`, then `.json`.
 
 ```sh
@@ -409,7 +409,13 @@ and pool levels over one or more periods. Each active diameter varies between
 /path/to/staci_calibrate --seed 12345
 ```
 
-A minimal single-period example is:
+Start with the [own-network calibration walkthrough](doc/calibration_quickstart.md),
+including complete JSON settings, measurement units, Windows/macOS/Linux commands,
+and result checks. Runnable examples: [two pipes](examples/calibration/README.md)
+and [Anytown](examples/calibration/anytown/README.md).
+
+The following single-period XML example is only a loading/smoke check, not an
+informative pressure fit:
 
 ```xml
 <settings>
@@ -569,7 +575,7 @@ project/
 | --- | --- | --- |
 | `staci` | Network path and mode on the command line | Hydraulic JSON for INP, native results, `.ros`/`.rps`/`.rrs`; EPS/quality files according to mode |
 | `staci_split` | XML/JSON settings selected by `--settings` (or the default filename); `fname` selects the network | `membership.txt`, configured log and sensitivity matrices when applicable |
-| `staci_calibrate` | XML/JSON settings selected by `--settings` (or the default filename), period-specific SPR files and measured targets | `best.dat`, `bog.dat`, configured logs and sensitivity files |
+| `staci_calibrate` | XML/JSON settings selected by `--settings` (or the default filename), SPR/INP snapshots and measured targets | `best.dat`, `bog.dat`, configured logs and sensitivity files |
 | `staci_flush` | `--inp` plus JSON config or explicit hydrant/outlet arguments | Plan TXT/CSV, summary, per-pipe/scenario tables and optional inspection INP files |
 
 `staci_split` and `staci_calibrate` accept `--settings path.xml|path.json`.
@@ -577,9 +583,10 @@ Without it, the program uses `staci_<name>_settings.xml`, or the `.json` sibling
 if XML is absent. Use the example configurations, replace
 all model paths and IDs, then launch from the project directory. CMake's `.in`
 templates contain substitution placeholders; use the generated examples or
-replace the placeholders before running. Calibration currently assembles
-period filenames with `.spr`, so shared INP support in the hydraulic core is
-not a promise that this calibration input convention accepts INP periods.
+replace the placeholders before running. Calibration accepts numbered `.spr`
+or `.inp` snapshots through `fname_prefix` and `network_extension`, or one
+explicitly named snapshot through `network_file`. See the
+[calibration walkthrough](doc/calibration_quickstart.md).
 
 For a GUI, configure the executable path, working directory and arguments as
 separate process-launch fields. Supply the same absolute diagnostics path to

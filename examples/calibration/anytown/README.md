@@ -61,3 +61,7 @@ The standard CTest case `calibration_anytown_example` regenerates the data in
 isolation, verifies topology and source preservation, runs the prepared example,
 and checks recovered diameters within 1% and pressure/level agreement within
 0.1 m. See the [calibration contract](../../../doc/calibration.md).
+
+For your own measurements and network, follow the
+[calibration walkthrough](../../../doc/calibration_quickstart.md). It includes explicit pipe selection,
+absolute diameter bounds, pressure/tank units and output checks.
