@@ -41,10 +41,11 @@ var searchData=
   ['convergence_20investigation_38',['ky10: reference convergence investigation',['../md_doc_2ky10__convergence.html',1,'']]],
   ['convergence_20is_20unreliable_20here_39',['EPANET&apos;s nominal convergence is unreliable here',['../md_doc_2anytown__convergence.html#epanets-nominal-convergence-is-unreliable-here',1,'']]],
   ['corpus_40',['corpus',['../md_doc_2anytown__physical__model.html#current-corpus',1,'Current corpus'],['../dir_50a2aaf16926734421f021d7ec4de7b5.html#public-epanet-hydraulic-regression-corpus',1,'Public EPANET hydraulic regression corpus'],['../md_doc_2testing.html#public-epanet-steady-snapshot-regression-corpus',1,'Public EPANET steady-snapshot regression corpus']]],
-  ['creating_20artifacts_41',['Creating artifacts',['../dir_b94f9f0c034b39d5d6d39e3a6fbfd3e1.html#creating-artifacts',1,'']]],
-  ['current_20corpus_42',['Current corpus',['../md_doc_2anytown__physical__model.html#current-corpus',1,'']]],
-  ['current_20numerical_20verification_202026_2010_2002_43',['Current numerical verification (2026-10-02)',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#current-numerical-verification-2026-10-02',1,'']]],
-  ['current_20public_20network_20error_20classification_44',['Current public-network error classification',['../md_doc_2error__classification.html',1,'']]],
-  ['current_20validation_45',['EPANET hydraulic support and current validation',['../index.html#epanet-hydraulic-support-and-current-validation',1,'']]],
-  ['current_20verification_202026_2010_2002_46',['Current verification (2026-10-02)',['../md_doc_2epanet__valves.html#current-verification-2026-10-02',1,'']]]
+  ['correction_41',['correction',['../md_doc_2ci__performance.html#pinned-epanet-parser-safety-correction',1,'Pinned EPANET parser safety correction'],['../md_doc_2epanet__reference.html#pinned-epanet-parser-safety-correction-1',1,'Pinned EPANET parser safety correction']]],
+  ['creating_20artifacts_42',['Creating artifacts',['../dir_b94f9f0c034b39d5d6d39e3a6fbfd3e1.html#creating-artifacts',1,'']]],
+  ['current_20corpus_43',['Current corpus',['../md_doc_2anytown__physical__model.html#current-corpus',1,'']]],
+  ['current_20numerical_20verification_202026_2010_2002_44',['Current numerical verification (2026-10-02)',['../dir_50a2aaf16926734421f021d7ec4de7b5.html#current-numerical-verification-2026-10-02',1,'']]],
+  ['current_20public_20network_20error_20classification_45',['Current public-network error classification',['../md_doc_2error__classification.html',1,'']]],
+  ['current_20validation_46',['EPANET hydraulic support and current validation',['../index.html#epanet-hydraulic-support-and-current-validation',1,'']]],
+  ['current_20verification_202026_2010_2002_47',['Current verification (2026-10-02)',['../md_doc_2epanet__valves.html#current-verification-2026-10-02',1,'']]]
 ];

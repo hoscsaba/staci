@@ -98,3 +98,16 @@ reference is a test tool, not a new runtime dependency of the shipped programs.
 CTest writes `build/ctest-results.xml`. The post-test gate requires the 20
 reference cases by name and rejects any skipped/failed test. This prevents an
 unavailable reference or accidentally disabled registration from turning green.
+
+### Pinned EPANET parser safety correction
+
+The setup script applies one bounded-loop correction to EPANET 2.2 `hour()` in
+`src/input2.c`: `n <= 3` becomes `n < 3` for the three-element `double y[3]`.
+The unchanged upstream `bad_times.inp` fixture contains a four-component time;
+AddressSanitizer confirms a stack-buffer overflow in the unpatched source, and
+Linux's stack protector aborts the public-corpus test. The correction preserves
+the existing first-three-field interpretation and changes no hydraulic equations
+or valid time values. This is a pinned EPANET 2.2 reference with this explicit
+parser safety patch, not a byte-identical upstream build. The setup-script hash
+invalidates the CI cache when this correction changes. The public-corpus test
+continues to check the original fixture and its hash without weakening tolerances.

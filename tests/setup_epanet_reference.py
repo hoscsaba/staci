@@ -80,6 +80,25 @@ def safely_extract(archive: Path, destination: Path) -> Path:
     return destination / roots.pop()
 
 
+def apply_time_parser_bounds_fix(source_dir: Path) -> None:
+    """Bound EPANET 2.2's hh:mm:ss array; do not change hydraulic equations.
+
+    The pinned hour() loop uses n <= 3 for double y[3]. Four-component times
+    in the unchanged bad_times.inp fixture write y[3] and abort on Linux.
+    Retain the legacy interpretation of the first three fields without that write.
+    Cache identity includes this script, so unpatched builds cannot be reused.
+    """
+    source = source_dir / "src" / "input2.c"
+    original = "while (s != NULL && n <= 3)"
+    fixed = "while (s != NULL && n < 3)"
+    text = source.read_text(encoding="utf-8")
+    if text.count(original) == 1:
+        source.write_text(text.replace(original, fixed), encoding="utf-8")
+    elif text.count(original) != 0 or text.count(fixed) != 1:
+        raise RuntimeError("Pinned EPANET hour() context changed; cannot apply bounds fix")
+    print("EPANET patch: hour() three-field time-parser bounds fix applied", flush=True)
+
+
 def main() -> int:
     args = parse_arguments()
     if args.jobs <= 0:
@@ -103,6 +122,8 @@ def main() -> int:
             extracted = safely_extract(archive, temporary_dir / "source")
             shutil.move(str(extracted), str(source_dir))
         marker.write_text(EPANET_COMMIT + "\n", encoding="ascii")
+
+    apply_time_parser_bounds_fix(source_dir)
 
     sdk_arguments = []
     if platform.system() == 'Darwin':
