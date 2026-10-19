@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="calibration-with-spr-or-epanet-inp-networks"></a></p>
-<p><span class="tt">staci_calibrate</span> varies selected <b>pipe diameters</b> using pagmo's genetic algorithm. Every candidate uses the same diameters across all supplied periods. Bounds are 0.5 to 2 times each original diameter. It does not fit roughness, demands, pump curves or chlorine parameters.</p>
+<p><span class="tt">staci_calibrate</span> varies selected <b>pipe diameters</b> using pagmo's genetic algorithm. Every candidate uses the same diameters across all supplied periods. Default bounds are 0.5 to 2 times each original diameter; optional absolute bounds are described below. It does not fit roughness, demands, pump curves or chlorine parameters.</p>
 <h1 class="doxsection"><a class="anchor" id="inputs-and-invocation"></a>
 Inputs and invocation</h1>
 <div class="fragment"><div class="line">staci_calibrate --settings settings.json --seed 12345</div>
@@ -119,6 +119,13 @@ Inputs and invocation</h1>
 <div class="line">  {&quot;id&quot;: &quot;T1&quot;, &quot;type&quot;: &quot;pool&quot;, &quot;values&quot;: [3.0, 3.1]}</div>
 <div class="line">]}</div>
 </div><!-- fragment --><p>These illustrative values are <b>pressure head in metres</b>, not bar, and tank water depth in metres above the bottom. Use the original INP junction/tank IDs; the internal <span class="tt">EPANET_TANK_</span> prefix is not required. Either measurement type may be used; choose weights accordingly. Each row needs at least <span class="tt">Start_of_Periods + Num_of_Periods</span> finite values. CSV equivalents are <span class="tt">J1;node;30.2;29.8;</span> and <span class="tt">T1;pool;3.0;3.1;</span>.</p>
+<h1 class="doxsection"><a class="anchor" id="diameter-bounds"></a>
+Diameter bounds</h1>
+<p>Optional settings (metres, for all selected pipes):</p>
+<div class="fragment"><div class="line">&quot;min_diameter_m&quot;: 0.08,</div>
+<div class="line">&quot;max_diameter_m&quot;: 0.60</div>
+</div><!-- fragment --><p>These are <b>absolute replacement bounds</b>, not multipliers or additional clamps. If the lower bound is absent, it is 0.5 times that pipe's original diameter; if the upper bound is absent, it is 2 times that pipe's original diameter. You may supply either or both. The resulting interval must satisfy <span class="tt">0 &lt; lower &lt; upper</span> for every selected pipe. Nonfinite/nonpositive values, reversed/equal bounds, or a supplied bound conflicting with the other default produce <span class="tt">INPUT.CONFIG</span> with exit code 2. The original diameter need not lie inside the chosen interval. Effective bounds for each pipe are logged before optimization. <span class="tt">Dmin</span> remains a pipe-selection threshold, not a diameter bound.</p>
+<p>XML equivalents are <span class="tt">&lt;min_diameter_m&gt;0.08&lt;/min_diameter_m&gt;</span> and <span class="tt">&lt;max_diameter_m&gt;0.60&lt;/max_diameter_m&gt;</span>. Existing configurations retain the half-to-double behavior without changes.</p>
 <h1 class="doxsection"><a class="anchor" id="explicit-pipe-selection"></a>
 Explicit pipe selection</h1>
 <p>To calibrate specified pipes, use these fields in the settings JSON:</p>

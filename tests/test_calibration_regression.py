@@ -133,6 +133,41 @@ HEADLOSS H-W
         run = subprocess.run([str(a.binary.resolve()), '--settings', str(settings)],
                              cwd=work, capture_output=True, text=True, timeout=30)
         assert run.returncode == 2 and message in run.stderr, run.stderr
+    # Absolute bounds override (rather than intersect) the old relative bounds.
+    for bounds, lower, upper in [({}, .1, .4),
+                                 ({'min_diameter_m': .45, 'max_diameter_m': .5}, .45, .5),
+                                 ({'min_diameter_m': .25}, .25, .4),
+                                 ({'max_diameter_m': .15}, .1, .15)]:
+        for suffix in ('json', 'xml'):
+            data = dict(direct, type_of_pipe_selection='list', pipe_ids=['Large'], **bounds)
+            path = work/('bounds.'+suffix)
+            if suffix == 'json': path.write_text(json.dumps(data))
+            else:
+                xml = ET.Element('settings')
+                for key,value in data.items():
+                    ET.SubElement(xml,key).text = (json.dumps(value) if isinstance(value,list) else
+                        ('yes' if value else 'no') if isinstance(value,bool) else str(value))
+                ET.ElementTree(xml).write(path,encoding='unicode')
+            run = subprocess.run([str(a.binary.resolve()), '--settings', str(path), '--seed', '123'],
+                                 cwd=work, capture_output=True, text=True, timeout=30)
+            assert run.returncode == 0, run.stderr
+            diameter = float((work/'best.dat').read_text().splitlines()[1].split(';')[0])
+            assert lower <= diameter <= upper, (bounds,diameter)
+            history = (work/base['best_logfilename']).read_text().splitlines()
+            assert history and all(lower <= float(row.split(';')[2]) <= upper for row in history)
+    for bounds, message in [({'min_diameter_m': 0}, 'positive finite'),
+                             ({'max_diameter_m': -1}, 'positive finite'),
+                             ({'min_diameter_m': 'nan'}, 'finite number'),
+                             ({'min_diameter_m': .3, 'max_diameter_m': .3}, 'strictly less'),
+                             ({'min_diameter_m': .4, 'max_diameter_m': .2}, 'strictly less'),
+                             ({'min_diameter_m': .5}, "bounds for pipe 'Large'"),
+                             ({'max_diameter_m': .05}, "bounds for pipe 'Large'")]:
+        data = dict(direct, type_of_pipe_selection='list', pipe_ids=['Large'], **bounds)
+        settings.write_text(json.dumps(data))
+        run = subprocess.run([str(a.binary.resolve()), '--settings', str(settings)],
+                             cwd=work, capture_output=True, text=True, timeout=30)
+        assert run.returncode == 2 and message in run.stderr, run.stderr
+
     # Prevent silently applying measurements/tank history to different elements.
     settings.write_text(json.dumps(dict(base, network_extension='.inp', Num_of_Periods=2)))
     (work/'calibrate_network_1.inp').write_text(inp_template.format(demand=2).replace('Large ', 'Changed '))

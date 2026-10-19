@@ -455,6 +455,10 @@ Active pipes can also be selected by `largest_diameter`,
 uses a diameter cutoff named `Dmin`. Use larger optimization runs and assess
 convergence for a real calibration.
 
+Optional `min_diameter_m` and `max_diameter_m` specify absolute bounds in metres
+for selected pipes. Each omitted bound defaults independently to 0.5 or 2 times
+the original diameter; see [diameter bounds](doc/calibration.md#diameter-bounds).
+
 Outputs include `best.dat` with fitted diameter ratios and target comparisons,
 `bog.dat` with optimization progress, the configured logs, and final sensitivity
 files. Treat these as calibration results to review; the program does not

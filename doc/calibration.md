@@ -2,7 +2,8 @@
 
 `staci_calibrate` varies selected **pipe diameters** using pagmo's genetic
 algorithm. Every candidate uses the same diameters across all supplied periods.
-Bounds are 0.5 to 2 times each original diameter. It does not fit roughness,
+Default bounds are 0.5 to 2 times each original diameter; optional absolute
+bounds are described below. It does not fit roughness,
 demands, pump curves or chlorine parameters.
 
 ## Inputs and invocation
@@ -54,6 +55,29 @@ the internal `EPANET_TANK_` prefix is not required. Either measurement type may
 be used; choose weights accordingly. Each row needs at least
 `Start_of_Periods + Num_of_Periods` finite values. CSV equivalents are
 `J1;node;30.2;29.8;` and `T1;pool;3.0;3.1;`.
+
+## Diameter bounds
+
+Optional settings (metres, for all selected pipes):
+
+```json
+"min_diameter_m": 0.08,
+"max_diameter_m": 0.60
+```
+
+These are **absolute replacement bounds**, not multipliers or additional clamps.
+If the lower bound is absent, it is 0.5 times that pipe's original diameter;
+if the upper bound is absent, it is 2 times that pipe's original diameter.
+You may supply either or both. The resulting interval must satisfy
+`0 < lower < upper` for every selected pipe. Nonfinite/nonpositive values,
+reversed/equal bounds, or a supplied bound conflicting with the other default
+produce `INPUT.CONFIG` with exit code 2. The original diameter need not lie
+inside the chosen interval. Effective bounds for each pipe are logged before
+optimization. `Dmin` remains a pipe-selection threshold, not a diameter bound.
+
+XML equivalents are `<min_diameter_m>0.08</min_diameter_m>` and
+`<max_diameter_m>0.60</max_diameter_m>`. Existing configurations retain the
+half-to-double behavior without changes.
 
 ## Explicit pipe selection
 

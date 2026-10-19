@@ -12,6 +12,7 @@
 #include <numeric>
 #include <list>
 #include <memory>
+#include <optional>
 #include "xmlParser.h"
 
 using namespace std;
@@ -24,6 +25,7 @@ string dir_name;
 string fname_prefix;
 string network_file, network_extension;
 vector<string> requested_pipe_ids;
+std::optional<double> min_diameter_m, max_diameter_m;
 string logfilename;
 string best_logfilename;
 string sollwert_dfile;
@@ -212,8 +214,12 @@ int run_application(int argc, char **argv) {
     for (unsigned int i = 0; i < pipe_name.size(); i++) {
         if (pipe_is_active.at(i)) {
             dia = wds.at(0)->get_dprop(pipe_name.at(i), "diameter");
-            const double lower_bound = 0.5 * dia;
-            const double upper_bound = 2.0 * dia;
+            const double lower_bound = min_diameter_m.value_or(0.5 * dia);
+            const double upper_bound = max_diameter_m.value_or(2.0 * dia);
+            if (!(lower_bound > 0 && lower_bound < upper_bound) || !std::isfinite(upper_bound))
+                input_config::fail(settings_file, "invalid diameter bounds for pipe '" + pipe_name.at(i) +
+                    "': lower=" + std::to_string(lower_bound) + " m, upper=" + std::to_string(upper_bound) +
+                    " m; require 0 < lower < upper. Missing bounds default to 0.5/2 times the original diameter.");
             lower_bounds.push_back(lower_bound);
             upper_bounds.push_back(upper_bound);
             msg << "\t" << pipe_name.at(i) << " D=" << dia << ", LB=" << lower_bound << ", UB=" << upper_bound << endl;
@@ -1081,6 +1087,15 @@ vector<string> csv_read_row(istream &in, char delimiter) {
 string Load_Settings() {
 
     input_config::Settings settings(settings_file);
+
+    min_diameter_m.reset();
+    max_diameter_m.reset();
+    if (settings.contains("min_diameter_m")) min_diameter_m = settings.real("min_diameter_m");
+    if (settings.contains("max_diameter_m")) max_diameter_m = settings.real("max_diameter_m");
+    if ((min_diameter_m && *min_diameter_m <= 0) || (max_diameter_m && *max_diameter_m <= 0))
+        input_config::fail(settings_file, "min_diameter_m and max_diameter_m must be positive finite values in metres.");
+    if (min_diameter_m && max_diameter_m && *min_diameter_m >= *max_diameter_m)
+        input_config::fail(settings_file, "min_diameter_m must be strictly less than max_diameter_m.");
 
     global_debug_level = settings.integer("global_debug_level");
     Staci_debug_level = settings.integer("Staci_debug_level");
