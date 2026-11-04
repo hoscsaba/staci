@@ -436,7 +436,10 @@ Common node properties include `elevation_m`, `pressure_head_m`, `total_head_m`,
 `demand_m3s`, `water_age_s`, `concentration_kgm3`, and
 `source_concentration_kgm3`. Common link properties include `flow_rate_m3s`,
 `velocity_ms`, `status`, and pipe-specific `diameter_m`, `length_m`,
-`friction_coeff`, and `minor_loss`. Pump speed/power, valve position/setting,
+`friction_coeff`, `minor_loss`, `bulk_reaction_per_s`, and
+`wall_reaction_m_s`. Chemical concentrations use kg/m³ inside STACI; imported
+EPANET first-order bulk and wall rates are converted from per day to SI units.
+Pump speed/power, valve position/setting,
 pool water level and fixed boundary head are also exposed when supported by the
 selected STACI element type. Unsupported property/type combinations raise a
 MATLAB exception instead of entering a legacy interactive error path.

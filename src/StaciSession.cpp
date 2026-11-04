@@ -217,6 +217,10 @@ void StaciSession::set_link_property(const std::vector<std::string> &ids,
             item.Set_dprop("diameter", value);
         } else if (property == "friction_coeff" && is_pipe(item))
             item.Set_dprop("friction_coeff", value);
+        else if (property == "bulk_reaction_per_s" && is_pipe(item))
+            item.Set_dprop("cl_k", value);
+        else if (property == "wall_reaction_m_s" && is_pipe(item))
+            item.Set_dprop("cl_w", value);
         else if (property == "minor_loss" && is_pipe(item))
             item.Set_dprop("minor_loss", value);
         else if (property == "speed" &&

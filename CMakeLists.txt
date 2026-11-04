@@ -367,6 +367,14 @@ if(BUILD_TESTING)
         "${PROJECT_SOURCE_DIR}/tests/test_epanet_steady_quality.cpp"
         "${PROJECT_SOURCE_DIR}/src/epanet_steady_quality.cpp"
     )
+    add_executable(staci_session_steady_chemistry_test
+        "${PROJECT_SOURCE_DIR}/tests/test_session_steady_chemistry.cpp")
+    target_link_libraries(staci_session_steady_chemistry_test PRIVATE staci_core)
+    add_test(NAME session_steady_chemistry
+        COMMAND $<TARGET_FILE:staci_session_steady_chemistry_test>
+            "${PROJECT_SOURCE_DIR}/tests/epanet_steady_quality.inp")
+    set_tests_properties(session_steady_chemistry PROPERTIES
+        LABELS "epanet;quality;steady;session")
     target_compile_features(staci_epanet_steady_quality_test PRIVATE cxx_std_17)
     set_target_properties(staci_epanet_steady_quality_test PROPERTIES CXX_EXTENSIONS OFF)
     target_include_directories(staci_epanet_steady_quality_test PRIVATE
@@ -1081,6 +1089,12 @@ if(BUILD_TESTING)
                 --calibrate $<TARGET_FILE:staci_calibrate>)
         set_tests_properties(json_auxiliary_inputs PROPERTIES
             LABELS "cli;json;integration" TIMEOUT 240)
+        add_test(NAME pressure_anchor_all_modules
+            COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_pressure_anchor_modules.py"
+                --staci $<TARGET_FILE:staci> --split $<TARGET_FILE:staci_split>
+                --calibrate $<TARGET_FILE:staci_calibrate>)
+        set_tests_properties(pressure_anchor_all_modules PROPERTIES
+            LABELS "epanet;hydraulics;quality;water_age;split;calibration;integration" TIMEOUT 120)
     endif()
     add_test(NAME epanet_hydraulic_diagnostics
         COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_epanet_diagnostics.py"

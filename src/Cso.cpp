@@ -348,6 +348,10 @@ void Cso::Set_dprop(const string &mit, double mire) {
   }
   else if ((mit == "erdesseg") || (mit == "friction_coeff")) {
     erdesseg = mire;
+  } else if (mit == "cl_k") {
+    cl_k = mire;
+  } else if (mit == "cl_w") {
+    cl_w = mire;
   } else if (mit == "minor_loss") {
     if (mire < 0.0)
       throw invalid_argument("Pipe minor-loss coefficient cannot be negative.");

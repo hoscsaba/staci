@@ -296,6 +296,19 @@ Use `staci` to solve steady hydraulics, calculate transport and sensitivities,
 inspect or modify network properties, and convert networks. It also supports
 EPANET extended-period hydraulics and steady water-quality calculations.
 
+For a **pressure-only anchor** in an EPANET-compatible INP, use a zero-demand
+junction connected to the physical network, and impose its target total-head
+band as an external design or calibration constraint. The junction is not a
+reservoir: it cannot inject or absorb water. The same INP is accepted by the
+steady hydraulic, residence-time, steady-quality, split and calibration
+executables. In calibration, include the anchor node as a pressure measurement
+and select the physical pipes with `type_of_pipe_selection: "list"` and
+`pipe_ids`; a virtual connector should not become a diameter decision variable.
+For partitioning, the connector remains a topological link, so interpret its
+community assignment accordingly. `pressure_anchor_all_modules` checks this
+shared behavior. A real tank or balancing reservoir with nonzero exchange must
+remain an EPANET tank or reservoir and is a different physical model.
+
 ```sh
 ./build/staci --help
 

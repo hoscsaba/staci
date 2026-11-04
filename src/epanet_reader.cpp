@@ -343,8 +343,9 @@ void EpanetReader::parse_options() {
                     quality_units_ = record.fields[3];
                 if (!extended_period_)
                     add_warning("OPTIONS", "QUALITY", record.line_number,
-                                "Chemical configuration is retained; execute EPANET EPS mode "
-                                "to apply sources and first-order reactions.");
+                                "A steady INP import applies first-order reactions and "
+                                "CONCEN sources at the initial hydraulic snapshot; "
+                                "time-dependent quality requires EPS.");
             } else if (quality_mode_ == "TRACE") {
                 if (record.fields.size() > 2)
                     quality_trace_node_ = record.fields[2];
@@ -360,7 +361,9 @@ void EpanetReader::parse_options() {
                 if (quality_units_.empty()) quality_units_ = "mg/L";
                 if (!extended_period_)
                     add_warning("OPTIONS", "QUALITY", record.line_number,
-                                "Chemical configuration is retained; use EPS to simulate transport, sources and reactions.");
+                                "A steady INP import applies first-order reactions and "
+                                "CONCEN sources at the initial hydraulic snapshot; "
+                                "time-dependent quality requires EPS.");
             }
         }
         else if (starts_with(record.fields, {"SPECIFIC", "GRAVITY"}))
@@ -1112,6 +1115,65 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
         if (node->GetEpanetInitialQuality().specified)
             ++initial_quality_count;
     }
+    // Preserve first-order chemical settings for in-memory steady quality as
+    // well as for CLI readers. EPANET specifies bulk rates per day and wall
+    // rates in length per day; STACI stores both in SI units per second.
+    double global_bulk = 0.0;
+    double global_wall = 0.0;
+    std::map<std::string, double> pipe_bulk;
+    std::map<std::string, double> pipe_wall;
+    if (quality_mode_ == "CHEMICAL") {
+        for (const Record &record : records("REACTIONS")) {
+            if (record.fields.size() < 3) continue;
+            const std::string kind = upper(record.fields[0]);
+            const std::string target = upper(record.fields[1]);
+            const double value = number(record, 2, "reaction coefficient", 0.0);
+            if (kind == "ORDER" && (target == "BULK" || target == "WALL") &&
+                std::abs(value - 1.0) > 1.0e-12) {
+                add_warning("REACTIONS", target, record.line_number,
+                            "Only first-order reactions are supported by the steady quality solver.");
+                continue;
+            }
+            if (kind == "GLOBAL" && target == "BULK")
+                global_bulk = value / 86400.0;
+            else if (kind == "GLOBAL" && target == "WALL")
+                global_wall = length_to_metres(value) / 86400.0;
+            else if (kind == "BULK")
+                pipe_bulk[record.fields[1]] = value / 86400.0;
+            else if (kind == "WALL")
+                pipe_wall[record.fields[1]] = length_to_metres(value) / 86400.0;
+        }
+        for (const auto &edge : edges) {
+            if (edge->GetType() != "Cso") continue;
+            const auto bulk = pipe_bulk.find(edge->Get_nev());
+            const auto wall = pipe_wall.find(edge->Get_nev());
+            edge->Set_dprop("cl_k", bulk == pipe_bulk.end() ? global_bulk : bulk->second);
+            edge->Set_dprop("cl_w", wall == pipe_wall.end() ? global_wall : wall->second);
+        }
+        double source_factor = 1.0e-3; // EPANET mg/L -> STACI kg/m^3
+        if (upper(quality_units_) == "UG/L") source_factor = 1.0e-6;
+        for (const Record &record : records("SOURCES")) {
+            if (record.fields.size() < 3) continue;
+            const std::string kind = upper(record.fields[1]);
+            if (kind != "CONCEN") {
+                add_warning("SOURCES", record.fields[0], record.line_number,
+                            "Only CONCEN sources are represented in the steady in-memory quality model.");
+                continue;
+            }
+            if (record.fields.size() > 3) {
+                add_warning("SOURCES", record.fields[0], record.line_number,
+                            "Source pattern uses its initial multiplier in the steady snapshot.");
+            }
+            const double concentration = number(record, 2, "source concentration", 0.0)
+                * source_factor * (record.fields.size() > 3
+                    ? first_pattern_multiplier(record.fields[3]) : 1.0);
+            for (const auto &item : nodes)
+                if (item->Get_nev() == record.fields[0]) {
+                    item->Set_dprop("cl_be", concentration);
+                    break;
+                }
+        }
+    }
     warn_for_unsupported_sections();
     print_report(nodes.size(), edges.size(), demand_component_count,
                  initial_quality_count, reservoir_head_pattern_count);
@@ -1120,8 +1182,6 @@ void EpanetReader::load_system(std::vector<std::unique_ptr<Csomopont> > &nodes,
 void EpanetReader::warn_for_unsupported_sections() {
     const std::vector<std::pair<std::string, std::string> > unsupported = {
 
-        {"SOURCES", "EPANET water-quality sources are not represented."},
-        {"REACTIONS", "EPANET reaction options are not transferred to STACI's transport model."},
         {"MIXING", "Tank mixing models are not represented."},
     };
     for (const auto &entry : unsupported)
