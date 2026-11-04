@@ -346,8 +346,12 @@ StaciSteadyQualityResults StaciSession::solve_steady_quality(
 
     for (std::size_t index = 0; index < quality_nodes.size(); ++index) {
         Csomopont &item = node(info_.node_ids[index]);
+        // Under PDA, requested demand can be positive while the delivered
+        // demand is zero after a pipe outage. Such a node has no advective
+        // inflow and its concentration is undefined; retain its specified
+        // initial/source value instead of making the steady matrix singular.
         if (!quality_nodes[index].fixed_age &&
-            std::abs(item.Get_dprop("demand")) <= kFlowEpsilon &&
+            std::abs(item.DeliveredDemand() / item.Get_dprop("ro")) <= kFlowEpsilon &&
             incoming[index] <= kFlowEpsilon) {
             quality_nodes[index].fixed_age = true;
             quality_nodes[index].fixed_chemical = true;

@@ -46,6 +46,13 @@ quality = model.solveSteadyQuality("both");
 sensitivity = model.hydraulicSensitivity("PIPE74", "diameter_m");
 ```
 
+For pressure-driven demand after an outage, a junction may have positive
+requested demand but zero **delivered** demand and no incoming flow. The
+stationary chemical solver retains that junction's specified initial/source
+concentration (normally zero) instead of treating its requested demand as
+flow. A component with no hydraulic source has no reference head and must be
+excluded from the model being solved; its delivery is zero in service metrics.
+
 Sensitivity parameters currently supported are pipe `diameter_m`, pipe
 `friction_coeff`, and nodal `demand_m3s`. Result derivatives are returned for
 every link flow and node pressure head in consistent SI units.
