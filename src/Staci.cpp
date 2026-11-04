@@ -118,7 +118,7 @@ void Staci::SetInitialParameters() {
     logfile_write(ss.str(), 1);
 
     // A rejected new solve must not leave an earlier success marker behind.
-    if (mode == 0 || mode == 6) {
+    if (!quiet_mode && (mode == 0 || mode == 6)) {
       std::remove((def_file + ".rrs").c_str());
       if (has_inp_extension(def_file)) std::remove((def_file + ".hydraulics.json").c_str());
     }
@@ -1612,11 +1612,14 @@ bool Staci::solve_system() {
         }
       }
     diagnostic << "  Check source connectivity, closed/check-valve links, pump operating points and demand feasibility. "
-               << "This is a numerical hydraulic failure; it does not by itself prove an unsupported element. "
-               << "See the .ros solver log for iteration details.\n";
+               << "This is a numerical hydraulic failure; it does not by itself prove an unsupported element. ";
+    if (!quiet_mode) diagnostic << "See the .ros solver log for iteration details. ";
+    diagnostic << "\n";
     diagnostics::error("HYDRAULICS.NONCONVERGENCE", diagnostic.str());
-    std::ofstream diagnostic_log(out_file.c_str(), std::ios::app);
-    diagnostic_log << diagnostic.str();
+    if (!quiet_mode) {
+      std::ofstream diagnostic_log(out_file.c_str(), std::ios::app);
+      diagnostic_log << diagnostic.str();
+    }
   }
 
   if (konv_ok) {
@@ -2585,8 +2588,10 @@ bool Staci::solve_sparse_system(const vector<double> &rhs,
         message << "The sparse matrix could not be factorized; check non-finite hydraulic coefficients and available memory.";
       message << "\n";
       diagnostics::error("HYDRAULICS.LINEAR_SOLVE", message.str());
-      std::ofstream failure_log(out_file.c_str(), std::ios::app);
-      failure_log << message.str();
+      if (!quiet_mode) {
+        std::ofstream failure_log(out_file.c_str(), std::ios::app);
+        failure_log << message.str();
+      }
       return false;
     }
     m_umfpack_numeric.reset(numeric);
