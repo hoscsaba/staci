@@ -1263,13 +1263,17 @@ public:
         }
 
         std::vector<double> total_inflow(quality_nodes.size(), 0.0);
+        std::vector<double> total_outflow(quality_nodes.size(), 0.0);
         for (std::size_t index = 0; index < quality_nodes.size(); ++index)
             total_inflow[index] = quality_nodes[index].external_inflow_m3s;
         for (const EpanetSteadyQualityLink &link : quality_links) {
-            if (link.flow_m3s >= 0.0)
+            if (link.flow_m3s >= 0.0) {
                 total_inflow[link.to_node] += link.flow_m3s;
-            else
+                total_outflow[link.from_node] += link.flow_m3s;
+            } else {
                 total_inflow[link.from_node] -= link.flow_m3s;
+                total_outflow[link.to_node] -= link.flow_m3s;
+            }
         }
         for (const auto &entry : chemical_sources_) {
             const auto found = node_index.find(entry.first);
@@ -1293,6 +1297,25 @@ public:
                 warn("SOURCES", entry.first, 0,
                      "SETPOINT was represented as a fixed steady concentration; the conditional no-removal behavior is nonlinear and is not applied.");
             }
+        }
+
+        // A zero-demand, zero-flow junction can prescribe hydraulic head
+        // through a closed or stagnant adapter without exchanging water.
+        // Keep its imported initial quality as a passive boundary so the
+        // steady quality matrix remains nonsingular; it cannot affect any
+        // flowing node. A source or nonzero demand is not a passive anchor.
+        constexpr double kQualityFlowEpsilon = 1.0e-12;
+        for (std::size_t index = 0; index < quality_nodes.size(); ++index) {
+            EpanetSteadyQualityNode &node = quality_nodes[index];
+            if (node.fixed_age || node.fixed_chemical ||
+                chemical_sources_.count(node.id) != 0 ||
+                std::abs(system.cspok[index]->Get_dprop("demand") / 3600.0) >
+                    kQualityFlowEpsilon ||
+                total_inflow[index] > kQualityFlowEpsilon ||
+                total_outflow[index] > kQualityFlowEpsilon)
+                continue;
+            node.fixed_age = true;
+            node.fixed_chemical = true;
         }
 
         EpanetSteadyQualitySensitivityInput sensitivity;

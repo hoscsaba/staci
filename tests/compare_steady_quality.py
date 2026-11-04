@@ -49,6 +49,21 @@ def replace_pipe_diameter(source, destination, diameter_mm):
     destination.write_text(text, encoding="utf-8")
 
 
+def add_zero_flow_pressure_anchor(source, destination):
+    text = source.read_text(encoding="utf-8")
+    entries = {
+        "[JUNCTIONS]": "ANCHOR  10  0",
+        "[PIPES]": "P_ANCHOR  J1  ANCHOR  100  100  120  0  Open",
+        "[QUALITY]": "ANCHOR  0.25",
+    }
+    for section, entry in entries.items():
+        heading = section + "\n"
+        if text.count(heading) != 1:
+            raise RuntimeError(f"Expected one {section} section")
+        text = text.replace(heading, heading + entry + "\n", 1)
+    destination.write_text(text, encoding="utf-8")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--staci", type=Path, required=True)
@@ -87,6 +102,45 @@ def main():
     age_links = last_rows(args.work_dir / "time-age-links.csv", "link_id")
 
     checks = []
+    anchor_input = args.work_dir / "zero-flow-anchor.inp"
+    add_zero_flow_pressure_anchor(chemical_input, anchor_input)
+    anchor_prefix = args.work_dir / "zero-flow-anchor"
+    log_parts.append(run([
+        str(args.staci), "-q", str(anchor_input), "-o", str(anchor_prefix),
+        "--quality-mode", "both", "--quality-sensitivity",
+        "-e", "P1", "-p", "diameter"], args.work_dir))
+    anchor_nodes = rows_by_id(args.work_dir / "zero-flow-anchor-steady-nodes.csv",
+                              "node_id")
+    anchor_links = rows_by_id(args.work_dir / "zero-flow-anchor-steady-links.csv",
+                              "link_id")
+    original_nodes = rows_by_id(args.work_dir / "steady-steady-nodes.csv",
+                               "node_id")
+    for identifier in ("J1", "J2"):
+        for column, floor in (("water_age_s", 60.0),
+                              ("chemical_concentration_kgm3", 1.0e-8)):
+            actual = float(anchor_nodes[identifier][column])
+            expected = float(original_nodes[identifier][column])
+            checks.append((f"zero-flow anchor leaves {identifier} {column} unchanged",
+                           actual, expected, relative_error(actual, expected, floor),
+                           1.0e-6))
+    for column, expected, floor in (("water_age_s", 0.0, 1.0),
+                                    ("chemical_concentration_kgm3", 2.5e-4, 1.0e-8)):
+        actual = float(anchor_nodes["ANCHOR"][column])
+        checks.append((f"zero-flow anchor {column}", actual, expected,
+                       relative_error(actual, expected, floor), 1.0e-6))
+    anchor_flow = float(anchor_links["P_ANCHOR"]["flow_m3s"])
+    checks.append(("zero-flow anchor pipe flow", anchor_flow, 0.0,
+                   relative_error(anchor_flow, 0.0, 1.0e-8), 1.0e-4))
+    with (args.work_dir / "zero-flow-anchor-steady-sensitivity.csv").open(
+            newline="", encoding="utf-8") as stream:
+        anchor_sensitivity = list(csv.DictReader(stream))
+    for quantity in ("node_water_age_s", "node_chemical_concentration_kgm3"):
+        value = next(float(row["derivative_per_si_parameter"])
+                     for row in anchor_sensitivity
+                     if row["result_quantity"] == quantity and
+                     row["result_id"] == "ANCHOR")
+        checks.append((f"zero-flow anchor {quantity} sensitivity", value, 0.0,
+                       relative_error(value, 0.0, 1.0e-8), 1.0e-4))
     for identifier in ("J1", "J2"):
         steady = float(steady_nodes[identifier]["water_age_s"])
         marched = float(age_nodes[identifier]["water_age_s"])

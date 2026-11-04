@@ -43,8 +43,9 @@ ctest --test-dir build -R epanet_steady_quality --output-on-failure
 
 They verify the sparse equations against closed-form pipe/mixing results,
 compare the asymptotic result with the existing 24-hour time-marching AGE and
-CHEMICAL models, and compare analytic diameter sensitivities with centered
-finite differences. The readable benchmark log is
+CHEMICAL models, verify that a zero-flow pressure anchor preserves its initial
+quality without changing served nodes, and compare analytic diameter
+sensitivities with centered finite differences. The readable benchmark log is
 `build/steady-quality-test/steady-quality-test.log`.
 
 The portable Python test runner recursively tests every `.spr` and `.inp` file

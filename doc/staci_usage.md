@@ -314,7 +314,12 @@ pipe travel time, and applies the exact first-order transfer factor
 `exp(k*tau)`. Complete instantaneous mixing gives one sparse linear system for
 node water age and another for node chemical concentration. Pumps and valves
 are represented as zero-volume links. Tanks are fixed quality boundaries at
-their imported initial values for this snapshot. This is an asymptotic,
+their imported initial values for this snapshot. A zero-demand junction with
+no incoming or outgoing flow, such as a pressure-only anchor behind a stagnant
+pipe, retains its imported initial chemical concentration and zero water age.
+It still participates in hydraulics but cannot supply, absorb, or mix quality
+mass. A chemical source or nonzero demand prevents this passive-anchor rule.
+This is an asymptotic,
 fixed-boundary calculation; EPS must be used when demands, controls, tank levels, source
 strengths or flow directions change with time. Non-first-order reactions are
 rejected explicitly.
