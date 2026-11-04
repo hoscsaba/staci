@@ -1089,10 +1089,16 @@ if(BUILD_TESTING)
                 --calibrate $<TARGET_FILE:staci_calibrate>)
         set_tests_properties(json_auxiliary_inputs PROPERTIES
             LABELS "cli;json;integration" TIMEOUT 240)
+        set(_pressure_anchor_reference_args "")
+        if(STACI_EPANET_LIBRARY)
+            list(APPEND _pressure_anchor_reference_args
+                --reference-library "${STACI_EPANET_LIBRARY}")
+        endif()
         add_test(NAME pressure_anchor_all_modules
             COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/test_pressure_anchor_modules.py"
                 --staci $<TARGET_FILE:staci> --split $<TARGET_FILE:staci_split>
-                --calibrate $<TARGET_FILE:staci_calibrate>)
+                --calibrate $<TARGET_FILE:staci_calibrate>
+                ${_pressure_anchor_reference_args})
         set_tests_properties(pressure_anchor_all_modules PROPERTIES
             LABELS "epanet;hydraulics;quality;water_age;split;calibration;integration" TIMEOUT 120)
     endif()

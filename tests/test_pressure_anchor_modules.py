@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import subprocess
 import tempfile
+from epanet_reference import snapshot, compare
 
 
 def run(binary, directory, *arguments):
@@ -32,6 +33,7 @@ def main():
     parser = argparse.ArgumentParser()
     for app in ("staci", "split", "calibrate"):
         parser.add_argument("--" + app, type=Path, required=True)
+    parser.add_argument("--reference-library", type=Path)
     args = parser.parse_args()
     network = """[JUNCTIONS]
 J1 0 0
@@ -72,6 +74,12 @@ QUALITY TIMESTEP 0:05
                 "--quality-mode", "both")
         anchored = json.loads(Path(str(inp) + ".hydraulics.json").read_text())
         original = json.loads(Path(str(base) + ".hydraulics.json").read_text())
+        if args.reference_library:
+            epanet_work = work / "epanet"
+            epanet_work.mkdir()
+            reference = snapshot(args.reference_library, inp, epanet_work)
+            check = compare(anchored, reference)
+            assert check["passed"], check["failures"]
         for node in ("J1", "D1"):
             assert abs(anchored["nodes"][node]["head_m"] -
                        original["nodes"][node]["head_m"]) < 1e-7
