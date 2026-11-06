@@ -81,3 +81,7 @@ MATLAB's JVM but no MEX or Python. The separate
 `test_staci_cli_adapter('/absolute/path/staci')` checks successful steady/EPS
 runs, invalid input, timeouts and paths containing spaces. See
 [README_DEV](../README_DEV.md#matlab) for usage and diagnostics.
+
+## Paper reproduction using this interface
+
+The [entropy and water-quality paper repository](https://github.com/hoscsaba/Entropy_water_quality_paper_2026) uses this resident MEX model for fixed-load pipe-sizing searches, stationary chlorine, ranking studies, and pipe-outage service. Its README gives the exact INPs, saved diameter vectors, script order, and independent EPANET 2.2 checks. The reported calculations used STACI revision `21816cb`; use that revision when matching the published numbers. No extra pressure-source element is created for Anytown: the paper imposes its zero-flow pressure anchors as optimizer constraints on ordinary terminal junctions.
