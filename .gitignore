@@ -1,3 +1,15 @@
 tests/test-results/
 
 /build/
+
+# Local build and editor output; sources and tests remain versioned.
+/build-matlab/
+/cmake-build-*/
+.idea/
+.DS_Store
+**/__pycache__/
+*.pyc
+*.ros
+*.rps
+*.rrs
+/staci-diagnostics.jsonl
