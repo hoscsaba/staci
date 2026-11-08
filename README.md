@@ -21,6 +21,7 @@ Compared with EPANET's water-distribution focus, STACI additionally provides:
 
 ## Table of contents
 
+- [License](#license)
 - [Standalone programs](#standalone-programs)
 - [Installation](#installation)
   - [Quick start and build options](#quick-start-and-build-options)
@@ -41,6 +42,14 @@ Compared with EPANET's water-distribution focus, STACI additionally provides:
 - [Tests](#tests)
 - [Further documentation and examples](#further-documentation-and-examples)
 - [EPANET support, GUI diagnostics, solver settings and validation](#epanet-hydraulic-support-and-current-validation)
+
+## License
+
+STACI is distributed under the GNU General Public License, version 2
+(GPL-2.0); see [LICENSE](LICENSE). Third-party libraries are installed
+separately and retain their own licenses. The public benchmark networks in
+`tests/public_networks/` retain their source terms; see that directory's
+README and license notices.
 
 ## Standalone programs
 
