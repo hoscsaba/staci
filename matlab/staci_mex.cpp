@@ -197,6 +197,14 @@ extern "C" void staciMexFunction(int nlhs, mxArray *plhs[], int nrhs,
         } else if (command == "reset") {
             require_arguments(nrhs, 2, "staci_mex('reset', handle)");
             session(prhs[1]).reset_hydraulic_state();
+        } else if (command == "set_solver_tolerances") {
+            require_arguments(nrhs, 4,
+                "staci_mex('set_solver_tolerances', handle, head_m, mass_kgs)");
+            const std::vector<double> head = numeric_vector(prhs[2], "head_m");
+            const std::vector<double> mass = numeric_vector(prhs[3], "mass_kgs");
+            if (head.size() != 1 || mass.size() != 1)
+                throw std::invalid_argument("Solver tolerances must be scalar");
+            session(prhs[1]).set_solver_tolerances(head.front(), mass.front());
         } else if (command == "solve_hydraulics") {
             require_arguments(nrhs, 2, "status = staci_mex('solve_hydraulics', handle)");
             const StaciHydraulicStatus status = session(prhs[1]).solve_hydraulics();

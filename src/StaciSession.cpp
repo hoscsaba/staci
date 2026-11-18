@@ -86,6 +86,11 @@ void StaciSession::reset_hydraulic_state() {
     solved_ = false;
 }
 
+void StaciSession::set_solver_tolerances(double head_m, double mass_kgs) {
+    system_->set_solver_tolerances(head_m, mass_kgs);
+    solved_ = false;
+}
+
 StaciHydraulicStatus StaciSession::solve_hydraulics() {
     bool converged = system_->solve_system();
     if (!converged) {

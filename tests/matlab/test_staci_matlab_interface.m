@@ -56,6 +56,18 @@ verifyTrue(testCase, status.converged);
 verifyTrue(testCase, all(isfinite(model.nodeResults().pressure_head_m)));
 end
 
+function testResidentSolverToleranceSetter(testCase)
+% Changing numerical tolerances must work on the resident model without
+% exporting or re-importing an INP, as used by the PDA replay fallback.
+networkFile = fullfile(testCase.TestData.repositoryDirectory, 'tests', ...
+    'epanet_smoke.inp');
+model = StaciModel(networkFile);
+model.setSolverTolerances(1e-4, 1e-6);
+status = model.solveHydraulics();
+verifyTrue(testCase, status.converged);
+verifyTrue(testCase, all(isfinite(model.nodeResults().pressure_head_m)));
+end
+
 function testSteadyWaterAge(testCase)
 model = StaciModel(testCase.TestData.networkFile);
 verifyTrue(testCase, model.solveHydraulics().converged);

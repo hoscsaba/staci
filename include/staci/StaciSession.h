@@ -67,6 +67,9 @@ public:
 
     const StaciSessionInfo &info() const noexcept { return info_; }
     void reset_hydraulic_state();
+    // Resident Newton stopping tolerances (RMS head in m, continuity in
+    // kg/s). Changing them invalidates the previous hydraulic solution.
+    void set_solver_tolerances(double head_m, double mass_kgs);
     StaciHydraulicStatus solve_hydraulics();
 
     std::vector<double> get_node_property(

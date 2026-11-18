@@ -94,6 +94,15 @@ classdef StaciModel < handle
             staci_mex('reset', object.Handle);
         end
 
+        function setSolverTolerances(object, head_m, mass_kgs)
+            %SETSOLVERTOLERANCES Override RMS head and continuity tolerances.
+            % Units are m and kg/s. Use only for a documented numerical
+            % fallback after checking the resulting service uncertainty.
+            object.requireOpen();
+            staci_mex('set_solver_tolerances', object.Handle, ...
+                double(head_m), double(mass_kgs));
+        end
+
         function results = nodeResults(object)
             object.requireOpen();
             results = staci_mex('node_results', object.Handle);

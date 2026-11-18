@@ -46,6 +46,13 @@ quality = model.solveSteadyQuality("both");
 sensitivity = model.hydraulicSensitivity("PIPE74", "diameter_m");
 ```
 
+`model.setSolverTolerances(head_m, mass_kgs)` changes the resident Newton
+solver's RMS head and continuity stopping tolerances without exporting an INP.
+Both arguments use SI units. It invalidates the previous hydraulic solution;
+call `solveHydraulics()` again. Use a relaxed continuity tolerance only as a
+documented numerical fallback and check its outputs against an independent
+solver. The paper's TT Pareto outage audit records every such retry.
+
 For pressure-driven demand after an outage, a junction may have positive
 requested demand but zero **delivered** demand and no incoming flow. The
 stationary chemical solver retains that junction's specified initial/source
@@ -70,7 +77,7 @@ between workers.
 
 ## Validation and external-process alternative
 
-The in-memory interface is covered by `tests/matlab/run_matlab_tests.m` (six
+The in-memory interface is covered by `tests/matlab/run_matlab_tests.m` (seven
 tests). The current MEX module was built and these tests passed in MATLAB
 R2026a on macOS arm64. Each build must match the MATLAB architecture.
 
@@ -84,4 +91,12 @@ runs, invalid input, timeouts and paths containing spaces. See
 
 ## Paper reproduction using this interface
 
-The [entropy and water-quality paper repository](https://github.com/hoscsaba/Entropy_water_quality_paper_2026) uses this resident MEX model for fixed-load pipe-sizing searches, stationary chlorine, ranking studies, and pipe-outage service. Its README gives the exact INPs, saved diameter vectors, script order, and independent EPANET 2.2 checks. The reported calculations used STACI revision `21816cb`; use that revision when matching the published numbers. No extra pressure-source element is created for Anytown: the paper imposes its zero-flow pressure anchors as optimizer constraints on ordinary terminal junctions.
+The [entropy and water-quality paper repository](https://github.com/hoscsaba/Entropy_water_quality_paper_2026) uses this resident MEX model for fixed-load pipe-sizing searches, stationary chlorine, ranking studies, and pipe-outage service. Its README maps the exact INPs, saved diameter vectors, figure scripts, and independent EPANET 2.2 checks. Build this checkout's MEX source for the TT Pareto outage audit; older binaries do not expose `setSolverTolerances`.
+
+The paper's *pressure anchor* is an optimization constraint on an ordinary
+zero-demand junction, not a STACI or EPANET fixed-head element. In nominal
+Anytown, two tank sites are anchors and the pump supplies demand. In nominal
+Balerma, R38 is an anchor while R43, R44 and R88 remain physical reservoirs.
+The corresponding failure replays restore the physical reservoirs and use
+pressure-driven demand. These model changes are made by the paper's scripts;
+the STACI hydraulic API itself applies the boundary types in the supplied INP.
