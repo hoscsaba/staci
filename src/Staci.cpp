@@ -3690,7 +3690,6 @@ double Staci::GetMinPressure(int &idx) {
 
 
 void Staci::Statistics() {
-  //@todo: if idx is uninitialized, we have an out of index error on Linux
   int idx=0;
   m_ss.str("");
   m_ss << endl << endl << "Statistics:";
@@ -3775,7 +3774,7 @@ void Staci::Avr_absmax_stddev(vector<double> x, double &a, double &m, double &s)
   s = pow(s / (n - 1), 0.5);
 }
 
-// WR Reading doubles from file, separeted with ','
+// Read comma-separated numeric values.
 vector<vector<double> > Staci::CSVRead(ifstream &file) {
   string temp, line;
   int k = 0;
@@ -3787,7 +3786,6 @@ vector<vector<double> > Staci::CSVRead(ifstream &file) {
           temp += *j;
         else {
           v.at(k).push_back(atof(temp.c_str()));
-          //v.at(k).push_back(stod(temp, 0)); // not working WHY? TODO
           k++;
           temp = "";
         }
