@@ -9,6 +9,12 @@ The project is written in C++17 and built with CMake. It supports GCC and Clang
 on Linux and macOS, and MSVC on Windows. The numerical solver uses UMFPACK from
 SuiteSparse.
 
+For the published water-distribution design study, see the
+[paper reproduction repository](https://github.com/hoscsaba/Entropy_water_quality_paper_2026)
+and this project's [MATLAB interface guide](matlab/README.md). The paper used
+STACI commit `74d3660`; select that revision when reproducing its exact
+numerical record. The current `master` branch contains subsequent maintenance.
+
 Compared with EPANET's water-distribution focus, STACI additionally provides:
 
 - native stationary open-channel elements with rectangular, circular and

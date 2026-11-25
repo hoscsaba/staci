@@ -91,7 +91,7 @@ runs, invalid input, timeouts and paths containing spaces. See
 
 ## Paper reproduction using this interface
 
-The [entropy and water-quality paper repository](https://github.com/hoscsaba/Entropy_water_quality_paper_2026) uses this resident MEX model for fixed-load pipe-sizing searches, stationary chlorine, ranking studies, and pipe-outage service. Its README maps the exact INPs, saved diameter vectors, figure scripts, and independent EPANET 2.2 checks. Build this checkout's MEX source for the TT Pareto outage audit; older binaries do not expose `setSolverTolerances`.
+The [entropy and water-quality paper repository](https://github.com/hoscsaba/Entropy_water_quality_paper_2026) uses this resident MEX model for fixed-load pipe-sizing searches, stationary chlorine, ranking studies, and pipe-outage service. Its README maps the exact INPs, saved diameter vectors, figure scripts, and independent EPANET 2.2 checks. For exact reproduction, check out STACI commit `74d3660` and build its MEX source; older binaries do not expose `setSolverTolerances`. Later revisions may differ from the version used for the paper.
 
 The paper's *pressure anchor* is an optimization constraint on an ordinary
 zero-demand junction, not a STACI or EPANET fixed-head element. In nominal
